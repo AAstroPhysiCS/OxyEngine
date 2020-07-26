@@ -1,0 +1,26 @@
+<component name="ProjectDictionaryState">
+  <dictionary name="okang">
+    <words>
+      <w>attrib</w>
+      <w>coords</w>
+      <w>dest</w>
+      <w>fovy</w>
+      <w>framebuffer</w>
+      <w>glfw</w>
+      <w>glsl</w>
+      <w>imgui</w>
+      <w>jcenter</w>
+      <w>lwjgl</w>
+      <w>macos</w>
+      <w>renderable</w>
+      <w>renderlist</w>
+      <w>shaders</w>
+      <w>stringified</w>
+      <w>texturecoords</w>
+      <w>xoffset</w>
+      <w>xpos</w>
+      <w>yoffset</w>
+      <w>ypos</w>
+    </words>
+  </dictionary>
+</component>

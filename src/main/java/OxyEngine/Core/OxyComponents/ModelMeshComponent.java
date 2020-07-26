@@ -1,0 +1,125 @@
+package OxyEngine.Core.OxyComponents;
+
+import OxyEngine.Core.Renderer.Buffer.*;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
+
+import static OxyEngine.Core.OxyComponents.ModelMeshComponent.BufferAttributes.*;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
+
+public class ModelMeshComponent extends MeshComponent {
+
+    private final float[] vertices, textureCoords, normals;
+    private final int[] indices;
+
+    private ModelMeshComponent(BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+        this.vertices = vertices;
+        this.indices = indices;
+        this.textureCoords = textureCoords;
+        this.normals = normals;
+        this.mode = mode;
+
+        vertexBuffer = new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
+                .setVerticesStrideSize(4)
+                .setUsage(usage)
+                .setAttribPointer(attributesVert, attributesTXSlots));
+
+        indexBuffer = new IndexBuffer();
+
+        textureBuffer = new TextureBuffer(() -> new BufferTemplate.BufferTemplateImpl()
+                .setAttribPointer(attributesTXCoords));
+
+        vertexBuffer.setVertices(vertices);
+        indexBuffer.setIndices(indices);
+        textureBuffer.setTextureCoords(textureCoords);
+    }
+
+    interface BufferAttributes {
+        BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0);
+        BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0);
+        BufferTemplate.Attributes attributesTXSlots = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOTS, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
+    }
+
+    interface ModelMeshBuilder {
+        ModelMeshBuilder setVertices(float[] vertices);
+
+        ModelMeshBuilder setIndices(int[] vertices);
+
+        ModelMeshBuilder setTextureCoords(float[] vertices);
+
+        ModelMeshBuilder setNormals(float[] normals);
+
+        ModelMeshBuilder setMode(int mode);
+
+        ModelMeshBuilder setUsage(BufferTemplate.Usage usage);
+
+        ModelMeshComponent create();
+    }
+
+    public static class ModelMeshBuilderImpl implements ModelMeshBuilder {
+
+        private float[] vertices, textureCoords, normals;
+        private int[] indices;
+        private int mode;
+        private BufferTemplate.Usage usage;
+
+        @Override
+        public ModelMeshBuilderImpl setVertices(float[] vertices) {
+            this.vertices = vertices;
+            return this;
+        }
+
+        @Override
+        public ModelMeshBuilderImpl setIndices(int[] indices) {
+            this.indices = indices;
+            return this;
+        }
+
+        @Override
+        public ModelMeshBuilderImpl setTextureCoords(float[] textureCoords) {
+            this.textureCoords = textureCoords;
+            return this;
+        }
+
+        @Override
+        public ModelMeshBuilderImpl setNormals(float[] normals) {
+            this.normals = normals;
+            return this;
+        }
+
+        @Override
+        public ModelMeshBuilderImpl setMode(int mode) {
+            this.mode = mode;
+            return this;
+        }
+
+        @Override
+        public ModelMeshBuilderImpl setUsage(BufferTemplate.Usage usage) {
+            this.usage = usage;
+            return this;
+        }
+
+        @Override
+        public ModelMeshComponent create() {
+            if (textureCoords == null || indices == null || vertices == null)
+                throw new NullPointerException("Data that is given is null.");
+
+            return new ModelMeshComponent(usage, mode, vertices, indices, textureCoords, normals);
+        }
+    }
+
+    public float[] getTextureCoords() {
+        return textureCoords;
+    }
+
+    public float[] getVertices() {
+        return vertices;
+    }
+
+    public float[] getNormals() {
+        return normals;
+    }
+
+    public int[] getIndices() {
+        return indices;
+    }
+}
