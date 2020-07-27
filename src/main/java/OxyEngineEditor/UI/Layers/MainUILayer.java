@@ -1,7 +1,7 @@
 package OxyEngineEditor.UI.Layers;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Window.WindowHandle;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Font.OxyFontSystem;
 import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
@@ -16,17 +16,17 @@ public class MainUILayer extends UILayer {
 
     private static final List<UILayer> ALL_UI_COMPONENTS_LINKED = new ArrayList<>();
 
-    public MainUILayer(WindowHandle windowHandle, OxyRenderer currentRenderer) {
-        super(windowHandle, currentRenderer);
+    public MainUILayer(WindowHandle windowHandle, Scene scene) {
+        super(windowHandle, scene);
     }
 
-    public void addUILayers(UILayer component){
+    public void addUILayers(UILayer component) {
         ALL_UI_COMPONENTS_LINKED.add(component);
     }
 
     @Override
     public void preload() {
-        for(UILayer component : ALL_UI_COMPONENTS_LINKED){
+        for (UILayer component : ALL_UI_COMPONENTS_LINKED) {
             component.preload();
         }
     }
@@ -49,7 +49,7 @@ public class MainUILayer extends UILayer {
         ImGui.popStyleColor();
         ImGui.dockSpace(1);
 
-        for(UILayer component : ALL_UI_COMPONENTS_LINKED){
+        for (UILayer component : ALL_UI_COMPONENTS_LINKED) {
             component.renderLayer();
         }
 

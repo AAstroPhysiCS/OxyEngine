@@ -8,6 +8,7 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Window.WindowHint;
 import OxyEngine.OpenGL.OpenGLContext;
 import OxyEngine.System.OxyDisposable;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.MainUILayer;
 import OxyEngineEditor.UI.Loader.UIThemeLoader;
 
@@ -41,8 +42,6 @@ public class OxyEngine implements OxyDisposable {
         if(type == OxyRendererType.Oxy3D)
             renderer = OxyRenderer3D.getInstance(windowHandle);
         //OxyRenderer2D is not a thing... but will be a thing (hopefully)
-
-        MAIN_UI_COMPONENT = new MainUILayer(windowHandle, renderer);
     }
 
     public enum Antialiasing {
@@ -80,6 +79,10 @@ public class OxyEngine implements OxyDisposable {
         });
         OpenGLContext.init(windowHandle);
         glfwSwapInterval(vSync ? 1 : 0);
+    }
+
+    public void initLayers(Scene scene){
+        MAIN_UI_COMPONENT = new MainUILayer(windowHandle, scene);
     }
 
     @Override

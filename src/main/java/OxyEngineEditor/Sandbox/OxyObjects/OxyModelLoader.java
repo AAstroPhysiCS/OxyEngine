@@ -1,7 +1,8 @@
-package OxyEngine.Core.OxyObjects.Model;
+package OxyEngineEditor.Sandbox.OxyObjects;
 
-import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.System.OxySystem;
+import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -19,13 +20,15 @@ public class OxyModelLoader {
     private static final List<Vector3f> normals = new ArrayList<>();
     private static final List<int[]> faces = new ArrayList<>();
 
-    private static OxyRenderer3D renderer;
-    private static OxyModel.ModelSpec spec;
+    private static ModelSpec spec;
 
-    public static OxyModel load(OxyRenderer3D renderer, OxyModel.ModelSpec spec) {
-        OxyModelLoader.renderer = renderer;
+    private static Scene scene;
+
+    public static OxyEntity load(Scene scene, ModelSpec spec) {
         OxyModelLoader.spec = spec;
-        OxyModel oxyModel = processData();
+        OxyModelLoader.scene = scene;
+
+        OxyEntity oxyModel = processData();
 
         textureCoords.clear();
         normals.clear();
@@ -33,11 +36,11 @@ public class OxyModelLoader {
         return oxyModel;
     }
 
-    private static OxyModel processData() {
+    private static OxyEntity processData() {
         return fillIn(OxySystem.FileSystem.load(spec.getObjName()));
     }
 
-    private static OxyModel fillIn(String content) {
+    private static OxyEntity fillIn(String content) {
         String[] splitted = content.split("\n");
         for (String s : splitted) {
             if (s.startsWith("v ")) getValues3f(s, vertices);
@@ -73,7 +76,7 @@ public class OxyModelLoader {
         }
     }
 
-    public static OxyModel constructData() {
+    public static OxyEntity constructData() {
 
         float[] verticesArr = new float[vertices.size() * 4];
         float[] normalsArr = new float[vertices.size() * 3];
@@ -119,6 +122,19 @@ public class OxyModelLoader {
             normalsArr[vertexPtr * 3 + 1] = normals3f.y;
             normalsArr[vertexPtr * 3 + 2] = normals3f.z;
         }
-        return new OxyModel(renderer, spec, vertices, verticesArr, toPrimitiveInteger(indicesArr), textureCoordsArr, normalsArr);
+
+        OxyEntity e = scene.createEntity(new ModelTemplate(vertices));
+        e.vertices = verticesArr;
+        e.indices = toPrimitiveInteger(indicesArr);
+        e.tcs = textureCoordsArr;
+        e.normals = normalsArr;
+
+        if (spec.getColor() == null) e.addComponent(spec.getTexture());
+        else {
+            spec.getColor().init();
+            e.addComponent(spec.getColor());
+        }
+        e.addComponent(new TransformComponent(spec.getPosition(), spec.getRotation(), spec.getScale()));
+        return e;
     }
 }

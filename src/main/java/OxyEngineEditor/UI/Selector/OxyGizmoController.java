@@ -3,8 +3,10 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.Events.OxyMouseListener;
-import OxyEngine.Core.OxyObjects.Model.OxyModel;
-import OxyEngine.Core.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.OxyObjects.ModelTemplate;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.OxyUISystem;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
@@ -16,21 +18,24 @@ import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
  */
 public class OxyGizmoController implements OxyMouseListener {
 
-    OxyModel hoveredGameObject = null;
+    OxyEntity hoveredGameObject = null;
     OxyColor standardColor = null;
     boolean init = false;
 
     Vector2d oldMousePos = new Vector2d();
-    final OxyModel xAxis;
-    final OxyModel yAxis;
-    final OxyModel zAxis;
+    final OxyEntity xAxis;
+    final OxyEntity yAxis;
+    final OxyEntity zAxis;
+
+    final Scene scene;
 
     private static OxyEntity currentEntitySelected;
 
-    OxyGizmoController(OxyModel xAxis, OxyModel yAxis, OxyModel zAxis) {
+    OxyGizmoController(Scene scene, OxyEntity xAxis, OxyEntity yAxis, OxyEntity zAxis) {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
         this.zAxis = zAxis;
+        this.scene = scene;
     }
 
     public static void setCurrentEntitySelected(OxyEntity currentEntitySelected) {
@@ -48,45 +53,50 @@ public class OxyGizmoController implements OxyMouseListener {
             Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
             Vector2d directionVector = nowMousePos.sub(oldMousePos);
 
+            TransformComponent xC = (TransformComponent) xAxis.get(TransformComponent.class);
+            TransformComponent yC = (TransformComponent) yAxis.get(TransformComponent.class);
+            TransformComponent zC = (TransformComponent) zAxis.get(TransformComponent.class);
+            TransformComponent currC = (TransformComponent) currentEntitySelected.get(TransformComponent.class);
+
             if (selectedEntity == xAxis) {
                 if (directionVector.x > 0) {
-                    xAxis.getPosition().add(0, 0, -0.15f);
-                    yAxis.getPosition().add(0, 0, -0.15f);
-                    zAxis.getPosition().add(0, 0, -0.15f);
-                    currentEntitySelected.getPosition().add(0, 0, -0.15f);
+                    xC.position.add(0, 0, -0.15f);
+                    yC.position.add(0, 0, -0.15f);
+                    zC.position.add(0, 0, -0.15f);
+                    currC.position.add(0, 0, -0.15f);
                 } else if (directionVector.x < 0) {
-                    xAxis.getPosition().add(0, 0, 0.15f);
-                    yAxis.getPosition().add(0, 0, 0.15f);
-                    zAxis.getPosition().add(0, 0, 0.15f);
-                    currentEntitySelected.getPosition().add(0, 0, 0.15f);
+                    xC.position.add(0, 0, 0.15f);
+                    yC.position.add(0, 0, 0.15f);
+                    zC.position.add(0, 0, 0.15f);
+                    currC.position.add(0, 0, 0.15f);
                 }
             } else if (selectedEntity == yAxis) {
                 if (directionVector.y > 0) {
-                    xAxis.getPosition().add(0, 0.15f, 0);
-                    yAxis.getPosition().add(0, 0.15f, 0);
-                    zAxis.getPosition().add(0, 0.15f, 0);
-                    currentEntitySelected.getPosition().add(0, 0.15f, 0);
+                    xC.position.add(0, 0.15f, 0);
+                    yC.position.add(0, 0.15f, 0);
+                    zC.position.add(0, 0.15f, 0);
+                    currC.position.add(0, 0.15f, 0);
                 } else if (directionVector.y < 0) {
-                    xAxis.getPosition().add(0, -0.15f, 0);
-                    yAxis.getPosition().add(0, -0.15f, 0);
-                    zAxis.getPosition().add(0, -0.15f, 0);
-                    currentEntitySelected.getPosition().add(0, -0.15f, 0);
+                    xC.position.add(0, -0.15f, 0);
+                    yC.position.add(0, -0.15f, 0);
+                    zC.position.add(0, -0.15f, 0);
+                    currC.position.add(0, -0.15f, 0);
                 }
             } else if (selectedEntity == zAxis) {
                 if (directionVector.x > 0) {
-                    xAxis.getPosition().add(0.15f, 0, 0);
-                    yAxis.getPosition().add(0.15f, 0, 0);
-                    zAxis.getPosition().add(0.15f, 0, 0);
-                    currentEntitySelected.getPosition().add(0.15f, 0, 0);
+                    xC.position.add(0.15f, 0, 0);
+                    yC.position.add(0.15f, 0, 0);
+                    zC.position.add(0.15f, 0, 0);
+                    currC.position.add(0.15f, 0, 0);
                 } else if (directionVector.x < 0) {
-                    xAxis.getPosition().add(-0.15f, 0, 0);
-                    yAxis.getPosition().add(-0.15f, 0, 0);
-                    zAxis.getPosition().add(-0.15f, 0, 0);
-                    currentEntitySelected.getPosition().add(-0.15f, 0, 0);
+                    xC.position.add(-0.15f, 0, 0);
+                    yC.position.add(-0.15f, 0, 0);
+                    zC.position.add(-0.15f, 0, 0);
+                    currC.position.add(-0.15f, 0, 0);
                 }
             }
             currentEntitySelected.updateData();
-            sandBoxMesh.obj.updateSingleEntityData(currentEntitySelected);
+            scene.updateSingleEntityData(currentEntitySelected, sandBoxMesh.obj);
             xAxis.updateData();
             yAxis.updateData();
             zAxis.updateData();
@@ -95,17 +105,19 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseHovered(OxyEntity hoveredEntity, OxyMouseEvent mouseEvent) {
-        if (hoveredEntity instanceof OxyModel g) {
+        if (hoveredEntity.getTemplate() instanceof ModelTemplate g) {
             if (!init) {
+                OxyColor color = (OxyColor) hoveredEntity.get(OxyColor.class);
                 try {
-                    standardColor = (OxyColor) g.getColor().clone();
+                    standardColor = (OxyColor) color.clone();
                 } catch (CloneNotSupportedException e) {
                     e.printStackTrace();
                 }
                 init = true;
             }
-            hoveredGameObject = g;
-            hoveredGameObject.getColor().setColorRGBA(new float[]{1.0f, 1.0f, 0.0f, 1.0f});
+            hoveredGameObject = hoveredEntity;
+            OxyColor hoveredColor = (OxyColor) hoveredGameObject.get(OxyColor.class);
+            hoveredColor.setColorRGBA(new float[]{1.0f, 1.0f, 0.0f, 1.0f});
         }
     }
 
@@ -116,7 +128,8 @@ public class OxyGizmoController implements OxyMouseListener {
     @Override
     public void mouseNoAction() {
         if (hoveredGameObject != null) {
-            hoveredGameObject.getColor().setColorRGBA(standardColor.getNumbers());
+            OxyColor hoveredColor = (OxyColor) hoveredGameObject.get(OxyColor.class);
+            hoveredColor.setColorRGBA(standardColor.getNumbers());
         }
     }
 }

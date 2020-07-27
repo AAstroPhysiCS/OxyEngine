@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngine.Core.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;

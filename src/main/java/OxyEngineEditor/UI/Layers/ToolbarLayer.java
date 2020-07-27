@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Layers;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.Sandbox3D;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -18,13 +19,13 @@ public class ToolbarLayer extends UILayer {
 
     private static ToolbarLayer INSTANCE = null;
 
-    public static ToolbarLayer getInstance(WindowHandle windowHandle, OxyRenderer renderer){
-        if(INSTANCE == null) INSTANCE = new ToolbarLayer(windowHandle, renderer);
+    public static ToolbarLayer getInstance(WindowHandle windowHandle, Scene scene){
+        if(INSTANCE == null) INSTANCE = new ToolbarLayer(windowHandle, scene);
         return INSTANCE;
     }
 
-    private ToolbarLayer(WindowHandle windowHandle, OxyRenderer currentRenderer) {
-        super(windowHandle, currentRenderer);
+    private ToolbarLayer(WindowHandle windowHandle, Scene scene) {
+        super(windowHandle, scene);
     }
 
     @Override

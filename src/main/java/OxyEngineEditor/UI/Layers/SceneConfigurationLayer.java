@@ -1,7 +1,7 @@
 package OxyEngineEditor.UI.Layers;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Window.WindowHandle;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
@@ -15,13 +15,13 @@ public class SceneConfigurationLayer extends UILayer {
 
     private static SceneConfigurationLayer INSTANCE = null;
 
-    public static SceneConfigurationLayer getInstance(WindowHandle windowHandle, OxyRenderer renderer){
-        if(INSTANCE == null) INSTANCE = new SceneConfigurationLayer(windowHandle, renderer);
+    public static SceneConfigurationLayer getInstance(WindowHandle windowHandle, Scene scene){
+        if(INSTANCE == null) INSTANCE = new SceneConfigurationLayer(windowHandle, scene);
         return INSTANCE;
     }
 
-    private SceneConfigurationLayer(WindowHandle windowHandle, OxyRenderer currentRenderer) {
-        super(windowHandle, currentRenderer);
+    private SceneConfigurationLayer(WindowHandle windowHandle, Scene scene) {
+        super(windowHandle, scene);
     }
 
     @Override

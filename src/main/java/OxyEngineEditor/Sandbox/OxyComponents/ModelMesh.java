@@ -1,17 +1,17 @@
-package OxyEngine.Core.OxyComponents;
+package OxyEngineEditor.Sandbox.OxyComponents;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 
-import static OxyEngine.Core.OxyComponents.ModelMeshComponent.BufferAttributes.*;
+import static OxyEngineEditor.Sandbox.OxyComponents.ModelMesh.BufferAttributes.*;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
-public class ModelMeshComponent extends MeshComponent {
+public class ModelMesh extends Mesh {
 
     private final float[] vertices, textureCoords, normals;
     private final int[] indices;
 
-    private ModelMeshComponent(BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+    private ModelMesh(BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
         this.vertices = vertices;
         this.indices = indices;
         this.textureCoords = textureCoords;
@@ -52,7 +52,7 @@ public class ModelMeshComponent extends MeshComponent {
 
         ModelMeshBuilder setUsage(BufferTemplate.Usage usage);
 
-        ModelMeshComponent create();
+        ModelMesh create();
     }
 
     public static class ModelMeshBuilderImpl implements ModelMeshBuilder {
@@ -99,11 +99,11 @@ public class ModelMeshComponent extends MeshComponent {
         }
 
         @Override
-        public ModelMeshComponent create() {
+        public ModelMesh create() {
             if (textureCoords == null || indices == null || vertices == null)
                 throw new NullPointerException("Data that is given is null.");
 
-            return new ModelMeshComponent(usage, mode, vertices, indices, textureCoords, normals);
+            return new ModelMesh(usage, mode, vertices, indices, textureCoords, normals);
         }
     }
 

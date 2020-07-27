@@ -1,12 +1,16 @@
 package OxyEngineEditor.UI.Layers;
 
 import OxyEngine.Core.Camera.PerspectiveCamera;
-import OxyEngine.Core.OxyObjects.Cube;
-import OxyEngine.Core.OxyObjects.WorldGrid;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
-import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Renderer.Texture.OxyTextureCoords;
 import OxyEngine.Core.Window.WindowHandle;
+import OxyEngine.System.OxySystem;
+import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.OxyObjects.CubeTemplate;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.OxyObjects.WorldGrid;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -30,14 +34,17 @@ public class SceneLayer extends UILayer {
 
     private static SceneLayer INSTANCE = null;
 
-    public static SceneLayer getInstance(WindowHandle windowHandle, OxyRenderer3D renderer){
-        if(INSTANCE == null) INSTANCE = new SceneLayer(windowHandle, renderer);
+    private final Scene scene;
+
+    public static SceneLayer getInstance(WindowHandle windowHandle, Scene scene) {
+        if (INSTANCE == null) INSTANCE = new SceneLayer(windowHandle, scene);
         return INSTANCE;
     }
 
-    private SceneLayer(WindowHandle windowHandle, OxyRenderer renderer) {
-        super(windowHandle, renderer);
-        worldGrid = new WorldGrid(renderer, 50);
+    private SceneLayer(WindowHandle windowHandle, Scene scene) {
+        super(windowHandle, scene);
+        this.scene = scene;
+        worldGrid = new WorldGrid(scene, 50);
     }
 
     @Override
@@ -45,13 +52,13 @@ public class SceneLayer extends UILayer {
     }
 
     static int counter = 1;
-    public static Cube cube;
+    public static OxyEntity cube;
 
     @Override
     public void renderLayer() {
-        currentRenderer.getShader().enable();
+        scene.getRenderer().getShader().enable();
         worldGrid.render();
-        currentRenderer.getShader().disable();
+        scene.getRenderer().getShader().disable();
 
         ImGui.setNextWindowSize(windowHandle.getWidth() / 1.3f, windowHandle.getHeight() / 1.3f, ImGuiCond.Once);
         ImGui.setNextWindowPos(40, 40, ImGuiCond.Once);
@@ -84,13 +91,14 @@ public class SceneLayer extends UILayer {
 
         if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {
             frameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
-            if (currentRenderer.getCamera() instanceof PerspectiveCamera p)
+            if (scene.getRenderer().getCamera() instanceof PerspectiveCamera p)
                 p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
         }
 
         if (ImGui.beginDragDropTarget()) {
             if (ImGui.acceptDragDropPayload("mousePosViewportLayer") != null) {
-                cube = new Cube(1, new Vector3f(-30, -10 * counter++, 0), new Vector3f(0, 0, 0));
+                cube = scene.createEntity(new CubeTemplate());
+                cube.addComponent(new OxyTexture(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE), new TransformComponent(new Vector3f(-30, -10 * counter++, 0), new Vector3f(0, 0, 0)));
                 cube.initData(sandBoxMesh.obj);
                 sandBoxMesh.obj.add(cube);
             }

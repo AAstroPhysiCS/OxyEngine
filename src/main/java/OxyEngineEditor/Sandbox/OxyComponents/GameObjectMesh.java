@@ -1,24 +1,23 @@
-package OxyEngine.Core.OxyComponents;
+package OxyEngineEditor.Sandbox.OxyComponents;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngine.Core.OxyObjects.GameObject;
-import OxyEngine.Core.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
-public class GameObjectMeshComponent extends MeshComponent {
+public class GameObjectMesh extends Mesh {
 
     public int indicesX, indicesY, indicesZ;
 
-    private final GameObject.Type type;
-    private final List<OxyEntity> oxyEntityList = new ArrayList<>();
+    private final GameObjectType type;
 
-    private GameObjectMeshComponent(int mode, GameObject.Type type, VertexBuffer vertexBuffer, IndexBuffer indexBuffer, FrameBuffer frameBuffer) {
+    private GameObjectMesh(int mode, GameObjectType type, VertexBuffer vertexBuffer, IndexBuffer indexBuffer, FrameBuffer frameBuffer) {
         this.mode = mode;
         this.indexBuffer = indexBuffer;
         this.vertexBuffer = vertexBuffer;
@@ -36,7 +35,7 @@ public class GameObjectMeshComponent extends MeshComponent {
 
         GameObjectMeshBuilder setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers);
 
-        GameObjectMeshBuilder setGameObjectType(GameObject.Type gameObjectType);
+        GameObjectMeshBuilder setGameObjectType(GameObjectType gameObjectType);
 
         GameObjectMeshBuilder runOnFrameBuffer(WindowHandle windowHandle);
 
@@ -44,12 +43,12 @@ public class GameObjectMeshComponent extends MeshComponent {
 
         GameObjectMeshBuilder setUsage(BufferTemplate.Usage usage);
 
-        GameObjectMeshComponent create();
+        GameObjectMesh create();
     }
 
     public static class GameObjectMeshBuilderImpl implements GameObjectMeshBuilder {
 
-        private GameObject.Type gameObjectType;
+        private GameObjectType gameObjectType;
         private static FrameBuffer frameBuffer;
         private BufferTemplate.Attributes[] verticesPointers;
         private int mode = -1;
@@ -62,7 +61,7 @@ public class GameObjectMeshComponent extends MeshComponent {
         }
 
         @Override
-        public GameObjectMeshBuilderImpl setGameObjectType(GameObject.Type gameObjectType) {
+        public GameObjectMeshBuilderImpl setGameObjectType(GameObjectType gameObjectType) {
             this.gameObjectType = gameObjectType;
             return this;
         }
@@ -88,11 +87,11 @@ public class GameObjectMeshComponent extends MeshComponent {
         }
 
         @Override
-        public GameObjectMeshComponent create() {
+        public GameObjectMesh create() {
             if (mode == -1 || gameObjectType == null || usage == null)
                 throw new IllegalArgumentException("Some arguments not defined!");
 
-            return new GameObjectMeshComponent(mode, gameObjectType,
+            return new GameObjectMesh(mode, gameObjectType,
                     new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                             .setVerticesStrideSize(6)
                             .setUsage(usage)
@@ -102,7 +101,6 @@ public class GameObjectMeshComponent extends MeshComponent {
     }
 
     public void add(OxyEntity oxyEntity) {
-        oxyEntityList.add(oxyEntity);
         vertexBuffer.addToBuffer(oxyEntity);
         indexBuffer.addToBuffer(oxyEntity);
 
@@ -110,9 +108,8 @@ public class GameObjectMeshComponent extends MeshComponent {
     }
 
     public void add(List<OxyEntity> list) {
-        oxyEntityList.addAll(list);
-        vertexBuffer.addToBuffer(GameObject.sumAllVertices(list, type));
-        indexBuffer.addToBuffer(GameObject.sumAllIndices(list, type));
+        vertexBuffer.addToBuffer(OxyEntity.sumAllVertices(list, type));
+        indexBuffer.addToBuffer(OxyEntity.sumAllIndices(list, type));
 
         load();
     }
@@ -124,20 +121,7 @@ public class GameObjectMeshComponent extends MeshComponent {
         load();
     }
 
-    public void updateSingleEntityData(OxyEntity entity) {
-        for (int i = 0; i < oxyEntityList.size(); i++) {
-            OxyEntity e = oxyEntityList.get(i);
-            if (e.equals(entity)) {
-                vertexBuffer.updateSingleEntityData(i * GameObject.Type.Cube.n_Vertices(), entity.getVertices());
-            }
-        }
-    }
-
-    public GameObject.Type getOxyObjectType() {
+    public GameObjectType getOxyObjectType() {
         return type;
-    }
-
-    public List<OxyEntity> getOxyEntityList() {
-        return oxyEntityList;
     }
 }

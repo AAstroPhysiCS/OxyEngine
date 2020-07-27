@@ -7,6 +7,8 @@ import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
 import OxyEngine.Events.OxyEventDispatcherThread;
 import OxyEngine.OxyEngine;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Font.FontLoader;
 import OxyEngineEditor.UI.Font.OxyFontSystem;
 import OxyEngineEditor.UI.Selector.OxySelectSystem;
@@ -21,7 +23,9 @@ import imgui.flag.ImGuiMouseCursor;
 import imgui.gl3.ImGuiImplGl3;
 
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 import static OxyEngine.System.OxySystem.gl_Version;
@@ -39,12 +43,12 @@ public class OxyUISystem {
 
     private final long[] mouseCursors = new long[ImGuiMouseCursor.COUNT];
 
-    public OxyUISystem(OxyRenderer3D renderer, WindowHandle windowHandle) {
+    public OxyUISystem(Scene scene, WindowHandle windowHandle) {
         this.windowHandle = windowHandle;
         imGuiRenderer = new ImGuiImplGl3();
         dispatcherThread = new OxyEventDispatcherThread();
         dispatcherThread.startThread();
-        selectSystem = OxySelectSystem.getInstance(renderer);
+        selectSystem = OxySelectSystem.getInstance(scene);
         init();
     }
 
@@ -121,8 +125,8 @@ public class OxyUISystem {
         glfwSetInputMode(windowHandle.getPointer(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
-    public void render(OxyCamera camera) {
-        selectSystem.start(sandBoxMesh.obj.getOxyEntityList(), camera);
+    public void render(Set<OxyEntity> entityList, OxyCamera camera) {
+        selectSystem.start(entityList, camera);
     }
 
     public void updateImGuiRenderer() {

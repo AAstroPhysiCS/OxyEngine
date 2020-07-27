@@ -5,7 +5,7 @@ import OxyEngine.System.OxyDisposable;
 
 import static org.lwjgl.opengl.GL45.*;
 
-public abstract class MeshComponent implements OxyDisposable {
+public abstract class Mesh implements OxyDisposable {
 
     protected IndexBuffer indexBuffer;
     protected VertexBuffer vertexBuffer;

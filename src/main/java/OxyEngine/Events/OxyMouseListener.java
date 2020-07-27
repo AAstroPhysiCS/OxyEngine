@@ -1,6 +1,6 @@
 package OxyEngine.Events;
 
-import OxyEngine.Core.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import OxyEngineEditor.UI.OxyUISystem;

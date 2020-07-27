@@ -1,6 +1,7 @@
 package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.System.OxyDisposable;
+import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import static org.lwjgl.opengl.GL45.*;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
-public class OxyTexture implements OxyDisposable {
+public class OxyTexture implements OxyDisposable, EntityComponent {
 
     public static final List<OxyTexture> allTextures = new ArrayList<>();
 

@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngine.Core.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 
 public abstract class Buffer implements OxyDisposable {

@@ -2,9 +2,9 @@ package OxyEngine.Core.Renderer;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.ScenePerspectiveCamera;
-import OxyEngine.Core.OxyComponents.GameObjectMeshComponent;
-import OxyEngine.Core.Renderer.Buffer.MeshComponent;
-import OxyEngine.Core.OxyComponents.ModelMeshComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Line.OxyInfoLine;
@@ -28,20 +28,20 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
         this.shader = shader;
     }
 
-    public abstract void render(MeshComponent meshComponent, OxyCamera camera);
+    public abstract void render(Mesh mesh, OxyCamera camera);
 
-    public abstract void render(MeshComponent meshComponent);
+    public abstract void render(Mesh mesh);
 
-    protected abstract void renderImpl(GameObjectMeshComponent mesh, OxyCamera camera);
+    protected abstract void renderImpl(GameObjectMesh mesh, OxyCamera camera);
 
-    protected abstract void renderImpl(ModelMeshComponent mesh, OxyCamera camera);
+    protected abstract void renderImpl(ModelMesh mesh, OxyCamera camera);
 
     /**
      * All global meshes should be here!
      */
     public interface MeshSystem {
-        Ref<GameObjectMeshComponent> sandBoxMesh = new Ref<>(null);
-        Ref<GameObjectMeshComponent> worldGridMesh = new Ref<>(null);
+        Ref<GameObjectMesh> sandBoxMesh = new Ref<>(null);
+        Ref<GameObjectMesh> worldGridMesh = new Ref<>(null);
     }
 
     public static record Stats() {

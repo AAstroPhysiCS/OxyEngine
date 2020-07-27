@@ -1,13 +1,14 @@
 package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import org.joml.Vector4f;
 
 import java.awt.*;
 
 import static OxyEngine.System.Globals.Globals.normalizeColor;
 
-public class OxyColor implements Cloneable {
+public class OxyColor implements Cloneable, EntityComponent {
 
     private final OxyShader shader;
     private float[] numbers;

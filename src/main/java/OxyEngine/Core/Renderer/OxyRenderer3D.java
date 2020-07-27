@@ -1,11 +1,11 @@
 package OxyEngine.Core.Renderer;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.OxyObjects.GameObject;
-import OxyEngine.Core.OxyComponents.GameObjectMeshComponent;
-import OxyEngine.Core.Renderer.Buffer.MeshComponent;
-import OxyEngine.Core.OxyComponents.ModelMeshComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngine.Core.Window.WindowHandle;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 
 import static OxyEngine.System.OxySystem.logger;
 
@@ -27,7 +27,7 @@ public class OxyRenderer3D extends OxyRenderer {
      * Draws automatically with the bounded texture.
      */
     @Override
-    public void render(MeshComponent meshComponent, OxyCamera camera) {
+    public void render(Mesh mesh, OxyCamera camera) {
         shader.enable();
         OxyRenderer.currentBoundedCamera = camera;
         shader.setCamera(camera);
@@ -35,35 +35,33 @@ public class OxyRenderer3D extends OxyRenderer {
             logger.severe("Shader is not instantiated.");
             throw new NullPointerException("Shader is not instantiated.");
         }
-        if(meshComponent instanceof GameObjectMeshComponent m)
+        if(mesh instanceof GameObjectMesh m)
             renderImpl(m, camera);
-        else if(meshComponent instanceof ModelMeshComponent m)
+        else if(mesh instanceof ModelMesh m)
             renderImpl(m, camera);
         shader.disable();
     }
 
     @Override
-    public void render(MeshComponent meshComponent) {
-        render(meshComponent, currentBoundedCamera);
+    public void render(Mesh mesh) {
+        render(mesh, currentBoundedCamera);
     }
 
     @Override
-    protected void renderImpl(GameObjectMeshComponent mesh, OxyCamera camera) {
-        if(mesh.getOxyEntityList() == null || mesh.getOxyObjectType() == null) {
+    protected void renderImpl(GameObjectMesh mesh, OxyCamera camera) {
+        if(mesh.getOxyObjectType() == null) {
             logger.severe("Object list or type not instantiated/defined.");
             throw new NullPointerException("Object list or type not instantiated/defined.");
         }
         if (mesh.empty()) {
-            mesh.getVertexBuffer().setVertices(GameObject.sumAllVertices(mesh.getOxyEntityList(), mesh.getOxyObjectType()));
-            mesh.getIndexBuffer().setIndices(GameObject.sumAllIndices(mesh.getOxyEntityList(), mesh.getOxyObjectType()));
             mesh.load();
         }
         mesh.render();
-        Stats.totalShapeCount = mesh.getOxyEntityList().size();
+//        Stats.totalShapeCount = mesh.getOxyEntityList().size();
     }
 
     @Override
-    protected void renderImpl(ModelMeshComponent mesh, OxyCamera camera) {
+    protected void renderImpl(ModelMesh mesh, OxyCamera camera) {
         if(mesh.empty())
             mesh.load();
         mesh.render();
