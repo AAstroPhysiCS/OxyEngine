@@ -3,7 +3,6 @@ package OxyEngineEditor.Sandbox.OxyObjects;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Matrix4f;
@@ -45,22 +44,19 @@ public class ModelTemplate implements ObjectTemplate {
         OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
-        Matrix4f transform;
-        if (c.transform == null) {
-            transform = new Matrix4f()
-                    .scale(c.scale)
-                    .translate(c.position)
-                    .rotateX(c.rotation.x)
-                    .rotateY(c.rotation.y)
-                    .rotateZ(c.rotation.z);
-        } else transform = c.transform;
+        c.transform = new Matrix4f()
+                .scale(c.scale)
+                .translate(c.position)
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z);
 
         int vertPtr = 0;
         int slot = 0;
         if (texture != null) slot = texture.getTextureSlot();
         for (int i = 0; i < allNonTransformVertices.size() / 3; i++) {
             Vector3f v = allNonTransformVertices.get(i);
-            Vector4f transformed = new Vector4f(v, 1.0f).mul(transform);
+            Vector4f transformed = new Vector4f(v, 1.0f).mul(c.transform);
             e.vertices[vertPtr++] = transformed.x;
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;

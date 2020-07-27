@@ -39,7 +39,6 @@ public final class IndexBuffer extends Buffer {
         System.arraycopy(indices, 0, newObjInd, 0, indices.length);
         System.arraycopy(m_indices, 0, newObjInd, indices.length, m_indices.length);
         this.indices = newObjInd;
-        newObjInd = null;
     }
 
     public int length() {

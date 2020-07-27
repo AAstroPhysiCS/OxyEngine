@@ -35,20 +35,17 @@ public record GridTemplate(OxyShader shader) implements ObjectTemplate {
 
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
-        Matrix4f transform;
-        if (c.transform == null) {
-            transform = new Matrix4f()
-                    .scale(c.scale)
-                    .translate(c.position)
-                    .rotateX(c.rotation.x)
-                    .rotateY(c.rotation.y)
-                    .rotateZ(c.rotation.z);
-        } else transform = c.transform;
+        c.transform = new Matrix4f()
+                .scale(c.scale)
+                .translate(c.position)
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z);
 
         Vector4f[] vec4Vertices = new Vector4f[4];
         int vecPtr = 0;
         for (int i = 0; i < vec4Vertices.length; i++) {
-            vec4Vertices[i] = new Vector4f(vertexPos[vecPtr++], vertexPos[vecPtr++], vertexPos[vecPtr++], 1.0f).mul(transform);
+            vec4Vertices[i] = new Vector4f(vertexPos[vecPtr++], vertexPos[vecPtr++], vertexPos[vecPtr++], 1.0f).mul(c.transform);
         }
 
         e.vertices = new float[GameObjectType.Grid.n_Vertices()];

@@ -54,20 +54,17 @@ public record CubeTemplate() implements ObjectTemplate {
         OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
-        Matrix4f transform;
-        if (c.transform == null) {
-            transform = new Matrix4f()
-                    .scale(c.scale)
-                    .translate(c.position)
-                    .rotateX(c.rotation.x)
-                    .rotateY(c.rotation.y)
-                    .rotateZ(c.rotation.z);
-        } else transform = c.transform;
+        c.transform = new Matrix4f()
+                .scale(c.scale)
+                .translate(c.position)
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z);
 
         Vector4f[] vec4Vertices = new Vector4f[24];
         int vecPtr = 0;
         for (int i = 0; i < vec4Vertices.length; i++) {
-            vec4Vertices[i] = new Vector4f(cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], 1.0f).mul(transform);
+            vec4Vertices[i] = new Vector4f(cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], 1.0f).mul(c.transform);
         }
         int slot = 0; // 0 => color
         float[] tcs = null;
@@ -94,7 +91,7 @@ public record CubeTemplate() implements ObjectTemplate {
 
     @Override
     public void initData(OxyEntity e, Mesh m) {
-        if(m instanceof GameObjectMesh mesh) {
+        if (m instanceof GameObjectMesh mesh) {
             e.indices = new int[]{
                     mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,
                     3 + mesh.indicesX, mesh.indicesY, 2 + mesh.indicesZ,

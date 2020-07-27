@@ -1,6 +1,5 @@
 package OxyEngineEditor.UI.Layers;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.Sandbox3D;
 import OxyEngineEditor.Sandbox.Scene.Scene;

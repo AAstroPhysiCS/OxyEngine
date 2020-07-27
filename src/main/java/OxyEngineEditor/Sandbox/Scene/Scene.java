@@ -2,6 +2,7 @@ package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
@@ -31,13 +32,26 @@ public class Scene {
         return e;
     }
 
-    public void updateSingleEntityData(OxyEntity entity, Mesh mesh) {
+    public final OxyEntity getEntityByIndex(int index){
         int i = 0;
-        for (OxyEntity e : registry.componentList.keySet()) {
-            if (e.equals(entity)) {
-                mesh.getVertexBuffer().updateSingleEntityData(i * GameObjectType.Cube.n_Vertices(), entity.getVertices());
+        for(OxyEntity e : registry.componentList.keySet()){
+            if(i == index){
+                return e;
             }
             i++;
+        }
+        return null;
+    }
+
+    public void updateSingleEntityData(OxyEntity e, Mesh mesh){
+        if(mesh instanceof GameObjectMesh g) {
+            int i = 0;
+            for (OxyEntity entity : registry.componentList.keySet()) {
+                if (entity.equals(e)) {
+                    g.getVertexBuffer().updateSingleEntityData(i * g.getOxyObjectType().n_Vertices(), e.getVertices());
+                }
+                i++;
+            }
         }
     }
 
@@ -72,6 +86,7 @@ public class Scene {
     /*
      * gets all the entities associated with multiple classes
      */
+    @SafeVarargs
     public final Set<OxyEntity> group(Class<? extends EntityComponent>... destClasses) {
         return registry.group(destClasses);
     }

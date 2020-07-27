@@ -6,12 +6,15 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
 import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class GameObjectMesh extends Mesh {
+
+    public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
+    public static final BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
+    public static final BufferTemplate.Attributes attributesTXSlots = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOTS, 1, GL_FLOAT, false, 6 * Float.BYTES, 5 * Float.BYTES);
 
     public int indicesX, indicesY, indicesZ;
 
@@ -23,12 +26,6 @@ public class GameObjectMesh extends Mesh {
         this.vertexBuffer = vertexBuffer;
         this.frameBuffer = frameBuffer;
         this.type = type;
-    }
-
-    public interface BufferAttributes {
-        BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
-        BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-        BufferTemplate.Attributes attributesTXSlots = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOTS, 1, GL_FLOAT, false, 6 * Float.BYTES, 5 * Float.BYTES);
     }
 
     interface GameObjectMeshBuilder {

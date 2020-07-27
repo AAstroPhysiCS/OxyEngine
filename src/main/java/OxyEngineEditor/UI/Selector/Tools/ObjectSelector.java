@@ -8,7 +8,6 @@ import org.joml.Intersectionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.util.List;
 import java.util.Set;
 
 public interface ObjectSelector {

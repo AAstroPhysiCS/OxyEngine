@@ -23,14 +23,16 @@ public class OxyEntity {
         this.template = template;
     }
 
-    public void initData(Mesh mesh){
+    public void initData(Mesh mesh) {
         template.constructData(this);
-        if(mesh instanceof GameObjectMesh m)
+        if (mesh instanceof GameObjectMesh m)
             template.initData(this, m);
     }
 
-    public void updateData(){
-        if(template instanceof ModelTemplate m)
+    public void updateData() {
+        if (template instanceof GameObjectMesh)
+            template.constructData(this);
+        if (template instanceof ModelTemplate m)
             m.updateData(this);
     }
 
@@ -102,10 +104,6 @@ public class OxyEntity {
 
     public float[] getVertices() {
         return vertices;
-    }
-
-    public void setVertices(float[] vertices) {
-        this.vertices = vertices;
     }
 
     public int[] getIndices() {

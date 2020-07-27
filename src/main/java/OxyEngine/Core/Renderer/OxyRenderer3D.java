@@ -5,7 +5,6 @@ import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 
 import static OxyEngine.System.OxySystem.logger;
 

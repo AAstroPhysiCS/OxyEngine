@@ -1,7 +1,6 @@
 package OxyEngineEditor.UI;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
@@ -23,11 +22,9 @@ import imgui.flag.ImGuiMouseCursor;
 import imgui.gl3.ImGuiImplGl3;
 
 import java.io.File;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 import static OxyEngine.System.OxySystem.gl_Version;
 import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.*;
 import static org.lwjgl.glfw.GLFW.*;

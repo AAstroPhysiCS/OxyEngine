@@ -1,9 +1,9 @@
 package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
-import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import OxyEngineEditor.UI.OxyUISystem;
@@ -13,7 +13,6 @@ import imgui.ImVec2;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import java.util.List;
 import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_3;
@@ -55,8 +54,8 @@ public class OxySelectSystem {
                 OxyEntity zModel = axis.getZModel();
 
                 TransformComponent xC = (TransformComponent) xModel.get(TransformComponent.class);
-                TransformComponent yC = (TransformComponent) xModel.get(TransformComponent.class);
-                TransformComponent zC = (TransformComponent) xModel.get(TransformComponent.class);
+                TransformComponent yC = (TransformComponent) yModel.get(TransformComponent.class);
+                TransformComponent zC = (TransformComponent) zModel.get(TransformComponent.class);
 
                 xC.position.set(new Vector3f(ePos).add(0, 0, -3));
                 yC.position.set(new Vector3f(ePos).add(0, -3, 0));
@@ -75,7 +74,7 @@ public class OxySelectSystem {
         axis.render(camera);
     }
 
-    public void moveController(OxyEntity e){
+    public void moveController(OxyEntity e) {
         OxyGizmoController.setCurrentEntitySelected(e);
     }
 }

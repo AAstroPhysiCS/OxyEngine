@@ -11,7 +11,7 @@ import java.util.List;
 
 import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.worldGridMesh;
-import static OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh.BufferAttributes.*;
+import static OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh.*;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
 public class WorldGrid {
@@ -38,6 +38,7 @@ public class WorldGrid {
                 OxyEntity e = scene.createEntity(new GridTemplate(scene.getRenderer().getShader()));
                 e.addComponent(new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
                 e.initData(worldGridMesh.obj);
+                worldGrids.add(e);
             }
         }
     }

@@ -130,10 +130,7 @@ public class OxyModelLoader {
         e.normals = normalsArr;
 
         if (spec.getColor() == null) e.addComponent(spec.getTexture());
-        else {
-            spec.getColor().init();
-            e.addComponent(spec.getColor());
-        }
+        else e.addComponent(spec.getColor());
         e.addComponent(new TransformComponent(spec.getPosition(), spec.getRotation(), spec.getScale()));
         return e;
     }

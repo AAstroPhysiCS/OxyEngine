@@ -29,7 +29,7 @@ import java.util.List;
 
 import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 import static OxyEngine.System.OxySystem.logger;
-import static OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh.BufferAttributes.*;
+import static OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh.*;
 import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.dispatcherThread;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
@@ -39,7 +39,6 @@ public class Sandbox3D {
 
     private final WindowHandle windowHandle;
 
-    private OxyRenderer3D oxyRenderer;
     private OxyShader oxyShader;
     private OxyUISystem oxyUISystem;
     private final OxyEngine oxyEngine;
@@ -78,15 +77,18 @@ public class Sandbox3D {
                 .runOnFrameBuffer(windowHandle) //optional (single use)
                 .create();
 
-        oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
+        OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
         oxyRenderer.setShader(oxyShader);
 
         scene = new Scene(oxyRenderer);
         oxyEngine.initLayers(scene);
 
-        final List<OxyEntity> fuck = new ArrayList<>();
-
+        final List<OxyEntity> fuck = new ArrayList<>(8000);
         OxyTexture texture = new OxyTexture(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
+
+        //TODO: CUBE TAKES TOO MUCH VERTICES... ABOUT 144... REDUCE IT TO SOMETHING => TEXTURE..., COLOR..., BUT NOT BOTH AT THE SAME TIME!!!!!, PROBABLY THAT'S THE CAUSE OF BOTTLENECK
+        //TODO: PROBABLY USE A TEXTURE BUFFER INSTEAD OF SHOVING ALL OF THEM IN TO THE VERTEXBUFFER
+
         for (int x = -10; x < 10; x++) {
             for (int y = -10; y < 10; y++) {
                 for (int z = -10; z < 10; z++) {
@@ -115,14 +117,24 @@ public class Sandbox3D {
         oxyShader.disable();
 
         oxyUISystem = new OxyUISystem(scene, windowHandle);
+
+        testEntity = scene.getEntityByIndex(0);
+        c = (TransformComponent) testEntity.get(TransformComponent.class);
     }
 
     private void update(float deltaTime) {
         oxyUISystem.updateImGuiContext(deltaTime);
     }
 
+    static OxyEntity testEntity;
+    static TransformComponent c;
+
     private void render() {
         OxyTexture.bindAllTextureSlots();
+
+        c.position.add(0.01f, 0f, 0f);
+        testEntity.updateData();
+        scene.updateSingleEntityData(testEntity, sandBoxMesh.obj);
 
         sandBoxMesh.obj.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();

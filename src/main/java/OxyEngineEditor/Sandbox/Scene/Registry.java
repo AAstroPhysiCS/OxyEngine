@@ -1,9 +1,12 @@
 package OxyEngineEditor.Sandbox.Scene;
 
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 /*
  * Entity Component System (ECS)
@@ -71,6 +74,7 @@ public class Registry {
     /*
      * gets all the entities associated with multiple classes
      */
+    @SafeVarargs
     public final Set<OxyEntity> group(Class<? extends EntityComponent>... destClasses) {
         Set<OxyEntity> list = new HashSet<>();
         for (var entrySet : componentList.entrySet()) {
