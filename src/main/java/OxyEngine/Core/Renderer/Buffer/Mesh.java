@@ -2,6 +2,9 @@ package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.System.OxyDisposable;
+import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import static org.lwjgl.opengl.GL45.*;
 
@@ -66,6 +69,18 @@ public abstract class Mesh implements OxyDisposable {
         bind();
         draw();
         unbind();
+    }
+
+    public void updateSingleEntityData(Scene scene, OxyEntity e) {
+        if (this instanceof GameObjectMesh g) {
+            int i = 0;
+            for (OxyEntity entity : scene.getEntities()) {
+                if (entity.equals(e)) {
+                    g.getVertexBuffer().updateSingleEntityData(i * g.getOxyObjectType().n_Vertices(), e.getVertices());
+                }
+                i++;
+            }
+        }
     }
 
     @Override

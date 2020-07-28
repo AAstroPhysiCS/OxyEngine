@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Selector.Tools;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
 import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 import org.joml.Intersectionf;
 import org.joml.Vector2f;
@@ -18,12 +19,20 @@ public interface ObjectSelector {
     Vector3f getObjectPosRelativeToCamera(float width, float height, Vector2f mousePos, OxyCamera camera);
 
     //It's better to not summarize this method with the other ones...
-    default OxyEntity selectObject(Set<OxyEntity> entities, Vector3f center, Vector3f direction) {
+    default OxyEntity selectObject(Set<OxyEntity> entities, Vector3f center, Vector3f direction, GameObjectType... typesToSelect) {
         reset();
         OxyEntity selectedEntity = null;
         float closestDistance = Float.POSITIVE_INFINITY;
 
+        label:
         for (OxyEntity entity : entities) {
+
+            for(GameObjectType type : typesToSelect){
+                if(!entity.getTemplate().type.equals(type)){
+                    continue label;
+                }
+            }
+
             TransformComponent c = (TransformComponent) entity.get(TransformComponent.class);
             SelectedComponent selected = (SelectedComponent) entity.get(SelectedComponent.class);
             selected.selected = false;

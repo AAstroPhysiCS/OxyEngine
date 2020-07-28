@@ -1,6 +1,8 @@
 package OxyEngineEditor.Sandbox.OxyObjects;
 
+import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.System.OxySystem;
+import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import org.joml.Matrix4f;
@@ -12,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class OxyModelLoader {
 
@@ -29,6 +32,7 @@ public class OxyModelLoader {
         OxyModelLoader.scene = scene;
 
         OxyEntity oxyModel = processData();
+        oxyModel.initData(null);
 
         textureCoords.clear();
         normals.clear();

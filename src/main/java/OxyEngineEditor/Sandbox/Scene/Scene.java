@@ -2,14 +2,12 @@ package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
-import OxyEngineEditor.Sandbox.OxyObjects.ObjectTemplate;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.OxyObjects.ObjectTemplate;
+import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -24,7 +22,7 @@ public class Scene {
         this.renderer = renderer;
     }
 
-    public final OxyEntity createEntity(ObjectTemplate template){
+    public final OxyEntity createEntity(ObjectTemplate template) {
         OxyEntity e = new OxyEntity(this, template);
         registry.componentList.put(e, new LinkedHashSet<>(10));
         e.addComponent(new TransformComponent());
@@ -32,27 +30,15 @@ public class Scene {
         return e;
     }
 
-    public final OxyEntity getEntityByIndex(int index){
+    public final OxyEntity getEntityByIndex(int index) {
         int i = 0;
-        for(OxyEntity e : registry.componentList.keySet()){
-            if(i == index){
+        for (OxyEntity e : registry.componentList.keySet()) {
+            if (i == index) {
                 return e;
             }
             i++;
         }
         return null;
-    }
-
-    public void updateSingleEntityData(OxyEntity e, Mesh mesh){
-        if(mesh instanceof GameObjectMesh g) {
-            int i = 0;
-            for (OxyEntity entity : registry.componentList.keySet()) {
-                if (entity.equals(e)) {
-                    g.getVertexBuffer().updateSingleEntityData(i * g.getOxyObjectType().n_Vertices(), e.getVertices());
-                }
-                i++;
-            }
-        }
     }
 
     /*
@@ -103,7 +89,7 @@ public class Scene {
         return renderer;
     }
 
-    public Set<OxyEntity> getEntities(){
+    public Set<OxyEntity> getEntities() {
         return registry.componentList.keySet();
     }
 }

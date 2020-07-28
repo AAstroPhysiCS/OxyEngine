@@ -117,24 +117,18 @@ public class Sandbox3D {
         oxyShader.disable();
 
         oxyUISystem = new OxyUISystem(scene, windowHandle);
-
-        testEntity = scene.getEntityByIndex(0);
-        c = (TransformComponent) testEntity.get(TransformComponent.class);
     }
 
     private void update(float deltaTime) {
         oxyUISystem.updateImGuiContext(deltaTime);
     }
 
-    static OxyEntity testEntity;
-    static TransformComponent c;
-
     private void render() {
         OxyTexture.bindAllTextureSlots();
 
-        c.position.add(0.01f, 0f, 0f);
+        /*c.position.add(0.01f, 0f, 0f);
         testEntity.updateData();
-        scene.updateSingleEntityData(testEntity, sandBoxMesh.obj);
+        sandBoxMesh.obj.updateSingleEntityData(scene, testEntity);*/
 
         sandBoxMesh.obj.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();

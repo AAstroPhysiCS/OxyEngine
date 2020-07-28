@@ -3,7 +3,8 @@ package OxyEngineEditor.Sandbox.OxyObjects;
 public enum GameObjectType {
     //TCS: 48
     Cube(144, 36),
-    Grid(24, 6);
+    Grid(24, 6),
+    Model(0, 0);
 
     private final int n_Vertices;
     private final int n_Indices;

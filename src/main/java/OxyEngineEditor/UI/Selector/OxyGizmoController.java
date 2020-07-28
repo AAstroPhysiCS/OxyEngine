@@ -96,7 +96,7 @@ public class OxyGizmoController implements OxyMouseListener {
                 }
             }
             currentEntitySelected.updateData();
-            scene.updateSingleEntityData(currentEntitySelected, sandBoxMesh.obj);
+            sandBoxMesh.obj.updateSingleEntityData(scene, currentEntitySelected);
             xAxis.updateData();
             yAxis.updateData();
             zAxis.updateData();

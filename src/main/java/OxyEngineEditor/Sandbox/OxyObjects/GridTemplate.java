@@ -10,7 +10,7 @@ import org.joml.Vector4f;
 
 import static OxyEngine.System.OxySystem.logger;
 
-public record GridTemplate(OxyShader shader) implements ObjectTemplate {
+public class GridTemplate extends ObjectTemplate {
 
     private static OxyColor color;
 
@@ -21,7 +21,8 @@ public record GridTemplate(OxyShader shader) implements ObjectTemplate {
             0.5f, 0.5f, -0.5f,
     };
 
-    public GridTemplate {
+    public GridTemplate(OxyShader shader) {
+        type = GameObjectType.Grid;
         color = new OxyColor(1.0f, 1.0f, 1.0f, 0.2f, shader);
         color.init();
     }

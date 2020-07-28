@@ -9,7 +9,6 @@ import OxyEngineEditor.Sandbox.OxyObjects.ModelTemplate;
 import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 import OxyEngineEditor.Sandbox.OxyObjects.OxyModelLoader;
 import OxyEngineEditor.Sandbox.Scene.Scene;
-import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -42,10 +41,6 @@ public class OxyGizmo3D {
         yC.rotation.set(-90, -180, 0);
         zC.rotation.set(0, -90, 0);
 
-        xModel.initData(((ModelTemplate)xModel.getTemplate()).getMesh());
-        yModel.initData(((ModelTemplate)yModel.getTemplate()).getMesh());
-        zModel.initData(((ModelTemplate)zModel.getTemplate()).getMesh());
-
         xModel.addEventListener(new OxyGizmoController(scene, xModel, yModel, zModel));
         yModel.addEventListener(new OxyGizmoController(scene, xModel, yModel, zModel));
         zModel.addEventListener(new OxyGizmoController(scene, xModel, yModel, zModel));
@@ -55,13 +50,13 @@ public class OxyGizmo3D {
         glEnable(GL_CULL_FACE);
         OxyColor cX = (OxyColor) xModel.get(OxyColor.class);
         cX.init();
-        scene.render(((ModelTemplate)xModel.getTemplate()).getMesh(), camera);
+        scene.render(((ModelTemplate) xModel.getTemplate()).getMesh(), camera);
         OxyColor cY = (OxyColor) yModel.get(OxyColor.class);
         cY.init();
-        scene.render(((ModelTemplate)yModel.getTemplate()).getMesh(), camera);
+        scene.render(((ModelTemplate) yModel.getTemplate()).getMesh(), camera);
         OxyColor cZ = (OxyColor) zModel.get(OxyColor.class);
         cZ.init();
-        scene.render(((ModelTemplate)zModel.getTemplate()).getMesh(), camera);
+        scene.render(((ModelTemplate) zModel.getTemplate()).getMesh(), camera);
         glDisable(GL_CULL_FACE);
     }
 

@@ -9,7 +9,7 @@ import org.joml.Vector4f;
 
 import static OxyEngine.System.OxySystem.logger;
 
-public record CubeTemplate() implements ObjectTemplate {
+public class CubeTemplate extends ObjectTemplate {
 
     private static final float[] cubeVertexPos = new float[]{
             -0.5f, -0.5f, 0.5f,
@@ -48,6 +48,9 @@ public record CubeTemplate() implements ObjectTemplate {
             0.5f, 0.5f, -0.5f
     };
 
+    public CubeTemplate(){
+        type = GameObjectType.Cube;
+    }
 
     @Override
     public void constructData(OxyEntity e) {

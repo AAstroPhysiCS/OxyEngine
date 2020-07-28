@@ -13,12 +13,14 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
-public class ModelTemplate implements ObjectTemplate {
+public class ModelTemplate extends ObjectTemplate {
 
     private ModelMesh mesh;
     private final List<Vector3f> allNonTransformVertices;
 
+
     public ModelTemplate(List<Vector3f> allNonTransformVertices) {
+        type = GameObjectType.Model;
         this.allNonTransformVertices = allNonTransformVertices;
     }
 

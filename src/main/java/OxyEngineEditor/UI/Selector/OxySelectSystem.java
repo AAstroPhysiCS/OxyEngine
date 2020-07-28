@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
 import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.SceneLayer;
@@ -44,10 +45,10 @@ public class OxySelectSystem {
             ImVec2 mousePos = new ImVec2();
             ImGui.getMousePos(mousePos);
             direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), renderer.getCamera());
-            OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
+            OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction, GameObjectType.Cube);
+
             if (e != null) {
                 TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
-                Vector3f ePos = new Vector3f(c.position);
 
                 OxyEntity xModel = axis.getXModel();
                 OxyEntity yModel = axis.getYModel();
@@ -57,13 +58,13 @@ public class OxySelectSystem {
                 TransformComponent yC = (TransformComponent) yModel.get(TransformComponent.class);
                 TransformComponent zC = (TransformComponent) zModel.get(TransformComponent.class);
 
-                xC.position.set(new Vector3f(ePos).add(0, 0, -3));
-                yC.position.set(new Vector3f(ePos).add(0, -3, 0));
-                zC.position.set(new Vector3f(ePos).add(-3, 0, 0));
+                xC.position.set(new Vector3f(c.position).add(0, 0, -3));
+                yC.position.set(new Vector3f(c.position).add(0, -3, 0));
+                zC.position.set(new Vector3f(c.position).add(-3, 0, 0));
 
-                xC.rotation.set(180, 0, 0);
-                yC.rotation.set(-90, -180, 0);
-                zC.rotation.set(0, -90, 0);
+                xC.rotation.set(Math.toRadians(180), 0, 0);
+                yC.rotation.set(Math.toRadians(-90), Math.toRadians(-180), 0);
+                zC.rotation.set(0, Math.toRadians(-90), 0);
 
                 xModel.updateData();
                 yModel.updateData();

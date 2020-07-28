@@ -2,9 +2,11 @@ package OxyEngineEditor.Sandbox.OxyObjects;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 
-public interface ObjectTemplate {
+public abstract class ObjectTemplate {
 
-    void constructData(OxyEntity e);
+    public GameObjectType type;
 
-    void initData(OxyEntity e, Mesh mesh);
+    public abstract void constructData(OxyEntity e);
+
+    public abstract void initData(OxyEntity e, Mesh mesh);
 }

@@ -30,8 +30,9 @@ public class OxyEntity {
     }
 
     public void updateData() {
-        if (template instanceof GameObjectMesh)
+        if (template instanceof CubeTemplate || template instanceof GridTemplate){
             template.constructData(this);
+        }
         if (template instanceof ModelTemplate m)
             m.updateData(this);
     }
