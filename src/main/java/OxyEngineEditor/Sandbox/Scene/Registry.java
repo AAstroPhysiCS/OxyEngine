@@ -1,7 +1,6 @@
 package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -34,9 +33,10 @@ public class Registry {
     public boolean has(OxyEntity entity, Class<? extends EntityComponent> destClass) {
         Set<EntityComponent> set = componentList.get(entity);
         for (EntityComponent c : set) {
-            if (c.getClass() == destClass) {
+            if (destClass.equals(c.getClass()))
                 return true;
-            }
+            if(destClass.isInstance(c))
+                return true;
         }
         return false;
     }
@@ -48,6 +48,9 @@ public class Registry {
         Set<EntityComponent> set = componentList.get(entity);
         for (EntityComponent c : set) {
             if (c.getClass() == destClass) {
+                return c;
+            }
+            if(destClass.isInstance(c)){
                 return c;
             }
         }

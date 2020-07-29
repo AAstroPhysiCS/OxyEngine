@@ -32,16 +32,13 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
 
     public abstract void render(Mesh mesh);
 
-    protected abstract void renderImpl(GameObjectMesh mesh, OxyCamera camera);
-
-    protected abstract void renderImpl(ModelMesh mesh, OxyCamera camera);
-
     /**
      * All global meshes should be here!
      */
     public interface MeshSystem {
         Ref<GameObjectMesh> sandBoxMesh = new Ref<>(null);
         Ref<GameObjectMesh> worldGridMesh = new Ref<>(null);
+        Ref<ModelMesh> modelMesh = new Ref<>(null);
     }
 
     public static record Stats() {

@@ -3,8 +3,7 @@ package OxyEngineEditor.UI.Selector.Tools;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import org.joml.Intersectionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -19,19 +18,15 @@ public interface ObjectSelector {
     Vector3f getObjectPosRelativeToCamera(float width, float height, Vector2f mousePos, OxyCamera camera);
 
     //It's better to not summarize this method with the other ones...
-    default OxyEntity selectObject(Set<OxyEntity> entities, Vector3f center, Vector3f direction, GameObjectType... typesToSelect) {
+    default OxyEntity selectObject(Set<OxyEntity> entities, Vector3f center, Vector3f direction) {
         reset();
         OxyEntity selectedEntity = null;
         float closestDistance = Float.POSITIVE_INFINITY;
 
-        label:
+
         for (OxyEntity entity : entities) {
 
-            for(GameObjectType type : typesToSelect){
-                if(!entity.getTemplate().type.equals(type)){
-                    continue label;
-                }
-            }
+            if (!entity.has(SelectedComponent.class)) continue;
 
             TransformComponent c = (TransformComponent) entity.get(TransformComponent.class);
             SelectedComponent selected = (SelectedComponent) entity.get(SelectedComponent.class);
@@ -51,7 +46,8 @@ public interface ObjectSelector {
 
     default OxyEntity selectObject(OxyEntity entity, Vector3f center, Vector3f direction) {
         reset();
-        if (center == null || direction == null) return null;
+        if (center == null || direction == null || !entity.has(SelectedComponent.class)) return null;
+
         OxyEntity selectedEntity = null;
         TransformComponent c = (TransformComponent) entity.get(TransformComponent.class);
         SelectedComponent selected = (SelectedComponent) entity.get(SelectedComponent.class);

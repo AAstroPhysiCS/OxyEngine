@@ -5,8 +5,9 @@ import org.joml.Vector3f;
 
 public class TransformComponent implements EntityComponent {
 
-    public Vector3f position, rotation;
-    public float scale;
+    public final Vector3f position;
+    public final Vector3f rotation;
+    public final float scale;
 
     public Matrix4f transform;
 

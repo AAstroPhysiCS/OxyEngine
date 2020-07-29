@@ -1,9 +1,8 @@
-package OxyEngineEditor.Sandbox.OxyObjects;
+package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.Scene;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import static org.lwjgl.opengl.GL11.GL_LINES;
 
 public class WorldGrid {
 
-    private static final List<OxyEntity> worldGrids = new ArrayList<>();
+    private static final List<OxyGameObject> worldGrids = new ArrayList<>();
 
     private final Scene scene;
 
@@ -26,7 +25,6 @@ public class WorldGrid {
                 .setMode(GL_LINES)
                 .setUsage(BufferTemplate.Usage.STATIC)
                 .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlots)
-                .setGameObjectType(GameObjectType.Grid)
                 .create();
         add(size);
         worldGridMesh.obj.add(worldGrids);
@@ -35,8 +33,8 @@ public class WorldGrid {
     private void add(int size) {
         for (int x = -size; x < size; x++) {
             for (int z = -size; z < size; z++) {
-                OxyEntity e = scene.createEntity(new GridTemplate(scene.getRenderer().getShader()));
-                e.addComponent(new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
+                OxyGameObject e = scene.createGameObjectEntity();
+                e.addComponent(new GridTemplate(scene.getRenderer().getShader()), new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
                 e.initData(worldGridMesh.obj);
                 worldGrids.add(e);
             }

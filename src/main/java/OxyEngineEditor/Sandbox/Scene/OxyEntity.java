@@ -1,41 +1,31 @@
-package OxyEngineEditor.Sandbox.OxyObjects;
+package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
-import OxyEngineEditor.Sandbox.Scene.Scene;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static OxyEngine.System.Globals.Globals.toPrimitiveFloat;
+import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
 import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.dispatcherThread;
 
-public class OxyEntity {
+public abstract class OxyEntity {
 
     float[] vertices, tcs, normals;
     int[] indices;
 
-    private final Scene scene;
-    private final ObjectTemplate template;
+    protected ObjectType type;
+    protected final Scene scene;
 
-    public OxyEntity(Scene scene, ObjectTemplate template) {
+    public OxyEntity(Scene scene) {
         this.scene = scene;
-        this.template = template;
     }
 
-    public void initData(Mesh mesh) {
-        template.constructData(this);
-        if (mesh instanceof GameObjectMesh m)
-            template.initData(this, m);
-    }
+    public abstract void initData(Mesh mesh);
 
-    public void updateData() {
-        if (template instanceof CubeTemplate || template instanceof GridTemplate){
-            template.constructData(this);
-        }
-        if (template instanceof ModelTemplate m)
-            m.updateData(this);
-    }
+    public abstract void updateData();
 
     public final void addComponent(EntityComponent... component) {
         scene.addComponent(this, component);
@@ -55,10 +45,10 @@ public class OxyEntity {
         return scene.get(this, destClass);
     }
 
-    public static float[] sumAllVertices(OxyEntity[] arr, GameObjectType type) {
+    public static float[] sumAllVertices(OxyGameObject[] arr, ObjectType type) {
         float[] allVertices = new float[arr.length * type.n_Vertices()];
         int ptr = 0;
-        for (OxyEntity oxyObj : arr) {
+        for (OxyGameObject oxyObj : arr) {
             for (int i = 0; i < oxyObj.vertices.length; i++) {
                 allVertices[ptr++] = oxyObj.vertices[i];
             }
@@ -66,10 +56,10 @@ public class OxyEntity {
         return allVertices;
     }
 
-    public static int[] sumAllIndices(OxyEntity[] arr, GameObjectType type) {
+    public static int[] sumAllIndices(OxyGameObject[] arr, ObjectType type) {
         int[] allIndices = new int[arr.length * type.n_Indices()];
         int ptr = 0;
-        for (OxyEntity oxyObj : arr) {
+        for (OxyGameObject oxyObj : arr) {
             for (int i = 0; i < oxyObj.indices.length; i++) {
                 allIndices[ptr++] = oxyObj.indices[i];
             }
@@ -77,26 +67,24 @@ public class OxyEntity {
         return allIndices;
     }
 
-    public static float[] sumAllVertices(List<OxyEntity> arr, GameObjectType type) {
-        float[] allVertices = new float[arr.size() * type.n_Vertices()];
-        int ptr = 0;
-        for (OxyEntity oxyObj : arr) {
+    public static float[] sumAllVertices(List<OxyGameObject> arr) {
+        List<Float> allVertices = new ArrayList<>();
+        for (OxyGameObject oxyObj : arr) {
             for (int i = 0; i < oxyObj.vertices.length; i++) {
-                allVertices[ptr++] = oxyObj.vertices[i];
+                allVertices.add(oxyObj.vertices[i]);
             }
         }
-        return allVertices;
+        return toPrimitiveFloat(allVertices);
     }
 
-    public static int[] sumAllIndices(List<OxyEntity> arr, GameObjectType type) {
-        int[] allIndices = new int[arr.size() * type.n_Indices()];
-        int ptr = 0;
-        for (OxyEntity oxyObj : arr) {
+    public static int[] sumAllIndices(List<OxyGameObject> arr) {
+        List<Integer> allIndices = new ArrayList<>();
+        for (OxyGameObject oxyObj : arr) {
             for (int i = 0; i < oxyObj.indices.length; i++) {
-                allIndices[ptr++] = oxyObj.indices[i];
+                allIndices.add(oxyObj.indices[i]);
             }
         }
-        return allIndices;
+        return toPrimitiveInteger(allIndices);
     }
 
     public void addEventListener(OxyEventListener listener) {
@@ -111,11 +99,20 @@ public class OxyEntity {
         return indices;
     }
 
-    public ObjectTemplate getTemplate() {
-        return template;
-    }
-
     public float[] getTcs() {
         return tcs;
+    }
+
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public ObjectType getType() {
+        return type;
     }
 }

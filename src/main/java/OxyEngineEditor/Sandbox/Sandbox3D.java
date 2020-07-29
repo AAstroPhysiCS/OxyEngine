@@ -13,11 +13,9 @@ import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.OxyObjects.CubeTemplate;
-import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
-import OxyEngineEditor.Sandbox.Scene.Scene;
+import OxyEngineEditor.Sandbox.Scene.*;
 import OxyEngineEditor.UI.Layers.*;
 import OxyEngineEditor.UI.OxyUISystem;
 import imgui.ImGui;
@@ -73,7 +71,6 @@ public class Sandbox3D {
                 .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setMode(GL_TRIANGLES)
                 .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlots)
-                .setGameObjectType(GameObjectType.Cube)
                 .runOnFrameBuffer(windowHandle) //optional (single use)
                 .create();
 
@@ -83,23 +80,22 @@ public class Sandbox3D {
         scene = new Scene(oxyRenderer);
         oxyEngine.initLayers(scene);
 
-        final List<OxyEntity> fuck = new ArrayList<>(8000);
+        final List<OxyGameObject> listOfCubes = new ArrayList<>(8000);
         OxyTexture texture = new OxyTexture(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
 
-        //TODO: CUBE TAKES TOO MUCH VERTICES... ABOUT 144... REDUCE IT TO SOMETHING => TEXTURE..., COLOR..., BUT NOT BOTH AT THE SAME TIME!!!!!, PROBABLY THAT'S THE CAUSE OF BOTTLENECK
-        //TODO: PROBABLY USE A TEXTURE BUFFER INSTEAD OF SHOVING ALL OF THEM IN TO THE VERTEXBUFFER
-
+        OxyModel cubeModel = OxyModelLoader.load(scene, "src/main/resources/models/cube.obj");
+        //TODO: CREATE A METHOD FOR MODELS THAT TAKES AN LIST OR ARRAY AND SUIMS IN ONE MODELMESH
         for (int x = -10; x < 10; x++) {
             for (int y = -10; y < 10; y++) {
                 for (int z = -10; z < 10; z++) {
-                    OxyEntity e = scene.createEntity(new CubeTemplate());
-                    e.addComponent(texture, new TransformComponent(new Vector3f(x, y, z), new Vector3f((float) Math.toRadians(0), 0, 0)));
-                    e.initData(sandBoxMesh.obj);
-                    fuck.add(e);
+                    OxyGameObject cube = scene.createGameObjectEntity();
+                    cube.addComponent(new CubeTemplate(), texture, new TransformComponent(new Vector3f(x, y, z)), new SelectedComponent(false));
+                    cube.initData(sandBoxMesh.obj);
+                    listOfCubes.add(cube);
                 }
             }
         }
-        sandBoxMesh.obj.add(fuck);
+        sandBoxMesh.obj.add(listOfCubes);
 
         camera = new ScenePerspectiveCamera(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
 
@@ -125,10 +121,6 @@ public class Sandbox3D {
 
     private void render() {
         OxyTexture.bindAllTextureSlots();
-
-        /*c.position.add(0.01f, 0f, 0f);
-        testEntity.updateData();
-        sandBoxMesh.obj.updateSingleEntityData(scene, testEntity);*/
 
         sandBoxMesh.obj.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();

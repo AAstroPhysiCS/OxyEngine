@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
 
 import java.nio.ByteBuffer;
 
@@ -58,7 +58,7 @@ public class FrameBuffer extends Buffer {
     }
 
     @Override
-    public void addToBuffer(OxyEntity oxyEntity) {
+    public void addToBuffer(OxyGameObject oxyEntity) {
         //does nothing too essential
     }
 

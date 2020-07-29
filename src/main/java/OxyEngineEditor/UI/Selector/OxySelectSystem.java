@@ -3,8 +3,9 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.OxyObjects.GameObjectType;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
+import OxyEngineEditor.Sandbox.Scene.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import OxyEngineEditor.UI.OxyUISystem;
@@ -45,14 +46,14 @@ public class OxySelectSystem {
             ImVec2 mousePos = new ImVec2();
             ImGui.getMousePos(mousePos);
             direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), renderer.getCamera());
-            OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction, GameObjectType.Cube);
+            OxyGameObject e = (OxyGameObject) mSelector.selectObject(entities, camera.getCameraController().origin, direction);
 
             if (e != null) {
                 TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
-                OxyEntity xModel = axis.getXModel();
-                OxyEntity yModel = axis.getYModel();
-                OxyEntity zModel = axis.getZModel();
+                OxyModel xModel = axis.getXModel();
+                OxyModel yModel = axis.getYModel();
+                OxyModel zModel = axis.getZModel();
 
                 TransformComponent xC = (TransformComponent) xModel.get(TransformComponent.class);
                 TransformComponent yC = (TransformComponent) yModel.get(TransformComponent.class);
@@ -75,7 +76,7 @@ public class OxySelectSystem {
         axis.render(camera);
     }
 
-    public void moveController(OxyEntity e) {
+    public void moveController(OxyGameObject e) {
         OxyGizmoController.setCurrentEntitySelected(e);
     }
 }

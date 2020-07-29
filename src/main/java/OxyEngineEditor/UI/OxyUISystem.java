@@ -6,7 +6,7 @@ import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
 import OxyEngine.Events.OxyEventDispatcherThread;
 import OxyEngine.OxyEngine;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Font.FontLoader;
 import OxyEngineEditor.UI.Font.OxyFontSystem;

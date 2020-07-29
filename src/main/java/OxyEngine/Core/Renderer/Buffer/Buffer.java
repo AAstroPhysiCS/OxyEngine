@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
 import OxyEngine.System.OxyDisposable;
 
 public abstract class Buffer implements OxyDisposable {
@@ -11,7 +11,7 @@ public abstract class Buffer implements OxyDisposable {
 
     protected abstract void load();
 
-    public abstract void addToBuffer(OxyEntity oxyEntity);
+    public abstract void addToBuffer(OxyGameObject oxyEntity);
 
     public boolean empty(){
         return bufferId == 0;

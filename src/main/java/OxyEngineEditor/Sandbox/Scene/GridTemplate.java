@@ -1,6 +1,5 @@
-package OxyEngineEditor.Sandbox.OxyObjects;
+package OxyEngineEditor.Sandbox.Scene;
 
-import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
@@ -8,9 +7,7 @@ import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-import static OxyEngine.System.OxySystem.logger;
-
-public class GridTemplate extends ObjectTemplate {
+public class GridTemplate extends GameObjectTemplate {
 
     private static OxyColor color;
 
@@ -22,7 +19,7 @@ public class GridTemplate extends ObjectTemplate {
     };
 
     public GridTemplate(OxyShader shader) {
-        type = GameObjectType.Grid;
+        type = ObjectType.Grid;
         color = new OxyColor(1.0f, 1.0f, 1.0f, 0.2f, shader);
         color.init();
     }
@@ -32,8 +29,7 @@ public class GridTemplate extends ObjectTemplate {
     }
 
     @Override
-    public void constructData(OxyEntity e) {
-
+    public void constructData(OxyGameObject e) {
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
@@ -49,9 +45,9 @@ public class GridTemplate extends ObjectTemplate {
             vec4Vertices[i] = new Vector4f(vertexPos[vecPtr++], vertexPos[vecPtr++], vertexPos[vecPtr++], 1.0f).mul(c.transform);
         }
 
-        e.vertices = new float[GameObjectType.Grid.n_Vertices()];
+        e.vertices = new float[ObjectType.Grid.n_Vertices()];
         int ptr = 0;
-        for (int i = 0; i < GameObjectType.Grid.n_Vertices(); ) {
+        for (int i = 0; i < ObjectType.Grid.n_Vertices(); ) {
             e.vertices[i++] = vec4Vertices[ptr].x;
             e.vertices[i++] = vec4Vertices[ptr].y;
             e.vertices[i++] = vec4Vertices[ptr].z;
@@ -62,18 +58,13 @@ public class GridTemplate extends ObjectTemplate {
     }
 
     @Override
-    public void initData(OxyEntity e, Mesh m) {
-        if (m instanceof GameObjectMesh mesh) {
-            e.indices = new int[]{
-                    mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,
-                    3 + mesh.indicesX, mesh.indicesY, 2 + mesh.indicesZ,
-            };
-            mesh.indicesX += 4;
-            mesh.indicesY += 4;
-            mesh.indicesZ += 4;
-        } else {
-            logger.severe("Grid must have an GameObjectMesh");
-            throw new IllegalStateException("Grid must have an GameObjectMesh");
-        }
+    public void initData(OxyGameObject e, GameObjectMesh mesh) {
+        e.indices = new int[]{
+                mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,
+                3 + mesh.indicesX, mesh.indicesY, 2 + mesh.indicesZ,
+        };
+        mesh.indicesX += 4;
+        mesh.indicesY += 4;
+        mesh.indicesZ += 4;
     }
 }

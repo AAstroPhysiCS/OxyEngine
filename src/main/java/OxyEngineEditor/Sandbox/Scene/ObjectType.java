@@ -1,6 +1,6 @@
-package OxyEngineEditor.Sandbox.OxyObjects;
+package OxyEngineEditor.Sandbox.Scene;
 
-public enum GameObjectType {
+public enum ObjectType {
     //TCS: 48
     Cube(144, 36),
     Grid(24, 6),
@@ -9,7 +9,7 @@ public enum GameObjectType {
     private final int n_Vertices;
     private final int n_Indices;
 
-    GameObjectType(int n_Vertices, int n_Indices) {
+    ObjectType(int n_Vertices, int n_Indices) {
         this.n_Indices = n_Indices;
         this.n_Vertices = n_Vertices;
     }

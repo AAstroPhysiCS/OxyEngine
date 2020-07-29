@@ -4,19 +4,17 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.OxyObjects.ModelSpec;
-import OxyEngineEditor.Sandbox.OxyObjects.ModelTemplate;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyModelLoader;
+import OxyEngineEditor.Sandbox.Scene.OxyModel;
+import OxyEngineEditor.Sandbox.Scene.OxyModelLoader;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class OxyGizmo3D {
 
-    private final OxyEntity xModel;
-    private final OxyEntity yModel;
-    private final OxyEntity zModel;
+    private final OxyModel xModel;
+    private final OxyModel yModel;
+    private final OxyModel zModel;
 
     private static OxyGizmo3D INSTANCE = null;
 
@@ -29,13 +27,18 @@ public class OxyGizmo3D {
 
     private OxyGizmo3D(Scene scene, OxyShader oxyShader) {
         this.scene = scene;
-        xModel = OxyModelLoader.load(scene, new ModelSpec("src/main/resources/models/arrow.obj", new OxyColor(1f, 0f, 0f, 0.8f, oxyShader)));
-        yModel = OxyModelLoader.load(scene, new ModelSpec("src/main/resources/models/arrow.obj", new OxyColor(0f, 1f, 0f, 0.8f, oxyShader)));
-        zModel = OxyModelLoader.load(scene, new ModelSpec("src/main/resources/models/arrow.obj", new OxyColor(0f, 0f, 1f, 0.8f, oxyShader)));
+
+        xModel = OxyModelLoader.load(scene, "src/main/resources/models/arrow.obj");
+        yModel = OxyModelLoader.load(scene, "src/main/resources/models/arrow.obj");
+        zModel = OxyModelLoader.load(scene, "src/main/resources/models/arrow.obj");
+
+        xModel.addComponent(new OxyColor(new float[]{1f, 0f, 0f, 0.8f}, oxyShader));
+        yModel.addComponent(new OxyColor(new float[]{0f, 1f, 0f, 0.8f}, oxyShader));
+        zModel.addComponent(new OxyColor(new float[]{0f, 0f, 1f, 0.8f}, oxyShader));
 
         TransformComponent xC = (TransformComponent) xModel.get(TransformComponent.class);
-        TransformComponent yC = (TransformComponent) xModel.get(TransformComponent.class);
-        TransformComponent zC = (TransformComponent) xModel.get(TransformComponent.class);
+        TransformComponent yC = (TransformComponent) yModel.get(TransformComponent.class);
+        TransformComponent zC = (TransformComponent) zModel.get(TransformComponent.class);
 
         xC.rotation.set(180, 0, 0);
         yC.rotation.set(-90, -180, 0);
@@ -50,25 +53,25 @@ public class OxyGizmo3D {
         glEnable(GL_CULL_FACE);
         OxyColor cX = (OxyColor) xModel.get(OxyColor.class);
         cX.init();
-        scene.render(((ModelTemplate) xModel.getTemplate()).getMesh(), camera);
+        scene.render(xModel.getMesh(), camera);
         OxyColor cY = (OxyColor) yModel.get(OxyColor.class);
         cY.init();
-        scene.render(((ModelTemplate) yModel.getTemplate()).getMesh(), camera);
+        scene.render(yModel.getMesh(), camera);
         OxyColor cZ = (OxyColor) zModel.get(OxyColor.class);
         cZ.init();
-        scene.render(((ModelTemplate) zModel.getTemplate()).getMesh(), camera);
+        scene.render(zModel.getMesh(), camera);
         glDisable(GL_CULL_FACE);
     }
 
-    public OxyEntity getXModel() {
+    public OxyModel getXModel() {
         return xModel;
     }
 
-    public OxyEntity getZModel() {
+    public OxyModel getZModel() {
         return zModel;
     }
 
-    public OxyEntity getYModel() {
+    public OxyModel getYModel() {
         return yModel;
     }
 }

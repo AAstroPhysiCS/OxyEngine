@@ -1,6 +1,6 @@
 package OxyEngine.Events;
 
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngine.Core.Renderer.OxyRenderer;
 
 import java.util.ArrayList;

@@ -4,8 +4,9 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.Events.OxyMouseListener;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.OxyObjects.ModelTemplate;
-import OxyEngineEditor.Sandbox.OxyObjects.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
+import OxyEngineEditor.Sandbox.Scene.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.OxyUISystem;
 import imgui.flag.ImGuiMouseButton;
@@ -23,22 +24,22 @@ public class OxyGizmoController implements OxyMouseListener {
     boolean init = false;
 
     Vector2d oldMousePos = new Vector2d();
-    final OxyEntity xAxis;
-    final OxyEntity yAxis;
-    final OxyEntity zAxis;
+    final OxyModel xAxis;
+    final OxyModel yAxis;
+    final OxyModel zAxis;
 
     final Scene scene;
 
-    private static OxyEntity currentEntitySelected;
+    private static OxyGameObject currentEntitySelected;
 
-    OxyGizmoController(Scene scene, OxyEntity xAxis, OxyEntity yAxis, OxyEntity zAxis) {
+    OxyGizmoController(Scene scene, OxyModel xAxis, OxyModel yAxis, OxyModel zAxis) {
         this.xAxis = xAxis;
         this.yAxis = yAxis;
         this.zAxis = zAxis;
         this.scene = scene;
     }
 
-    public static void setCurrentEntitySelected(OxyEntity currentEntitySelected) {
+    public static void setCurrentEntitySelected(OxyGameObject currentEntitySelected) {
         OxyGizmoController.currentEntitySelected = currentEntitySelected;
     }
 
@@ -105,7 +106,7 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseHovered(OxyEntity hoveredEntity, OxyMouseEvent mouseEvent) {
-        if (hoveredEntity.getTemplate() instanceof ModelTemplate g) {
+        if (hoveredEntity instanceof OxyModel) {
             if (!init) {
                 OxyColor color = (OxyColor) hoveredEntity.get(OxyColor.class);
                 try {
