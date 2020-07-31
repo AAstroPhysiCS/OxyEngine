@@ -6,6 +6,7 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTextureCoords;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxySystem;
+import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.CubeTemplate;
 import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
@@ -98,7 +99,7 @@ public class SceneLayer extends UILayer {
         if (ImGui.beginDragDropTarget()) {
             if (ImGui.acceptDragDropPayload("mousePosViewportLayer") != null) {
                 cube = scene.createGameObjectEntity();
-                cube.addComponent(sandBoxMesh.obj, new CubeTemplate(), new OxyTexture(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE), new TransformComponent(new Vector3f(-30, -10 * counter++, 0), new Vector3f(0, 0, 0)));
+                cube.addComponent(new SelectedComponent(false), sandBoxMesh.obj, new CubeTemplate(), OxyTexture.loadCached(1), new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
                 cube.initData();
                 sandBoxMesh.obj.add(cube);
             }

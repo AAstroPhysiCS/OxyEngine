@@ -4,7 +4,7 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.Scene.ModelImportType;
 import OxyEngineEditor.Sandbox.Scene.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
@@ -28,9 +28,9 @@ public class OxyGizmo3D {
     private OxyGizmo3D(Scene scene, OxyShader oxyShader) {
         this.scene = scene;
 
-        xModel = scene.createModelEntity("src/main/resources/models/arrow.obj");
-        yModel = scene.createModelEntity("src/main/resources/models/arrow.obj");
-        zModel = scene.createModelEntity("src/main/resources/models/arrow.obj");
+        xModel = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
+        yModel = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
+        zModel = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
 
         xModel.addComponent(new SelectedComponent(false), new OxyColor(new float[]{1f, 0f, 0f, 0.8f}, oxyShader));
         yModel.addComponent(new SelectedComponent(false), new OxyColor(new float[]{0f, 1f, 0f, 0.8f}, oxyShader));
@@ -43,14 +43,8 @@ public class OxyGizmo3D {
 
     public void render(OxyCamera camera) {
         glEnable(GL_CULL_FACE);
-        OxyColor cX = (OxyColor) xModel.get(OxyColor.class);
-        cX.init();
         scene.render(xModel.getMesh(), camera);
-        OxyColor cY = (OxyColor) yModel.get(OxyColor.class);
-        cY.init();
         scene.render(yModel.getMesh(), camera);
-        OxyColor cZ = (OxyColor) zModel.get(OxyColor.class);
-        cZ.init();
         scene.render(zModel.getMesh(), camera);
         glDisable(GL_CULL_FACE);
     }

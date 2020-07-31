@@ -27,13 +27,38 @@ public class Scene {
         return e;
     }
 
-    public final OxyModel createModelEntity(String path) {
+    public final OxyModel createModelEntity(ModelImportType type, String... paths) {
         OxyModel e = new OxyModel(this);
-        OxyModelLoader loader = new OxyModelLoader(path);
+
+        OxyModelLoader loader;
+        switch (type) {
+            case obj -> {
+                if (paths.length < 2) throw new IllegalStateException("Not enough parameters are given!");
+                loader = new OxyObjFileLoader(paths[0], paths[1]);
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        }
         registry.componentList.put(e, new LinkedHashSet<>(10));
         e.addComponent(new TransformComponent(), new ModelTemplate(loader.vertices, loader.textureCoords, loader.normals, loader.faces));
         e.initData();
         return e;
+    }
+
+    public final OxyModel[] createModelEntities(ModelImportType type, String... paths) {
+        OxyModel e = new OxyModel(this);
+
+        OxyModelLoader loader;
+        switch (type) {
+            case obj -> {
+                if (paths.length < 2) throw new IllegalStateException("Not enough parameters are given!");
+                loader = new OxyObjFileLoader(paths[0], paths[1]);
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + type);
+        }
+        registry.componentList.put(e, new LinkedHashSet<>(10));
+        e.addComponent(new TransformComponent(), new ModelTemplate(loader.vertices, loader.textureCoords, loader.normals, loader.faces));
+        e.initData();
+        return new OxyModel[]{e};
     }
 
     public void update() {

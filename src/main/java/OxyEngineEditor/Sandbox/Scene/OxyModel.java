@@ -1,6 +1,7 @@
 package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
+import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -26,7 +27,7 @@ public class OxyModel extends OxyEntity {
 
     @Override
     void initData() {
-        if(!has(ModelTemplate.class)) throw new IllegalStateException("Models should have a Model Template");
+        if (!has(ModelTemplate.class)) throw new IllegalStateException("Models should have a Model Template");
         template = (ModelTemplate) get(ModelTemplate.class);
         template.constructData(this);
         addComponent(new ModelMesh.ModelMeshBuilderImpl()
@@ -47,6 +48,8 @@ public class OxyModel extends OxyEntity {
     }
 
     public ModelMesh getMesh() {
+        OxyColor color = (OxyColor) get(OxyColor.class);
+        if (color != null) color.init();
         return (ModelMesh) get(ModelMesh.class);
     }
 }

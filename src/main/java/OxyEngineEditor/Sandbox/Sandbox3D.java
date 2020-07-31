@@ -68,7 +68,7 @@ public class Sandbox3D {
         oxyShader = new OxyShader("shaders/world.glsl");
 
         sandBoxMesh.obj = new GameObjectMesh.GameObjectMeshBuilderImpl()
-                .setUsage(BufferTemplate.Usage.DYNAMIC)
+                .setUsage(BufferTemplate.Usage.STATIC)
                 .setMode(GL_TRIANGLES)
                 .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlots)
                 .runOnFrameBuffer(windowHandle) //optional (single use)
@@ -81,7 +81,7 @@ public class Sandbox3D {
         oxyEngine.initLayers(scene);
 
         final List<OxyGameObject> listOfCubes = new ArrayList<>(8000);
-        OxyTexture texture = new OxyTexture(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
+        OxyTexture texture = OxyTexture.load(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
 
         //TODO: WATCH CHERNOS NEWEST TWITCH STREAM OR YOUTUBE VIDEO AND CODE THE SCENE CLASS WITH RENDER AND UPDATE METHODS
         //TODO: CREATE A METHOD FOR MODELS THAT TAKES AN LIST OR ARRAY AND SUMS IN ONE MODELMESH
@@ -114,8 +114,8 @@ public class Sandbox3D {
 
         oxyUISystem = new OxyUISystem(scene, windowHandle);
 
-        testCube = scene.createModelEntity("D:\\programming\\Java\\OxyEngine\\src\\main\\resources\\models\\cube.obj");
-        testCube.addComponent(new TransformComponent(new Vector3f(0, -30, 0)), new SelectedComponent(false));
+        testCube = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/scene1.obj", "src/main/resources/models/scene1.mtl");
+        testCube.addComponent(new TransformComponent(new Vector3f(0, -1, 0), new Vector3f((float) Math.toRadians(180), 0 ,0), 50f), new SelectedComponent(false));
         testCube.updateData();
     }
 
@@ -131,7 +131,6 @@ public class Sandbox3D {
 
         sandBoxMesh.obj.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();
-//        scene.render();
         scene.render(testCube.getMesh(), camera);
         scene.render(sandBoxMesh.obj, camera);
         oxyUISystem.render(scene.getEntities(), camera);
@@ -146,6 +145,7 @@ public class Sandbox3D {
 
         OpenGLRendererAPI.swapBuffer(windowHandle);
         OpenGLRendererAPI.pollEvents();
+        OxyTexture.unbindAllTextureSlots();
     }
 
     private Runnable run() {

@@ -28,9 +28,9 @@ public class ModelTemplate implements EntityComponent {
     }
 
     public void constructData(OxyModel e) {
-        e.vertices = new float[verticesNonTransformed.size() * 4];
-        e.normals = new float[verticesNonTransformed.size() * 3];
-        e.tcs = new float[verticesNonTransformed.size() * 2];
+        e.vertices = new float[verticesNonTransformed.size() * 4 * 4];
+        e.normals = new float[verticesNonTransformed.size() * 3 * 4];
+        e.tcs = new float[verticesNonTransformed.size() * 2 * 4];
         List<Integer> indicesArr = new ArrayList<>();
 
         OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
@@ -78,7 +78,7 @@ public class ModelTemplate implements EntityComponent {
         e.indices = toPrimitiveInteger(indicesArr);
     }
 
-    public void updateData(OxyModel e) {
+   /* public void updateData(OxyModel e) {
 
         OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
@@ -101,5 +101,5 @@ public class ModelTemplate implements EntityComponent {
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
         }
-    }
+    }*/
 }

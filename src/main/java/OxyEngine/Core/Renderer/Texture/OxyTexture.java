@@ -14,7 +14,7 @@ import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class OxyTexture implements OxyDisposable, EntityComponent {
 
-    public static final List<OxyTexture> allTextures = new ArrayList<>();
+    private static final List<OxyTexture> allTextures = new ArrayList<>();
 
     private final int textureSlot;
     private final int textureId;
@@ -23,7 +23,7 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
 
     private final String path;
 
-    public OxyTexture(int slot, String path, float[] textureCoords) {
+    private OxyTexture(int slot, String path, float[] textureCoords) {
         this.textureCoords = textureCoords;
         this.path = path;
         this.textureSlot = slot;
@@ -59,12 +59,25 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
         allTextures.add(this);
     }
 
-    public OxyTexture(int slot, String path, OxyTextureCoords coords) {
+    private OxyTexture(int slot, String path, OxyTextureCoords coords) {
         this(slot, path, coords.getTcs());
     }
 
-    public OxyTexture(int slot, String path){
-        this(slot, path, new float[]{});
+    public static OxyTexture load(int slot, String path, OxyTextureCoords coords){
+        return new OxyTexture(slot, path, coords);
+    }
+
+    public static OxyTexture load(int slot, String path){
+        return new OxyTexture(slot, path, new float[]{});
+    }
+
+    public static OxyTexture loadCached(int slot){
+        for(OxyTexture t : allTextures){
+            if(t.getTextureSlot() == slot){
+                return t;
+            }
+        }
+        return null;
     }
 
     public static void bindAllTextureSlots(){
