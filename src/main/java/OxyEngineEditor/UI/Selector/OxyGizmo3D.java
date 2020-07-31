@@ -3,9 +3,9 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
+import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyModel;
-import OxyEngineEditor.Sandbox.Scene.OxyModelLoader;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -28,21 +28,13 @@ public class OxyGizmo3D {
     private OxyGizmo3D(Scene scene, OxyShader oxyShader) {
         this.scene = scene;
 
-        xModel = OxyModelLoader.load(scene, "src/main/resources/models/arrow.obj");
-        yModel = OxyModelLoader.load(scene, "src/main/resources/models/arrow.obj");
-        zModel = OxyModelLoader.load(scene, "src/main/resources/models/arrow.obj");
+        xModel = scene.createModelEntity("src/main/resources/models/arrow.obj");
+        yModel = scene.createModelEntity("src/main/resources/models/arrow.obj");
+        zModel = scene.createModelEntity("src/main/resources/models/arrow.obj");
 
-        xModel.addComponent(new OxyColor(new float[]{1f, 0f, 0f, 0.8f}, oxyShader));
-        yModel.addComponent(new OxyColor(new float[]{0f, 1f, 0f, 0.8f}, oxyShader));
-        zModel.addComponent(new OxyColor(new float[]{0f, 0f, 1f, 0.8f}, oxyShader));
-
-        TransformComponent xC = (TransformComponent) xModel.get(TransformComponent.class);
-        TransformComponent yC = (TransformComponent) yModel.get(TransformComponent.class);
-        TransformComponent zC = (TransformComponent) zModel.get(TransformComponent.class);
-
-        xC.rotation.set(180, 0, 0);
-        yC.rotation.set(-90, -180, 0);
-        zC.rotation.set(0, -90, 0);
+        xModel.addComponent(new SelectedComponent(false), new OxyColor(new float[]{1f, 0f, 0f, 0.8f}, oxyShader));
+        yModel.addComponent(new SelectedComponent(false), new OxyColor(new float[]{0f, 1f, 0f, 0.8f}, oxyShader));
+        zModel.addComponent(new SelectedComponent(false), new OxyColor(new float[]{0f, 0f, 1f, 0.8f}, oxyShader));
 
         xModel.addEventListener(new OxyGizmoController(scene, xModel, yModel, zModel));
         yModel.addEventListener(new OxyGizmoController(scene, xModel, yModel, zModel));

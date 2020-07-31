@@ -4,6 +4,7 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class CubeTemplate extends GameObjectTemplate {
@@ -61,17 +62,17 @@ public class CubeTemplate extends GameObjectTemplate {
                 .rotateY(c.rotation.y)
                 .rotateZ(c.rotation.z);
 
-        Vector4f[] vec4Vertices = new Vector4f[24];
-        int vecPtr = 0;
-        for (int i = 0; i < vec4Vertices.length; i++) {
-            vec4Vertices[i] = new Vector4f(cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], 1.0f).mul(c.transform);
-        }
         int slot = 0; // 0 => color
         float[] tcs = null;
 
         if (texture != null) {
             slot = texture.getTextureSlot();
             tcs = texture.getTextureCoords();
+        }
+        Vector4f[] vec4Vertices = new Vector4f[24];
+        int vecPtr = 0;
+        for (int i = 0; i < vec4Vertices.length; i++) {
+            vec4Vertices[i] = new Vector4f(cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], 1.0f).mul(c.transform);
         }
 
         e.vertices = new float[ObjectType.Cube.n_Vertices()];
@@ -86,6 +87,40 @@ public class CubeTemplate extends GameObjectTemplate {
             } else i += 2;
             e.vertices[i++] = slot;
             ptr++;
+        }
+    }
+    //YOu could summarize these both methods... but i won't do that.. bcs i need that clarification
+    @Override
+    public void updateData(OxyGameObject e){
+        OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
+        TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
+
+        c.transform = new Matrix4f()
+                .scale(c.scale)
+                .translate(c.position)
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z);
+
+        int slot = 0; // 0 => color
+        float[] tcs = null;
+
+        if (texture != null) {
+            slot = texture.getTextureSlot();
+            tcs = texture.getTextureCoords();
+        }
+        Vector4f[] vec4Vertices = new Vector4f[24];
+        int vecPtr = 0, texIndex = 0, cubeVertPosIndex = 0;
+        for (int i = 0; i < vec4Vertices.length; i++) {
+            vec4Vertices[i] = new Vector4f(cubeVertexPos[cubeVertPosIndex++], cubeVertexPos[cubeVertPosIndex++], cubeVertexPos[cubeVertPosIndex++], 1.0f).mul(c.transform);
+            e.vertices[vecPtr++] = vec4Vertices[i].x;
+            e.vertices[vecPtr++] = vec4Vertices[i].y;
+            e.vertices[vecPtr++] = vec4Vertices[i].z;
+            if (texture != null) {
+                e.vertices[vecPtr++] = tcs[texIndex++];
+                e.vertices[vecPtr++] = tcs[texIndex++];
+            } else vecPtr += 2;
+            e.vertices[vecPtr++] = slot;
         }
     }
 

@@ -1,18 +1,16 @@
 package OxyEngineEditor.UI.Selector;
 
+import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.Events.OxyMouseListener;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
-import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
 import OxyEngineEditor.Sandbox.Scene.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.OxyUISystem;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
-
-import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 
 /*
  * TODO: REFACTOR IT!
@@ -30,7 +28,7 @@ public class OxyGizmoController implements OxyMouseListener {
 
     final Scene scene;
 
-    private static OxyGameObject currentEntitySelected;
+    private static OxyEntity currentEntitySelected;
 
     OxyGizmoController(Scene scene, OxyModel xAxis, OxyModel yAxis, OxyModel zAxis) {
         this.xAxis = xAxis;
@@ -39,7 +37,7 @@ public class OxyGizmoController implements OxyMouseListener {
         this.scene = scene;
     }
 
-    public static void setCurrentEntitySelected(OxyGameObject currentEntitySelected) {
+    public static void setCurrentEntitySelected(OxyEntity currentEntitySelected) {
         OxyGizmoController.currentEntitySelected = currentEntitySelected;
     }
 
@@ -58,7 +56,6 @@ public class OxyGizmoController implements OxyMouseListener {
             TransformComponent yC = (TransformComponent) yAxis.get(TransformComponent.class);
             TransformComponent zC = (TransformComponent) zAxis.get(TransformComponent.class);
             TransformComponent currC = (TransformComponent) currentEntitySelected.get(TransformComponent.class);
-
             if (selectedEntity == xAxis) {
                 if (directionVector.x > 0) {
                     xC.position.add(0, 0, -0.15f);
@@ -97,7 +94,7 @@ public class OxyGizmoController implements OxyMouseListener {
                 }
             }
             currentEntitySelected.updateData();
-            sandBoxMesh.obj.updateSingleEntityData(scene, currentEntitySelected);
+            ((Mesh) currentEntitySelected.get(Mesh.class)).updateSingleEntityData(scene, currentEntitySelected);
             xAxis.updateData();
             yAxis.updateData();
             zAxis.updateData();

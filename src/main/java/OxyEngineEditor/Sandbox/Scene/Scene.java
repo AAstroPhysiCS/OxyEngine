@@ -27,11 +27,21 @@ public class Scene {
         return e;
     }
 
-    public final OxyModel createModelEntity(){
+    public final OxyModel createModelEntity(String path) {
         OxyModel e = new OxyModel(this);
+        OxyModelLoader loader = new OxyModelLoader(path);
         registry.componentList.put(e, new LinkedHashSet<>(10));
-        e.addComponent(new TransformComponent());
+        e.addComponent(new TransformComponent(), new ModelTemplate(loader.vertices, loader.textureCoords, loader.normals, loader.faces));
+        e.initData();
         return e;
+    }
+
+    public void update() {
+//        OxyEntity allEntities = view()
+    }
+
+    public void render() {
+
     }
 
     public final OxyEntity getEntityByIndex(int index) {

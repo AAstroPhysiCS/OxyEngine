@@ -1,12 +1,13 @@
 package OxyEngineEditor.Sandbox.Scene;
 
-import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
+
+import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class OxyModel extends OxyEntity {
 
     private ModelTemplate template;
-    private ModelMesh mesh;
 
     OxyModel(Scene scene) {
         super(scene);
@@ -15,7 +16,6 @@ public class OxyModel extends OxyEntity {
 
     OxyModel(OxyModel other) {
         this(other.scene);
-        this.mesh = other.mesh;
         this.template = other.template;
         this.vertices = other.vertices;
         this.tcs = other.tcs;
@@ -25,20 +25,28 @@ public class OxyModel extends OxyEntity {
     }
 
     @Override
-    public void initData(Mesh mesh) {
+    void initData() {
         if(!has(ModelTemplate.class)) throw new IllegalStateException("Models should have a Model Template");
-
         template = (ModelTemplate) get(ModelTemplate.class);
         template.constructData(this);
-        this.mesh = template.getMesh();
+        addComponent(new ModelMesh.ModelMeshBuilderImpl()
+                .setMode(GL_TRIANGLES)
+                .setUsage(BufferTemplate.Usage.DYNAMIC)
+                .setVertices(vertices)
+                .setIndices(indices)
+                .setTextureCoords(tcs)
+                .setNormals(normals)
+                .create());
     }
 
     @Override
     public void updateData() {
-        template.updateData(this);
+        template.constructData(this);
+//        template.updateData(this);
+        ((ModelMesh) get(ModelMesh.class)).getVertexBuffer().updateSingleEntityData(0, vertices);
     }
 
     public ModelMesh getMesh() {
-        return mesh;
+        return (ModelMesh) get(ModelMesh.class);
     }
 }

@@ -22,7 +22,7 @@ public class Registry {
     public final void addComponent(OxyEntity entity, EntityComponent... component) {
         for (EntityComponent c : component) {
             Set<EntityComponent> entityComponentSet = componentList.get(entity);
-            entityComponentSet.removeIf(entityComponent -> entityComponent.getClass().equals(c.getClass()));
+            entityComponentSet.removeIf(entityComponent -> entityComponent.getClass().equals(c.getClass()) || entityComponent.getClass().isInstance(c));
             componentList.get(entity).add(c);
         }
     }
@@ -35,7 +35,7 @@ public class Registry {
         for (EntityComponent c : set) {
             if (destClass.equals(c.getClass()))
                 return true;
-            if(destClass.isInstance(c))
+            if (destClass.isInstance(c))
                 return true;
         }
         return false;
@@ -50,7 +50,7 @@ public class Registry {
             if (c.getClass() == destClass) {
                 return c;
             }
-            if(destClass.isInstance(c)){
+            if (destClass.isInstance(c)) {
                 return c;
             }
         }

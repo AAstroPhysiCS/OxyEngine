@@ -9,5 +9,7 @@ public abstract class GameObjectTemplate implements EntityComponent {
 
     abstract void constructData(OxyGameObject e);
 
+    abstract void updateData(OxyGameObject e);
+
     abstract void initData(OxyGameObject e, GameObjectMesh mesh);
 }

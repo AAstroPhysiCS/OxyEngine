@@ -28,9 +28,11 @@ public interface OxyMouseListener extends OxyEventListener {
         ImGui.getMousePos(mousePos);
         Vector3f direction = MouseSelector.getInstance().getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), OxyRenderer.currentBoundedCamera);
         OxyEntity e = MouseSelector.getInstance().selectObject(entity, OxyRenderer.currentBoundedCamera.getCameraController().origin, direction);
-        if (e == entity && SceneLayer.focusedWindow)
-            dispatchMethods(entity);
-        else mouseNoAction();
+        if(e == null || !SceneLayer.focusedWindow) {
+            mouseNoAction();
+            return;
+        }
+        if (e.equals(entity)) dispatchMethods(entity);
     }
 
     private void dispatchMethods(OxyEntity e) {

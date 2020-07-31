@@ -83,14 +83,14 @@ public class Sandbox3D {
         final List<OxyGameObject> listOfCubes = new ArrayList<>(8000);
         OxyTexture texture = new OxyTexture(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
 
-        OxyModel cubeModel = OxyModelLoader.load(scene, "src/main/resources/models/cube.obj");
-        //TODO: CREATE A METHOD FOR MODELS THAT TAKES AN LIST OR ARRAY AND SUIMS IN ONE MODELMESH
+        //TODO: WATCH CHERNOS NEWEST TWITCH STREAM OR YOUTUBE VIDEO AND CODE THE SCENE CLASS WITH RENDER AND UPDATE METHODS
+        //TODO: CREATE A METHOD FOR MODELS THAT TAKES AN LIST OR ARRAY AND SUMS IN ONE MODELMESH
         for (int x = -10; x < 10; x++) {
             for (int y = -10; y < 10; y++) {
                 for (int z = -10; z < 10; z++) {
                     OxyGameObject cube = scene.createGameObjectEntity();
-                    cube.addComponent(new CubeTemplate(), texture, new TransformComponent(new Vector3f(x, y, z)), new SelectedComponent(false));
-                    cube.initData(sandBoxMesh.obj);
+                    cube.addComponent(sandBoxMesh.obj, new CubeTemplate(), texture, new TransformComponent(new Vector3f(x, y, z)), new SelectedComponent(false));
+                    cube.initData();
                     listOfCubes.add(cube);
                 }
             }
@@ -113,17 +113,26 @@ public class Sandbox3D {
         oxyShader.disable();
 
         oxyUISystem = new OxyUISystem(scene, windowHandle);
+
+        testCube = scene.createModelEntity("D:\\programming\\Java\\OxyEngine\\src\\main\\resources\\models\\cube.obj");
+        testCube.addComponent(new TransformComponent(new Vector3f(0, -30, 0)), new SelectedComponent(false));
+        testCube.updateData();
     }
 
     private void update(float deltaTime) {
         oxyUISystem.updateImGuiContext(deltaTime);
+        scene.update();
     }
+
+    static OxyModel testCube;
 
     private void render() {
         OxyTexture.bindAllTextureSlots();
 
         sandBoxMesh.obj.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();
+//        scene.render();
+        scene.render(testCube.getMesh(), camera);
         scene.render(sandBoxMesh.obj, camera);
         oxyUISystem.render(scene.getEntities(), camera);
         sandBoxMesh.obj.getFrameBuffer().unbind();

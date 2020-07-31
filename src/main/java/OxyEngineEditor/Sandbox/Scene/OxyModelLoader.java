@@ -11,34 +11,23 @@ import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
 
 public class OxyModelLoader {
 
-    private static final List<Vector3f> vertices = new ArrayList<>();
-    private static final List<Vector2f> textureCoords = new ArrayList<>();
-    private static final List<Vector3f> normals = new ArrayList<>();
-    private static final List<int[]> faces = new ArrayList<>();
+    final List<Vector3f> vertices = new ArrayList<>();
+    final List<Vector2f> textureCoords = new ArrayList<>();
+    final List<Vector3f> normals = new ArrayList<>();
+    final List<int[]> faces = new ArrayList<>();
 
-    private static String objPath;
+    final String objPath;
 
-    private static Scene scene;
-
-    public static OxyModel load(Scene scene, String objPath) {
-        OxyModelLoader.objPath = objPath;
-        OxyModelLoader.scene = scene;
-
-        OxyModel oxyModel = processData();
-        oxyModel.initData(null);
-
-        vertices.clear();
-        textureCoords.clear();
-        normals.clear();
-        faces.clear();
-        return oxyModel;
+    OxyModelLoader(String path){
+        this.objPath = path;
+        processData();
     }
 
-    private static OxyModel processData() {
-        return fillIn(OxySystem.FileSystem.load(objPath));
+    private void processData() {
+        fillIn(OxySystem.FileSystem.load(objPath));
     }
 
-    private static OxyModel fillIn(String content) {
+    private void fillIn(String content) {
         String[] splitted = content.split("\n");
         for (String s : splitted) {
             if (s.startsWith("v ")) getValues3f(s, vertices);
@@ -46,22 +35,21 @@ public class OxyModelLoader {
             if (s.startsWith("vn ")) getValues3f(s, normals);
             if (s.startsWith("f ")) getFaces(s);
         }
-        return constructData();
     }
 
-    private static void getValues3f(String s, List<Vector3f> list) {
+    private void getValues3f(String s, List<Vector3f> list) {
         String[] splitted = s.split(" ");
         for (int i = 1; i < splitted.length; )
             list.add(new Vector3f(Float.parseFloat(splitted[i++]), Float.parseFloat(splitted[i++]), Float.parseFloat(splitted[i++])));
     }
 
-    private static void getValues2f(String s, List<Vector2f> list) {
+    private void getValues2f(String s, List<Vector2f> list) {
         String[] splitted = s.split(" ");
         for (int i = 1; i < splitted.length; )
             list.add(new Vector2f(Float.parseFloat(splitted[i++]), Float.parseFloat(splitted[i++])));
     }
 
-    private static void getFaces(String s) {
+    private void getFaces(String s) {
         List<Integer> vertexCollection = new ArrayList<>();
         String[] splitted = s.split(" ");
         for (int i = 1; i < splitted.length; i++) {
@@ -72,11 +60,5 @@ public class OxyModelLoader {
             faces.add(toPrimitiveInteger(vertexCollection));
             vertexCollection.clear();
         }
-    }
-
-    private static OxyModel constructData() {
-        OxyModel e = scene.createModelEntity();
-        e.addComponent(new ModelTemplate(vertices, textureCoords, normals, faces));
-        return e;
     }
 }

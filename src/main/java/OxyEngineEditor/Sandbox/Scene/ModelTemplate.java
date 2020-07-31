@@ -1,9 +1,7 @@
 package OxyEngineEditor.Sandbox.Scene;
 
-import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -14,48 +12,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class ModelTemplate implements EntityComponent {
 
-    static ObjectType type;
-    private ModelMesh mesh;
-    private final List<Vector3f> vertices;
+    private final List<Vector3f> verticesNonTransformed;
     private final List<Vector2f> textureCoords;
     private final List<Vector3f> normals;
     private final List<int[]> faces;
 
-    public ModelTemplate(List<Vector3f> vertices, List<Vector2f> textureCoords, List<Vector3f> normals, List<int[]> faces) {
-        type = ObjectType.Model;
-        this.vertices = vertices;
+    public ModelTemplate(List<Vector3f> verticesNonTransformed, List<Vector2f> textureCoords, List<Vector3f> normals, List<int[]> faces) {
+        this.verticesNonTransformed = verticesNonTransformed;
         this.textureCoords = textureCoords;
         this.normals = normals;
         this.faces = faces;
     }
 
     public void constructData(OxyModel e) {
-
-        e.vertices = new float[vertices.size() * 4];
-        e.normals = new float[vertices.size() * 3];
-        e.tcs = new float[vertices.size() * 2];
+        e.vertices = new float[verticesNonTransformed.size() * 4];
+        e.normals = new float[verticesNonTransformed.size() * 3];
+        e.tcs = new float[verticesNonTransformed.size() * 2];
         List<Integer> indicesArr = new ArrayList<>();
 
         OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
-        Matrix4f transform = new Matrix4f()
+        c.transform = new Matrix4f()
                 .scale(c.scale)
                 .translate(c.position)
-                .rotateX((float) Math.toRadians(c.rotation.x))
-                .rotateY((float) Math.toRadians(c.rotation.y))
-                .rotateZ((float) Math.toRadians(c.rotation.z));
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z);
 
         int slot = 0;
         if (texture != null) slot = texture.getTextureSlot();
 
         int vertPtr = 0;
-        for (Vector3f v : vertices) {
-            Vector4f transformed = new Vector4f(v, 1.0f).mul(transform);
+        for (Vector3f v : verticesNonTransformed) {
+            Vector4f transformed = new Vector4f(v, 1.0f).mul(c.transform);
             e.vertices[vertPtr++] = transformed.x;
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
@@ -82,16 +75,7 @@ public class ModelTemplate implements EntityComponent {
             e.normals[vertexPtr * 3 + 1] = normals3f.y;
             e.normals[vertexPtr * 3 + 2] = normals3f.z;
         }
-
         e.indices = toPrimitiveInteger(indicesArr);
-        this.mesh = new ModelMesh.ModelMeshBuilderImpl()
-                .setMode(GL_TRIANGLES)
-                .setUsage(BufferTemplate.Usage.DYNAMIC)
-                .setVertices(e.vertices)
-                .setIndices(e.indices)
-                .setTextureCoords(e.tcs)
-                .setNormals(e.normals)
-                .create();
     }
 
     public void updateData(OxyModel e) {
@@ -109,17 +93,13 @@ public class ModelTemplate implements EntityComponent {
         int vertPtr = 0;
         int slot = 0;
         if (texture != null) slot = texture.getTextureSlot();
-        for (int i = 0; i < vertices.size() / 3; i++) {
-            Vector3f v = vertices.get(i);
+        for (int i = 0; i < verticesNonTransformed.size() / 3; i++) {
+            Vector3f v = verticesNonTransformed.get(i);
             Vector4f transformed = new Vector4f(v, 1.0f).mul(c.transform);
             e.vertices[vertPtr++] = transformed.x;
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
         }
-    }
-
-    public ModelMesh getMesh() {
-        return mesh;
     }
 }

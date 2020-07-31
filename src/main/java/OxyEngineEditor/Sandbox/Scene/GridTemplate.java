@@ -58,6 +58,11 @@ public class GridTemplate extends GameObjectTemplate {
     }
 
     @Override
+    void updateData(OxyGameObject e) {
+        //don't need that
+    }
+
+    @Override
     public void initData(OxyGameObject e, GameObjectMesh mesh) {
         e.indices = new int[]{
                 mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,

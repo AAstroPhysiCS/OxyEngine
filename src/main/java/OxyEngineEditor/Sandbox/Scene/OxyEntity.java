@@ -1,6 +1,5 @@
 package OxyEngineEditor.Sandbox.Scene;
 
-import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 
@@ -23,7 +22,7 @@ public abstract class OxyEntity {
         this.scene = scene;
     }
 
-    public abstract void initData(Mesh mesh);
+    abstract void initData();
 
     public abstract void updateData();
 

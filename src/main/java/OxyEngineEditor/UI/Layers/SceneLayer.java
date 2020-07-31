@@ -98,8 +98,8 @@ public class SceneLayer extends UILayer {
         if (ImGui.beginDragDropTarget()) {
             if (ImGui.acceptDragDropPayload("mousePosViewportLayer") != null) {
                 cube = scene.createGameObjectEntity();
-                cube.addComponent(new CubeTemplate(), new OxyTexture(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE), new TransformComponent(new Vector3f(-30, -10 * counter++, 0), new Vector3f(0, 0, 0)));
-                cube.initData(sandBoxMesh.obj);
+                cube.addComponent(sandBoxMesh.obj, new CubeTemplate(), new OxyTexture(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE), new TransformComponent(new Vector3f(-30, -10 * counter++, 0), new Vector3f(0, 0, 0)));
+                cube.initData();
                 sandBoxMesh.obj.add(cube);
             }
             ImGui.endDragDropTarget();

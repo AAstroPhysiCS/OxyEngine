@@ -8,16 +8,13 @@ import static OxyEngine.System.OxySystem.logger;
 public class OxyGameObject extends OxyEntity implements Cloneable {
 
     private GameObjectTemplate template;
-    //TODO: CHANGE MESH to MeshCOMPONENT
-    private GameObjectMesh mesh;
 
     OxyGameObject(Scene scene) {
         super(scene);
     }
 
-    OxyGameObject(OxyGameObject other){
+    OxyGameObject(OxyGameObject other) {
         this(other.scene);
-        this.mesh = other.mesh;
         this.vertices = other.vertices;
         this.template = other.template;
         this.tcs = other.tcs;
@@ -26,14 +23,15 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
         this.type = other.type;
     }
 
-    @Override
-    public void initData(Mesh mesh) {
-        if(!has(GameObjectTemplate.class)) throw new IllegalStateException("Game object need to have a template!");
+    public void initData() {
+        if (!has(GameObjectTemplate.class) || !has(Mesh.class))
+            throw new IllegalStateException("Game object need to have a template!");
+
+        Mesh mesh = (Mesh) get(Mesh.class);
 
         template = (GameObjectTemplate) get(GameObjectTemplate.class);
         template.constructData(this);
-        if(mesh instanceof GameObjectMesh gameObjectMesh){
-            this.mesh = gameObjectMesh;
+        if (mesh instanceof GameObjectMesh gameObjectMesh) {
             template.initData(this, gameObjectMesh);
         } else {
             logger.severe("Game Objects needs to have a GameObjectMesh");
@@ -44,7 +42,7 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
 
     @Override
     public void updateData() {
-        template.constructData(this);
-        mesh.updateSingleEntityData(scene, this);
+        template.updateData(this);
+        ((GameObjectMesh) get(GameObjectMesh.class)).updateSingleEntityData(scene, this);
     }
 }
