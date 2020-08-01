@@ -2,10 +2,7 @@ package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /*
  * Entity Component System (ECS)
@@ -61,7 +58,7 @@ public class Registry {
      * gets all the entities associated with these classes
      */
     public Set<OxyEntity> view(Class<? extends EntityComponent> destClass) {
-        Set<OxyEntity> list = new HashSet<>();
+        Set<OxyEntity> list = new LinkedHashSet<>();
         for (var entrySet : componentList.entrySet()) {
             Set<EntityComponent> value = entrySet.getValue();
             OxyEntity entity = entrySet.getKey();
@@ -79,7 +76,7 @@ public class Registry {
      */
     @SafeVarargs
     public final Set<OxyEntity> group(Class<? extends EntityComponent>... destClasses) {
-        Set<OxyEntity> list = new HashSet<>();
+        Set<OxyEntity> list = new LinkedHashSet<>();
         for (var entrySet : componentList.entrySet()) {
             Set<EntityComponent> value = entrySet.getValue();
             OxyEntity entity = entrySet.getKey();
@@ -92,6 +89,21 @@ public class Registry {
             }
         }
         return list;
+    }
+
+    @SafeVarargs
+    public final Set<EntityComponent> distinct(Class<? extends EntityComponent>... destClasses) {
+        Set<EntityComponent> allDistinctComponents = new LinkedHashSet<>();
+        for (var value : componentList.values()) {
+            for (EntityComponent c : value) {
+                for (var destClass : destClasses) {
+                    if (c.getClass() == destClass) {
+                        allDistinctComponents.add(c);
+                    }
+                }
+            }
+        }
+        return allDistinctComponents;
     }
 
     public Map<OxyEntity, Set<EntityComponent>> getComponentList() {

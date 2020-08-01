@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Camera.ScenePerspectiveCamera;
+import OxyEngine.Core.Camera.PerspectiveCameraComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
@@ -88,7 +88,7 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
                     currentBoundedCamera.getCameraController().getRotation().x,
                     currentBoundedCamera.getCameraController().getRotation().y,
                     currentBoundedCamera.getCameraController().getRotation().z,
-                    ScenePerspectiveCamera.zoom
+                    PerspectiveCameraComponent.zoom
             );
             reset();
             return s;

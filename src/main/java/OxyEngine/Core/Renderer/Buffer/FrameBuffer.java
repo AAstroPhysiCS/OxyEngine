@@ -13,6 +13,7 @@ import static org.lwjgl.opengl.GL45.glCreateTextures;
 public class FrameBuffer extends Buffer {
 
     private int colorAttachmentId, depthAttachment;
+    private boolean primary = false;
 
     private int width;
     private int height;
@@ -94,6 +95,14 @@ public class FrameBuffer extends Buffer {
 
     public int getHeight() {
         return height;
+    }
+
+    public boolean isPrimary() {
+        return primary;
+    }
+
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
     }
 
     @Override

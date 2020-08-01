@@ -3,15 +3,13 @@ package OxyEngineEditor.UI.Layers;
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Core.Renderer.Texture.OxyTextureCoords;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.CubeTemplate;
 import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
-import OxyEngineEditor.Sandbox.Scene.WorldGrid;
 import OxyEngineEditor.Sandbox.Scene.Scene;
+import OxyEngineEditor.Sandbox.Scene.WorldGrid;
 import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -57,9 +55,9 @@ public class SceneLayer extends UILayer {
 
     @Override
     public void renderLayer() {
-        scene.getRenderer().getShader().enable();
-        worldGrid.render();
-        scene.getRenderer().getShader().disable();
+//        scene.getRenderer().getShader().enable();
+//        worldGrid.render();
+//        scene.getRenderer().getShader().disable();
 
         ImGui.setNextWindowSize(windowHandle.getWidth() / 1.3f, windowHandle.getHeight() / 1.3f, ImGuiCond.Once);
         ImGui.setNextWindowPos(40, 40, ImGuiCond.Once);
@@ -87,7 +85,7 @@ public class SceneLayer extends UILayer {
         ImVec2 availContentRegionSize = new ImVec2();
         ImGui.getContentRegionAvail(availContentRegionSize);
 
-        FrameBuffer frameBuffer = sandBoxMesh.obj.getFrameBuffer();
+        FrameBuffer frameBuffer = Scene.currentFrameBuffer;
         ImGui.image(frameBuffer.getColorAttachment(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
 
         if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {

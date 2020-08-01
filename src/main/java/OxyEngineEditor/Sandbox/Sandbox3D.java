@@ -1,7 +1,6 @@
 package OxyEngineEditor.Sandbox;
 
-import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Camera.ScenePerspectiveCamera;
+import OxyEngine.Core.Camera.PerspectiveCameraComponent;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererType;
@@ -43,7 +42,7 @@ public class Sandbox3D {
 
     private Scene scene;
 
-    private OxyCamera camera;
+    public static PerspectiveCameraComponent camera;
 
     private static MainUILayer mainUILayer;
 
@@ -71,7 +70,7 @@ public class Sandbox3D {
                 .setUsage(BufferTemplate.Usage.STATIC)
                 .setMode(GL_TRIANGLES)
                 .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlots)
-                .runOnFrameBuffer(windowHandle) //optional (single use)
+                .runOnFrameBuffer(windowHandle, true)
                 .create();
 
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
@@ -83,21 +82,22 @@ public class Sandbox3D {
         final List<OxyGameObject> listOfCubes = new ArrayList<>(8000);
         OxyTexture texture = OxyTexture.load(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
 
-        //TODO: WATCH CHERNOS NEWEST TWITCH STREAM OR YOUTUBE VIDEO AND CODE THE SCENE CLASS WITH RENDER AND UPDATE METHODS
+        //TODO: ALL MESHES SHOULD HAVE AN LIST OF ENTITIES, SO THAT I DONT NEED TO CALL ADD ON EVERY MESH INSTANCE
+        //TODO: READ MTL FILE... PARSE MULTIPLE MESHES/ENTITIES, RENDER THEM SEPERATELY
         //TODO: CREATE A METHOD FOR MODELS THAT TAKES AN LIST OR ARRAY AND SUMS IN ONE MODELMESH
+        camera = new PerspectiveCameraComponent(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
+
         for (int x = -10; x < 10; x++) {
             for (int y = -10; y < 10; y++) {
                 for (int z = -10; z < 10; z++) {
                     OxyGameObject cube = scene.createGameObjectEntity();
-                    cube.addComponent(sandBoxMesh.obj, new CubeTemplate(), texture, new TransformComponent(new Vector3f(x, y, z)), new SelectedComponent(false));
+                    cube.addComponent(camera, sandBoxMesh.obj, new CubeTemplate(), texture, new TransformComponent(new Vector3f(x, y, z)), new SelectedComponent(false));
                     cube.initData();
                     listOfCubes.add(cube);
                 }
             }
         }
         sandBoxMesh.obj.add(listOfCubes);
-
-        camera = new ScenePerspectiveCamera(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
 
         mainUILayer = OxyEngine.getMainUIComponent();
         mainUILayer.addUILayers(StatsLayer.getInstance(windowHandle, scene));
@@ -114,30 +114,28 @@ public class Sandbox3D {
 
         oxyUISystem = new OxyUISystem(scene, windowHandle);
 
-        testCube = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/scene1.obj", "src/main/resources/models/scene1.mtl");
-        testCube.addComponent(new TransformComponent(new Vector3f(0, -1, 0), new Vector3f((float) Math.toRadians(180), 0 ,0), 50f), new SelectedComponent(false));
-        testCube.updateData();
+        testObjects = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/scene1.obj", "src/main/resources/models/scene1.mtl");
+        testObjects.addComponent(camera,
+                new TransformComponent(new Vector3f(0, -1, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 50f),
+                new SelectedComponent(false));
+        testObjects.updateData();
+
+        scene.setup();
     }
 
     private void update(float deltaTime) {
         oxyUISystem.updateImGuiContext(deltaTime);
-        scene.update();
     }
 
-    static OxyModel testCube;
+    static OxyModel testObjects;
 
     private void render() {
         OxyTexture.bindAllTextureSlots();
-
-        sandBoxMesh.obj.getFrameBuffer().bind();
-        OpenGLRendererAPI.clearBuffer();
-        scene.render(testCube.getMesh(), camera);
-        scene.render(sandBoxMesh.obj, camera);
+        scene.update();
         oxyUISystem.render(scene.getEntities(), camera);
-        sandBoxMesh.obj.getFrameBuffer().unbind();
+
         OpenGLRendererAPI.clearBuffer();
         OpenGLRendererAPI.clearColor(41, 41, 41, 1.0f);
-
         ImGui.newFrame();
         mainUILayer.renderLayer();
         ImGui.render();

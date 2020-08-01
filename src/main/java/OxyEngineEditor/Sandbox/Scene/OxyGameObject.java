@@ -25,7 +25,7 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
 
     public void initData() {
         if (!has(GameObjectTemplate.class) || !has(Mesh.class))
-            throw new IllegalStateException("Game object need to have a template!");
+            throw new IllegalStateException("Game object need to have a template or a Mesh!");
 
         Mesh mesh = (Mesh) get(Mesh.class);
 

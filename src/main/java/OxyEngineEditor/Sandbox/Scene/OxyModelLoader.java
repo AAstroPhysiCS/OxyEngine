@@ -1,5 +1,6 @@
 package OxyEngineEditor.Sandbox.Scene;
 
+import OxyEngine.Core.Renderer.Buffer.Mesh;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -11,7 +12,7 @@ public abstract class OxyModelLoader {
     final List<Vector2f> textureCoords = new ArrayList<>();
     final List<Vector3f> normals = new ArrayList<>();
     final List<int[]> faces = new ArrayList<>();
-
+    final List<Mesh> meshes = new ArrayList<>();
 
     String objPath, mtlPath;
 

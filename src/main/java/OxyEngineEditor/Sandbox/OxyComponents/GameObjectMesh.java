@@ -28,7 +28,7 @@ public class GameObjectMesh extends Mesh {
 
         GameObjectMeshBuilder setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers);
 
-        GameObjectMeshBuilder runOnFrameBuffer(WindowHandle windowHandle);
+        GameObjectMeshBuilder runOnFrameBuffer(WindowHandle windowHandle, boolean primary);
 
         GameObjectMeshBuilder setMode(int mode);
 
@@ -39,7 +39,7 @@ public class GameObjectMesh extends Mesh {
 
     public static class GameObjectMeshBuilderImpl implements GameObjectMeshBuilder {
 
-        private static FrameBuffer frameBuffer;
+        private FrameBuffer frameBuffer;
         private BufferTemplate.Attributes[] verticesPointers;
         private int mode = -1;
         private BufferTemplate.Usage usage;
@@ -51,10 +51,9 @@ public class GameObjectMesh extends Mesh {
         }
 
         @Override
-        public GameObjectMeshBuilderImpl runOnFrameBuffer(WindowHandle windowHandle) {
-            if (frameBuffer != null)
-                throw new IllegalArgumentException("Frame buffer already bound to a another mesh instance");
+        public GameObjectMeshBuilderImpl runOnFrameBuffer(WindowHandle windowHandle, boolean primary) {
             frameBuffer = new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight());
+            frameBuffer.setPrimary(primary);
             return this;
         }
 

@@ -3,9 +3,7 @@ package OxyEngine.Core.Renderer.Buffer;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
-import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import static org.lwjgl.opengl.GL45.*;

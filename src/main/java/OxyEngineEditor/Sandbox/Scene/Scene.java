@@ -1,18 +1,25 @@
 package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static OxyEngineEditor.Sandbox.Sandbox3D.camera;
+
 public class Scene {
 
     private final Registry registry = new Registry();
+    private Set<EntityComponent> cachedComponents;
 
     private final OxyRenderer3D renderer;
 
@@ -33,7 +40,8 @@ public class Scene {
         OxyModelLoader loader;
         switch (type) {
             case obj -> {
-                if (paths.length < 2) throw new IllegalStateException("Not enough parameters are given!");
+                if (paths.length < 2 || paths[0].contains(".mtl") || paths[1].contains(".obj"))
+                    throw new IllegalStateException("Not enough parameters are given or in the wrong order!");
                 loader = new OxyObjFileLoader(paths[0], paths[1]);
             }
             default -> throw new IllegalStateException("Unexpected value: " + type);
@@ -44,13 +52,14 @@ public class Scene {
         return e;
     }
 
+    //TODO: MAKE THIS METHOD
     public final OxyModel[] createModelEntities(ModelImportType type, String... paths) {
         OxyModel e = new OxyModel(this);
-
         OxyModelLoader loader;
         switch (type) {
             case obj -> {
-                if (paths.length < 2) throw new IllegalStateException("Not enough parameters are given!");
+                if (paths.length < 2 || paths[0].contains(".mtl") || paths[1].contains(".obj"))
+                    throw new IllegalStateException("Not enough parameters are given or in the wrong order!");
                 loader = new OxyObjFileLoader(paths[0], paths[1]);
             }
             default -> throw new IllegalStateException("Unexpected value: " + type);
@@ -61,11 +70,35 @@ public class Scene {
         return new OxyModel[]{e};
     }
 
-    public void update() {
-//        OxyEntity allEntities = view()
+    public void setup() {
+        cachedComponents = distinct(ModelMesh.class, GameObjectMesh.class);
     }
 
-    public void render() {
+    public static FrameBuffer currentFrameBuffer;
+
+    public void update() {
+
+        //Framebuffer
+        {
+            for (EntityComponent e : cachedComponents) {
+                if(e instanceof Mesh mesh){
+                    if (mesh.getFrameBuffer().isPrimary()) {
+                        currentFrameBuffer = mesh.getFrameBuffer();
+                        break;
+                    }
+                }
+            }
+        }
+
+        //Rendering
+        {
+            if(currentFrameBuffer != null) currentFrameBuffer.bind();
+            OpenGLRendererAPI.clearBuffer();
+            for (EntityComponent e : cachedComponents) {
+                if (e instanceof Mesh m) render(m, camera);
+            }
+            if(currentFrameBuffer != null) currentFrameBuffer.unbind();
+        }
 
     }
 
@@ -116,12 +149,17 @@ public class Scene {
         return registry.group(destClasses);
     }
 
-    public void render(Mesh mesh, OxyCamera camera) {
+    @SafeVarargs
+    public final Set<EntityComponent> distinct(Class<? extends EntityComponent>... destClasses) {
+        return registry.distinct(destClasses);
+    }
+
+    private void render(Mesh mesh, OxyCamera camera) {
         renderer.render(mesh, camera);
         OxyRenderer.Stats.totalShapeCount = registry.componentList.keySet().size();
     }
 
-    public void render(Mesh mesh) {
+    private void render(Mesh mesh) {
         renderer.render(mesh);
         OxyRenderer.Stats.totalShapeCount = registry.componentList.keySet().size();
     }

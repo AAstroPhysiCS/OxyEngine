@@ -43,7 +43,6 @@ public class OxyModel extends OxyEntity {
     @Override
     public void updateData() {
         template.constructData(this);
-//        template.updateData(this);
         ((ModelMesh) get(ModelMesh.class)).getVertexBuffer().updateSingleEntityData(0, vertices);
     }
 

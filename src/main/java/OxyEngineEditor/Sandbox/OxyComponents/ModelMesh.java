@@ -2,6 +2,7 @@ package OxyEngineEditor.Sandbox.OxyComponents;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Window.WindowHandle;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
@@ -14,7 +15,8 @@ public class ModelMesh extends Mesh {
     private final float[] vertices, textureCoords, normals;
     private final int[] indices;
 
-    private ModelMesh(BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+    private ModelMesh(FrameBuffer buffer, BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+        this.frameBuffer = buffer;
         this.vertices = vertices;
         this.indices = indices;
         this.textureCoords = textureCoords;
@@ -49,11 +51,14 @@ public class ModelMesh extends Mesh {
 
         ModelMeshBuilder setUsage(BufferTemplate.Usage usage);
 
+        ModelMeshBuilder runOnFrameBuffer(WindowHandle windowHandle, boolean primary);
+
         ModelMesh create();
     }
 
     public static class ModelMeshBuilderImpl implements ModelMeshBuilder {
 
+        private FrameBuffer frameBuffer;
         private float[] vertices, textureCoords, normals;
         private int[] indices;
         private int mode;
@@ -96,11 +101,18 @@ public class ModelMesh extends Mesh {
         }
 
         @Override
+        public ModelMeshBuilderImpl runOnFrameBuffer(WindowHandle windowHandle, boolean primary) {
+            frameBuffer = new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight());
+            frameBuffer.setPrimary(primary);
+            return this;
+        }
+
+        @Override
         public ModelMesh create() {
             if (textureCoords == null || indices == null || vertices == null)
                 throw new NullPointerException("Data that is given is null.");
 
-            return new ModelMesh(usage, mode, vertices, indices, textureCoords, normals);
+            return new ModelMesh(frameBuffer, usage, mode, vertices, indices, textureCoords, normals);
         }
     }
 

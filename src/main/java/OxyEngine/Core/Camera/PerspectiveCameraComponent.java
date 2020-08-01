@@ -1,17 +1,19 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
+import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class ScenePerspectiveCamera extends PerspectiveCamera {
+public class PerspectiveCameraComponent extends PerspectiveCamera implements EntityComponent {
 
     public static int zoom = 50;
+    public final boolean primary = false;
 
-    public ScenePerspectiveCamera(float fovY, float aspect, float zNear, float zFar, int location, boolean transpose, Vector3f center, Vector3f rotation) {
+    public PerspectiveCameraComponent(float fovY, float aspect, float zNear, float zFar, int location, boolean transpose, Vector3f center, Vector3f rotation) {
         super(fovY, aspect, zNear, zFar, center, rotation, location, transpose);
     }
 
@@ -45,5 +47,9 @@ public class ScenePerspectiveCamera extends PerspectiveCamera {
         viewMatrix = new Matrix4f();
         viewMatrix.set(projectionMatrix);
         viewMatrix.mul(modelMatrix);
+    }
+
+    public boolean isPrimary() {
+        return primary;
     }
 }
