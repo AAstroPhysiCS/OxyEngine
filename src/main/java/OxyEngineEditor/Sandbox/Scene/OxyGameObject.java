@@ -43,6 +43,6 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
     @Override
     public void updateData() {
         template.updateData(this);
-        ((GameObjectMesh) get(GameObjectMesh.class)).updateSingleEntityData(scene, this);
+        ((Mesh) get(Mesh.class)).updateSingleEntityData(scene, this);
     }
 }

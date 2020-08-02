@@ -47,6 +47,7 @@ public class OxySelectSystem {
             ImGui.getMousePos(mousePos);
             direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), renderer.getCamera());
             OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
+
             if (e != null && !((SelectedComponent)e.get(SelectedComponent.class)).fixedValue) {
 
                 TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
@@ -74,12 +75,12 @@ public class OxySelectSystem {
                 xModel.updateData();
                 yModel.updateData();
                 zModel.updateData();
-                moveGameObject(e);
+                moveEntity(e);
             }
         }
     }
 
-    public void moveGameObject(OxyEntity e) {
+    public void moveEntity(OxyEntity e) {
         OxyGizmoController.setCurrentEntitySelected(e);
     }
 }

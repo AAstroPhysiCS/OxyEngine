@@ -88,6 +88,11 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         load();
     }
 
+    public void clear(){
+        vertexBuffer.clear();
+        indexBuffer.clear();
+    }
+
     public void render() {
         bind();
         draw();
@@ -98,7 +103,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         int i = 0;
         for (OxyEntity entity : scene.getEntities()) {
             if (entity.equals(e)) {
-                vertexBuffer.updateSingleEntityData(i * e.getType().n_Vertices(), e.getVertices());
+                vertexBuffer.updateSingleEntityData(i * e.getType().n_Vertices() * Float.BYTES, e.getVertices());
                 break;
             }
             i++;

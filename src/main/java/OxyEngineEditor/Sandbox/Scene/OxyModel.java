@@ -1,7 +1,7 @@
 package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -43,12 +43,6 @@ public class OxyModel extends OxyEntity {
     @Override
     public void updateData() {
         template.constructData(this);
-        ((ModelMesh) get(ModelMesh.class)).updateSingleEntityData();
-    }
-
-    public ModelMesh getMesh() {
-        OxyColor color = (OxyColor) get(OxyColor.class);
-        if (color != null) color.enable();
-        return (ModelMesh) get(ModelMesh.class);
+        ((Mesh) get(Mesh.class)).updateSingleEntityData(0, vertices);
     }
 }

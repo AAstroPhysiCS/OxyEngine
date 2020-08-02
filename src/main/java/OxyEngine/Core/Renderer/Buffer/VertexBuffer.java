@@ -91,4 +91,8 @@ public final class VertexBuffer extends Buffer {
     public void dispose() {
         glDeleteBuffers(bufferId);
     }
+
+    public void clear() {
+        vertices = new float[0];
+    }
 }

@@ -34,7 +34,6 @@ public class Sandbox3D {
     private final WindowHandle windowHandle;
 
     private OxyShader oxyShader;
-    private OxyUISystem oxyUISystem;
     private final OxyEngine oxyEngine;
 
     private Scene scene;
@@ -73,7 +72,7 @@ public class Sandbox3D {
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
         oxyRenderer.setShader(oxyShader);
 
-        scene = new Scene(oxyRenderer);
+        scene = new Scene(windowHandle, oxyRenderer);
         oxyEngine.initLayers(scene);
 
         OxyTexture texture = OxyTexture.load(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
@@ -106,42 +105,33 @@ public class Sandbox3D {
         oxyShader.setUniform1iv("tex", samplers);
         oxyShader.disable();
 
-        oxyUISystem = new OxyUISystem(scene, windowHandle);
-
-        testObjects = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/scene1.obj", "src/main/resources/models/scene1.mtl");
+        testObjects = scene.createModelEntity(ModelFileType.OBJ, "src/main/resources/models/scene1.obj", "src/main/resources/models/scene1.mtl");
         testObjects.addComponent(camera,
                 new TransformComponent(new Vector3f(-100, -1, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 50),
                 new SelectedComponent(false));
         testObjects.updateData();
 
         scene.build();
-        cubeTest = (OxyGameObject) scene.getEntityByIndex(0);
-        cubeT = (TransformComponent) cubeTest.get(TransformComponent.class);
     }
 
     private void update(float deltaTime) {
-        oxyUISystem.updateImGuiContext(deltaTime);
+        scene.update(deltaTime);
     }
 
     static OxyModel testObjects;
-    static OxyGameObject cubeTest;
-    static TransformComponent cubeT;
 
-    private void render() {
+    private void render(float deltaTime) {
         OxyTexture.bindAllTextureSlots();
 
-        cubeT.position.add(0.01f, 0.0f, 0.0f);
-        cubeTest.updateData();
-
-        scene.render();
-        oxyUISystem.render(scene.getEntities(), camera);
+        scene.render(deltaTime);
 
         OpenGLRendererAPI.clearBuffer();
         OpenGLRendererAPI.clearColor(41, 41, 41, 1.0f);
+
         ImGui.newFrame();
         mainUILayer.renderLayer();
         ImGui.render();
-        oxyUISystem.updateImGuiRenderer();
+        scene.getOxyUISystem().updateImGuiRenderer();
 
         OpenGLRendererAPI.swapBuffer(windowHandle);
         OpenGLRendererAPI.pollEvents();
@@ -166,11 +156,12 @@ public class Sandbox3D {
                 final double deltaTime = (time > 0) ? (currentTime - time) : 1f / 60f;
                 time = currentTime;
                 update((float) deltaTime);
-                render();
+                render((float) deltaTime);
 
                 frames++;
 
-                if (System.currentTimeMillis() - timeMillis > 1000) {
+                long millis = 0;
+                if ((millis = System.currentTimeMillis() - timeMillis) > 1000) {
                     timeMillis += 1000;
                     FPS = frames;
                     frames = 0;
@@ -186,8 +177,8 @@ public class Sandbox3D {
     public void dispose() {
         oxyEngine.dispose();
         oxyShader.dispose();
+        scene.dispose();
         sandBoxMesh.obj.dispose();
-        oxyUISystem.dispose();
         dispatcherThread.joinThread();
     }
 }

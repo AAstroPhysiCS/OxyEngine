@@ -56,4 +56,8 @@ public final class IndexBuffer extends Buffer {
     public void dispose() {
         glDeleteBuffers(bufferId);
     }
+
+    public void clear() {
+        indices = new int[0];
+    }
 }

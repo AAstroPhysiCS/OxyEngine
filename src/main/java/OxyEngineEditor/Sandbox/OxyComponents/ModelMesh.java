@@ -116,10 +116,6 @@ public class ModelMesh extends Mesh {
         }
     }
 
-    public void updateSingleEntityData(){
-        super.updateSingleEntityData(0, vertices);
-    }
-
     public float[] getTextureCoords() {
         return textureCoords;
     }

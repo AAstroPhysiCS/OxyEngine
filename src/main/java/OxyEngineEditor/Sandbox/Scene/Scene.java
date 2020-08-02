@@ -5,26 +5,31 @@ import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
+import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.UI.OxyUISystem;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static OxyEngineEditor.Sandbox.Sandbox3D.camera;
 
-public class Scene {
+public class Scene implements OxyDisposable {
 
     private final Registry registry = new Registry();
 
     private final OxyRenderer3D renderer;
+    private final WindowHandle windowHandle;
+    private OxyUISystem oxyUISystem;
 
-    public Scene(OxyRenderer3D renderer) {
+    public Scene(WindowHandle windowHandle, OxyRenderer3D renderer) {
         this.renderer = renderer;
+        this.windowHandle = windowHandle;
     }
 
     public final OxyGameObject createGameObjectEntity() {
@@ -34,11 +39,11 @@ public class Scene {
         return e;
     }
 
-    public final OxyModel createModelEntity(ModelImportType type, String... paths) {
+    public final OxyModel createModelEntity(ModelFileType type, String... paths) {
         OxyModel e = new OxyModel(this);
         OxyModelLoader loader;
         switch (type) {
-            case obj -> {
+            case OBJ -> {
                 if (paths.length < 2 || paths[0].contains(".mtl") || paths[1].contains(".obj"))
                     throw new IllegalStateException("Not enough parameters are given or in the wrong order!");
                 loader = new OxyObjFileLoader(paths[0], paths[1]);
@@ -52,29 +57,11 @@ public class Scene {
         return e;
     }
 
-    //TODO: MAKE THIS METHOD
-
-    public final OxyModel[] createModelEntities(ModelImportType type, String... paths) {
-        OxyModel e = new OxyModel(this);
-        OxyModelLoader loader;
-        switch (type) {
-            case obj -> {
-                if (paths.length < 2 || paths[0].contains(".mtl") || paths[1].contains(".obj"))
-                    throw new IllegalStateException("Not enough parameters are given or in the wrong order!");
-                loader = new OxyObjFileLoader(paths[0], paths[1]);
-            }
-            default -> throw new IllegalStateException("Unexpected value: " + type);
-        }
-        registry.componentList.put(e, new LinkedHashSet<>(10));
-        e.addComponent(new TransformComponent(), new ModelTemplate(loader.vertices, loader.textureCoords, loader.normals, loader.faces));
-        e.initData();
-        return new OxyModel[]{e};
-    }
-
     private Set<EntityComponent> cachedGameObjectsEntities;
     public static FrameBuffer currentFrameBuffer;
 
     public void build() {
+        oxyUISystem = new OxyUISystem(this, windowHandle);
         cachedGameObjectsEntities = distinct(GameObjectMesh.class, ModelMesh.class);
         //Prep
         {
@@ -88,12 +75,18 @@ public class Scene {
         //Prep
         {
             for (EntityComponent e : cachedGameObjectsEntities) {
-                ((Mesh) e).initList();
+                Mesh mesh = (Mesh) e;
+                mesh.clear();
+                mesh.initList();
             }
         }
     }
 
-    public void render() {
+    public void update(float deltaTime){
+        oxyUISystem.updateImGuiContext(deltaTime);
+    }
+
+    public void render(float deltaTime) {
 
         //Framebuffer
         {
@@ -109,17 +102,18 @@ public class Scene {
             }
         }
 
+
         if (currentFrameBuffer != null) currentFrameBuffer.bind();
         OpenGLRendererAPI.clearBuffer();
 
         //Rendering
         {
-            GameObjectMesh sameMesh = null;
             for (EntityComponent c : cachedGameObjectsEntities) {
                 render((Mesh) c, camera);
             }
         }
         if (currentFrameBuffer != null) currentFrameBuffer.unbind();
+        oxyUISystem.render(registry.componentList.keySet(), camera);
     }
 
     public final OxyEntity getEntityByIndex(int index) {
@@ -188,7 +182,16 @@ public class Scene {
         return renderer;
     }
 
+    public OxyUISystem getOxyUISystem() {
+        return oxyUISystem;
+    }
+
     public Set<OxyEntity> getEntities() {
         return registry.componentList.keySet();
+    }
+
+    @Override
+    public void dispose() {
+        oxyUISystem.dispose();
     }
 }

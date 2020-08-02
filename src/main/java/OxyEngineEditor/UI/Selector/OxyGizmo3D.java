@@ -3,7 +3,7 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
-import OxyEngineEditor.Sandbox.Scene.ModelImportType;
+import OxyEngineEditor.Sandbox.Scene.ModelFileType;
 import OxyEngineEditor.Sandbox.Scene.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
@@ -24,13 +24,17 @@ public class OxyGizmo3D {
 
     private OxyGizmo3D(Scene scene, OxyShader oxyShader) {
 
-        xModel = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
-        yModel = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
-        zModel = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
+        xModel = scene.createModelEntity(ModelFileType.OBJ, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
+        yModel = scene.createModelEntity(ModelFileType.OBJ, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
+        zModel = scene.createModelEntity(ModelFileType.OBJ, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
 
         xModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{1f, 0f, 0f, 0.8f}, oxyShader));
         yModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{0f, 1f, 0f, 0.8f}, oxyShader));
         zModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{0f, 0f, 1f, 0.8f}, oxyShader));
+
+        xModel.updateData();
+        yModel.updateData();
+        zModel.updateData();
 
         xModel.addEventListener(new OxyGizmoController(scene, xModel, yModel, zModel));
         yModel.addEventListener(new OxyGizmoController(scene, xModel, yModel, zModel));
