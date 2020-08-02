@@ -46,6 +46,11 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         indexBuffer.load();
         if (textureBuffer != null) if (textureBuffer.empty()) textureBuffer.load();
         if (frameBuffer != null) if (frameBuffer.empty()) frameBuffer.load();
+
+        if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC) {
+            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.getBufferId());
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer.getVertices());
+        }
     }
 
     private void draw() {
@@ -55,10 +60,11 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     private void bind() {
         glBindVertexArray(vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.bufferId);
-        if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC) {
-            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.getBufferId());
-            //TODO: OPTIMIZE THIS
-            glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer.getVertices());
+        if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC && vertexBuffer.offsetToUpdate != -1) {
+            glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.bufferId);
+            glBufferSubData(GL_ARRAY_BUFFER, vertexBuffer.offsetToUpdate, vertexBuffer.dataToUpdate);
+
+            vertexBuffer.offsetToUpdate = -1;
         }
     }
 
@@ -93,9 +99,14 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         for (OxyEntity entity : scene.getEntities()) {
             if (entity.equals(e)) {
                 vertexBuffer.updateSingleEntityData(i * e.getType().n_Vertices(), e.getVertices());
+                break;
             }
             i++;
         }
+    }
+
+    public void updateSingleEntityData(int offsetToUpdate, float[] dataToUpdate) {
+        vertexBuffer.updateSingleEntityData(offsetToUpdate, dataToUpdate);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
         this.path = path;
         this.textureSlot = slot;
 
-        if(slot == 0) throw new IllegalArgumentException("Slot can not be 0");
+        if (slot == 0) throw new IllegalArgumentException("Slot can not be 0");
 
         int[] width = new int[1];
         int[] height = new int[1];
@@ -63,29 +63,29 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
         this(slot, path, coords.getTcs());
     }
 
-    public static OxyTexture load(int slot, String path, OxyTextureCoords coords){
+    public static OxyTexture load(int slot, String path, OxyTextureCoords coords) {
         return new OxyTexture(slot, path, coords);
     }
 
-    public static OxyTexture load(int slot, String path){
+    public static OxyTexture load(int slot, String path) {
         return new OxyTexture(slot, path, new float[]{});
     }
 
-    public static OxyTexture loadCached(int slot){
-        for(OxyTexture t : allTextures){
-            if(t.getTextureSlot() == slot){
+    public static OxyTexture loadCached(int slot) {
+        for (OxyTexture t : allTextures) {
+            if (t.getTextureSlot() == slot) {
                 return t;
             }
         }
         return null;
     }
 
-    public static void bindAllTextureSlots(){
-        for(OxyTexture t : allTextures) glBindTextureUnit(t.getTextureSlot(), t.getTextureId());
+    public static void bindAllTextureSlots() {
+        for (OxyTexture t : allTextures) glBindTextureUnit(t.getTextureSlot(), t.getTextureId());
     }
 
-    public static void unbindAllTextureSlots(){
-        for(int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
+    public static void unbindAllTextureSlots() {
+        for (int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
     }
 
     public float[] getTextureCoords() {

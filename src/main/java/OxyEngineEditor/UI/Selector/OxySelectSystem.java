@@ -21,7 +21,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_3;
 
 public class OxySelectSystem {
 
-    private static OxyGizmo3D axis;
+    private static OxyGizmo3D gizmo;
     private static MouseSelector mSelector;
 
     private final OxyRenderer3D renderer;
@@ -35,7 +35,7 @@ public class OxySelectSystem {
 
     private OxySelectSystem(Scene scene) {
         this.renderer = scene.getRenderer();
-        axis = OxyGizmo3D.getInstance(scene);
+        gizmo = OxyGizmo3D.getInstance(scene);
         mSelector = MouseSelector.getInstance();
     }
 
@@ -51,9 +51,9 @@ public class OxySelectSystem {
 
                 TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
-                OxyModel xModel = axis.getXModel();
-                OxyModel yModel = axis.getYModel();
-                OxyModel zModel = axis.getZModel();
+                OxyModel xModel = gizmo.getXModel();
+                OxyModel yModel = gizmo.getYModel();
+                OxyModel zModel = gizmo.getZModel();
 
                 TransformComponent xC = (TransformComponent) xModel.get(TransformComponent.class);
                 TransformComponent yC = (TransformComponent) yModel.get(TransformComponent.class);

@@ -10,6 +10,9 @@ public final class VertexBuffer extends Buffer {
     private float[] vertices = new float[0];
     private final BufferTemplate.BufferTemplateImpl implementation;
 
+    int offsetToUpdate = -1;
+    float[] dataToUpdate;
+
     public VertexBuffer(BufferTemplate template) {
         this.implementation = template.setup();
 
@@ -61,6 +64,8 @@ public final class VertexBuffer extends Buffer {
     }
 
     public void updateSingleEntityData(int pos, float[] newVertices) {
+        this.offsetToUpdate = pos;
+        this.dataToUpdate = newVertices;
         for (float newVertex : newVertices) {
             vertices[pos++] = newVertex;
         }
@@ -72,6 +77,10 @@ public final class VertexBuffer extends Buffer {
 
     public float[] getVertices() {
         return vertices;
+    }
+
+    public int getOffsetToUpdate() {
+        return offsetToUpdate;
     }
 
     public void setVertices(float[] vertices) {

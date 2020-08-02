@@ -36,7 +36,6 @@ public interface ObjectSelector {
             min.add(-c.scale, -c.scale, -c.scale);
             max.add(c.scale, c.scale, c.scale);
             if (Intersectionf.intersectRayAab(center, direction, min, max, nearFar) && nearFar.x < closestDistance) {
-                System.out.println(entity);
                 closestDistance = nearFar.x;
                 selectedEntity = entity;
                 selected.selected = true;

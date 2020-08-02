@@ -64,7 +64,7 @@ public class Sandbox3D {
         oxyShader = new OxyShader("shaders/world.glsl");
 
         sandBoxMesh.obj = new GameObjectMesh.GameObjectMeshBuilderImpl()
-                .setUsage(BufferTemplate.Usage.STATIC)
+                .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setMode(GL_TRIANGLES)
                 .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot)
                 .runOnFrameBuffer(windowHandle, true)
@@ -115,6 +115,8 @@ public class Sandbox3D {
         testObjects.updateData();
 
         scene.build();
+        cubeTest = (OxyGameObject) scene.getEntityByIndex(0);
+        cubeT = (TransformComponent) cubeTest.get(TransformComponent.class);
     }
 
     private void update(float deltaTime) {
@@ -122,9 +124,14 @@ public class Sandbox3D {
     }
 
     static OxyModel testObjects;
+    static OxyGameObject cubeTest;
+    static TransformComponent cubeT;
 
     private void render() {
         OxyTexture.bindAllTextureSlots();
+
+        cubeT.position.add(0.01f, 0.0f, 0.0f);
+        cubeTest.updateData();
 
         scene.render();
         oxyUISystem.render(scene.getEntities(), camera);

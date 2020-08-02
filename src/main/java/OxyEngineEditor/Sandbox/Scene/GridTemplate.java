@@ -24,10 +24,6 @@ public class GridTemplate extends GameObjectTemplate {
         color.enable();
     }
 
-    public static OxyColor getColor() {
-        return color;
-    }
-
     @Override
     public void constructData(OxyGameObject e) {
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);

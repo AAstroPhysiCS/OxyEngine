@@ -5,6 +5,7 @@ import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
@@ -75,7 +76,6 @@ public class Scene {
 
     public void build() {
         cachedGameObjectsEntities = distinct(GameObjectMesh.class, ModelMesh.class);
-//        cachedGameObjectsColor = group(GameObjectMesh.class, OxyColor.class);
         //Prep
         {
             for (EntityComponent e : cachedGameObjectsEntities) {
@@ -98,7 +98,7 @@ public class Scene {
         //Framebuffer
         {
             for (EntityComponent e : cachedGameObjectsEntities) {
-                if (e instanceof Mesh mesh) {
+                if(e instanceof Mesh mesh) {
                     if (mesh.getFrameBuffer() != null) {
                         if (mesh.getFrameBuffer().isPrimary()) {
                             currentFrameBuffer = mesh.getFrameBuffer();
@@ -114,6 +114,7 @@ public class Scene {
 
         //Rendering
         {
+            GameObjectMesh sameMesh = null;
             for (EntityComponent c : cachedGameObjectsEntities) {
                 render((Mesh) c, camera);
             }
