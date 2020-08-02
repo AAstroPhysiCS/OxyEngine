@@ -1,5 +1,6 @@
 package OxyEngineEditor.Sandbox.Scene;
 
+import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 
@@ -28,6 +29,11 @@ public abstract class OxyEntity {
 
     public final void addComponent(EntityComponent... component) {
         scene.addComponent(this, component);
+        for(EntityComponent c : component){
+            if(c instanceof Mesh m){
+                m.addToList(this);
+            }
+        }
     }
 
     /*
@@ -44,10 +50,10 @@ public abstract class OxyEntity {
         return scene.get(this, destClass);
     }
 
-    public static float[] sumAllVertices(OxyGameObject[] arr, ObjectType type) {
+    public static float[] sumAllVertices(OxyEntity[] arr, ObjectType type) {
         float[] allVertices = new float[arr.length * type.n_Vertices()];
         int ptr = 0;
-        for (OxyGameObject oxyObj : arr) {
+        for (OxyEntity oxyObj : arr) {
             for (int i = 0; i < oxyObj.vertices.length; i++) {
                 allVertices[ptr++] = oxyObj.vertices[i];
             }
@@ -55,10 +61,10 @@ public abstract class OxyEntity {
         return allVertices;
     }
 
-    public static int[] sumAllIndices(OxyGameObject[] arr, ObjectType type) {
+    public static int[] sumAllIndices(OxyEntity[] arr, ObjectType type) {
         int[] allIndices = new int[arr.length * type.n_Indices()];
         int ptr = 0;
-        for (OxyGameObject oxyObj : arr) {
+        for (OxyEntity oxyObj : arr) {
             for (int i = 0; i < oxyObj.indices.length; i++) {
                 allIndices[ptr++] = oxyObj.indices[i];
             }
@@ -66,9 +72,9 @@ public abstract class OxyEntity {
         return allIndices;
     }
 
-    public static float[] sumAllVertices(List<OxyGameObject> arr) {
+    public static float[] sumAllVertices(List<OxyEntity> arr) {
         List<Float> allVertices = new ArrayList<>();
-        for (OxyGameObject oxyObj : arr) {
+        for (OxyEntity oxyObj : arr) {
             for (int i = 0; i < oxyObj.vertices.length; i++) {
                 allVertices.add(oxyObj.vertices[i]);
             }
@@ -76,9 +82,9 @@ public abstract class OxyEntity {
         return toPrimitiveFloat(allVertices);
     }
 
-    public static int[] sumAllIndices(List<OxyGameObject> arr) {
+    public static int[] sumAllIndices(List<OxyEntity> arr) {
         List<Integer> allIndices = new ArrayList<>();
-        for (OxyGameObject oxyObj : arr) {
+        for (OxyEntity oxyObj : arr) {
             for (int i = 0; i < oxyObj.indices.length; i++) {
                 allIndices.add(oxyObj.indices[i]);
             }

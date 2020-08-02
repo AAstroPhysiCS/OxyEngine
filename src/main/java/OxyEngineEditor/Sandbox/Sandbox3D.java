@@ -21,9 +21,6 @@ import imgui.ImGui;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 import static OxyEngine.System.OxySystem.logger;
 import static OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh.*;
@@ -69,7 +66,7 @@ public class Sandbox3D {
         sandBoxMesh.obj = new GameObjectMesh.GameObjectMeshBuilderImpl()
                 .setUsage(BufferTemplate.Usage.STATIC)
                 .setMode(GL_TRIANGLES)
-                .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlots)
+                .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot)
                 .runOnFrameBuffer(windowHandle, true)
                 .create();
 
@@ -79,10 +76,9 @@ public class Sandbox3D {
         scene = new Scene(oxyRenderer);
         oxyEngine.initLayers(scene);
 
-        final List<OxyGameObject> listOfCubes = new ArrayList<>(8000);
         OxyTexture texture = OxyTexture.load(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
 
-        //TODO: ALL MESHES SHOULD HAVE AN LIST OF ENTITIES, SO THAT I DONT NEED TO CALL ADD ON EVERY MESH INSTANCE
+        //TODO: COLOR?????
         //TODO: READ MTL FILE... PARSE MULTIPLE MESHES/ENTITIES, RENDER THEM SEPERATELY
         //TODO: CREATE A METHOD FOR MODELS THAT TAKES AN LIST OR ARRAY AND SUMS IN ONE MODELMESH
         camera = new PerspectiveCameraComponent(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
@@ -93,11 +89,9 @@ public class Sandbox3D {
                     OxyGameObject cube = scene.createGameObjectEntity();
                     cube.addComponent(camera, sandBoxMesh.obj, new CubeTemplate(), texture, new TransformComponent(new Vector3f(x, y, z)), new SelectedComponent(false));
                     cube.initData();
-                    listOfCubes.add(cube);
                 }
             }
         }
-        sandBoxMesh.obj.add(listOfCubes);
 
         mainUILayer = OxyEngine.getMainUIComponent();
         mainUILayer.addUILayers(StatsLayer.getInstance(windowHandle, scene));
@@ -116,11 +110,11 @@ public class Sandbox3D {
 
         testObjects = scene.createModelEntity(ModelImportType.obj, "src/main/resources/models/scene1.obj", "src/main/resources/models/scene1.mtl");
         testObjects.addComponent(camera,
-                new TransformComponent(new Vector3f(0, -1, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 50f),
+                new TransformComponent(new Vector3f(-100, -1, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 50),
                 new SelectedComponent(false));
         testObjects.updateData();
 
-        scene.setup();
+        scene.build();
     }
 
     private void update(float deltaTime) {
@@ -131,7 +125,8 @@ public class Sandbox3D {
 
     private void render() {
         OxyTexture.bindAllTextureSlots();
-        scene.update();
+
+        scene.render();
         oxyUISystem.render(scene.getEntities(), camera);
 
         OpenGLRendererAPI.clearBuffer();

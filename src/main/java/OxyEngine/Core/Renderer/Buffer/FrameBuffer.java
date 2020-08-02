@@ -1,7 +1,5 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
-
 import java.nio.ByteBuffer;
 
 import static OxyEngine.System.OxySystem.logger;
@@ -56,11 +54,6 @@ public class FrameBuffer extends Buffer {
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    }
-
-    @Override
-    public void addToBuffer(OxyGameObject oxyEntity) {
-        //does nothing too essential
     }
 
     public void bind() {

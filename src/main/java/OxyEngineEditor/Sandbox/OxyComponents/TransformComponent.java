@@ -7,7 +7,7 @@ public class TransformComponent implements EntityComponent {
 
     public final Vector3f position;
     public final Vector3f rotation;
-    public final float scale;
+    public float scale;
 
     public Matrix4f transform;
 

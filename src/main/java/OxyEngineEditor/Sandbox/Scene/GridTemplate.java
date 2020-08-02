@@ -21,7 +21,7 @@ public class GridTemplate extends GameObjectTemplate {
     public GridTemplate(OxyShader shader) {
         type = ObjectType.Grid;
         color = new OxyColor(1.0f, 1.0f, 1.0f, 0.2f, shader);
-        color.init();
+        color.enable();
     }
 
     public static OxyColor getColor() {

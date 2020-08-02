@@ -1,7 +1,6 @@
 package OxyEngineEditor.Sandbox.Scene;
 
 public enum ObjectType {
-    //TCS: 48
     Cube(144, 36),
     Grid(24, 6),
     Model(0, 0);

@@ -2,6 +2,7 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.OxyModel;
@@ -46,8 +47,7 @@ public class OxySelectSystem {
             ImGui.getMousePos(mousePos);
             direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), renderer.getCamera());
             OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
-
-            if (e != null) {
+            if (e != null && !((SelectedComponent)e.get(SelectedComponent.class)).fixedValue) {
 
                 TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
@@ -67,13 +67,16 @@ public class OxySelectSystem {
                 yC.rotation.set(Math.toRadians(-90), Math.toRadians(-180), 0);
                 zC.rotation.set(0, Math.toRadians(-90), 0);
 
+                xC.scale = c.scale;
+                yC.scale = c.scale;
+                zC.scale = c.scale;
+
                 xModel.updateData();
                 yModel.updateData();
                 zModel.updateData();
                 moveGameObject(e);
             }
         }
-//        axis.render(camera);
     }
 
     public void moveGameObject(OxyEntity e) {

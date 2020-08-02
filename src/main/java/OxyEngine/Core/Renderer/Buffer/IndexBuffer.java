@@ -21,7 +21,6 @@ public final class IndexBuffer extends Buffer {
         this.length = indices.length;
     }
 
-    @Override
     public void addToBuffer(OxyGameObject oxyEntity) {
         addToBuffer(oxyEntity.getIndices());
     }

@@ -5,15 +5,13 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
 
-import java.util.List;
-
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class GameObjectMesh extends Mesh {
-
+    //TODO: ATTRIBUTES, MAYBE DYNAMICALLY CHANGE IT?? BUT HOW??
     public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
     public static final BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-    public static final BufferTemplate.Attributes attributesTXSlots = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOTS, 1, GL_FLOAT, false, 6 * Float.BYTES, 5 * Float.BYTES);
+    public static final BufferTemplate.Attributes attributesTXSlot = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 6 * Float.BYTES, 5 * Float.BYTES);
 
     public int indicesX, indicesY, indicesZ;
 
@@ -83,21 +81,15 @@ public class GameObjectMesh extends Mesh {
         }
     }
 
-    public void add(OxyGameObject oxyEntity) {
+    public void addToBuffer(OxyGameObject oxyEntity) {
+        entities.add(oxyEntity);
         vertexBuffer.addToBuffer(oxyEntity);
         indexBuffer.addToBuffer(oxyEntity);
 
         load();
     }
 
-    public void add(List<OxyGameObject> list) {
-        vertexBuffer.addToBuffer(OxyGameObject.sumAllVertices(list));
-        indexBuffer.addToBuffer(OxyGameObject.sumAllIndices(list));
-
-        load();
-    }
-
-    public void add(float[] vertices, int[] indices) {
+    public void addToBuffer(float[] vertices, int[] indices) {
         vertexBuffer.addToBuffer(vertices);
         indexBuffer.addToBuffer(indices);
 

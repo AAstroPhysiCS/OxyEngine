@@ -6,6 +6,9 @@ import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.lwjgl.opengl.GL45.*;
 
 public abstract class Mesh implements OxyDisposable, EntityComponent {
@@ -14,6 +17,8 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     protected VertexBuffer vertexBuffer;
     protected TextureBuffer textureBuffer;
     protected FrameBuffer frameBuffer;
+
+    protected final List<OxyEntity> entities = new ArrayList<>();
 
     protected int mode, vao;
 
@@ -52,6 +57,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.bufferId);
         if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.getBufferId());
+            //TODO: OPTIMIZE THIS
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer.getVertices());
         }
     }
@@ -63,6 +69,17 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         OxyRenderer.Stats.drawCalls++;
         OxyRenderer.Stats.totalVertexCount += vertexBuffer.getVertices().length;
         OxyRenderer.Stats.totalIndicesCount += indexBuffer.getIndices().length;
+    }
+
+    public void addToList(OxyEntity e) {
+        entities.add(e);
+    }
+
+    public void initList() {
+        vertexBuffer.addToBuffer(OxyEntity.sumAllVertices(entities));
+        indexBuffer.addToBuffer(OxyEntity.sumAllIndices(entities));
+
+        load();
     }
 
     public void render() {

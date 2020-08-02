@@ -48,7 +48,7 @@ public class OxyModel extends OxyEntity {
 
     public ModelMesh getMesh() {
         OxyColor color = (OxyColor) get(OxyColor.class);
-        if (color != null) color.init();
+        if (color != null) color.enable();
         return (ModelMesh) get(ModelMesh.class);
     }
 }

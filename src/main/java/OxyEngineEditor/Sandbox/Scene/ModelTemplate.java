@@ -77,29 +77,5 @@ public class ModelTemplate implements EntityComponent {
         }
         e.indices = toPrimitiveInteger(indicesArr);
     }
-
-   /* public void updateData(OxyModel e) {
-
-        OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
-        TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
-
-        c.transform = new Matrix4f()
-                .scale(c.scale)
-                .translate(c.position)
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z);
-
-        int vertPtr = 0;
-        int slot = 0;
-        if (texture != null) slot = texture.getTextureSlot();
-        for (int i = 0; i < verticesNonTransformed.size() / 3; i++) {
-            Vector3f v = verticesNonTransformed.get(i);
-            Vector4f transformed = new Vector4f(v, 1.0f).mul(c.transform);
-            e.vertices[vertPtr++] = transformed.x;
-            e.vertices[vertPtr++] = transformed.y;
-            e.vertices[vertPtr++] = transformed.z;
-            e.vertices[vertPtr++] = slot;
-        }
-    }*/
+    //TODO: UPDATE DATA
 }

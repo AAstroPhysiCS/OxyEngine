@@ -4,7 +4,6 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.PerspectiveCameraComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
-import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Line.OxyInfoLine;
@@ -38,7 +37,6 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
     public interface MeshSystem {
         Ref<GameObjectMesh> sandBoxMesh = new Ref<>(null);
         Ref<GameObjectMesh> worldGridMesh = new Ref<>(null);
-        Ref<ModelMesh> modelMesh = new Ref<>(null);
     }
 
     public static record Stats() {

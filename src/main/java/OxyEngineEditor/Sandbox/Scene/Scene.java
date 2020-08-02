@@ -19,7 +19,6 @@ import static OxyEngineEditor.Sandbox.Sandbox3D.camera;
 public class Scene {
 
     private final Registry registry = new Registry();
-    private Set<EntityComponent> cachedComponents;
 
     private final OxyRenderer3D renderer;
 
@@ -36,7 +35,6 @@ public class Scene {
 
     public final OxyModel createModelEntity(ModelImportType type, String... paths) {
         OxyModel e = new OxyModel(this);
-
         OxyModelLoader loader;
         switch (type) {
             case obj -> {
@@ -46,6 +44,7 @@ public class Scene {
             }
             default -> throw new IllegalStateException("Unexpected value: " + type);
         }
+
         registry.componentList.put(e, new LinkedHashSet<>(10));
         e.addComponent(new TransformComponent(), new ModelTemplate(loader.vertices, loader.textureCoords, loader.normals, loader.faces));
         e.initData();
@@ -53,6 +52,7 @@ public class Scene {
     }
 
     //TODO: MAKE THIS METHOD
+
     public final OxyModel[] createModelEntities(ModelImportType type, String... paths) {
         OxyModel e = new OxyModel(this);
         OxyModelLoader loader;
@@ -70,36 +70,55 @@ public class Scene {
         return new OxyModel[]{e};
     }
 
-    public void setup() {
-        cachedComponents = distinct(ModelMesh.class, GameObjectMesh.class);
-    }
-
+    private Set<EntityComponent> cachedGameObjectsEntities;
     public static FrameBuffer currentFrameBuffer;
 
-    public void update() {
+    public void build() {
+        cachedGameObjectsEntities = distinct(GameObjectMesh.class, ModelMesh.class);
+//        cachedGameObjectsColor = group(GameObjectMesh.class, OxyColor.class);
+        //Prep
+        {
+            for (EntityComponent e : cachedGameObjectsEntities) {
+                ((Mesh) e).initList();
+            }
+        }
+    }
+
+    public void rebuild() {
+        //Prep
+        {
+            for (EntityComponent e : cachedGameObjectsEntities) {
+                ((Mesh) e).initList();
+            }
+        }
+    }
+
+    public void render() {
 
         //Framebuffer
         {
-            for (EntityComponent e : cachedComponents) {
-                if(e instanceof Mesh mesh){
-                    if (mesh.getFrameBuffer().isPrimary()) {
-                        currentFrameBuffer = mesh.getFrameBuffer();
-                        break;
+            for (EntityComponent e : cachedGameObjectsEntities) {
+                if (e instanceof Mesh mesh) {
+                    if (mesh.getFrameBuffer() != null) {
+                        if (mesh.getFrameBuffer().isPrimary()) {
+                            currentFrameBuffer = mesh.getFrameBuffer();
+                            break;
+                        }
                     }
                 }
             }
         }
 
+        if (currentFrameBuffer != null) currentFrameBuffer.bind();
+        OpenGLRendererAPI.clearBuffer();
+
         //Rendering
         {
-            if(currentFrameBuffer != null) currentFrameBuffer.bind();
-            OpenGLRendererAPI.clearBuffer();
-            for (EntityComponent e : cachedComponents) {
-                if (e instanceof Mesh m) render(m, camera);
+            for (EntityComponent c : cachedGameObjectsEntities) {
+                render((Mesh) c, camera);
             }
-            if(currentFrameBuffer != null) currentFrameBuffer.unbind();
         }
-
+        if (currentFrameBuffer != null) currentFrameBuffer.unbind();
     }
 
     public final OxyEntity getEntityByIndex(int index) {

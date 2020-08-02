@@ -95,11 +95,11 @@ public class CubeTemplate extends GameObjectTemplate {
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
-                .scale(c.scale)
                 .translate(c.position)
                 .rotateX(c.rotation.x)
                 .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z);
+                .rotateZ(c.rotation.z)
+                .scale(c.scale);
 
         int slot = 0; // 0 => color
         float[] tcs = null;

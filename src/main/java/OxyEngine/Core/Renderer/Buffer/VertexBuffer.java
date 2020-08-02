@@ -41,7 +41,6 @@ public final class VertexBuffer extends Buffer {
         glBufferData(GL_ARRAY_BUFFER, vertices.length * implementation.getStrideSize(), GL_DYNAMIC_DRAW);
     }
 
-    @Override
     public void addToBuffer(OxyGameObject oxyEntity) {
         addToBuffer(oxyEntity.getVertices());
     }

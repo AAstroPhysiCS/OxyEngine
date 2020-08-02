@@ -16,7 +16,7 @@ public class OxyShader implements OxyDisposable {
 
     public static final int VERTICES = 0;
     public static final int TEXTURE_COORDS = 1;
-    public static final int TEXTURE_SLOTS = 2;
+    public static final int TEXTURE_SLOT = 2;
 
     private final Map<String, ? super Number> uniformLocations = new HashMap<>();
 

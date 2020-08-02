@@ -51,14 +51,10 @@ public class SceneLayer extends UILayer {
     }
 
     static int counter = 1;
-    public static OxyGameObject cube;
+    static OxyGameObject cube;
 
     @Override
     public void renderLayer() {
-//        scene.getRenderer().getShader().enable();
-//        worldGrid.render();
-//        scene.getRenderer().getShader().disable();
-
         ImGui.setNextWindowSize(windowHandle.getWidth() / 1.3f, windowHandle.getHeight() / 1.3f, ImGuiCond.Once);
         ImGui.setNextWindowPos(40, 40, ImGuiCond.Once);
 
@@ -99,7 +95,7 @@ public class SceneLayer extends UILayer {
                 cube = scene.createGameObjectEntity();
                 cube.addComponent(new SelectedComponent(false), sandBoxMesh.obj, new CubeTemplate(), OxyTexture.loadCached(1), new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
                 cube.initData();
-                sandBoxMesh.obj.add(cube);
+                scene.rebuild();
             }
             ImGui.endDragDropTarget();
         }

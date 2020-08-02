@@ -29,7 +29,6 @@ public class TextureBuffer extends Buffer{
         }
     }
 
-    @Override
     public void addToBuffer(OxyGameObject oxyEntity) {
         addToBuffer(oxyEntity.getVertices());
     }

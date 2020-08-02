@@ -17,7 +17,7 @@ public class OxyColor implements Cloneable, EntityComponent {
         //constructor overloading does not work here!
         Color color = Color.decode(code);
         float r = color.getRed(), g = color.getGreen(), b = color.getBlue(), a = color.getAlpha();
-        float[] numbers = {r, g, b ,a};
+        float[] numbers = {r, g, b, a};
         if (r > 1 || b > 1 || g > 1 || a > 1) {
             numbers = normalizeColor(r, g, b, a);
         }
@@ -26,7 +26,7 @@ public class OxyColor implements Cloneable, EntityComponent {
     }
 
     public OxyColor(float r, float g, float b, float a, OxyShader shader) {
-        float[] numbers = {r, g, b ,a};
+        float[] numbers = {r, g, b, a};
         if (r > 1 || b > 1 || g > 1 || a > 1) {
             numbers = normalizeColor(r, g, b, a);
         }
@@ -40,16 +40,20 @@ public class OxyColor implements Cloneable, EntityComponent {
     }
 
     public OxyColor(int r, int g, int b, int a, OxyShader shader) {
-        this((float)r, (float)g, (float)b, (float)a, shader);
+        this((float) r, (float) g, (float) b, (float) a, shader);
     }
 
     public void setColorRGBA(float[] numbers) {
         this.numbers = numbers;
     }
 
-    public void init(){
+    public void enable() {
         shader.enable();
         shader.setUniformVec4("colorInput", new Vector4f(numbers[0], numbers[1], numbers[2], numbers[3]));
+    }
+
+    public void disable() {
+        shader.disable();
     }
 
     @Override
