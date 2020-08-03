@@ -2,6 +2,7 @@ package OxyEngine.Core.Renderer;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.PerspectiveCameraComponent;
+import OxyEngine.System.OxyTimestep;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -27,9 +28,9 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
         this.shader = shader;
     }
 
-    public abstract void render(Mesh mesh, OxyCamera camera);
+    public abstract void render(OxyTimestep ts, Mesh mesh, OxyCamera camera);
 
-    public abstract void render(Mesh mesh);
+    public abstract void render(OxyTimestep ts, Mesh mesh);
 
     /**
      * All global meshes should be here!

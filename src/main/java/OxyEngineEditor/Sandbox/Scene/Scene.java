@@ -8,6 +8,7 @@ import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.OxyTimestep;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
@@ -82,16 +83,16 @@ public class Scene implements OxyDisposable {
         }
     }
 
-    public void update(float deltaTime){
-        oxyUISystem.updateImGuiContext(deltaTime);
+    public void update(OxyTimestep ts) {
+        oxyUISystem.updateImGuiContext((float) ts.getDeltaTime());
     }
 
-    public void render(float deltaTime) {
+    public void render(OxyTimestep ts) {
 
         //Framebuffer
         {
             for (EntityComponent e : cachedGameObjectsEntities) {
-                if(e instanceof Mesh mesh) {
+                if (e instanceof Mesh mesh) {
                     if (mesh.getFrameBuffer() != null) {
                         if (mesh.getFrameBuffer().isPrimary()) {
                             currentFrameBuffer = mesh.getFrameBuffer();
@@ -109,7 +110,7 @@ public class Scene implements OxyDisposable {
         //Rendering
         {
             for (EntityComponent c : cachedGameObjectsEntities) {
-                render((Mesh) c, camera);
+                render(ts, (Mesh) c, camera);
             }
         }
         if (currentFrameBuffer != null) currentFrameBuffer.unbind();
@@ -168,13 +169,13 @@ public class Scene implements OxyDisposable {
         return registry.distinct(destClasses);
     }
 
-    private void render(Mesh mesh, OxyCamera camera) {
-        renderer.render(mesh, camera);
+    private void render(OxyTimestep ts, Mesh mesh, OxyCamera camera) {
+        renderer.render(ts, mesh, camera);
         OxyRenderer.Stats.totalShapeCount = registry.componentList.keySet().size();
     }
 
-    private void render(Mesh mesh) {
-        renderer.render(mesh);
+    private void render(OxyTimestep ts, Mesh mesh) {
+        renderer.render(ts, mesh);
         OxyRenderer.Stats.totalShapeCount = registry.componentList.keySet().size();
     }
 

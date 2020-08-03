@@ -1,6 +1,7 @@
 package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
+import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Vector3f;
@@ -19,7 +20,7 @@ public class WorldGrid {
         worldGridMesh.obj = new GameObjectMesh.GameObjectMeshBuilderImpl()
                 .setMode(GL_LINES)
                 .setUsage(BufferTemplate.Usage.STATIC)
-                .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot)
+                .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot, attributesColors)
                 .create();
         add(size);
         worldGridMesh.obj.initList();
@@ -29,7 +30,7 @@ public class WorldGrid {
         for (int x = -size; x < size; x++) {
             for (int z = -size; z < size; z++) {
                 OxyGameObject e = scene.createGameObjectEntity();
-                e.addComponent(camera, worldGridMesh.obj, new GridTemplate(scene.getRenderer().getShader()), new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
+                e.addComponent(camera, worldGridMesh.obj, new GridTemplate(), new OxyColor(1.0f, 1.0f, 1.0f, 0.2f), new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
                 e.initData();
             }
         }

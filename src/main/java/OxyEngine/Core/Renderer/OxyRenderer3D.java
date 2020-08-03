@@ -3,6 +3,7 @@ package OxyEngine.Core.Renderer;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Window.WindowHandle;
+import OxyEngine.System.OxyTimestep;
 
 import static OxyEngine.System.OxySystem.logger;
 
@@ -21,10 +22,10 @@ public class OxyRenderer3D extends OxyRenderer {
     }
 
     @Override
-    public void render(Mesh mesh, OxyCamera camera) {
+    public void render(OxyTimestep ts, Mesh mesh, OxyCamera camera) {
         shader.enable();
         OxyRenderer.currentBoundedCamera = camera;
-        shader.setCamera(camera);
+        shader.setCamera(ts, camera);
         if (shader == null) {
             logger.severe("Shader is not instantiated.");
             throw new NullPointerException("Shader is not instantiated.");
@@ -37,7 +38,7 @@ public class OxyRenderer3D extends OxyRenderer {
     }
 
     @Override
-    public void render(Mesh mesh) {
-        render(mesh, currentBoundedCamera);
+    public void render(OxyTimestep ts, Mesh mesh) {
+        render(ts, mesh, currentBoundedCamera);
     }
 }

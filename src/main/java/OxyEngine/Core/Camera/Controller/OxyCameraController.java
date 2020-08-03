@@ -1,5 +1,6 @@
 package OxyEngine.Core.Camera.Controller;
 
+import OxyEngine.System.OxyTimestep;
 import OxyEngine.Tools.Ref;
 import org.joml.Vector3f;
 
@@ -43,5 +44,5 @@ public abstract class OxyCameraController {
         return positionRef.obj;
     }
 
-    public abstract void update(Mode mode);
+    public abstract void update(OxyTimestep ts, Mode mode);
 }

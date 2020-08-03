@@ -23,7 +23,6 @@ public interface ObjectSelector {
         OxyEntity selectedEntity = null;
         float closestDistance = Float.POSITIVE_INFINITY;
 
-
         for (OxyEntity entity : entities) {
 
             if (!entity.has(SelectedComponent.class)) continue;

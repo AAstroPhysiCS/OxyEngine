@@ -18,19 +18,19 @@ public class OxyGizmo3D {
     private static OxyGizmo3D INSTANCE = null;
 
     public static OxyGizmo3D getInstance(Scene scene) {
-        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(scene, scene.getRenderer().getShader());
+        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(scene);
         return INSTANCE;
     }
 
-    private OxyGizmo3D(Scene scene, OxyShader oxyShader) {
+    private OxyGizmo3D(Scene scene) {
 
         xModel = scene.createModelEntity(ModelFileType.OBJ, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
         yModel = scene.createModelEntity(ModelFileType.OBJ, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
         zModel = scene.createModelEntity(ModelFileType.OBJ, "src/main/resources/models/arrow.obj", "src/main/resources/models/arrow.mtl");
 
-        xModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{1f, 0f, 0f, 0.8f}, oxyShader));
-        yModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{0f, 1f, 0f, 0.8f}, oxyShader));
-        zModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{0f, 0f, 1f, 0.8f}, oxyShader));
+        xModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{1f, 0f, 0f, 0.8f}));
+        yModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{0f, 1f, 0f, 0.8f}));
+        zModel.addComponent(camera, new SelectedComponent(false, true), new OxyColor(new float[]{0f, 0f, 1f, 0.8f}));
 
         xModel.updateData();
         yModel.updateData();

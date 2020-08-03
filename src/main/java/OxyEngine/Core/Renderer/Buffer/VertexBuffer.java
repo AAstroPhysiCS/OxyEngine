@@ -64,7 +64,7 @@ public final class VertexBuffer extends Buffer {
     }
 
     public void updateSingleEntityData(int pos, float[] newVertices) {
-        this.offsetToUpdate = pos;
+        this.offsetToUpdate = pos * Float.BYTES;
         this.dataToUpdate = newVertices;
         for (float newVertex : newVertices) {
             vertices[pos++] = newVertex;
@@ -77,10 +77,6 @@ public final class VertexBuffer extends Buffer {
 
     public float[] getVertices() {
         return vertices;
-    }
-
-    public int getOffsetToUpdate() {
-        return offsetToUpdate;
     }
 
     public void setVertices(float[] vertices) {

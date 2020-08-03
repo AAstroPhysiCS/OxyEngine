@@ -2,6 +2,7 @@ package OxyEngine.Core.Renderer.Shader;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.OxyTimestep;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
@@ -17,6 +18,7 @@ public class OxyShader implements OxyDisposable {
     public static final int VERTICES = 0;
     public static final int TEXTURE_COORDS = 1;
     public static final int TEXTURE_SLOT = 2;
+    public static final int COLOR = 3;
 
     private final Map<String, ? super Number> uniformLocations = new HashMap<>();
 
@@ -75,8 +77,8 @@ public class OxyShader implements OxyDisposable {
         buffer.clear();
     }
 
-    public void setCamera(OxyCamera camera){
-        camera.finalizeCamera();
+    public void setCamera(OxyTimestep ts, OxyCamera camera){
+        camera.finalizeCamera(ts);
         setUniformMatrix4fv(camera.getViewMatrix(), camera.getLocation(), camera.isTranspose());
     }
 

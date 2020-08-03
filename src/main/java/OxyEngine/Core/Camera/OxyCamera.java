@@ -1,6 +1,7 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
+import OxyEngine.System.OxyTimestep;
 import org.joml.Matrix4f;
 
 public abstract class OxyCamera {
@@ -20,7 +21,7 @@ public abstract class OxyCamera {
 
     public abstract Matrix4f setModelMatrix();
 
-    public abstract void finalizeCamera();
+    public abstract void finalizeCamera(OxyTimestep ts);
 
     public boolean isTranspose() {
         return transpose;

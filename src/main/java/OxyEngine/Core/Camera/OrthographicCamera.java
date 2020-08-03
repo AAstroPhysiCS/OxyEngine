@@ -1,5 +1,6 @@
 package OxyEngine.Core.Camera;
 
+import OxyEngine.System.OxyTimestep;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -12,11 +13,11 @@ public abstract class OrthographicCamera extends OxyCamera {
 
     private final Vector3f translation;
 
-    public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, int location, boolean transpose){
+    public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, int location, boolean transpose) {
         this(left, right, bottom, top, zNear, zFar, location, transpose, new Vector3f(0, 0, 0));
     }
 
-    public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, int location, boolean transpose, Vector3f translation){
+    public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, int location, boolean transpose, Vector3f translation) {
         super(location, transpose);
         this.left = left;
         this.right = right;
@@ -44,7 +45,7 @@ public abstract class OrthographicCamera extends OxyCamera {
     }
 
     @Override
-    public void finalizeCamera() {
+    public void finalizeCamera(OxyTimestep ts) {
         projectionMatrix = setProjectionMatrix();
         modelMatrix = setModelMatrix();
         viewMatrix.set(projectionMatrix);

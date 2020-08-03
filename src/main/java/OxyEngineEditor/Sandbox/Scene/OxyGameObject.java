@@ -30,6 +30,7 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
         Mesh mesh = (Mesh) get(Mesh.class);
 
         template = (GameObjectTemplate) get(GameObjectTemplate.class);
+        this.type = template.type;
         template.constructData(this);
         if (mesh instanceof GameObjectMesh gameObjectMesh) {
             template.initData(this, gameObjectMesh);
@@ -37,7 +38,6 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
             logger.severe("Game Objects needs to have a GameObjectMesh");
             throw new IllegalStateException("Game Objects needs to have a GameObjectMesh");
         }
-        this.type = template.type;
     }
 
     @Override

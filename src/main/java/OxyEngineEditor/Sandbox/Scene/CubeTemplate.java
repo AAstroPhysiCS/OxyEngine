@@ -1,5 +1,6 @@
 package OxyEngineEditor.Sandbox.Scene;
 
+import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
@@ -8,89 +9,50 @@ import org.joml.Vector4f;
 
 public class CubeTemplate extends GameObjectTemplate {
 
-    private static final float[] cubeVertexPos = new float[]{
-            -0.5f, -0.5f, 0.5f,
-            0.5f, -0.5f, 0.5f,
-            -0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f,
-
-            //back
-            -0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-            -0.5f, 0.5f, -0.5f,
-            0.5f, 0.5f, -0.5f,
-
-            //left
-            0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, 0.5f,
-            0.5f, 0.5f, -0.5f,
-            0.5f, 0.5f, 0.5f,
-
-            //right
-            -0.5f, -0.5f, -0.5f,
-            -0.5f, -0.5f, 0.5f,
-            -0.5f, 0.5f, -0.5f,
-            -0.5f, 0.5f, 0.5f,
-
-            //top
-            -0.5f, -0.5f, 0.5f,
-            0.5f, -0.5f, 0.5f,
-            -0.5f, -0.5f, -0.5f,
-            0.5f, -0.5f, -0.5f,
-
-            //bottom
-            -0.5f, 0.5f, 0.5f,
-            0.5f, 0.5f, 0.5f,
-            -0.5f, 0.5f, -0.5f,
-            0.5f, 0.5f, -0.5f
-    };
-
     public CubeTemplate() {
         type = ObjectType.Cube;
+        vertexPos = new float[]{
+                -0.5f, -0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
+                -0.5f, 0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+
+                //back
+                -0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f,
+                -0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, -0.5f,
+
+                //left
+                0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, 0.5f,
+                0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, 0.5f,
+
+                //right
+                -0.5f, -0.5f, -0.5f,
+                -0.5f, -0.5f, 0.5f,
+                -0.5f, 0.5f, -0.5f,
+                -0.5f, 0.5f, 0.5f,
+
+                //top
+                -0.5f, -0.5f, 0.5f,
+                0.5f, -0.5f, 0.5f,
+                -0.5f, -0.5f, -0.5f,
+                0.5f, -0.5f, -0.5f,
+
+                //bottom
+                -0.5f, 0.5f, 0.5f,
+                0.5f, 0.5f, 0.5f,
+                -0.5f, 0.5f, -0.5f,
+                0.5f, 0.5f, -0.5f
+        };
     }
 
-    @Override
-    public void constructData(OxyGameObject e) {
-        OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
-        TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
-
-        c.transform = new Matrix4f()
-                .scale(c.scale)
-                .translate(c.position)
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z);
-
-        int slot = 0; // 0 => color
-        float[] tcs = null;
-
-        if (texture != null) {
-            slot = texture.getTextureSlot();
-            tcs = texture.getTextureCoords();
-        }
-        Vector4f[] vec4Vertices = new Vector4f[24];
-        int vecPtr = 0;
-        for (int i = 0; i < vec4Vertices.length; i++) {
-            vec4Vertices[i] = new Vector4f(cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], cubeVertexPos[vecPtr++], 1.0f).mul(c.transform);
-        }
-
-        e.vertices = new float[ObjectType.Cube.n_Vertices()];
-        int ptr = 0, texIndex = 0;
-        for (int i = 0; i < ObjectType.Cube.n_Vertices(); ) {
-            e.vertices[i++] = vec4Vertices[ptr].x;
-            e.vertices[i++] = vec4Vertices[ptr].y;
-            e.vertices[i++] = vec4Vertices[ptr].z;
-            if (texture != null) {
-                e.vertices[i++] = tcs[texIndex++];
-                e.vertices[i++] = tcs[texIndex++];
-            } else i += 2;
-            e.vertices[i++] = slot;
-            ptr++;
-        }
-    }
     //YOu could summarize these both methods... but i won't do that.. bcs i need that clarification
     @Override
     public void updateData(OxyGameObject e){
+        OxyColor color = (OxyColor) e.get(OxyColor.class);
         OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
@@ -111,7 +73,7 @@ public class CubeTemplate extends GameObjectTemplate {
         Vector4f[] vec4Vertices = new Vector4f[24];
         int vecPtr = 0, texIndex = 0, cubeVertPosIndex = 0;
         for (int i = 0; i < vec4Vertices.length; i++) {
-            vec4Vertices[i] = new Vector4f(cubeVertexPos[cubeVertPosIndex++], cubeVertexPos[cubeVertPosIndex++], cubeVertexPos[cubeVertPosIndex++], 1.0f).mul(c.transform);
+            vec4Vertices[i] = new Vector4f(vertexPos[cubeVertPosIndex++], vertexPos[cubeVertPosIndex++], vertexPos[cubeVertPosIndex++], 1.0f).mul(c.transform);
             e.vertices[vecPtr++] = vec4Vertices[i].x;
             e.vertices[vecPtr++] = vec4Vertices[i].y;
             e.vertices[vecPtr++] = vec4Vertices[i].z;
@@ -120,6 +82,12 @@ public class CubeTemplate extends GameObjectTemplate {
                 e.vertices[vecPtr++] = tcs[texIndex++];
             } else vecPtr += 2;
             e.vertices[vecPtr++] = slot;
+            if(color != null && slot == 0){
+                e.vertices[vecPtr++] = color.getNumbers()[0];
+                e.vertices[vecPtr++] = color.getNumbers()[1];
+                e.vertices[vecPtr++] = color.getNumbers()[2];
+                e.vertices[vecPtr++] = color.getNumbers()[3];
+            } else vecPtr += 4;
         }
     }
 

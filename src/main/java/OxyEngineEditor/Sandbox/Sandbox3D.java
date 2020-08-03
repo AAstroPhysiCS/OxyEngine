@@ -5,12 +5,14 @@ import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTextureCoords;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
+import OxyEngine.System.OxyTimestep;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
@@ -65,7 +67,7 @@ public class Sandbox3D {
         sandBoxMesh.obj = new GameObjectMesh.GameObjectMeshBuilderImpl()
                 .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setMode(GL_TRIANGLES)
-                .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot)
+                .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot, attributesColors)
                 .runOnFrameBuffer(windowHandle, true)
                 .create();
 
@@ -77,7 +79,6 @@ public class Sandbox3D {
 
         OxyTexture texture = OxyTexture.load(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
 
-        //TODO: COLOR?????
         //TODO: READ MTL FILE... PARSE MULTIPLE MESHES/ENTITIES, RENDER THEM SEPERATELY
         //TODO: CREATE A METHOD FOR MODELS THAT TAKES AN LIST OR ARRAY AND SUMS IN ONE MODELMESH
         camera = new PerspectiveCameraComponent(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
@@ -107,23 +108,24 @@ public class Sandbox3D {
 
         testObjects = scene.createModelEntity(ModelFileType.OBJ, "src/main/resources/models/scene1.obj", "src/main/resources/models/scene1.mtl");
         testObjects.addComponent(camera,
-                new TransformComponent(new Vector3f(-100, -1, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 50),
+                new OxyColor(1.0f, 0.0f, 0.0f, 1.0f),
+                new TransformComponent(new Vector3f(-500, -1, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 1),
                 new SelectedComponent(false));
         testObjects.updateData();
 
         scene.build();
     }
 
-    private void update(float deltaTime) {
-        scene.update(deltaTime);
+    private void update(OxyTimestep ts) {
+        scene.update(ts);
     }
 
     static OxyModel testObjects;
 
-    private void render(float deltaTime) {
+    private void render(OxyTimestep ts) {
         OxyTexture.bindAllTextureSlots();
 
-        scene.render(deltaTime);
+        scene.render(ts);
 
         OpenGLRendererAPI.clearBuffer();
         OpenGLRendererAPI.clearColor(41, 41, 41, 1.0f);
@@ -143,6 +145,8 @@ public class Sandbox3D {
 
             init();
 
+            OxyTimestep ts = new OxyTimestep(0);
+
             double time = 0;
             long timeMillis = System.currentTimeMillis();
             int frames = 0;
@@ -154,14 +158,15 @@ public class Sandbox3D {
 
                 final double currentTime = glfwGetTime();
                 final double deltaTime = (time > 0) ? (currentTime - time) : 1f / 60f;
+                ts.setDeltaTime(deltaTime);
+                ts.setTimestep((float) (currentTime - time));
                 time = currentTime;
-                update((float) deltaTime);
-                render((float) deltaTime);
+                update(ts);
+                render(ts);
 
                 frames++;
 
-                long millis = 0;
-                if ((millis = System.currentTimeMillis() - timeMillis) > 1000) {
+                if (System.currentTimeMillis() - timeMillis > 1000) {
                     timeMillis += 1000;
                     FPS = frames;
                     frames = 0;

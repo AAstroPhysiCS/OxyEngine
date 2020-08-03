@@ -116,6 +116,7 @@ public class OxyGizmoController implements OxyMouseListener {
             hoveredGameObject = hoveredEntity;
             OxyColor hoveredColor = (OxyColor) hoveredGameObject.get(OxyColor.class);
             hoveredColor.setColorRGBA(new float[]{1.0f, 1.0f, 0.0f, 1.0f});
+            hoveredGameObject.updateData();
         }
     }
 
@@ -128,6 +129,7 @@ public class OxyGizmoController implements OxyMouseListener {
         if (hoveredGameObject != null) {
             OxyColor hoveredColor = (OxyColor) hoveredGameObject.get(OxyColor.class);
             hoveredColor.setColorRGBA(standardColor.getNumbers());
+            hoveredGameObject.updateData();
         }
     }
 }

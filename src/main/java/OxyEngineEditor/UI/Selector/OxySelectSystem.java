@@ -68,9 +68,9 @@ public class OxySelectSystem {
                 yC.rotation.set(Math.toRadians(-90), Math.toRadians(-180), 0);
                 zC.rotation.set(0, Math.toRadians(-90), 0);
 
-                xC.scale = c.scale;
-                yC.scale = c.scale;
-                zC.scale = c.scale;
+//                xC.scale = c.scale;
+//                yC.scale = c.scale;
+//                zC.scale = c.scale;
 
                 xModel.updateData();
                 yModel.updateData();
