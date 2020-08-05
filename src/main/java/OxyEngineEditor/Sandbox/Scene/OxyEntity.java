@@ -13,8 +13,8 @@ import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.dispatcherThread;
 
 public abstract class OxyEntity {
 
-    float[] vertices, tcs, normals;
-    int[] indices;
+    public float[] vertices, tcs, normals;
+    public int[] indices;
 
     protected ObjectType type;
     protected final Scene scene;
@@ -23,7 +23,7 @@ public abstract class OxyEntity {
         this.scene = scene;
     }
 
-    abstract void initData();
+    protected abstract void initData();
 
     public abstract void updateData();
 

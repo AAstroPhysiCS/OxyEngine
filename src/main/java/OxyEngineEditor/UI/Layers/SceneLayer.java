@@ -6,7 +6,7 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.CubeTemplate;
+import OxyEngineEditor.Sandbox.Scene.CubeFactory;
 import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.Sandbox.Scene.WorldGrid;
@@ -23,8 +23,6 @@ import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 import static OxyEngine.System.Globals.Globals.normalizeColor;
 
 public class SceneLayer extends UILayer {
-
-    private final WorldGrid worldGrid;
 
     public static boolean focusedWindowDragging, focusedWindow;
 
@@ -43,7 +41,7 @@ public class SceneLayer extends UILayer {
     private SceneLayer(WindowHandle windowHandle, Scene scene) {
         super(windowHandle, scene);
         this.scene = scene;
-        worldGrid = new WorldGrid(scene, 50);
+        new WorldGrid(scene, 50);
     }
 
     @Override
@@ -93,7 +91,7 @@ public class SceneLayer extends UILayer {
         if (ImGui.beginDragDropTarget()) {
             if (ImGui.acceptDragDropPayload("mousePosViewportLayer") != null) {
                 cube = scene.createGameObjectEntity();
-                cube.addComponent(new SelectedComponent(false), sandBoxMesh.obj, new CubeTemplate(), OxyTexture.loadCached(1), new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
+                cube.addComponent(new SelectedComponent(false), sandBoxMesh.obj, new CubeFactory(), OxyTexture.loadCached(1), new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
                 cube.initData();
                 scene.rebuild();
             }

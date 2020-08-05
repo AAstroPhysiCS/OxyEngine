@@ -8,7 +8,7 @@ import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-public abstract class GameObjectTemplate implements EntityComponent {
+public abstract class GameObjectFactory implements EntityComponent {
 
     ObjectType type;
     protected float[] vertexPos;

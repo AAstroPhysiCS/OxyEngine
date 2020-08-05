@@ -5,7 +5,7 @@ import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
-import OxyEngineEditor.Sandbox.Scene.OxyModel;
+import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import OxyEngineEditor.UI.OxyUISystem;
@@ -60,17 +60,9 @@ public class OxySelectSystem {
                 TransformComponent yC = (TransformComponent) yModel.get(TransformComponent.class);
                 TransformComponent zC = (TransformComponent) zModel.get(TransformComponent.class);
 
-                xC.position.set(new Vector3f(c.position).add(0, 0, -3));
-                yC.position.set(new Vector3f(c.position).add(0, -3, 0));
-                zC.position.set(new Vector3f(c.position).add(-3, 0, 0));
-
-                xC.rotation.set(Math.toRadians(180), 0, 0);
-                yC.rotation.set(Math.toRadians(-90), Math.toRadians(-180), 0);
-                zC.rotation.set(0, Math.toRadians(-90), 0);
-
-//                xC.scale = c.scale;
-//                yC.scale = c.scale;
-//                zC.scale = c.scale;
+                xC.position.set(new Vector3f(c.position));
+                yC.position.set(new Vector3f(c.position));
+                zC.position.set(new Vector3f(c.position));
 
                 xModel.updateData();
                 yModel.updateData();

@@ -2,9 +2,9 @@ package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 
-public class GridTemplate extends GameObjectTemplate {
+public class GridFactory extends GameObjectFactory {
 
-    public GridTemplate() {
+    public GridFactory() {
         type = ObjectType.Grid;
         vertexPos = new float[]{
                 -0.5f, 0.5f, 0.5f,

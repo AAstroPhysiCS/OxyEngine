@@ -1,7 +1,6 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
-import OxyEngine.System.OxyTimestep;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import imgui.ImGui;
@@ -37,7 +36,7 @@ public class PerspectiveCameraComponent extends PerspectiveCamera implements Ent
     }
 
     @Override
-    public void finalizeCamera(OxyTimestep ts) {
+    public void finalizeCamera(float ts) {
         ImGuiIO io = ImGui.getIO();
         if(SceneLayer.focusedWindow)
             zoom += io.getMouseWheel();

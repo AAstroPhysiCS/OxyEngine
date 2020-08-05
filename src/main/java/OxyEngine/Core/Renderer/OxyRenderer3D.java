@@ -3,7 +3,6 @@ package OxyEngine.Core.Renderer;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngine.System.OxyTimestep;
 
 import static OxyEngine.System.OxySystem.logger;
 
@@ -22,7 +21,7 @@ public class OxyRenderer3D extends OxyRenderer {
     }
 
     @Override
-    public void render(OxyTimestep ts, Mesh mesh, OxyCamera camera) {
+    public void render(float ts, Mesh mesh, OxyCamera camera) {
         shader.enable();
         OxyRenderer.currentBoundedCamera = camera;
         shader.setCamera(ts, camera);
@@ -38,7 +37,7 @@ public class OxyRenderer3D extends OxyRenderer {
     }
 
     @Override
-    public void render(OxyTimestep ts, Mesh mesh) {
+    public void render(float ts, Mesh mesh) {
         render(ts, mesh, currentBoundedCamera);
     }
 }

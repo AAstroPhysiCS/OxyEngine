@@ -6,7 +6,7 @@ import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.Events.OxyMouseListener;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
-import OxyEngineEditor.Sandbox.Scene.OxyModel;
+import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.OxyUISystem;
 import imgui.flag.ImGuiMouseButton;

@@ -2,7 +2,6 @@ package OxyEngine.Core.Renderer.Shader;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.System.OxyDisposable;
-import OxyEngine.System.OxyTimestep;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
@@ -77,7 +76,7 @@ public class OxyShader implements OxyDisposable {
         buffer.clear();
     }
 
-    public void setCamera(OxyTimestep ts, OxyCamera camera){
+    public void setCamera(float ts, OxyCamera camera){
         camera.finalizeCamera(ts);
         setUniformMatrix4fv(camera.getViewMatrix(), camera.getLocation(), camera.isTranspose());
     }

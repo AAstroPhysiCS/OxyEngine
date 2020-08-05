@@ -29,6 +29,10 @@ public class TransformComponent implements EntityComponent {
         this(position, new Vector3f(0, 0, 0), 1);
     }
 
+    public TransformComponent(float scale){
+        this(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), scale);
+    }
+
     public TransformComponent(){
         this(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), 1);
     }

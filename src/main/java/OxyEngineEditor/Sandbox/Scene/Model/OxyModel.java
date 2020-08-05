@@ -1,21 +1,25 @@
-package OxyEngineEditor.Sandbox.Scene;
+package OxyEngineEditor.Sandbox.Scene.Model;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
+import OxyEngineEditor.Sandbox.Scene.ModelFactory;
+import OxyEngineEditor.Sandbox.Scene.ObjectType;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class OxyModel extends OxyEntity {
 
-    private ModelTemplate template;
+    private ModelFactory template;
 
-    OxyModel(Scene scene) {
+    public OxyModel(Scene scene) {
         super(scene);
         this.type = ObjectType.Model;
     }
 
-    OxyModel(OxyModel other) {
+    public OxyModel(OxyModel other) {
         this(other.scene);
         this.template = other.template;
         this.vertices = other.vertices;
@@ -26,9 +30,9 @@ public class OxyModel extends OxyEntity {
     }
 
     @Override
-    void initData() {
-        if (!has(ModelTemplate.class)) throw new IllegalStateException("Models should have a Model Template");
-        template = (ModelTemplate) get(ModelTemplate.class);
+    public void initData() {
+        if (!has(ModelFactory.class)) throw new IllegalStateException("Models should have a Model Template");
+        template = (ModelFactory) get(ModelFactory.class);
         template.constructData(this);
         addComponent(new ModelMesh.ModelMeshBuilderImpl()
                 .setMode(GL_TRIANGLES)

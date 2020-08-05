@@ -18,9 +18,11 @@ public class Registry {
      */
     public final void addComponent(OxyEntity entity, EntityComponent... component) {
         for (EntityComponent c : component) {
-            Set<EntityComponent> entityComponentSet = componentList.get(entity);
-            entityComponentSet.removeIf(entityComponent -> entityComponent.getClass().equals(c.getClass()) || entityComponent.getClass().isInstance(c));
-            componentList.get(entity).add(c);
+            if(c != null) {
+                Set<EntityComponent> entityComponentSet = componentList.get(entity);
+                entityComponentSet.removeIf(entityComponent -> entityComponent.getClass().equals(c.getClass()) || entityComponent.getClass().isInstance(c));
+                componentList.get(entity).add(c);
+            }
         }
     }
 

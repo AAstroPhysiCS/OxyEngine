@@ -5,20 +5,25 @@ import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
-import OxyEngine.System.OxyTimestep;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
+import OxyEngineEditor.Sandbox.Scene.Model.OxyModelLoader;
 import OxyEngineEditor.UI.OxyUISystem;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import static OxyEngineEditor.Sandbox.Sandbox3D.camera;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Scene implements OxyDisposable {
 
@@ -40,22 +45,23 @@ public class Scene implements OxyDisposable {
         return e;
     }
 
-    public final OxyModel createModelEntity(ModelFileType type, String... paths) {
-        OxyModel e = new OxyModel(this);
-        OxyModelLoader loader;
-        switch (type) {
-            case OBJ -> {
-                if (paths.length < 2 || paths[0].contains(".mtl") || paths[1].contains(".obj"))
-                    throw new IllegalStateException("Not enough parameters are given or in the wrong order!");
-                loader = new OxyObjFileLoader(paths[0], paths[1]);
-            }
-            default -> throw new IllegalStateException("Unexpected value: " + type);
-        }
+    public final List<OxyModel> createModelEntity(String path) {
+        List<OxyModel> models = new ArrayList<>();
+        OxyModelLoader loader = new OxyModelLoader(path);
 
-        registry.componentList.put(e, new LinkedHashSet<>(10));
-        e.addComponent(new TransformComponent(), new ModelTemplate(loader.vertices, loader.textureCoords, loader.normals, loader.faces));
-        e.initData();
-        return e;
+        for (OxyModelLoader.AssimpMesh assimpMesh : loader.meshes) {
+            OxyModel e = new OxyModel(this);
+            registry.componentList.put(e, new LinkedHashSet<>(10));
+            e.addComponent(
+                    new TransformComponent(),
+                    assimpMesh.material.texture(),
+                    new OxyColor(assimpMesh.material.diffuseColor()),
+                    new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces)
+            );
+            e.initData();
+            models.add(e);
+        }
+        return models;
     }
 
     private Set<EntityComponent> cachedGameObjectsEntities;
@@ -83,11 +89,11 @@ public class Scene implements OxyDisposable {
         }
     }
 
-    public void update(OxyTimestep ts) {
-        oxyUISystem.updateImGuiContext((float) ts.getDeltaTime());
+    public void update(float ts, float deltaTime) {
+        oxyUISystem.updateImGuiContext(deltaTime);
     }
 
-    public void render(OxyTimestep ts) {
+    public void render(float ts, float deltaTime) {
 
         //Framebuffer
         {
@@ -110,7 +116,13 @@ public class Scene implements OxyDisposable {
         //Rendering
         {
             for (EntityComponent c : cachedGameObjectsEntities) {
-                render(ts, (Mesh) c, camera);
+                if (c instanceof ModelMesh) {
+                    glEnable(GL_CULL_FACE);
+                    render(ts, (Mesh) c, camera);
+                    glDisable(GL_CULL_FACE);
+                } else {
+                    render(ts, (Mesh) c, camera);
+                }
             }
         }
         if (currentFrameBuffer != null) currentFrameBuffer.unbind();
@@ -169,12 +181,12 @@ public class Scene implements OxyDisposable {
         return registry.distinct(destClasses);
     }
 
-    private void render(OxyTimestep ts, Mesh mesh, OxyCamera camera) {
+    private void render(float ts, Mesh mesh, OxyCamera camera) {
         renderer.render(ts, mesh, camera);
         OxyRenderer.Stats.totalShapeCount = registry.componentList.keySet().size();
     }
 
-    private void render(OxyTimestep ts, Mesh mesh) {
+    private void render(float ts, Mesh mesh) {
         renderer.render(ts, mesh);
         OxyRenderer.Stats.totalShapeCount = registry.componentList.keySet().size();
     }

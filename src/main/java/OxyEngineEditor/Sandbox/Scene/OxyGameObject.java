@@ -7,7 +7,7 @@ import static OxyEngine.System.OxySystem.logger;
 
 public class OxyGameObject extends OxyEntity implements Cloneable {
 
-    private GameObjectTemplate template;
+    private GameObjectFactory template;
 
     OxyGameObject(Scene scene) {
         super(scene);
@@ -24,12 +24,12 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
     }
 
     public void initData() {
-        if (!has(GameObjectTemplate.class) || !has(Mesh.class))
+        if (!has(GameObjectFactory.class) || !has(Mesh.class))
             throw new IllegalStateException("Game object need to have a template or a Mesh!");
 
         Mesh mesh = (Mesh) get(Mesh.class);
 
-        template = (GameObjectTemplate) get(GameObjectTemplate.class);
+        template = (GameObjectFactory) get(GameObjectFactory.class);
         this.type = template.type;
         template.constructData(this);
         if (mesh instanceof GameObjectMesh gameObjectMesh) {

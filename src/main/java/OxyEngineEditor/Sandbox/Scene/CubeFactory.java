@@ -7,9 +7,9 @@ import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-public class CubeTemplate extends GameObjectTemplate {
+public class CubeFactory extends GameObjectFactory {
 
-    public CubeTemplate() {
+    public CubeFactory() {
         type = ObjectType.Cube;
         vertexPos = new float[]{
                 -0.5f, -0.5f, 0.5f,
@@ -57,11 +57,11 @@ public class CubeTemplate extends GameObjectTemplate {
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
+                .scale(c.scale)
                 .translate(c.position)
                 .rotateX(c.rotation.x)
                 .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z)
-                .scale(c.scale);
+                .rotateZ(c.rotation.z);
 
         int slot = 0; // 0 => color
         float[] tcs = null;

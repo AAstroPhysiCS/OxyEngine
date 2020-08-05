@@ -1,7 +1,6 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Camera.Controller.PerspectiveCameraController;
-import OxyEngine.System.OxyTimestep;
 import OxyEngine.Tools.Ref;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -36,7 +35,7 @@ public abstract class PerspectiveCamera extends OxyCamera {
     public abstract Matrix4f setProjectionMatrix();
 
     @Override
-    public abstract void finalizeCamera(OxyTimestep ts);
+    public abstract void finalizeCamera(float ts);
 
     public void setAspect(float aspect) {
         this.aspect = aspect;

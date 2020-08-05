@@ -1,6 +1,5 @@
 package OxyEngine.Core.Camera;
 
-import OxyEngine.System.OxyTimestep;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -45,7 +44,7 @@ public abstract class OrthographicCamera extends OxyCamera {
     }
 
     @Override
-    public void finalizeCamera(OxyTimestep ts) {
+    public void finalizeCamera(float ts) {
         projectionMatrix = setProjectionMatrix();
         modelMatrix = setModelMatrix();
         viewMatrix.set(projectionMatrix);

@@ -30,7 +30,7 @@ public class WorldGrid {
         for (int x = -size; x < size; x++) {
             for (int z = -size; z < size; z++) {
                 OxyGameObject e = scene.createGameObjectEntity();
-                e.addComponent(camera, worldGridMesh.obj, new GridTemplate(), new OxyColor(1.0f, 1.0f, 1.0f, 0.2f), new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
+                e.addComponent(camera, worldGridMesh.obj, new GridFactory(), new OxyColor(1.0f, 1.0f, 1.0f, 0.2f), new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
                 e.initData();
             }
         }

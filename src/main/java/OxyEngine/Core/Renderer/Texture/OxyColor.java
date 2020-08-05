@@ -1,6 +1,7 @@
 package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import org.joml.Vector4f;
 
 import java.awt.*;
 
@@ -27,6 +28,10 @@ public class OxyColor implements Cloneable, EntityComponent {
             numbers = normalizeColor(r, g, b, a);
         }
         this.numbers = numbers;
+    }
+
+    public OxyColor(Vector4f rgba) {
+        this(rgba.x, rgba.y, rgba.z, rgba.w);
     }
 
     public OxyColor(float[] numbers) {
