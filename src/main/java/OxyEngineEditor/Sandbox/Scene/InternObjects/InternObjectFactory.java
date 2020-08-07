@@ -1,4 +1,4 @@
-package OxyEngineEditor.Sandbox.Scene;
+package OxyEngineEditor.Sandbox.Scene.InternObjects;
 
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
@@ -8,12 +8,12 @@ import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-public abstract class GameObjectFactory implements EntityComponent {
+public abstract class InternObjectFactory implements EntityComponent {
 
     ObjectType type;
     protected float[] vertexPos;
 
-    public void constructData(OxyGameObject e){
+    public void constructData(OxyInternObject e){
         OxyColor color = (OxyColor) e.get(OxyColor.class);
         OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
@@ -59,7 +59,7 @@ public abstract class GameObjectFactory implements EntityComponent {
         }
     }
 
-    abstract void updateData(OxyGameObject e);
+    abstract void updateData(OxyInternObject e);
 
-    abstract void initData(OxyGameObject e, GameObjectMesh mesh);
+    abstract void initData(OxyInternObject e, GameObjectMesh mesh);
 }

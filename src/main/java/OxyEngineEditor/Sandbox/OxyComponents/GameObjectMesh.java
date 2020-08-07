@@ -2,8 +2,7 @@ package OxyEngineEditor.Sandbox.OxyComponents;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
+import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
@@ -71,7 +70,7 @@ public class GameObjectMesh extends Mesh {
         }
     }
 
-    public void addToBuffer(OxyGameObject oxyEntity) {
+    public void addToBuffer(OxyInternObject oxyEntity) {
         entities.add(oxyEntity);
         vertexBuffer.addToBuffer(oxyEntity);
         indexBuffer.addToBuffer(oxyEntity);

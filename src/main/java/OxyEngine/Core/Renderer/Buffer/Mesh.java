@@ -3,6 +3,7 @@ package OxyEngine.Core.Renderer.Buffer;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
@@ -93,7 +94,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         unbind();
     }
 
-    public void updateSingleEntityData(Scene scene, OxyEntity e) {
+    public void updateSingleEntityData(Scene scene, OxyInternObject e) {
         int i = 0;
         for (OxyEntity entity : scene.getEntities()) {
             if (entity.equals(e)) {

@@ -10,6 +10,9 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Sandbox.OxyComponents.*;
+import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
+import OxyEngineEditor.Sandbox.Scene.Model.ModelFactory;
+import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModelLoader;
 import OxyEngineEditor.UI.OxyUISystem;
@@ -41,8 +44,8 @@ public class Scene implements OxyDisposable {
         this.frameBuffer = frameBuffer;
     }
 
-    public final OxyGameObject createGameObjectEntity() {
-        OxyGameObject e = new OxyGameObject(this);
+    final OxyInternObject createInternObjectEntity() {
+        OxyInternObject e = new OxyInternObject(this);
         registry.componentList.put(e, new LinkedHashSet<>(10));
         e.addComponent(new TransformComponent());
         return e;

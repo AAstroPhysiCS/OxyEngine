@@ -1,22 +1,25 @@
-package OxyEngineEditor.Sandbox.Scene;
+package OxyEngineEditor.Sandbox.Scene.InternObjects;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import static OxyEngine.System.OxySystem.logger;
 
-public class OxyGameObject extends OxyEntity implements Cloneable {
+public class OxyInternObject extends OxyEntity implements Cloneable {
 
-    private GameObjectFactory template;
+    private InternObjectFactory factory;
+    public ObjectType type;
 
-    OxyGameObject(Scene scene) {
+    public OxyInternObject(Scene scene) {
         super(scene);
     }
 
-    OxyGameObject(OxyGameObject other) {
+    OxyInternObject(OxyInternObject other) {
         this(other.scene);
         this.vertices = other.vertices;
-        this.template = other.template;
+        this.factory = other.factory;
         this.tcs = other.tcs;
         this.indices = other.indices;
         this.normals = other.normals;
@@ -24,16 +27,16 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
     }
 
     public void initData() {
-        if (!has(GameObjectFactory.class) || !has(Mesh.class))
+        if (!has(InternObjectFactory.class) || !has(Mesh.class))
             throw new IllegalStateException("Game object need to have a template or a Mesh!");
 
         Mesh mesh = (Mesh) get(Mesh.class);
 
-        template = (GameObjectFactory) get(GameObjectFactory.class);
-        this.type = template.type;
-        template.constructData(this);
+        factory = (InternObjectFactory) get(InternObjectFactory.class);
+        this.type = factory.type;
+        factory.constructData(this);
         if (mesh instanceof GameObjectMesh gameObjectMesh) {
-            template.initData(this, gameObjectMesh);
+            factory.initData(this, gameObjectMesh);
         } else {
             logger.severe("Game Objects needs to have a GameObjectMesh");
             throw new IllegalStateException("Game Objects needs to have a GameObjectMesh");
@@ -42,7 +45,11 @@ public class OxyGameObject extends OxyEntity implements Cloneable {
 
     @Override
     public void updateData() {
-        template.updateData(this);
+        factory.updateData(this);
         ((Mesh) get(Mesh.class)).updateSingleEntityData(scene, this);
+    }
+
+    public ObjectType getType() {
+        return type;
     }
 }

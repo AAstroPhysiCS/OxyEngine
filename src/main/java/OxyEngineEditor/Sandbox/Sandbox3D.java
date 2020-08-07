@@ -7,16 +7,14 @@ import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Core.Renderer.Texture.OxyTextureCoords;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.*;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.*;
 import OxyEngineEditor.UI.OxyUISystem;
 import imgui.ImGui;
@@ -78,23 +76,7 @@ public class Sandbox3D {
         scene = new Scene(windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
         oxyEngine.initLayers(scene);
 
-        OxyTexture texture = OxyTexture.load(OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE.getTcs());
-
         camera = new PerspectiveCameraComponent(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
-
-        OxyModel cube = scene.createModelEntity(ModelType.Cube).get(0);
-        cube.addComponent(camera, texture, new TransformComponent(new Vector3f(-30, 0, 0)), new SelectedComponent(false));
-        cube.updateData();
-
-        /*for (int x = -10; x < 10; x++) {
-            for (int y = -10; y < 10; y++) {
-                for (int z = -10; z < 10; z++) {
-                    OxyModel cube = scene.createModelEntity(ModelType.Cube).get(0);
-                    cube.addComponent(camera, sandBoxMesh.obj, new CubeFactory(), texture, new TransformComponent(new Vector3f(x + 25, y, z)), new SelectedComponent(false));
-                    cube.updateData();
-                }
-            }
-        }*/
 
         mainUILayer = OxyEngine.getMainUIComponent();
         mainUILayer.addUILayers(StatsLayer.getInstance(windowHandle, scene));
@@ -112,7 +94,7 @@ public class Sandbox3D {
         testObjects = scene.createModelEntity(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"));
 
         //TEMP
-        for(OxyModel obj : testObjects) {
+        for (OxyModel obj : testObjects) {
             obj.addComponent(camera, new SelectedComponent(false));
             obj.updateData();
         }

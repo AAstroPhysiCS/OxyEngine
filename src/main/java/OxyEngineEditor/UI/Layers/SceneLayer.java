@@ -20,8 +20,6 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector3f;
 
-import java.util.Arrays;
-
 import static OxyEngine.System.Globals.Globals.normalizeColor;
 
 public class SceneLayer extends UILayer {
@@ -97,8 +95,14 @@ public class SceneLayer extends UILayer {
             if (data != null) {
                 model = scene.createModelEntity(new String(data)).get(0);
                 //TEMP
-                OxyTexture texture = OxyTexture.load(SceneConfigurationLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
-                model.addComponent(new SelectedComponent(false), texture, new OxyColor(SceneConfigurationLayer.color), new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
+                OxyTexture texture = null;
+                if(SceneConfigurationLayer.lastTexturePath != null)
+                    texture = OxyTexture.load(SceneConfigurationLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
+                OxyColor color = null;
+                if(SceneConfigurationLayer.color != null)
+                    color = new OxyColor(SceneConfigurationLayer.color);
+
+                model.addComponent(new SelectedComponent(false), texture, color, new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
                 model.updateData();
                 scene.rebuild();
             }

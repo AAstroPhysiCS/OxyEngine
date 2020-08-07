@@ -1,4 +1,4 @@
-package OxyEngineEditor.Sandbox.Scene;
+package OxyEngineEditor.Sandbox.Scene.Model;
 
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;

@@ -1,9 +1,7 @@
-package OxyEngineEditor.Sandbox.Scene;
+package OxyEngineEditor.Sandbox.Scene.InternObjects;
 
 public enum ObjectType {
-    Cube(240, 36),
-    Grid(40, 6),
-    Model(0, 0);
+    Grid(40, 6);
 
     private final int n_Vertices;
     private final int n_Indices;

@@ -1,8 +1,8 @@
-package OxyEngineEditor.Sandbox.Scene;
+package OxyEngineEditor.Sandbox.Scene.InternObjects;
 
 import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
 
-public class GridFactory extends GameObjectFactory {
+public class GridFactory extends InternObjectFactory {
 
     public GridFactory() {
         type = ObjectType.Grid;
@@ -15,12 +15,12 @@ public class GridFactory extends GameObjectFactory {
     }
 
     @Override
-    void updateData(OxyGameObject e) {
+    void updateData(OxyInternObject e) {
         //don't need that
     }
 
     @Override
-    public void initData(OxyGameObject e, GameObjectMesh mesh) {
+    public void initData(OxyInternObject e, GameObjectMesh mesh) {
         e.indices = new int[]{
                 mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,
                 3 + mesh.indicesX, mesh.indicesY, 2 + mesh.indicesZ,

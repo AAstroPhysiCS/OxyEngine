@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
+import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
@@ -21,7 +21,7 @@ public final class IndexBuffer extends Buffer {
         this.length = indices.length;
     }
 
-    public void addToBuffer(OxyGameObject oxyEntity) {
+    public void addToBuffer(OxyInternObject oxyEntity) {
         addToBuffer(oxyEntity.getIndices());
     }
 

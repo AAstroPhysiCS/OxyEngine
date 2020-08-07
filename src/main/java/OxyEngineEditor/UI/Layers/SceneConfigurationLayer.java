@@ -1,7 +1,7 @@
 package OxyEngineEditor.UI.Layers;
 
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.Scene.ModelType;
+import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;

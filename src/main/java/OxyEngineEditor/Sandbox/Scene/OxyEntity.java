@@ -1,9 +1,9 @@
 package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.Scene.InternObjects.ObjectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,6 @@ public abstract class OxyEntity {
     public float[] vertices, tcs, normals;
     public int[] indices;
 
-    protected ObjectType type;
     protected final Scene scene;
 
     public OxyEntity(Scene scene) {
@@ -116,9 +115,5 @@ public abstract class OxyEntity {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public ObjectType getType() {
-        return type;
     }
 }
