@@ -1,8 +1,5 @@
 package OxyEngine.Core.Renderer.Texture;
 
-/*
- * TODO: TEMPORARY ENUM. DELETE IT!
- */
 public enum OxyTextureCoords {
     FULL(1), CUBE(2);
 

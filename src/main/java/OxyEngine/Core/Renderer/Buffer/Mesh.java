@@ -16,7 +16,6 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     protected IndexBuffer indexBuffer;
     protected VertexBuffer vertexBuffer;
     protected TextureBuffer textureBuffer;
-    protected FrameBuffer frameBuffer;
 
     protected final List<OxyEntity> entities = new ArrayList<>();
 
@@ -34,10 +33,6 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         return vertexBuffer;
     }
 
-    public FrameBuffer getFrameBuffer() {
-        return frameBuffer;
-    }
-
     public void load() {
         if (vao == 0) vao = glCreateVertexArrays();
         glBindVertexArray(vao);
@@ -45,7 +40,6 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         vertexBuffer.load();
         indexBuffer.load();
         if (textureBuffer != null) if (textureBuffer.empty()) textureBuffer.load();
-        if (frameBuffer != null) if (frameBuffer.empty()) frameBuffer.load();
 
         if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.getBufferId());
@@ -118,7 +112,6 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     public void dispose() {
         vertexBuffer.dispose();
         indexBuffer.dispose();
-        frameBuffer.dispose();
         glDeleteVertexArrays(vao);
     }
 }

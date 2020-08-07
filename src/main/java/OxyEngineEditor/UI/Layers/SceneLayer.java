@@ -2,12 +2,13 @@ package OxyEngineEditor.UI.Layers;
 
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Renderer.Texture.OxyTextureCoords;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.CubeFactory;
-import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
+import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.Sandbox.Scene.WorldGrid;
 import OxyEngineEditor.UI.UILayer;
@@ -19,7 +20,8 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector3f;
 
-import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
+import java.util.Arrays;
+
 import static OxyEngine.System.Globals.Globals.normalizeColor;
 
 public class SceneLayer extends UILayer {
@@ -49,7 +51,7 @@ public class SceneLayer extends UILayer {
     }
 
     static int counter = 1;
-    static OxyGameObject cube;
+    static OxyModel model;
 
     @Override
     public void renderLayer() {
@@ -79,20 +81,25 @@ public class SceneLayer extends UILayer {
         ImVec2 availContentRegionSize = new ImVec2();
         ImGui.getContentRegionAvail(availContentRegionSize);
 
-        FrameBuffer frameBuffer = Scene.currentFrameBuffer;
-        ImGui.image(frameBuffer.getColorAttachment(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
+        FrameBuffer frameBuffer = scene.getFrameBuffer();
+        if(frameBuffer != null) {
+            ImGui.image(frameBuffer.getColorAttachment(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
 
-        if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {
-            frameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
-            if (scene.getRenderer().getCamera() instanceof PerspectiveCamera p)
-                p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
+            if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {
+                frameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
+                if (scene.getRenderer().getCamera() instanceof PerspectiveCamera p)
+                    p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
+            }
         }
 
         if (ImGui.beginDragDropTarget()) {
-            if (ImGui.acceptDragDropPayload("mousePosViewportLayer") != null) {
-                cube = scene.createGameObjectEntity();
-                cube.addComponent(new SelectedComponent(false), sandBoxMesh.obj, new CubeFactory(), OxyTexture.loadCached(1), new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
-                cube.initData();
+            byte[] data = ImGui.acceptDragDropPayload("mousePosViewportLayer");
+            if (data != null) {
+                model = scene.createModelEntity(new String(data)).get(0);
+                //TEMP
+                OxyTexture texture = OxyTexture.load(SceneConfigurationLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
+                model.addComponent(new SelectedComponent(false), texture, new OxyColor(SceneConfigurationLayer.color), new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
+                model.updateData();
                 scene.rebuild();
             }
             ImGui.endDragDropTarget();

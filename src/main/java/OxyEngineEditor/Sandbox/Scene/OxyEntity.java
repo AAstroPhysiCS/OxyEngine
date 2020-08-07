@@ -1,6 +1,7 @@
 package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 

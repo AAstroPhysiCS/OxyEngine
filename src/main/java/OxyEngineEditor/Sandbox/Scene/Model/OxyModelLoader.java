@@ -13,24 +13,25 @@ import java.util.List;
 import java.util.Objects;
 
 import static org.lwjgl.assimp.Assimp.*;
-import static org.lwjgl.assimp.Assimp.aiImportFile;
 
 public class OxyModelLoader {
 
-    public static class AssimpMesh {
+    public static class AssimpOxyMesh {
         public final List<Vector3f> vertices = new ArrayList<>();
         public final List<Vector2f> textureCoords = new ArrayList<>();
         public final List<Vector3f> normals = new ArrayList<>();
         public final List<int[]> faces = new ArrayList<>();
+
         public OxyMaterial material;
 
         public final String name;
 
-        public AssimpMesh(String name){
+        public AssimpOxyMesh(String name) {
             this.name = name;
         }
     }
-    public final List<AssimpMesh> meshes = new ArrayList<>();
+
+    public final List<AssimpOxyMesh> meshes = new ArrayList<>();
 
     String objPath;
 
@@ -42,22 +43,20 @@ public class OxyModelLoader {
     void processData() {
         int flag = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_FixInfacingNormals;
         AIScene aiScene = aiImportFile(objPath, flag);
+        PointerBuffer materials = Objects.requireNonNull(aiScene).mMaterials();
         PointerBuffer meshes = Objects.requireNonNull(aiScene).mMeshes();
+
         for (int i = 0; i < aiScene.mNumMeshes(); i++) {
             AIMesh aiMesh = AIMesh.create(Objects.requireNonNull(meshes).get(i));
-            AssimpMesh oxyMesh = new AssimpMesh(aiMesh.mName().dataString());
+            AssimpOxyMesh oxyMesh = new AssimpOxyMesh(aiMesh.mName().dataString());
+            AIMaterial material = AIMaterial.create(Objects.requireNonNull(materials).get(aiMesh.mMaterialIndex()));
             addMesh(aiMesh, oxyMesh);
+            addMaterial(material, oxyMesh);
             this.meshes.add(oxyMesh);
-        }
-
-        PointerBuffer materials = aiScene.mMaterials();
-        for(int i = 0; i < aiScene.mNumMaterials() - 1; i++){
-            AIMaterial material = AIMaterial.create(Objects.requireNonNull(materials).get(i));
-            addMaterial(material, this.meshes.get(i));
         }
     }
 
-    private void addMesh(AIMesh mesh, AssimpMesh oxyMesh) {
+    private void addMesh(AIMesh mesh, AssimpOxyMesh oxyMesh) {
 
         AIVector3D.Buffer bufferVert = mesh.mVertices();
         while (bufferVert.hasRemaining()) {
@@ -82,20 +81,20 @@ public class OxyModelLoader {
         }
 
         AIVector3D.Buffer textCoords = mesh.mTextureCoords(0);
-        for (int i = 0; i < Objects.requireNonNull(textCoords).remaining(); i++) {
+        while (Objects.requireNonNull(textCoords).hasRemaining()) {
             AIVector3D textCoord = textCoords.get();
             oxyMesh.textureCoords.add(new Vector2f(textCoord.x(), 1 - textCoord.y()));
         }
     }
 
-    private void addMaterial(AIMaterial aiMaterial, AssimpMesh oxyMesh){
+    private void addMaterial(AIMaterial aiMaterial, AssimpOxyMesh oxyMesh) {
         AIColor4D color = AIColor4D.create();
         AIString path = AIString.calloc();
         Assimp.aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
         String textPath = path.dataString();
         OxyTexture texture = null;
-        if(!textPath.equals("")){
-            texture = OxyTexture.load(5, textPath);
+        if (!textPath.equals("")) {
+            texture = OxyTexture.load(textPath);
         }
         Vector4f ambient = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, aiTextureType_NONE, 0, color);
@@ -114,7 +113,6 @@ public class OxyModelLoader {
         if (result == 0) {
             specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
-
         oxyMesh.material = new OxyMaterial(texture, ambient, diffuse, specular, 1.0f);
     }
 }

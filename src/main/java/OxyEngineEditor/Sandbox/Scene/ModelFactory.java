@@ -15,7 +15,8 @@ import java.util.List;
 
 import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
 
-public record ModelFactory(List<Vector3f> verticesNonTransformed, List<Vector2f> textureCoords, List<Vector3f> normals, List<int[]> faces) implements EntityComponent {
+public record ModelFactory(List<Vector3f>verticesNonTransformed, List<Vector2f>textureCoords, List<Vector3f>normals,
+                           List<int[]>faces) implements EntityComponent {
 
     public void constructData(OxyModel e) {
         e.vertices = new float[verticesNonTransformed.size() * 4 * 8];
@@ -35,7 +36,8 @@ public record ModelFactory(List<Vector3f> verticesNonTransformed, List<Vector2f>
                 .rotateZ(c.rotation.z);
 
         int slot = 0;
-        if (texture != null) slot = texture.getTextureSlot();
+        if (texture != null)
+            slot = texture.getTextureSlot();
 
         int vertPtr = 0;
         for (Vector3f v : verticesNonTransformed) {
@@ -44,7 +46,7 @@ public record ModelFactory(List<Vector3f> verticesNonTransformed, List<Vector2f>
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
-            if (color != null && slot == 0) {
+            if (color != null) {
                 e.vertices[vertPtr++] = color.getNumbers()[0];
                 e.vertices[vertPtr++] = color.getNumbers()[1];
                 e.vertices[vertPtr++] = color.getNumbers()[2];
@@ -60,17 +62,16 @@ public record ModelFactory(List<Vector3f> verticesNonTransformed, List<Vector2f>
         }
 
         for (int[] face : faces) {
-            for(int i : face){
+            for (int i : face) {
                 indicesArr.add(i);
             }
         }
 
         int tcsPtr = 0;
-        for(Vector2f v : textureCoords){
+        for (Vector2f v : textureCoords) {
             e.tcs[tcsPtr++] = v.x;
             e.tcs[tcsPtr++] = v.y;
         }
         e.indices = toPrimitiveInteger(indicesArr);
     }
-    //TODO: UPDATE DATA
 }

@@ -8,7 +8,7 @@ import OxyEngineEditor.Sandbox.Scene.OxyGameObject;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class GameObjectMesh extends Mesh {
-    //TODO: ATTRIBUTES, MAYBE DYNAMICALLY CHANGE IT?? BUT HOW??
+
     public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 10 * Float.BYTES, 0);
     public static final BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 10 * Float.BYTES, 3 * Float.BYTES);
     public static final BufferTemplate.Attributes attributesTXSlot = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 10 * Float.BYTES, 5 * Float.BYTES);
@@ -16,18 +16,15 @@ public class GameObjectMesh extends Mesh {
 
     public int indicesX, indicesY, indicesZ;
 
-    private GameObjectMesh(int mode, VertexBuffer vertexBuffer, IndexBuffer indexBuffer, FrameBuffer frameBuffer) {
+    private GameObjectMesh(int mode, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
         this.mode = mode;
         this.indexBuffer = indexBuffer;
         this.vertexBuffer = vertexBuffer;
-        this.frameBuffer = frameBuffer;
     }
 
     interface GameObjectMeshBuilder {
 
         GameObjectMeshBuilder setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers);
-
-        GameObjectMeshBuilder runOnFrameBuffer(WindowHandle windowHandle, boolean primary);
 
         GameObjectMeshBuilder setMode(int mode);
 
@@ -38,7 +35,6 @@ public class GameObjectMesh extends Mesh {
 
     public static class GameObjectMeshBuilderImpl implements GameObjectMeshBuilder {
 
-        private FrameBuffer frameBuffer;
         private BufferTemplate.Attributes[] verticesPointers;
         private int mode = -1;
         private BufferTemplate.Usage usage;
@@ -46,13 +42,6 @@ public class GameObjectMesh extends Mesh {
         @Override
         public GameObjectMeshBuilderImpl setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers) {
             this.verticesPointers = verticesPointers;
-            return this;
-        }
-
-        @Override
-        public GameObjectMeshBuilderImpl runOnFrameBuffer(WindowHandle windowHandle, boolean primary) {
-            frameBuffer = new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight());
-            frameBuffer.setPrimary(primary);
             return this;
         }
 
@@ -78,7 +67,7 @@ public class GameObjectMesh extends Mesh {
                             .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
                             .setUsage(usage)
                             .setAttribPointer(verticesPointers)),
-                    new IndexBuffer(), frameBuffer);
+                    new IndexBuffer());
         }
     }
 

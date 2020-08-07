@@ -35,7 +35,7 @@ public class OxyColor implements Cloneable, EntityComponent {
     }
 
     public OxyColor(float[] numbers) {
-        this.numbers = numbers;
+        this(numbers[0], numbers[1], numbers[2], numbers[3]);
     }
 
     public OxyColor(int r, int g, int b, int a) {

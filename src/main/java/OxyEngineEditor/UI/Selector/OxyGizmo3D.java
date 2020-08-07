@@ -12,7 +12,6 @@ import java.util.List;
 
 import static OxyEngineEditor.Sandbox.Sandbox3D.camera;
 
-//TODO: REFACTOR IT
 public class OxyGizmo3D {
 
     private final List<OxyModel> gizmo;

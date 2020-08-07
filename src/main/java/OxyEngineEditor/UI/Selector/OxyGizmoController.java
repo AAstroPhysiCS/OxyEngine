@@ -12,9 +12,6 @@ import OxyEngineEditor.UI.OxyUISystem;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
 
-/*
- * TODO: REFACTOR IT!
- */
 public class OxyGizmoController implements OxyMouseListener {
 
     OxyEntity hoveredGameObject = null;

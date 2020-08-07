@@ -45,7 +45,8 @@ public interface ObjectSelector {
 
     default OxyEntity selectObject(OxyEntity entity, Vector3f center, Vector3f direction) {
         reset();
-        if (center == null || direction == null || !entity.has(SelectedComponent.class)) return null;
+        if (center == null || direction == null || !entity.has(SelectedComponent.class))
+            return null;
 
         OxyEntity selectedEntity = null;
         TransformComponent c = (TransformComponent) entity.get(TransformComponent.class);
@@ -63,8 +64,6 @@ public interface ObjectSelector {
     }
 
     default void reset() {
-        min.zero();
-        max.zero();
         nearFar.zero();
     }
 }

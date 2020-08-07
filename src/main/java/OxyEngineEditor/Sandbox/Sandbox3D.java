@@ -2,6 +2,7 @@ package OxyEngineEditor.Sandbox;
 
 import OxyEngine.Core.Camera.PerspectiveCameraComponent;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
+import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -69,33 +70,31 @@ public class Sandbox3D {
                 .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setMode(GL_TRIANGLES)
                 .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot, attributesColors)
-                .runOnFrameBuffer(windowHandle, true)
                 .create();
 
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
         oxyRenderer.setShader(oxyShader);
 
-        scene = new Scene(windowHandle, oxyRenderer);
+        scene = new Scene(windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
         oxyEngine.initLayers(scene);
 
-        OxyTexture texture = OxyTexture.load(1, OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE);
-
-        //TODO: INSTEAD OF OXYGAMEOBJECT JUST MODELS??
-        //TODO: SCENE MUST HAVE NON STATIC FRAMEBUFFER
-        //TODO: CAMERA COMPONENT
-        //TODO: PIXEL PERFECT OBJECT SELECTION, GIZMO CORRECTION!
+        OxyTexture texture = OxyTexture.load(OxySystem.FileSystem.getResourceByPath("/images/world.png"), OxyTextureCoords.CUBE.getTcs());
 
         camera = new PerspectiveCameraComponent(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
 
-        for (int x = -10; x < 10; x++) {
+        OxyModel cube = scene.createModelEntity(ModelType.Cube).get(0);
+        cube.addComponent(camera, texture, new TransformComponent(new Vector3f(-30, 0, 0)), new SelectedComponent(false));
+        cube.updateData();
+
+        /*for (int x = -10; x < 10; x++) {
             for (int y = -10; y < 10; y++) {
                 for (int z = -10; z < 10; z++) {
-                    OxyGameObject cube = scene.createGameObjectEntity();
+                    OxyModel cube = scene.createModelEntity(ModelType.Cube).get(0);
                     cube.addComponent(camera, sandBoxMesh.obj, new CubeFactory(), texture, new TransformComponent(new Vector3f(x + 25, y, z)), new SelectedComponent(false));
-                    cube.initData();
+                    cube.updateData();
                 }
             }
-        }
+        }*/
 
         mainUILayer = OxyEngine.getMainUIComponent();
         mainUILayer.addUILayers(StatsLayer.getInstance(windowHandle, scene));
@@ -114,9 +113,7 @@ public class Sandbox3D {
 
         //TEMP
         for(OxyModel obj : testObjects) {
-            obj.addComponent(camera,
-                    new TransformComponent(new Vector3f(0, 0, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 1),
-                    new SelectedComponent(false));
+            obj.addComponent(camera, new SelectedComponent(false));
             obj.updateData();
         }
 

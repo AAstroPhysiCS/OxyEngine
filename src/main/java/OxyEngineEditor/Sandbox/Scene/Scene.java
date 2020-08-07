@@ -9,18 +9,12 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.*;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModelLoader;
 import OxyEngineEditor.UI.OxyUISystem;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static OxyEngineEditor.Sandbox.Sandbox3D.camera;
 import static org.lwjgl.opengl.GL11.*;
@@ -33,9 +27,18 @@ public class Scene implements OxyDisposable {
     private final WindowHandle windowHandle;
     private OxyUISystem oxyUISystem;
 
+    private Set<EntityComponent> cachedGameObjectsEntities;
+    private FrameBuffer frameBuffer;
+
     public Scene(WindowHandle windowHandle, OxyRenderer3D renderer) {
         this.renderer = renderer;
         this.windowHandle = windowHandle;
+    }
+
+    public Scene(WindowHandle windowHandle, OxyRenderer3D renderer, FrameBuffer frameBuffer) {
+        this.renderer = renderer;
+        this.windowHandle = windowHandle;
+        this.frameBuffer = frameBuffer;
     }
 
     public final OxyGameObject createGameObjectEntity() {
@@ -45,11 +48,15 @@ public class Scene implements OxyDisposable {
         return e;
     }
 
+    public final List<OxyModel> createModelEntity(ModelType type){
+        return createModelEntity(type.getPath());
+    }
+
     public final List<OxyModel> createModelEntity(String path) {
         List<OxyModel> models = new ArrayList<>();
         OxyModelLoader loader = new OxyModelLoader(path);
 
-        for (OxyModelLoader.AssimpMesh assimpMesh : loader.meshes) {
+        for (OxyModelLoader.AssimpOxyMesh assimpMesh : loader.meshes) {
             OxyModel e = new OxyModel(this);
             registry.componentList.put(e, new LinkedHashSet<>(10));
             e.addComponent(
@@ -64,9 +71,6 @@ public class Scene implements OxyDisposable {
         return models;
     }
 
-    private Set<EntityComponent> cachedGameObjectsEntities;
-    public static FrameBuffer currentFrameBuffer;
-
     public void build() {
         oxyUISystem = new OxyUISystem(this, windowHandle);
         cachedGameObjectsEntities = distinct(GameObjectMesh.class, ModelMesh.class);
@@ -79,13 +83,12 @@ public class Scene implements OxyDisposable {
     }
 
     public void rebuild() {
+        cachedGameObjectsEntities = distinct(GameObjectMesh.class, ModelMesh.class);
         //Prep
         {
-            for (EntityComponent e : cachedGameObjectsEntities) {
-                Mesh mesh = (Mesh) e;
-                mesh.clear();
-                mesh.initList();
-            }
+            List<EntityComponent> cachedConverted = new ArrayList<>(cachedGameObjectsEntities);
+            Mesh mesh = (Mesh) cachedConverted.get(cachedConverted.size() - 1);
+            mesh.initList();
         }
     }
 
@@ -95,22 +98,7 @@ public class Scene implements OxyDisposable {
 
     public void render(float ts, float deltaTime) {
 
-        //Framebuffer
-        {
-            for (EntityComponent e : cachedGameObjectsEntities) {
-                if (e instanceof Mesh mesh) {
-                    if (mesh.getFrameBuffer() != null) {
-                        if (mesh.getFrameBuffer().isPrimary()) {
-                            currentFrameBuffer = mesh.getFrameBuffer();
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-
-        if (currentFrameBuffer != null) currentFrameBuffer.bind();
+        if (frameBuffer != null) frameBuffer.bind();
         OpenGLRendererAPI.clearBuffer();
 
         //Rendering
@@ -125,7 +113,7 @@ public class Scene implements OxyDisposable {
                 }
             }
         }
-        if (currentFrameBuffer != null) currentFrameBuffer.unbind();
+        if (frameBuffer != null) frameBuffer.unbind();
         oxyUISystem.render(registry.componentList.keySet(), camera);
     }
 
@@ -201,6 +189,10 @@ public class Scene implements OxyDisposable {
 
     public Set<OxyEntity> getEntities() {
         return registry.componentList.keySet();
+    }
+
+    public FrameBuffer getFrameBuffer() {
+        return frameBuffer;
     }
 
     @Override

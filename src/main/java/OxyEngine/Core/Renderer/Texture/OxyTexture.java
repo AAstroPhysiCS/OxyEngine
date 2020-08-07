@@ -16,15 +16,17 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
 
     private static final List<OxyTexture> allTextures = new ArrayList<>();
 
+    private static int slotCounter = 0;
+
+    private final float[] tcs;
+
     private final int textureSlot;
     private final int textureId;
 
-    private final float[] textureCoords;
-
     private final String path;
 
-    private OxyTexture(int slot, String path, float[] textureCoords) {
-        this.textureCoords = textureCoords;
+    private OxyTexture(int slot, String path, float[] tcs) {
+        this.tcs = tcs;
         this.path = path;
         this.textureSlot = slot;
 
@@ -59,16 +61,24 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
         allTextures.add(this);
     }
 
-    private OxyTexture(int slot, String path, OxyTextureCoords coords) {
-        this(slot, path, coords.getTcs());
-    }
-
-    public static OxyTexture load(int slot, String path, OxyTextureCoords coords) {
-        return new OxyTexture(slot, path, coords);
-    }
-
     public static OxyTexture load(int slot, String path) {
-        return new OxyTexture(slot, path, new float[]{});
+        if(slot <= slotCounter) throw new IllegalStateException("Texture Slot already being used");
+        return new OxyTexture(slot, path, null);
+    }
+
+    public static OxyTexture load(String path) {
+        slotCounter++;
+        return new OxyTexture(slotCounter, path, null);
+    }
+
+    public static OxyTexture load(String path, float[] tcs) {
+        slotCounter++;
+        return new OxyTexture(slotCounter, path, tcs);
+    }
+
+    public static OxyTexture load(int slot, String path, float[] tcs) {
+        if(slot <= slotCounter) throw new IllegalStateException("Texture Slot already being used");
+        return new OxyTexture(slot, path, tcs);
     }
 
     public static OxyTexture loadCached(int slot) {
@@ -89,7 +99,7 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
     }
 
     public float[] getTextureCoords() {
-        return textureCoords;
+        return tcs;
     }
 
     public boolean empty() {
