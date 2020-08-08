@@ -15,7 +15,6 @@ import org.lwjgl.util.nfd.NativeFileDialog;
 public class ConfigurationLayer extends UILayer {
 
     private static final ImBoolean helpWindowBool = new ImBoolean();
-    static String lastTexturePath = null;
 
     private static ConfigurationLayer INSTANCE = null;
 
@@ -31,9 +30,6 @@ public class ConfigurationLayer extends UILayer {
     @Override
     public void preload() {
     }
-
-    static final ImString inputTextPath = new ImString();
-    static final float[] color = new float[4];
 
     @Override
     public void renderLayer() {
@@ -51,19 +47,6 @@ public class ConfigurationLayer extends UILayer {
 
         if (ImGui.collapsingHeader("Shapes")) {
             if (ImGui.treeNode("Cube")) {
-                ImGui.spacing();
-                ImGui.inputText("", inputTextPath);
-                ImGui.colorPicker4("Color", color);
-                ImGui.sameLine();
-                if (ImGui.button("...")) {
-                    PointerBuffer buffer = PointerBuffer.allocateDirect(16);
-                    int result = NativeFileDialog.NFD_OpenDialog("", null, buffer);
-                    if (result == NativeFileDialog.NFD_OKAY) {
-                        lastTexturePath = buffer.getStringASCII();
-                        inputTextPath.set(lastTexturePath);
-                    }
-                    NativeFileDialog.nNFD_Free(buffer.get());
-                }
                 ImGui.button("Spawn");
                 if (ImGui.beginDragDropSource()) {
                     ImGui.setDragDropPayload("mousePosViewportLayer", ModelType.Cube.getPath().getBytes(), 0);

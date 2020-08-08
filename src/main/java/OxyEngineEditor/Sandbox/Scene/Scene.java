@@ -9,10 +9,7 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.*;
 import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelFactory;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
@@ -25,9 +22,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import static OxyEngineEditor.Sandbox.Sandbox3D.camera;
-import static org.lwjgl.opengl.GL11.*;
-
 public class Scene implements OxyDisposable {
 
     private final Registry registry = new Registry();
@@ -36,16 +30,11 @@ public class Scene implements OxyDisposable {
     private final WindowHandle windowHandle;
     private OxyUISystem oxyUISystem;
 
-    private Set<EntityComponent> cachedGameObjectsEntities;
-    private FrameBuffer frameBuffer;
+    private Set<OxyEntity> cachedModelEntities;
+    private Set<EntityComponent> cachedInternMeshes, cachedModelMeshes, cachedCameraComponents;
 
-    private String sceneName;
-
-    public Scene(String sceneName, WindowHandle windowHandle, OxyRenderer3D renderer) {
-        this.renderer = renderer;
-        this.windowHandle = windowHandle;
-        this.sceneName = sceneName;
-    }
+    private final FrameBuffer frameBuffer;
+    private final String sceneName;
 
     public Scene(String sceneName, WindowHandle windowHandle, OxyRenderer3D renderer, FrameBuffer frameBuffer) {
         this.renderer = renderer;
@@ -54,9 +43,9 @@ public class Scene implements OxyDisposable {
         this.sceneName = sceneName;
     }
 
-    final OxyInternObject createInternObjectEntity() {
+    public final OxyInternObject createInternObjectEntity() {
         OxyInternObject e = new OxyInternObject(this);
-        registry.componentList.put(e, new LinkedHashSet<>(10));
+        registry.entityList.put(e, new LinkedHashSet<>(10));
         e.addComponent(new TransformComponent());
         return e;
     }
@@ -71,7 +60,7 @@ public class Scene implements OxyDisposable {
 
         for (OxyModelLoader.AssimpOxyMesh assimpMesh : loader.meshes) {
             OxyModel e = new OxyModel(this);
-            registry.componentList.put(e, new LinkedHashSet<>(10));
+            registry.entityList.put(e, new LinkedHashSet<>(10));
             e.addComponent(
                     new TransformComponent(),
                     assimpMesh.material.texture(),
@@ -88,7 +77,7 @@ public class Scene implements OxyDisposable {
         OxyModelLoader loader = new OxyModelLoader(path);
         OxyModelLoader.AssimpOxyMesh assimpMesh = loader.meshes.get(0);
         OxyModel e = new OxyModel(this);
-        registry.componentList.put(e, new LinkedHashSet<>(10));
+        registry.entityList.put(e, new LinkedHashSet<>(10));
         e.addComponent(
                 new TransformComponent(),
                 assimpMesh.material.texture(),
@@ -101,21 +90,26 @@ public class Scene implements OxyDisposable {
 
     public void build() {
         oxyUISystem = new OxyUISystem(this, windowHandle);
-        cachedGameObjectsEntities = distinct(GameObjectMesh.class, ModelMesh.class);
+        cachedInternMeshes = distinct(InternObjectMesh.class);
+        cachedModelMeshes = distinct(ModelMesh.class);
+        cachedCameraComponents = distinct(OxyCamera.class);
         //Prep
         {
-            for (EntityComponent e : cachedGameObjectsEntities) {
+            for (EntityComponent e : cachedInternMeshes) {
                 ((Mesh) e).initList();
+            }
+            for (EntityComponent model : cachedModelMeshes) {
+                ((ModelMesh) model).initList();
             }
         }
     }
 
     public void rebuild() {
-        cachedGameObjectsEntities = distinct(GameObjectMesh.class, ModelMesh.class);
+        cachedModelMeshes = distinct(ModelMesh.class);
         //Prep
         {
-            List<EntityComponent> cachedConverted = new ArrayList<>(cachedGameObjectsEntities);
-            Mesh mesh = (Mesh) cachedConverted.get(cachedConverted.size() - 1);
+            List<EntityComponent> cachedConverted = new ArrayList<>(cachedModelMeshes);
+            ModelMesh mesh = (ModelMesh) cachedConverted.get(cachedConverted.size() - 1);
             mesh.initList();
         }
     }
@@ -129,25 +123,37 @@ public class Scene implements OxyDisposable {
         if (frameBuffer != null) frameBuffer.bind();
         OpenGLRendererAPI.clearBuffer();
 
-        //Rendering
+        //Camera
+        PerspectiveCamera mainCamera = null;
         {
-            for (EntityComponent c : cachedGameObjectsEntities) {
-                if (c instanceof ModelMesh) {
-                    glEnable(GL_CULL_FACE);
-                    render(ts, (Mesh) c, camera);
-                    glDisable(GL_CULL_FACE);
-                } else {
-                    render(ts, (Mesh) c, camera);
+            for (EntityComponent camera : cachedCameraComponents) {
+                if (camera instanceof PerspectiveCamera p) {
+                    if (p.isPrimary()) {
+                        mainCamera = p;
+                        break;
+                    }
                 }
             }
         }
+
+        //Rendering
+        {
+            for (EntityComponent c : cachedModelMeshes) {
+                if (c != null && mainCamera != null)
+                    render(ts, (Mesh) c, mainCamera);
+            }
+
+            for (EntityComponent c : cachedInternMeshes) {
+                render(ts, (Mesh) c);
+            }
+        }
         if (frameBuffer != null) frameBuffer.unbind();
-        oxyUISystem.render(registry.componentList.keySet(), camera);
+        oxyUISystem.render(registry.entityList.keySet(), OxyRenderer.currentBoundedCamera);
     }
 
     public final OxyEntity getEntityByIndex(int index) {
         int i = 0;
-        for (OxyEntity e : registry.componentList.keySet()) {
+        for (OxyEntity e : registry.entityList.keySet()) {
             if (i == index) {
                 return e;
             }
@@ -199,12 +205,12 @@ public class Scene implements OxyDisposable {
 
     private void render(float ts, Mesh mesh, OxyCamera camera) {
         renderer.render(ts, mesh, camera);
-        OxyRenderer.Stats.totalShapeCount = registry.componentList.keySet().size();
+        OxyRenderer.Stats.totalShapeCount = registry.entityList.keySet().size();
     }
 
     private void render(float ts, Mesh mesh) {
         renderer.render(ts, mesh);
-        OxyRenderer.Stats.totalShapeCount = registry.componentList.keySet().size();
+        OxyRenderer.Stats.totalShapeCount = registry.entityList.keySet().size();
     }
 
     public OxyRenderer3D getRenderer() {
@@ -216,7 +222,7 @@ public class Scene implements OxyDisposable {
     }
 
     public Set<OxyEntity> getEntities() {
-        return registry.componentList.keySet();
+        return registry.entityList.keySet();
     }
 
     public FrameBuffer getFrameBuffer() {

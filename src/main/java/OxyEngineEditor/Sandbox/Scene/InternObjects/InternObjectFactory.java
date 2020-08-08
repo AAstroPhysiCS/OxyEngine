@@ -3,7 +3,7 @@ package OxyEngineEditor.Sandbox.Scene.InternObjects;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -59,6 +59,6 @@ public abstract class InternObjectFactory implements EntityComponent {
         }
     }
 
-    abstract void initData(OxyInternObject e, GameObjectMesh mesh);
+    abstract void initData(OxyInternObject e, InternObjectMesh mesh);
 }
 

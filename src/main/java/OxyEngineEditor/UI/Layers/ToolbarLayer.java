@@ -1,7 +1,6 @@
 package OxyEngineEditor.UI.Layers;
 
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.Sandbox3D;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -10,15 +9,12 @@ import imgui.flag.ImGuiStyleVar;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-
 public class ToolbarLayer extends UILayer {
 
     private static ToolbarLayer INSTANCE = null;
 
-    public static ToolbarLayer getInstance(WindowHandle windowHandle, Scene scene){
-        if(INSTANCE == null) INSTANCE = new ToolbarLayer(windowHandle, scene);
+    public static ToolbarLayer getInstance(WindowHandle windowHandle, Scene scene) {
+        if (INSTANCE == null) INSTANCE = new ToolbarLayer(windowHandle, scene);
         return INSTANCE;
     }
 

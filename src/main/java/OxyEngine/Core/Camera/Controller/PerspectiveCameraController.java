@@ -1,5 +1,6 @@
 package OxyEngine.Core.Camera.Controller;
 
+import OxyEngine.Core.Camera.Controller.OxyCameraController;
 import OxyEngine.Tools.Ref;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import OxyEngineEditor.UI.OxyUISystem;

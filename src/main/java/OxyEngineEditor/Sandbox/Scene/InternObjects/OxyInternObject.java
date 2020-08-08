@@ -1,7 +1,7 @@
 package OxyEngineEditor.Sandbox.Scene.InternObjects;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
@@ -35,8 +35,8 @@ public class OxyInternObject extends OxyEntity implements Cloneable {
         factory = (InternObjectFactory) get(InternObjectFactory.class);
         this.type = factory.type;
         factory.constructData(this);
-        if (mesh instanceof GameObjectMesh gameObjectMesh) {
-            factory.initData(this, gameObjectMesh);
+        if (mesh instanceof InternObjectMesh internObjectMesh) {
+            factory.initData(this, internObjectMesh);
         } else {
             logger.severe("Game Objects needs to have a GameObjectMesh");
             throw new IllegalStateException("Game Objects needs to have a GameObjectMesh");

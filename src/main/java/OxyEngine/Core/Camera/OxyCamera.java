@@ -1,9 +1,10 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
+import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import org.joml.Matrix4f;
 
-public abstract class OxyCamera {
+public abstract class OxyCamera implements EntityComponent {
 
     protected final int location;
     protected final boolean transpose;

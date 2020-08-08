@@ -1,13 +1,13 @@
 package OxyEngine.Core.Renderer;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Camera.PerspectiveCameraComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Line.OxyInfoLine;
 import OxyEngine.Tools.Ref;
+import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
 import OxyEngineEditor.Sandbox.Sandbox3D;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -36,8 +36,8 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
      * All global meshes should be here!
      */
     public interface MeshSystem {
-        Ref<GameObjectMesh> sandBoxMesh = new Ref<>(null);
-        Ref<GameObjectMesh> worldGridMesh = new Ref<>(null);
+        Ref<InternObjectMesh> sandBoxMesh = new Ref<>(null);
+        Ref<InternObjectMesh> worldGridMesh = new Ref<>(null);
     }
 
     public static record Stats() {
@@ -89,7 +89,7 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
                     currentBoundedCamera.getCameraController().getRotation().x,
                     currentBoundedCamera.getCameraController().getRotation().y,
                     currentBoundedCamera.getCameraController().getRotation().z,
-                    PerspectiveCameraComponent.zoom
+                    PerspectiveCamera.zoom
             );
             reset();
             return s;

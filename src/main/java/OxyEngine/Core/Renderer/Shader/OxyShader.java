@@ -76,8 +76,7 @@ public class OxyShader implements OxyDisposable {
         buffer.clear();
     }
 
-    public void setCamera(float ts, OxyCamera camera){
-        camera.finalizeCamera(ts);
+    public void setCamera(OxyCamera camera) {
         setUniformMatrix4fv(camera.getViewMatrix(), camera.getLocation(), camera.isTranspose());
     }
 

@@ -24,7 +24,8 @@ public class OxyRenderer3D extends OxyRenderer {
     public void render(float ts, Mesh mesh, OxyCamera camera) {
         shader.enable();
         OxyRenderer.currentBoundedCamera = camera;
-        shader.setCamera(ts, camera);
+        camera.finalizeCamera(ts);
+        shader.setCamera(camera);
         if (shader == null) {
             logger.severe("Shader is not instantiated.");
             throw new NullPointerException("Shader is not instantiated.");
@@ -38,6 +39,7 @@ public class OxyRenderer3D extends OxyRenderer {
 
     @Override
     public void render(float ts, Mesh mesh) {
-        render(ts, mesh, currentBoundedCamera);
+        if(currentBoundedCamera != null)
+            render(ts, mesh, currentBoundedCamera);
     }
 }

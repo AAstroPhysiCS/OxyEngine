@@ -1,6 +1,6 @@
 package OxyEngineEditor.Sandbox;
 
-import OxyEngine.Core.Camera.PerspectiveCameraComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
@@ -11,9 +11,11 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
+import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.*;
 import OxyEngineEditor.UI.OxyUISystem;
@@ -25,7 +27,7 @@ import java.util.List;
 
 import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 import static OxyEngine.System.OxySystem.logger;
-import static OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh.*;
+import static OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh.*;
 import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.dispatcherThread;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
@@ -39,8 +41,6 @@ public class Sandbox3D {
     private final OxyEngine oxyEngine;
 
     private Scene scene;
-
-    public static PerspectiveCameraComponent camera;
 
     public static int FPS = 0;
 
@@ -62,7 +62,7 @@ public class Sandbox3D {
 
         oxyShader = new OxyShader("shaders/world.glsl");
 
-        sandBoxMesh.obj = new GameObjectMesh.GameObjectMeshBuilderImpl()
+        sandBoxMesh.obj = new InternObjectMesh.GameObjectMeshBuilderImpl()
                 .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setMode(GL_TRIANGLES)
                 .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot, attributesColors)
@@ -73,7 +73,14 @@ public class Sandbox3D {
 
         scene = new Scene("Main Scene", windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
-        camera = new PerspectiveCameraComponent(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
+        //Temp
+        cameraEntity = scene.createInternObjectEntity();
+        PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
+        cameraEntity.addComponent(camera);
+
+        cameraEntity2 = scene.createInternObjectEntity();
+        PerspectiveCamera camera2 = new PerspectiveCamera(false, 100, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
+        cameraEntity2.addComponent(camera2);
 
         windowHandle.addLayer(StatsLayer.getInstance(windowHandle, scene));
         windowHandle.addLayer(ToolbarLayer.getInstance(windowHandle, scene));
@@ -92,12 +99,15 @@ public class Sandbox3D {
 
         //TEMP
         for (OxyModel obj : testObjects) {
-            obj.addComponent(camera, new SelectedComponent(false));
+            obj.addComponent(new SelectedComponent(false));
             obj.updateData();
         }
 
         scene.build();
     }
+
+    public static OxyEntity cameraEntity;
+    public static OxyEntity cameraEntity2;
 
     private void update(float ts, float deltaTime) {
         scene.update(ts, deltaTime);

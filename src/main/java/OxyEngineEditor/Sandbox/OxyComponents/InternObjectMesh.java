@@ -6,7 +6,7 @@ import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
-public class GameObjectMesh extends Mesh {
+public class InternObjectMesh extends Mesh {
 
     public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 10 * Float.BYTES, 0);
     public static final BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 10 * Float.BYTES, 3 * Float.BYTES);
@@ -15,7 +15,7 @@ public class GameObjectMesh extends Mesh {
 
     public int indicesX, indicesY, indicesZ;
 
-    private GameObjectMesh(int mode, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
+    private InternObjectMesh(int mode, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
         this.mode = mode;
         this.indexBuffer = indexBuffer;
         this.vertexBuffer = vertexBuffer;
@@ -29,7 +29,7 @@ public class GameObjectMesh extends Mesh {
 
         GameObjectMeshBuilder setUsage(BufferTemplate.Usage usage);
 
-        GameObjectMesh create();
+        InternObjectMesh create();
     }
 
     public static class GameObjectMeshBuilderImpl implements GameObjectMeshBuilder {
@@ -57,11 +57,11 @@ public class GameObjectMesh extends Mesh {
         }
 
         @Override
-        public GameObjectMesh create() {
+        public InternObjectMesh create() {
             if (mode == -1 || usage == null)
                 throw new IllegalArgumentException("Some arguments not defined!");
 
-            return new GameObjectMesh(mode,
+            return new InternObjectMesh(mode,
                     new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                             .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
                             .setUsage(usage)

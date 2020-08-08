@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI.Layers;
 
-import OxyEngine.Core.Camera.PerspectiveCamera;
+import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
@@ -94,9 +94,11 @@ public class SceneLayer extends UILayer {
                 OxyModel model = scene.createModelEntity(new String(data));
                 //TEMP
                 OxyTexture texture = null;
-                if(ConfigurationLayer.lastTexturePath != null)
-                    texture = OxyTexture.load(ConfigurationLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
-                OxyColor color = new OxyColor(ConfigurationLayer.color);
+                if(PropertiesLayer.lastTexturePath != null){
+                    texture = OxyTexture.load(PropertiesLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
+                    PropertiesLayer.lastTextureID = texture.getTextureId();
+                }
+                OxyColor color = new OxyColor(PropertiesLayer.diffuseColor);
 
                 model.addComponent(new SelectedComponent(false), texture, color, new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
                 model.updateData();

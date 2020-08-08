@@ -3,7 +3,7 @@ package OxyEngine.Core.Camera;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public abstract class OrthographicCamera extends OxyCamera {
+public class OrthographicCamera extends OxyCamera {
 
     //if i happen to code the engine to 2D too, this class will be helpful.
     //But for now, it is left to die... (although i might use for something else ;) )

@@ -102,7 +102,7 @@ public class OxyUISystem {
         });
 
         File[] file = FontLoader.getInstance().load();
-        for (File f : file) OxyFontSystem.load(io, f.getPath(), 17, f.getName().split("\\.")[0]);
+        for (File f : file) OxyFontSystem.load(io, f.getPath(), 15, f.getName().split("\\.")[0]);
 
         imGuiRenderer.init(gl_Version);
     }
