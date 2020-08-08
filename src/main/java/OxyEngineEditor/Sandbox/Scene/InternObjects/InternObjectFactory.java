@@ -13,7 +13,7 @@ public abstract class InternObjectFactory implements EntityComponent {
     ObjectType type;
     protected float[] vertexPos;
 
-    public void constructData(OxyInternObject e){
+    public void constructData(OxyInternObject e) {
         OxyColor color = (OxyColor) e.get(OxyColor.class);
         OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
@@ -49,7 +49,7 @@ public abstract class InternObjectFactory implements EntityComponent {
                 e.vertices[i++] = tcs[texIndex++];
             } else i += 2;
             e.vertices[i++] = slot;
-            if(color != null && slot == 0){
+            if (color != null && slot == 0) {
                 e.vertices[i++] = color.getNumbers()[0];
                 e.vertices[i++] = color.getNumbers()[1];
                 e.vertices[i++] = color.getNumbers()[2];
@@ -59,7 +59,6 @@ public abstract class InternObjectFactory implements EntityComponent {
         }
     }
 
-    abstract void updateData(OxyInternObject e);
-
     abstract void initData(OxyInternObject e, GameObjectMesh mesh);
 }
+

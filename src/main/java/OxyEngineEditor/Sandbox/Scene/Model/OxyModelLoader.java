@@ -33,7 +33,7 @@ public class OxyModelLoader {
 
     public final List<AssimpOxyMesh> meshes = new ArrayList<>();
 
-    String objPath;
+    final String objPath;
 
     public OxyModelLoader(String objPath) {
         this.objPath = objPath;

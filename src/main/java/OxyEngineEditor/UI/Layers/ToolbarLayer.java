@@ -3,7 +3,6 @@ package OxyEngineEditor.UI.Layers;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.Sandbox3D;
 import OxyEngineEditor.Sandbox.Scene.Scene;
-import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
@@ -30,7 +29,6 @@ public class ToolbarLayer extends UILayer {
     @Override
     public void preload() {
     }
-
 
     @Override
     public void renderLayer() {
@@ -76,20 +74,10 @@ public class ToolbarLayer extends UILayer {
                 ImGui.endMenu();
             }
             ImGui.spacing();
-
-            ImGui.setCursorPosX(pos.x + windowHandle.getWidth() - 120);
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
-            ImGui.text("Time: " + dtf.format(LocalTime.now()));
-
-            ImGui.setCursorPosX(pos.x + windowHandle.getWidth() - 200);
-            ImGui.text("FPS: " + Sandbox3D.FPS);
-
             ImGui.endMainMenuBar();
         }
 
         ImGui.popStyleColor();
         ImGui.popStyleVar();
-
-//        chooser.renderLayer();
     }
 }

@@ -25,7 +25,7 @@ public class OxyGizmo3D {
 
     private OxyGizmo3D(Scene scene) {
 
-        gizmo = scene.createModelEntity(OxySystem.FileSystem.getResourceByPath("/models/oxygizmo.obj"));
+        gizmo = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/oxygizmo.obj"));
 
         gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, 0, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 0.5f), camera, new SelectedComponent(false, true), new OxyColor(new float[]{0f, 1f, 0f, 0.8f}));
         gizmo.get(1).addComponent(new TransformComponent(0.5f), camera, new SelectedComponent(false, true), new OxyColor(new float[]{1f, 0f, 0f, 0.8f}));

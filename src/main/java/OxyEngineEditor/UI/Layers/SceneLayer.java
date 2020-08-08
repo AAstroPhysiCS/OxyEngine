@@ -11,7 +11,6 @@ import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.Sandbox.Scene.WorldGrid;
-import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
@@ -49,7 +48,6 @@ public class SceneLayer extends UILayer {
     }
 
     static int counter = 1;
-    static OxyModel model;
 
     @Override
     public void renderLayer() {
@@ -93,14 +91,12 @@ public class SceneLayer extends UILayer {
         if (ImGui.beginDragDropTarget()) {
             byte[] data = ImGui.acceptDragDropPayload("mousePosViewportLayer");
             if (data != null) {
-                model = scene.createModelEntity(new String(data)).get(0);
+                OxyModel model = scene.createModelEntity(new String(data));
                 //TEMP
                 OxyTexture texture = null;
-                if(SceneConfigurationLayer.lastTexturePath != null)
-                    texture = OxyTexture.load(SceneConfigurationLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
-                OxyColor color = null;
-                if(SceneConfigurationLayer.color != null)
-                    color = new OxyColor(SceneConfigurationLayer.color);
+                if(ConfigurationLayer.lastTexturePath != null)
+                    texture = OxyTexture.load(ConfigurationLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
+                OxyColor color = new OxyColor(ConfigurationLayer.color);
 
                 model.addComponent(new SelectedComponent(false), texture, color, new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
                 model.updateData();

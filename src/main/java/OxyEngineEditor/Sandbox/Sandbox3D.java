@@ -42,8 +42,6 @@ public class Sandbox3D {
 
     public static PerspectiveCameraComponent camera;
 
-    private static MainUILayer mainUILayer;
-
     public static int FPS = 0;
 
     public static void main(String[] args) {
@@ -73,17 +71,16 @@ public class Sandbox3D {
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
         oxyRenderer.setShader(oxyShader);
 
-        scene = new Scene(windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
-        oxyEngine.initLayers(scene);
+        scene = new Scene("Main Scene", windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
         camera = new PerspectiveCameraComponent(70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, 4, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
 
-        mainUILayer = OxyEngine.getMainUIComponent();
-        mainUILayer.addUILayers(StatsLayer.getInstance(windowHandle, scene));
-        mainUILayer.addUILayers(ToolbarLayer.getInstance(windowHandle, scene));
-        mainUILayer.addUILayers(SceneConfigurationLayer.getInstance(windowHandle, scene));
-        mainUILayer.addUILayers(SceneLayer.getInstance(windowHandle, scene));
-        mainUILayer.preload();
+        windowHandle.addLayer(StatsLayer.getInstance(windowHandle, scene));
+        windowHandle.addLayer(ToolbarLayer.getInstance(windowHandle, scene));
+        windowHandle.addLayer(ConfigurationLayer.getInstance(windowHandle, scene));
+        windowHandle.addLayer(SceneLayer.getInstance(windowHandle, scene));
+        windowHandle.addLayer(PropertiesLayer.getInstance(windowHandle, scene));
+        windowHandle.preloadAllLayers();
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;
@@ -91,7 +88,7 @@ public class Sandbox3D {
         oxyShader.setUniform1iv("tex", samplers);
         oxyShader.disable();
 
-        testObjects = scene.createModelEntity(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"));
+        testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"));
 
         //TEMP
         for (OxyModel obj : testObjects) {
@@ -117,7 +114,7 @@ public class Sandbox3D {
         OpenGLRendererAPI.clearColor(41, 41, 41, 1.0f);
 
         ImGui.newFrame();
-        mainUILayer.renderLayer();
+        windowHandle.renderAllLayers();
         ImGui.render();
         scene.getOxyUISystem().updateImGuiRenderer();
 

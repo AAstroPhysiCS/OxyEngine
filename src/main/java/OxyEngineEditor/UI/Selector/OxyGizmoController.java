@@ -1,6 +1,5 @@
 package OxyEngineEditor.UI.Selector;
 
-import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.Events.OxyMouseListener;

@@ -15,11 +15,6 @@ public class GridFactory extends InternObjectFactory {
     }
 
     @Override
-    void updateData(OxyInternObject e) {
-        //don't need that
-    }
-
-    @Override
     public void initData(OxyInternObject e, GameObjectMesh mesh) {
         e.indices = new int[]{
                 mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,

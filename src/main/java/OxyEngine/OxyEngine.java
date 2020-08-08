@@ -9,7 +9,6 @@ import OxyEngine.Core.Window.WindowHint;
 import OxyEngine.OpenGL.OpenGLContext;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Sandbox.Scene.Scene;
-import OxyEngineEditor.UI.Layers.MainUILayer;
 import OxyEngineEditor.UI.Loader.UIThemeLoader;
 
 import java.util.Objects;
@@ -28,8 +27,6 @@ public class OxyEngine implements OxyDisposable {
     private final Thread thread;
 
     private OxyRenderer renderer;
-
-    private static MainUILayer MAIN_UI_COMPONENT;
 
     private static final float[][] LOADED_THEME = UIThemeLoader.getInstance().load();
 
@@ -81,10 +78,6 @@ public class OxyEngine implements OxyDisposable {
         glfwSwapInterval(vSync ? 1 : 0);
     }
 
-    public void initLayers(Scene scene){
-        MAIN_UI_COMPONENT = new MainUILayer(windowHandle, scene);
-    }
-
     @Override
     public void dispose() {
         glfwFreeCallbacks(windowHandle.getPointer());
@@ -100,10 +93,6 @@ public class OxyEngine implements OxyDisposable {
 
     public Thread getMainThread() {
         return thread;
-    }
-
-    public static MainUILayer getMainUIComponent() {
-        return MAIN_UI_COMPONENT;
     }
 
     public static float[][] getLoadedTheme() {

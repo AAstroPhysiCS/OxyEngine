@@ -8,6 +8,7 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Line.OxyInfoLine;
 import OxyEngine.Tools.Ref;
+import OxyEngineEditor.Sandbox.Sandbox3D;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -52,6 +53,7 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
 
         public static String getStats() {
             String s = """
+                    FPS: %s
                     Draw Calls: %s
                     Total Shapes: %s
                     Total Vertices: %s
@@ -71,6 +73,7 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
                         Z: %s
                     Zoom: %s
                     """.formatted(
+                    Sandbox3D.FPS,
                     drawCalls,
                     totalShapeCount,
                     totalVertexCount,

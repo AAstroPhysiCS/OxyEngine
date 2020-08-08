@@ -3,7 +3,6 @@ package OxyEngineEditor.UI.Layers;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
 import OxyEngineEditor.Sandbox.Scene.Scene;
-import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
@@ -13,19 +12,19 @@ import imgui.type.ImString;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
-public class SceneConfigurationLayer extends UILayer {
+public class ConfigurationLayer extends UILayer {
 
     private static final ImBoolean helpWindowBool = new ImBoolean();
     static String lastTexturePath = null;
 
-    private static SceneConfigurationLayer INSTANCE = null;
+    private static ConfigurationLayer INSTANCE = null;
 
-    public static SceneConfigurationLayer getInstance(WindowHandle windowHandle, Scene scene) {
-        if (INSTANCE == null) INSTANCE = new SceneConfigurationLayer(windowHandle, scene);
+    public static ConfigurationLayer getInstance(WindowHandle windowHandle, Scene scene) {
+        if (INSTANCE == null) INSTANCE = new ConfigurationLayer(windowHandle, scene);
         return INSTANCE;
     }
 
-    private SceneConfigurationLayer(WindowHandle windowHandle, Scene scene) {
+    private ConfigurationLayer(WindowHandle windowHandle, Scene scene) {
         super(windowHandle, scene);
     }
 
@@ -33,8 +32,8 @@ public class SceneConfigurationLayer extends UILayer {
     public void preload() {
     }
 
-    static ImString inputTextPath = new ImString();
-    static float[] color = new float[4];
+    static final ImString inputTextPath = new ImString();
+    static final float[] color = new float[4];
 
     @Override
     public void renderLayer() {
@@ -44,9 +43,9 @@ public class SceneConfigurationLayer extends UILayer {
         ImGui.pushStyleColor(ImGuiCol.WindowBg, bgC[0], bgC[1], bgC[2], bgC[3]);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding | ImGuiStyleVar.WindowBorderSize, 0);
 
-        ImGui.begin("Scene Configurator");
+        ImGui.begin("Configurator");
 
-        ImGui.text("Name: Example Scene");
+        ImGui.text("Name: " + scene.getSceneName());
         ImGui.separator();
         ImGui.spacing();
 
@@ -56,9 +55,9 @@ public class SceneConfigurationLayer extends UILayer {
                 ImGui.inputText("", inputTextPath);
                 ImGui.colorPicker4("Color", color);
                 ImGui.sameLine();
-                if(ImGui.button("...")){
+                if (ImGui.button("...")) {
                     PointerBuffer buffer = PointerBuffer.allocateDirect(16);
-                    int result = NativeFileDialog.NFD_OpenDialog("png, jpg\0", null, buffer);
+                    int result = NativeFileDialog.NFD_OpenDialog("", null, buffer);
                     if (result == NativeFileDialog.NFD_OKAY) {
                         lastTexturePath = buffer.getStringASCII();
                         inputTextPath.set(lastTexturePath);

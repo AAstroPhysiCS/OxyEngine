@@ -45,7 +45,7 @@ public class OxyInternObject extends OxyEntity implements Cloneable {
 
     @Override
     public void updateData() {
-        factory.updateData(this);
+        factory.constructData(this);
         ((Mesh) get(Mesh.class)).updateSingleEntityData(scene, this);
     }
 

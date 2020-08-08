@@ -9,7 +9,10 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Sandbox.OxyComponents.*;
+import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.GameObjectMesh;
+import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
+import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelFactory;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
@@ -17,7 +20,10 @@ import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModelLoader;
 import OxyEngineEditor.UI.OxyUISystem;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import static OxyEngineEditor.Sandbox.Sandbox3D.camera;
 import static org.lwjgl.opengl.GL11.*;
@@ -33,15 +39,19 @@ public class Scene implements OxyDisposable {
     private Set<EntityComponent> cachedGameObjectsEntities;
     private FrameBuffer frameBuffer;
 
-    public Scene(WindowHandle windowHandle, OxyRenderer3D renderer) {
+    private String sceneName;
+
+    public Scene(String sceneName, WindowHandle windowHandle, OxyRenderer3D renderer) {
         this.renderer = renderer;
         this.windowHandle = windowHandle;
+        this.sceneName = sceneName;
     }
 
-    public Scene(WindowHandle windowHandle, OxyRenderer3D renderer, FrameBuffer frameBuffer) {
+    public Scene(String sceneName, WindowHandle windowHandle, OxyRenderer3D renderer, FrameBuffer frameBuffer) {
         this.renderer = renderer;
         this.windowHandle = windowHandle;
         this.frameBuffer = frameBuffer;
+        this.sceneName = sceneName;
     }
 
     final OxyInternObject createInternObjectEntity() {
@@ -51,11 +61,11 @@ public class Scene implements OxyDisposable {
         return e;
     }
 
-    public final List<OxyModel> createModelEntity(ModelType type){
-        return createModelEntity(type.getPath());
+    public final List<OxyModel> createModelEntities(ModelType type) {
+        return createModelEntities(type.getPath());
     }
 
-    public final List<OxyModel> createModelEntity(String path) {
+    public final List<OxyModel> createModelEntities(String path) {
         List<OxyModel> models = new ArrayList<>();
         OxyModelLoader loader = new OxyModelLoader(path);
 
@@ -72,6 +82,21 @@ public class Scene implements OxyDisposable {
             models.add(e);
         }
         return models;
+    }
+
+    public final OxyModel createModelEntity(String path) {
+        OxyModelLoader loader = new OxyModelLoader(path);
+        OxyModelLoader.AssimpOxyMesh assimpMesh = loader.meshes.get(0);
+        OxyModel e = new OxyModel(this);
+        registry.componentList.put(e, new LinkedHashSet<>(10));
+        e.addComponent(
+                new TransformComponent(),
+                assimpMesh.material.texture(),
+                new OxyColor(assimpMesh.material.diffuseColor()),
+                new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces)
+        );
+        e.initData();
+        return e;
     }
 
     public void build() {
@@ -196,6 +221,10 @@ public class Scene implements OxyDisposable {
 
     public FrameBuffer getFrameBuffer() {
         return frameBuffer;
+    }
+
+    public String getSceneName() {
+        return sceneName;
     }
 
     @Override

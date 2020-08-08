@@ -2,13 +2,12 @@ package OxyEngineEditor.UI.Layers;
 
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.Scene.Scene;
-import OxyEngineEditor.UI.UILayer;
 import imgui.ImGui;
 import imgui.flag.ImGuiCond;
 
 import static OxyEngine.System.Globals.Globals.normalizeColor;
 
-public class StatsLayer extends UILayer {
+public class StatsLayer extends Layer {
 
     private static StatsLayer INSTANCE = null;
 
