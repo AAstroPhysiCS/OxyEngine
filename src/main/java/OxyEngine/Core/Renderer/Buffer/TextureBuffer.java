@@ -5,20 +5,20 @@ import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
-public class TextureBuffer extends Buffer{
+public class TextureBuffer extends Buffer {
 
     private final BufferTemplate.BufferTemplateImpl implementation;
 
     private float[] textureCoords;
 
-    public TextureBuffer(BufferTemplate template){
+    public TextureBuffer(BufferTemplate template) {
         this.implementation = template.setup();
         textureCoords = new float[0];
     }
 
     @Override
     protected void load() {
-        if(bufferId == 0) bufferId = glCreateBuffers();
+        if (bufferId == 0) bufferId = glCreateBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, bufferId);
         glBufferData(GL_ARRAY_BUFFER, textureCoords, GL_STATIC_DRAW);
 
@@ -33,7 +33,7 @@ public class TextureBuffer extends Buffer{
         addToBuffer(oxyEntity.getVertices());
     }
 
-    private void addToBuffer(float[] m_Vertices){
+    private void addToBuffer(float[] m_Vertices) {
         float[] newObjVert = new float[textureCoords.length + m_Vertices.length];
         System.arraycopy(textureCoords, 0, newObjVert, 0, textureCoords.length);
         System.arraycopy(m_Vertices, 0, newObjVert, textureCoords.length, m_Vertices.length);

@@ -48,14 +48,17 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
         textureId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureId);
 
-        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTextureParameteri(textureId, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTextureParameterf(textureId, GL_TEXTURE_LOD_BIAS, -0.4f);
 
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width[0], height[0], 0, internalFormat, GL_UNSIGNED_BYTE, buffer);
-        stbi_image_free(buffer);
+        glGenerateMipmap(GL_TEXTURE_2D);
 
+        stbi_image_free(buffer);
         glBindTexture(GL_TEXTURE_2D, 0);
 
         allTextures.add(this);

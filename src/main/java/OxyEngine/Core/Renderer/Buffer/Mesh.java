@@ -17,6 +17,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     protected IndexBuffer indexBuffer;
     protected VertexBuffer vertexBuffer;
     protected TextureBuffer textureBuffer;
+    protected NormalsBuffer normalsBuffer;
 
     protected final List<OxyEntity> entities = new ArrayList<>();
 
@@ -34,12 +35,22 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         return vertexBuffer;
     }
 
+    public TextureBuffer getTextureBuffer() {
+        return textureBuffer;
+    }
+
+    public NormalsBuffer getNormalsBuffer() {
+        return normalsBuffer;
+    }
+
     public void load() {
         if (vao == 0) vao = glCreateVertexArrays();
         glBindVertexArray(vao);
 
         vertexBuffer.load();
         indexBuffer.load();
+
+        if(normalsBuffer != null) if(normalsBuffer.empty()) normalsBuffer.load();
         if (textureBuffer != null) if (textureBuffer.empty()) textureBuffer.load();
 
         if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC) {
@@ -113,6 +124,10 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     public void dispose() {
         vertexBuffer.dispose();
         indexBuffer.dispose();
+        if(textureBuffer != null)
+            textureBuffer.dispose();
+        if(normalsBuffer != null)
+            normalsBuffer.dispose();
         glDeleteVertexArrays(vao);
     }
 }

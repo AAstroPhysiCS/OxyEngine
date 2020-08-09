@@ -3,6 +3,7 @@ package OxyEngineEditor.Sandbox.Scene;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
@@ -30,7 +31,7 @@ public class Scene implements OxyDisposable {
     private final WindowHandle windowHandle;
     private OxyUISystem oxyUISystem;
 
-    private Set<OxyEntity> cachedModelEntities;
+    private Set<OxyEntity> cachedLightEntities;
     private Set<EntityComponent> cachedInternMeshes, cachedModelMeshes, cachedCameraComponents;
 
     private final FrameBuffer frameBuffer;
@@ -67,6 +68,8 @@ public class Scene implements OxyDisposable {
                     new OxyColor(assimpMesh.material.diffuseColor()),
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces)
             );
+            e.name = assimpMesh.name;
+            assimpMesh.material.setValues(renderer.getShader());
             e.initData();
             models.add(e);
         }
@@ -93,6 +96,8 @@ public class Scene implements OxyDisposable {
         cachedInternMeshes = distinct(InternObjectMesh.class);
         cachedModelMeshes = distinct(ModelMesh.class);
         cachedCameraComponents = distinct(OxyCamera.class);
+        cachedLightEntities = view(Light.class);
+
         //Prep
         {
             for (EntityComponent e : cachedInternMeshes) {
@@ -116,6 +121,18 @@ public class Scene implements OxyDisposable {
 
     public void update(float ts, float deltaTime) {
         oxyUISystem.updateImGuiContext(deltaTime);
+
+        for (OxyEntity e : cachedLightEntities) {
+            if (!e.has(EmittingComponent.class)) continue;
+            Light l = (Light) e.get(Light.class);
+            EmittingComponent emittingComponent = (EmittingComponent) e.get(EmittingComponent.class);
+            l.setAmbient(emittingComponent.ambient());
+            l.setDiffuse(emittingComponent.diffuse());
+            l.setSpecular(emittingComponent.specular());
+            l.setPosition(emittingComponent.position());
+            l.setDirection(emittingComponent.direction());
+            l.update(renderer.getShader());
+        }
     }
 
     public void render(float ts, float deltaTime) {
@@ -148,7 +165,7 @@ public class Scene implements OxyDisposable {
             }
         }
         if (frameBuffer != null) frameBuffer.unbind();
-        oxyUISystem.render(registry.entityList.keySet(), OxyRenderer.currentBoundedCamera);
+        oxyUISystem.start(registry.entityList.keySet(), OxyRenderer.currentBoundedCamera);
     }
 
     public final OxyEntity getEntityByIndex(int index) {

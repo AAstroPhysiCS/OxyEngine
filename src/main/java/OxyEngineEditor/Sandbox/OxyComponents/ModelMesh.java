@@ -10,6 +10,9 @@ public class ModelMesh extends Mesh {
     public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 8 * Float.BYTES, 0);
     public static final BufferTemplate.Attributes attributesTXSlots = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 8 * Float.BYTES, 3 * Float.BYTES);
     public static final BufferTemplate.Attributes attributesColor = new BufferTemplate.Attributes(OxyShader.COLOR, 4, GL_FLOAT, false, 8 * Float.BYTES, 4 * Float.BYTES);
+
+    public static final BufferTemplate.Attributes attributesNormals = new BufferTemplate.Attributes(OxyShader.NORMALS, 3, GL_FLOAT, false, 0, 0);
+
     public static final BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0);
 
     private final float[] vertices, textureCoords, normals;
@@ -32,9 +35,13 @@ public class ModelMesh extends Mesh {
         textureBuffer = new TextureBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                 .setAttribPointer(attributesTXCoords));
 
+        normalsBuffer = new NormalsBuffer(() -> new BufferTemplate.BufferTemplateImpl()
+                .setAttribPointer(attributesNormals));
+
         vertexBuffer.setVertices(vertices);
         indexBuffer.setIndices(indices);
         textureBuffer.setTextureCoords(textureCoords);
+        normalsBuffer.setNormals(normals);
     }
 
     interface ModelMeshBuilder {

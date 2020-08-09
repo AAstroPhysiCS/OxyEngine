@@ -113,6 +113,6 @@ public class OxyModelLoader {
         if (result == 0) {
             specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
-        oxyMesh.material = new OxyMaterial(texture, ambient, diffuse, specular, 1.0f);
+        oxyMesh.material = new OxyMaterial(texture, ambient, diffuse, specular, 128f);
     }
 }

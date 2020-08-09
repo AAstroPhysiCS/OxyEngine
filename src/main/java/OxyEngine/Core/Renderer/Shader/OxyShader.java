@@ -3,6 +3,7 @@ package OxyEngine.Core.Renderer.Shader;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.System.OxyDisposable;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
@@ -18,6 +19,7 @@ public class OxyShader implements OxyDisposable {
     public static final int TEXTURE_COORDS = 1;
     public static final int TEXTURE_SLOT = 2;
     public static final int COLOR = 3;
+    public static final int NORMALS = 4;
 
     private final Map<String, ? super Number> uniformLocations = new HashMap<>();
 
@@ -70,6 +72,17 @@ public class OxyShader implements OxyDisposable {
         glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
     }
 
+    public void setUniformVec3(String vecName, Vector3f vec) {
+        if (!uniformLocations.containsKey(vecName)) {
+            uniformLocations.put(vecName, glGetUniformLocation(program, vecName));
+        }
+        glUniform3f((Integer) uniformLocations.get(vecName), vec.x, vec.y, vec.z);
+    }
+
+    public void setUniformVec3(Vector3f vec, int location) {
+        glUniform3f(location, vec.x, vec.y, vec.z);
+    }
+
     public void setUniformMatrix4fv(Matrix4f m, int location, boolean transpose) {
         m.get(buffer);
         glUniformMatrix4fv(location, transpose, buffer);
@@ -77,7 +90,9 @@ public class OxyShader implements OxyDisposable {
     }
 
     public void setCamera(OxyCamera camera) {
-        setUniformMatrix4fv(camera.getViewMatrix(), camera.getLocation(), camera.isTranspose());
+        setUniformMatrix4fv(camera.getProjectionMatrix(), camera.getProjectionMatrixLocation(), camera.isTranspose());
+        setUniformMatrix4fv(camera.getModelMatrix(), camera.getModelMatrixLocation(), camera.isTranspose());
+        setUniformMatrix4fv(camera.getViewMatrix(), camera.getViewMatrixLocation(), camera.isTranspose());
     }
 
     public Map<String, ? super Number> getUniformLocations() {

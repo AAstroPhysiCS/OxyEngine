@@ -18,6 +18,7 @@ public abstract class OxyEntity {
     public int[] indices;
 
     protected final Scene scene;
+    protected String name;
 
     public OxyEntity(Scene scene) {
         this.scene = scene;
@@ -29,8 +30,8 @@ public abstract class OxyEntity {
 
     public final void addComponent(EntityComponent... component) {
         scene.addComponent(this, component);
-        for(EntityComponent c : component){
-            if(c instanceof Mesh m){
+        for (EntityComponent c : component) {
+            if (c instanceof Mesh m) {
                 m.addToList(this);
             }
         }

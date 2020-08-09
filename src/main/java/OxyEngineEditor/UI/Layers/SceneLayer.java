@@ -98,8 +98,8 @@ public class SceneLayer extends UILayer {
                     texture = OxyTexture.load(PropertiesLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
                     PropertiesLayer.lastTextureID = texture.getTextureId();
                 }
-                OxyColor color = new OxyColor(PropertiesLayer.diffuseColor);
 
+                OxyColor color = new OxyColor(PropertiesLayer.diffuseColor);
                 model.addComponent(new SelectedComponent(false), texture, color, new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
                 model.updateData();
                 scene.rebuild();

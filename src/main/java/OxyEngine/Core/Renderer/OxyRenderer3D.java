@@ -24,6 +24,7 @@ public class OxyRenderer3D extends OxyRenderer {
     public void render(float ts, Mesh mesh, OxyCamera camera) {
         shader.enable();
         OxyRenderer.currentBoundedCamera = camera;
+        shader.setUniformVec3("cameraPos", camera.getCameraController().origin);
         camera.finalizeCamera(ts);
         shader.setCamera(camera);
         if (shader == null) {

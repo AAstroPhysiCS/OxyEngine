@@ -62,11 +62,12 @@ public class Registry {
     public Set<OxyEntity> view(Class<? extends EntityComponent> destClass) {
         Set<OxyEntity> list = new LinkedHashSet<>();
         for (var entrySet : entityList.entrySet()) {
-            int counter = 0;
             Set<EntityComponent> value = entrySet.getValue();
             OxyEntity entity = entrySet.getKey();
             for (EntityComponent c : value) {
                 if (c.getClass() == destClass) {
+                    list.add(entity);
+                } else if(destClass.isInstance(c)){
                     list.add(entity);
                 }
             }

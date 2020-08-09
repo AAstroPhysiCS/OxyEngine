@@ -107,14 +107,6 @@ public class PropertiesLayer extends UILayer {
             }
         }
 
-        if(ImGui.checkbox("Camera On Active", false)){
-            PerspectiveCamera camera = (PerspectiveCamera) scene.get(Sandbox3D.cameraEntity, PerspectiveCamera.class);
-            PerspectiveCamera camera2 = (PerspectiveCamera) scene.get(Sandbox3D.cameraEntity2, PerspectiveCamera.class);
-
-            camera.primary = !camera.primary;
-            camera2.primary = !camera2.primary;
-        }
-
         ImGui.end();
         ImGui.popStyleColor();
         ImGui.popStyleVar();

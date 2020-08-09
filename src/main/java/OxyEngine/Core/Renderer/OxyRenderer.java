@@ -52,47 +52,50 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
         }
 
         public static String getStats() {
-            String s = """
-                    FPS: %s
-                    Draw Calls: %s
-                    Total Shapes: %s
-                    Total Vertices: %s
-                    Total Indices: %s
-                                        
-                    Renderer: %s %s
-                    OpenGL version: %s
-                    Graphics Card Vendor: %s
-                    OpenGL Context running on %s Thread
-                    Current Origin: 
-                        X: %s, 
-                        Y: %s, 
-                        Z: %s
-                    Current Rotation: 
-                        X: %s, 
-                        Y: %s, 
-                        Z: %s
-                    Zoom: %s
-                    """.formatted(
-                    Sandbox3D.FPS,
-                    drawCalls,
-                    totalShapeCount,
-                    totalVertexCount,
-                    totalIndicesCount,
-                    type == OxyRendererType.Oxy3D ? "3D" : "2D",
-                    glGetString(GL_RENDERER),
-                    glGetString(GL_VERSION),
-                    glGetString(GL_VENDOR),
-                    Thread.currentThread().getName(),
-                    currentBoundedCamera.getCameraController().origin.x,
-                    currentBoundedCamera.getCameraController().origin.y,
-                    currentBoundedCamera.getCameraController().origin.z,
-                    currentBoundedCamera.getCameraController().getRotation().x,
-                    currentBoundedCamera.getCameraController().getRotation().y,
-                    currentBoundedCamera.getCameraController().getRotation().z,
-                    PerspectiveCamera.zoom
-            );
-            reset();
-            return s;
+            if(currentBoundedCamera != null) {
+                String s = """
+                        FPS: %s
+                        Draw Calls: %s
+                        Total Shapes: %s
+                        Total Vertices: %s
+                        Total Indices: %s
+                                            
+                        Renderer: %s %s
+                        OpenGL version: %s
+                        Graphics Card Vendor: %s
+                        OpenGL Context running on %s Thread
+                        Current Origin: 
+                            X: %s, 
+                            Y: %s, 
+                            Z: %s
+                        Current Rotation: 
+                            X: %s, 
+                            Y: %s, 
+                            Z: %s
+                        Zoom: %s
+                        """.formatted(
+                        Sandbox3D.FPS,
+                        drawCalls,
+                        totalShapeCount,
+                        totalVertexCount,
+                        totalIndicesCount,
+                        type == OxyRendererType.Oxy3D ? "3D" : "2D",
+                        glGetString(GL_RENDERER),
+                        glGetString(GL_VERSION),
+                        glGetString(GL_VENDOR),
+                        Thread.currentThread().getName(),
+                        currentBoundedCamera.getCameraController().origin.x,
+                        currentBoundedCamera.getCameraController().origin.y,
+                        currentBoundedCamera.getCameraController().origin.z,
+                        currentBoundedCamera.getCameraController().getRotation().x,
+                        currentBoundedCamera.getCameraController().getRotation().y,
+                        currentBoundedCamera.getCameraController().getRotation().z,
+                        PerspectiveCamera.zoom
+                );
+                reset();
+                return s;
+            }
+            return "No Camera";
         }
     }
 

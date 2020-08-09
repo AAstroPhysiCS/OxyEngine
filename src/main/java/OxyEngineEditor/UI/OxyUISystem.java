@@ -122,7 +122,7 @@ public class OxyUISystem {
         glfwSetInputMode(windowHandle.getPointer(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
-    public void render(Set<OxyEntity> entityList, OxyCamera camera) {
+    public void start(Set<OxyEntity> entityList, OxyCamera camera) {
         selectSystem.start(entityList, camera);
     }
 

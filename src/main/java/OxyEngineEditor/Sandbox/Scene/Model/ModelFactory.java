@@ -4,7 +4,6 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;

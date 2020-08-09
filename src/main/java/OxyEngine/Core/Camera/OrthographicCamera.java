@@ -17,7 +17,7 @@ public class OrthographicCamera extends OxyCamera {
     }
 
     public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, int location, boolean transpose, Vector3f translation) {
-        super(location, transpose);
+        super(4, 6, 7, transpose);
         this.left = left;
         this.right = right;
         this.bottom = bottom;
