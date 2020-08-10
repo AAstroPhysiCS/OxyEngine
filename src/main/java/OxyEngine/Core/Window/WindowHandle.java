@@ -21,7 +21,7 @@ public class WindowHandle {
     private long pointer;
     private final String title;
 
-    private List<Layer> layerList = new ArrayList<>();
+    private final List<Layer> layerList = new ArrayList<>();
 
     public WindowHandle(String title, int width, int height, WindowMode mode) {
         this.width = width;

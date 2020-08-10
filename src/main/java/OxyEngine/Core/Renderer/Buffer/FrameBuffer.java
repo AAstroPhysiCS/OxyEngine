@@ -2,7 +2,7 @@ package OxyEngine.Core.Renderer.Buffer;
 
 import java.nio.ByteBuffer;
 
-import static OxyEngine.System.OxySystem.logger;
+import static OxyEngine.System.OxySystem.logOut;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL42.glTexStorage2D;
 import static org.lwjgl.opengl.GL45.glCreateFramebuffers;
@@ -48,11 +48,7 @@ public class FrameBuffer extends Buffer {
 
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthAttachment, 0);
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            logger.severe("Framebuffer is incomplete!");
-            throw new InternalError("Framebuffer is incomplete!");
-        }
-
+        assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : logOut("Framebuffer is incomplete!");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 

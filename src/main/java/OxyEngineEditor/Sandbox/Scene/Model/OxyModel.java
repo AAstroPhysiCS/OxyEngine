@@ -6,6 +6,7 @@ import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
+import static OxyEngine.System.OxySystem.logOut;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class OxyModel extends OxyEntity {
@@ -30,7 +31,7 @@ public class OxyModel extends OxyEntity {
 
     @Override
     public void initData() {
-        if (!has(ModelFactory.class)) throw new IllegalStateException("Models should have a Model Template");
+        assert has(ModelFactory.class) : logOut("Models should have a Model Template");
         factory = (ModelFactory) get(ModelFactory.class);
         factory.constructData(this);
         addComponent(new ModelMesh.ModelMeshBuilderImpl()

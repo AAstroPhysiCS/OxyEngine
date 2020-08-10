@@ -80,14 +80,23 @@ public class Sandbox3D {
         PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
         cameraEntity.addComponent(camera);
 
-        OxyEntity directionalLight = scene.createInternObjectEntity();
-        Light directionalLightComponent = new PointLight();
-        directionalLight.addComponent(directionalLightComponent, new EmittingComponent(
+        OxyEntity pointLightEntity = scene.createInternObjectEntity();
+        Light pointLightComponent = new PointLight();
+        pointLightEntity.addComponent(pointLightComponent, new EmittingComponent(
                 new Vector3f(0, -13, 0),
                 null,
                 new Vector3f(0.5f, 0.5f, 0.5f),
                 new Vector3f(5.0f, 5.0f, 5.0f),
                 new Vector3f(0f, 0f, 0f)));
+
+//        OxyEntity directionalLightEntity = scene.createInternObjectEntity();
+//        Light directionalLightComponent = new DirectionalLight();
+//        directionalLightEntity.addComponent(directionalLightComponent, new EmittingComponent(
+//                null,
+//                new Vector3f(0, -13, 0),
+//                new Vector3f(0.5f, 0.5f, 0.5f),
+//                new Vector3f(5.0f, 5.0f, 5.0f),
+//                new Vector3f(0f, 0f, 0f)));
 
         windowHandle.addLayer(StatsLayer.getInstance(windowHandle, scene));
         windowHandle.addLayer(ToolbarLayer.getInstance(windowHandle, scene));

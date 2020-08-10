@@ -16,7 +16,7 @@ public class PerspectiveCamera extends OxyCamera {
     protected float aspect;
 
     public static int zoom = 50;
-    public boolean primary;
+    public final boolean primary;
 
     public static final int CAMERA_VIEW_MATRIX_LOCATION = 5;
     public static final int CAMERA_MODEL_MATRIX_LOCATION = 6;

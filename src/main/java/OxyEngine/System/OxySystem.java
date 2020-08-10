@@ -42,6 +42,11 @@ public interface OxySystem {
         return stringified;
     }
 
+    static String logOut(String msg){
+        logger.severe(msg);
+        return msg;
+    }
+
     interface FileSystem {
         static String load(String path) {
             final StringBuilder builder = new StringBuilder();

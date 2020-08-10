@@ -2,6 +2,7 @@ package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 
+import static OxyEngine.System.OxySystem.logOut;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
@@ -16,8 +17,7 @@ public final class VertexBuffer extends Buffer {
     public VertexBuffer(BufferTemplate template) {
         this.implementation = template.setup();
 
-        if (implementation.getUsage() == null || implementation.getStrideSize() == -1 || implementation.getAttribPointers() == null)
-            throw new NullPointerException("Some Implementation arguments are null");
+        assert implementation.getUsage() != null && implementation.getStrideSize() != -1 && implementation.getAttribPointers() != null : logOut("Some Implementation arguments are null");
     }
 
     @Override

@@ -3,6 +3,7 @@ package OxyEngineEditor.Sandbox.OxyComponents;
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 
+import static OxyEngine.System.OxySystem.logOut;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class ModelMesh extends Mesh {
@@ -105,9 +106,7 @@ public class ModelMesh extends Mesh {
 
         @Override
         public ModelMesh create() {
-            if (textureCoords == null || indices == null || vertices == null)
-                throw new NullPointerException("Data that is given is null.");
-
+            assert textureCoords != null || indices != null || vertices != null : logOut("Data that is given is null.");
             return new ModelMesh(usage, mode, vertices, indices, textureCoords, normals);
         }
     }

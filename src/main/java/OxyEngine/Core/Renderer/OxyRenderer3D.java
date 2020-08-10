@@ -4,7 +4,7 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Window.WindowHandle;
 
-import static OxyEngine.System.OxySystem.logger;
+import static OxyEngine.System.OxySystem.logOut;
 
 public class OxyRenderer3D extends OxyRenderer {
 
@@ -27,10 +27,7 @@ public class OxyRenderer3D extends OxyRenderer {
         shader.setUniformVec3("cameraPos", camera.getCameraController().origin);
         camera.finalizeCamera(ts);
         shader.setCamera(camera);
-        if (shader == null) {
-            logger.severe("Shader is not instantiated.");
-            throw new NullPointerException("Shader is not instantiated.");
-        }
+        assert shader != null : logOut("Shader is not instantiated.");
         if (mesh.empty()) {
             mesh.load();
         }
@@ -40,7 +37,7 @@ public class OxyRenderer3D extends OxyRenderer {
 
     @Override
     public void render(float ts, Mesh mesh) {
-        if(currentBoundedCamera != null)
+        if (currentBoundedCamera != null)
             render(ts, mesh, currentBoundedCamera);
     }
 }

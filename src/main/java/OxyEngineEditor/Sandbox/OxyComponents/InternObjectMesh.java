@@ -4,6 +4,7 @@ import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 
+import static OxyEngine.System.OxySystem.logOut;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class InternObjectMesh extends Mesh {
@@ -58,8 +59,7 @@ public class InternObjectMesh extends Mesh {
 
         @Override
         public InternObjectMesh create() {
-            if (mode == -1 || usage == null)
-                throw new IllegalArgumentException("Some arguments not defined!");
+            assert mode != -1 && usage != null : logOut("Some arguments not defined!");
 
             return new InternObjectMesh(mode,
                     new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()

@@ -1,9 +1,6 @@
 package OxyEngineEditor.UI.Layers;
 
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
-import OxyEngineEditor.Sandbox.Sandbox3D;
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import imgui.ImGui;
 import imgui.flag.*;

@@ -8,12 +8,12 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Window.WindowHint;
 import OxyEngine.OpenGL.OpenGLContext;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Loader.UIThemeLoader;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static OxyEngine.System.OxySystem.logOut;
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -57,10 +57,7 @@ public class OxyEngine implements OxyDisposable {
     public synchronized void start() { thread.start(); }
 
     public void init() {
-        if (!glfwInit()) {
-            logger.severe("Can't init GLFW");
-            throw new InternalError("Can't init GLFW");
-        }
+        assert glfwInit() : logOut("Can't init GLFW");
         logger.info("GLFW init successful");
 
         WindowBuilder builder = new WindowBuilder.WindowFactory();
