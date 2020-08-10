@@ -12,6 +12,7 @@ in vec4 normalsOut;
 in vec4 modelMatrixPosOut;
 
 uniform sampler2D tex[32];
+uniform samplerCube skyBoxTexture;
 uniform vec3 cameraPos;
 
 struct Material{
@@ -63,7 +64,11 @@ vec3 calcSpecular(vec3 lightDir, vec3 specular, vec3 lightSpecular){
 
 void main(){
       //TODO: SUMMARIZE THIS
-    if(currentLightIndex == 0){
+
+    vec3 I = normalize(vec3(modelMatrixPosOut) - cameraPos);
+    vec3 R = reflect(I, normalize(vec3(normalsOut)));
+
+    if(currentLightIndex == 0){ // POINTLIGHT
         vec3 lightDir = normalize(p_Light.position - vec3(modelMatrixPosOut));
         int index = int(round(textureSlotOut));
         if (index == 0){
@@ -78,7 +83,7 @@ void main(){
             specular *= attenuation;
             vec3 result = specular + diffuse + ambient;
 
-            color = vec4(result, 1.0f) * colorOut;
+            color = vec4(result, 1.0f) * colorOut * texture(skyBoxTexture, R);
         }
         else {
             vec3 ambient = calcAmbient(texture(tex[index], texCoordsOut).rgb, p_Light.ambient);
@@ -92,9 +97,9 @@ void main(){
             specular *= attenuation;
             vec3 result = specular + diffuse + ambient;
 
-            color = vec4(result, 1.0f);
+            color = vec4(result, 1.0f) * texture(skyBoxTexture, R);
         }
-    } else if(currentLightIndex == 1){
+    } else if(currentLightIndex == 1){ // DIRECTIONAL LIGHT
         vec3 lightDir = normalize(-d_Light.direction);
         int index = int(round(textureSlotOut));
         if (index == 0){
@@ -103,7 +108,7 @@ void main(){
             vec3 specular = calcSpecular(lightDir, material.specular, d_Light.specular);
             vec3 result = specular + diffuse + ambient;
 
-            color = vec4(result, 1.0f) * colorOut;
+            color = vec4(result, 1.0f) * colorOut * texture(skyBoxTexture, R);
         }
         else {
             vec3 ambient = calcAmbient(texture(tex[index], texCoordsOut).rgb, d_Light.ambient);
@@ -111,15 +116,15 @@ void main(){
             vec3 specular = calcSpecular(lightDir, texture(tex[index], texCoordsOut).rgb, d_Light.specular);
             vec3 result = specular + diffuse + ambient;
 
-            color = vec4(result, 1.0f);
+            color = vec4(result, 1.0f) * texture(skyBoxTexture, R);
         }
-    } else {
+    } else { // NO LIGHT
         int index = int(round(textureSlotOut));
         if (index == 0){
-            color = colorOut;
+            color = colorOut * texture(skyBoxTexture, R);
         }
         else {
-            color = texture(tex[index], texCoordsOut);
+            color = texture(tex[index], texCoordsOut) * texture(skyBoxTexture, R);
         }
     }
 }
@@ -134,8 +139,6 @@ layout(location = 3) in vec4 color;
 layout(location = 4) in vec4 normals;
 
 uniform mat4 v_Matrix;
-uniform mat4 m_Matrix;
-uniform mat4 pr_Matrix;
 
 out vec2 texCoordsOut;
 out float textureSlotOut;

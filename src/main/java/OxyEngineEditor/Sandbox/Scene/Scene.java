@@ -27,6 +27,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.lwjgl.opengl.GL11.glDepthMask;
+
 public class Scene implements OxyDisposable {
 
     private final Registry registry = new Registry();
@@ -98,13 +100,15 @@ public class Scene implements OxyDisposable {
     CubemapTexture cubemapTexture;
 
     public void build() {
-        cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyBoxBlue"), this);
-        cubemapTexture.init();
 
+        Set<EntityComponent> cachedShaders = distinct(OxyShader.class);
+        cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyBoxBlue"), this);
+        cubemapTexture.init(cachedShaders);
         cachedInternMeshes = distinct(InternObjectMesh.class);
         cachedModelMeshes = distinct(ModelMesh.class);
         cachedCameraComponents = distinct(OxyCamera.class);
         cachedLightEntities = view(Light.class);
+
 
         //Prep
         {
@@ -169,7 +173,15 @@ public class Scene implements OxyDisposable {
             }
 
             for (EntityComponent c : cachedInternMeshes) {
-                render(ts, (Mesh) c, mainCamera);
+                Mesh mesh = (Mesh) c;
+                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class))) {
+                    //skybox
+                    glDepthMask(false);
+                    render(ts, (Mesh) c, mainCamera);
+                    glDepthMask(true);
+                } else {
+                    render(ts, (Mesh) c, mainCamera);
+                }
             }
         }
         if (frameBuffer != null) frameBuffer.unbind();

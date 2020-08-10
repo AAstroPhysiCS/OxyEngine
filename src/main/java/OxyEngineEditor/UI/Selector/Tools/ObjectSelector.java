@@ -26,6 +26,7 @@ public interface ObjectSelector {
         for (OxyEntity entity : entities) {
 
             if (!entity.has(SelectedComponent.class)) continue;
+            if (((SelectedComponent) entity.get(SelectedComponent.class)).fixedValue) continue;
 
             TransformComponent c = (TransformComponent) entity.get(TransformComponent.class);
             SelectedComponent selected = (SelectedComponent) entity.get(SelectedComponent.class);

@@ -6,8 +6,12 @@ import static OxyEngine.System.OxySystem.oxyAssert;
 
 public class PointLight extends Light {
 
-    public PointLight() {
+    private final float constant, linear, quadratic;
 
+    public PointLight(float constant, float linear, float quadratic) {
+        this.constant = constant;
+        this.linear = linear;
+        this.quadratic = quadratic;
     }
 
     @Override
@@ -19,9 +23,9 @@ public class PointLight extends Light {
         shader.setUniformVec3("p_Light.ambient", ambient);
         shader.setUniformVec3("p_Light.specular", specular);
         shader.setUniformVec3("p_Light.diffuse", diffuse);
-        shader.setUniform1f("p_Light.constant", 1.0f);
-        shader.setUniform1f("p_Light.linear", 0.0075f);
-        shader.setUniform1f("p_Light.quadratic", 0.045f);
+        shader.setUniform1f("p_Light.constant", constant);
+        shader.setUniform1f("p_Light.linear", linear);
+        shader.setUniform1f("p_Light.quadratic", quadratic);
         shader.disable();
     }
 }

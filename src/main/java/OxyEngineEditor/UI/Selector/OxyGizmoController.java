@@ -52,6 +52,7 @@ public class OxyGizmoController implements OxyMouseListener {
             TransformComponent yC = (TransformComponent) yAxis.get(TransformComponent.class);
             TransformComponent zC = (TransformComponent) zAxis.get(TransformComponent.class);
             TransformComponent currC = (TransformComponent) currentEntitySelected.get(TransformComponent.class);
+
             if (selectedEntity == xAxis) {
                 if (directionVector.x > 0) {
                     xC.position.add(0, 0, -0.15f);

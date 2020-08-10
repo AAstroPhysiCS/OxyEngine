@@ -2,16 +2,14 @@ package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static OxyEngine.Core.Renderer.Texture.OxyTexture.allTextures;
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -70,6 +68,7 @@ public class CubemapTexture extends OxyTexture.Texture {
     };
 
     private final Scene scene;
+    private OxyShader shader;
     private static final List<String> fileStructure = Arrays.asList("right", "left", "top", "bottom", "back", "front");
     private static final List<String> totalFiles = new ArrayList<>();
 
@@ -116,29 +115,46 @@ public class CubemapTexture extends OxyTexture.Texture {
         allTextures.add(this);
     }
 
-    public void init() {
-        OxyShader shader = new OxyShader("shaders/skybox.glsl");
-        shader.enable();
-        shader.setUniform1i("skyBoxTexture", textureSlot);
-        shader.disable();
+    private OxyInternObject cube;
 
-        BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0);
+    public void init(Set<EntityComponent> allOtherShaders) {
 
-        InternObjectMesh mesh = new InternObjectMesh.InternMeshBuilderImpl()
-                .setShader(shader)
-                .setMode(GL_TRIANGLES)
-                .setUsage(BufferTemplate.Usage.STATIC)
-                .setVerticesBufferAttributes(attributesVert)
-                .create();
-
-        OxyInternObject cube = scene.createInternObjectEntity();
-        cube.vertices = skyboxVertices;
-        int[] indices = new int[skyboxVertices.length];
-        for (int i = 0; i < skyboxVertices.length; i++) {
-            indices[i] = i;
+        for (EntityComponent s : allOtherShaders) {
+            OxyShader ss = (OxyShader) s;
+            ss.enable();
+            ss.setUniform1i("skyBoxTexture", textureSlot);
+            ss.disable();
         }
-        cube.indices = indices;
-        cube.addComponent(mesh);
-        mesh.initList();
+
+        if (shader == null) {
+
+            shader = new OxyShader("shaders/skybox.glsl");
+            shader.enable();
+            shader.setUniform1i("skyBoxTexture", textureSlot);
+            shader.disable();
+
+            BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0);
+
+            InternObjectMesh mesh = new InternObjectMesh.InternMeshBuilderImpl()
+                    .setShader(shader)
+                    .setMode(GL_TRIANGLES)
+                    .setUsage(BufferTemplate.Usage.STATIC)
+                    .setVerticesBufferAttributes(attributesVert)
+                    .create();
+
+            cube = scene.createInternObjectEntity();
+            cube.vertices = skyboxVertices;
+            int[] indices = new int[skyboxVertices.length];
+            for (int i = 0; i < skyboxVertices.length; i++) {
+                indices[i] = i;
+            }
+            cube.indices = indices;
+            cube.addComponent(mesh, shader);
+            mesh.initList();
+        }
+    }
+
+    public OxyInternObject getCube() {
+        return cube;
     }
 }

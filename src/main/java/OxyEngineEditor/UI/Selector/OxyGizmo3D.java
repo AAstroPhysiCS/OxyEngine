@@ -1,13 +1,11 @@
 package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
-import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -26,9 +24,9 @@ public class OxyGizmo3D {
 
         gizmo = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
 
-        gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, 0, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 1f), new SelectedComponent(false, true), new OxyColor(new float[]{0f, 1f, 0f, 0.8f}));
-        gizmo.get(1).addComponent(new TransformComponent(1f), new SelectedComponent(false, true), new OxyColor(new float[]{1f, 0f, 0f, 0.8f}));
-        gizmo.get(2).addComponent(new TransformComponent(1f), new SelectedComponent(false, true), new OxyColor(new float[]{0f, 0f, 1f, 0.8f}));
+        gizmo.get(0).addComponent(new TransformComponent(1f), new SelectedComponent(false, true));
+        gizmo.get(1).addComponent(new TransformComponent(1f), new SelectedComponent(false, true));
+        gizmo.get(2).addComponent(new TransformComponent(1f), new SelectedComponent(false, true));
 
         gizmo.get(0).updateData();
         gizmo.get(1).updateData();

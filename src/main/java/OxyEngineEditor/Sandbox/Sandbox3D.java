@@ -1,9 +1,6 @@
 package OxyEngineEditor.Sandbox;
 
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
-import OxyEngine.Core.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Renderer.Light.Light;
-import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -12,7 +9,6 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Sandbox.OxyComponents.EmittingComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
@@ -62,7 +58,7 @@ public class Sandbox3D {
 
         OxyShader oxyShader = new OxyShader("shaders/world.glsl");
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
-        scene = new Scene("Main Scene", windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
+        scene = new Scene("Test Scene 1", windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
         scene.setUISystem(new OxyUISystem(scene, windowHandle, oxyShader));
 
         //Temp
@@ -70,23 +66,23 @@ public class Sandbox3D {
         PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
         cameraEntity.addComponent(camera);
 
-        OxyEntity pointLightEntity = scene.createInternObjectEntity();
-        Light pointLightComponent = new PointLight();
+        /*OxyEntity pointLightEntity = scene.createInternObjectEntity();
+        Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
         pointLightEntity.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
-                new Vector3f(0, -13, 0),
+                new Vector3f(-5, -25, 0),
                 null,
-                new Vector3f(0.5f, 0.5f, 0.5f),
-                new Vector3f(5.0f, 5.0f, 5.0f),
-                new Vector3f(0.1f, 0.1f, 0.1f)));
+                new Vector3f(0.2f, 0.2f, 0.2f),
+                new Vector3f(10f, 10f, 10f),
+                new Vector3f(1.0f, 1.0f, 1.0f)));*/
 
-        OxyEntity directionalLightEntity = scene.createInternObjectEntity();
+        /*OxyEntity directionalLightEntity = scene.createInternObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
         directionalLightEntity.addComponent(oxyShader, directionalLightComponent, new EmittingComponent(
                 null,
                 new Vector3f(33, -17, -32),
                 new Vector3f(0.5f, 0.5f, 0.5f),
                 new Vector3f(5.0f, 5.0f, 5.0f),
-                new Vector3f(0f, 0f, 0f)));
+                new Vector3f(0f, 0f, 0f)));*/
 
         windowHandle.addLayer(StatsLayer.getInstance(windowHandle, scene));
         windowHandle.addLayer(ToolbarLayer.getInstance(windowHandle, scene));
