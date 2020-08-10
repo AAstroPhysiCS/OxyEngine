@@ -106,7 +106,7 @@ public class ModelMesh extends Mesh {
 
         @Override
         public ModelMesh create() {
-            assert textureCoords != null || indices != null || vertices != null : logOut("Data that is given is null.");
+            assert textureCoords != null && indices != null && vertices != null : logOut("Data that is given is null.");
             return new ModelMesh(usage, mode, vertices, indices, textureCoords, normals);
         }
     }

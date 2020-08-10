@@ -14,6 +14,7 @@ public class PointLight extends Light {
     public void update(OxyShader shader) {
         assert direction == null : logOut("Point Lights should not have a direction");
         shader.enable();
+        shader.setUniform1f("currentLightIndex", 0);
         shader.setUniformVec3("p_Light.position", position);
         shader.setUniformVec3("p_Light.ambient", ambient);
         shader.setUniformVec3("p_Light.specular", specular);

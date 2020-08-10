@@ -14,6 +14,7 @@ public class DirectionalLight extends Light {
     public void update(OxyShader shader) {
         assert direction != null : logOut("Directional Lights should have a direction");
         shader.enable();
+        shader.setUniform1f("currentLightIndex", 1);
         shader.setUniformVec3("d_Light.direction", direction);
         shader.setUniformVec3("d_Light.ambient", ambient);
         shader.setUniformVec3("d_Light.specular", specular);
