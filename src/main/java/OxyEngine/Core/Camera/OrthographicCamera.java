@@ -12,12 +12,12 @@ public class OrthographicCamera extends OxyCamera {
 
     private final Vector3f translation;
 
-    public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, int location, boolean transpose) {
-        this(left, right, bottom, top, zNear, zFar, location, transpose, new Vector3f(0, 0, 0));
+    public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, boolean transpose) {
+        this(left, right, bottom, top, zNear, zFar, transpose, new Vector3f(0, 0, 0));
     }
 
-    public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, int location, boolean transpose, Vector3f translation) {
-        super(4, 6, 7, transpose);
+    public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, boolean transpose, Vector3f translation) {
+        super(transpose);
         this.left = left;
         this.right = right;
         this.bottom = bottom;

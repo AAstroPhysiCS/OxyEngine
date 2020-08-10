@@ -15,8 +15,8 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class OxyRenderer implements OxyInfoLine<String> {
 
     public static OxyCamera currentBoundedCamera;
-    protected OxyShader shader;
     protected final WindowHandle windowHandle;
+    protected static OxyShader currentShader;
 
     protected static OxyRendererType type;
 
@@ -24,19 +24,18 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
         this.windowHandle = windowHandle;
     }
 
-    public void setShader(OxyShader shader) {
-        this.shader = shader;
-    }
+    public abstract void begin(OxyShader shader);
 
     public abstract void render(float ts, Mesh mesh, OxyCamera camera);
 
     public abstract void render(float ts, Mesh mesh);
 
+    public abstract void end(OxyShader shader);
+
     /**
      * All global meshes should be here!
      */
     public interface MeshSystem {
-        Ref<InternObjectMesh> sandBoxMesh = new Ref<>(null);
         Ref<InternObjectMesh> worldGridMesh = new Ref<>(null);
     }
 
@@ -106,7 +105,7 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
         return currentBoundedCamera;
     }
 
-    public OxyShader getShader() {
-        return shader;
+    public static OxyShader getCurrentShader() {
+        return currentShader;
     }
 }

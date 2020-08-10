@@ -1,6 +1,5 @@
 package OxyEngineEditor.Sandbox;
 
-import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
@@ -14,7 +13,6 @@ import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.OxyComponents.EmittingComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
@@ -28,19 +26,17 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
-import static OxyEngine.Core.Renderer.OxyRenderer.MeshSystem.sandBoxMesh;
 import static OxyEngine.System.OxySystem.logger;
-import static OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh.*;
 import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.dispatcherThread;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
+import static org.lwjgl.opengl.GL11.glGetError;
 
 public class Sandbox3D {
 
     private final WindowHandle windowHandle;
 
-    private OxyShader oxyShader;
     private final OxyEngine oxyEngine;
 
     private Scene scene;
@@ -63,27 +59,20 @@ public class Sandbox3D {
     private void init() {
         oxyEngine.init();
 
-        oxyShader = new OxyShader("shaders/world.glsl");
 
-        sandBoxMesh.obj = new InternObjectMesh.GameObjectMeshBuilderImpl()
-                .setUsage(BufferTemplate.Usage.DYNAMIC)
-                .setMode(GL_TRIANGLES)
-                .setVerticesBufferAttributes(attributesVert, attributesTXCoords, attributesTXSlot, attributesColors)
-                .create();
-
+        OxyShader oxyShader = new OxyShader("shaders/world.glsl");
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
-        oxyRenderer.setShader(oxyShader);
-
         scene = new Scene("Main Scene", windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
+        scene.setUISystem(new OxyUISystem(scene, windowHandle, oxyShader));
 
         //Temp
         OxyEntity cameraEntity = scene.createInternObjectEntity();
         PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
         cameraEntity.addComponent(camera);
 
-        /*OxyEntity pointLightEntity = scene.createInternObjectEntity();
+        OxyEntity pointLightEntity = scene.createInternObjectEntity();
         Light pointLightComponent = new PointLight();
-        pointLightEntity.addComponent(pointLightComponent, new EmittingComponent(
+        pointLightEntity.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
                 new Vector3f(0, -13, 0),
                 null,
                 new Vector3f(0.5f, 0.5f, 0.5f),
@@ -92,17 +81,17 @@ public class Sandbox3D {
 
         OxyEntity directionalLightEntity = scene.createInternObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
-        directionalLightEntity.addComponent(directionalLightComponent, new EmittingComponent(
+        directionalLightEntity.addComponent(oxyShader, directionalLightComponent, new EmittingComponent(
                 null,
                 new Vector3f(33, -17, -32),
                 new Vector3f(0.5f, 0.5f, 0.5f),
                 new Vector3f(5.0f, 5.0f, 5.0f),
-                new Vector3f(0f, 0f, 0f)));*/
+                new Vector3f(0f, 0f, 0f)));
 
         windowHandle.addLayer(StatsLayer.getInstance(windowHandle, scene));
         windowHandle.addLayer(ToolbarLayer.getInstance(windowHandle, scene));
         windowHandle.addLayer(ConfigurationLayer.getInstance(windowHandle, scene));
-        windowHandle.addLayer(SceneLayer.getInstance(windowHandle, scene));
+        windowHandle.addLayer(SceneLayer.getInstance(windowHandle, scene, oxyShader));
         windowHandle.addLayer(PropertiesLayer.getInstance(windowHandle, scene));
         windowHandle.preloadAllLayers();
 
@@ -112,7 +101,7 @@ public class Sandbox3D {
         oxyShader.setUniform1iv("tex", samplers);
         oxyShader.disable();
 
-        List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"));
+        List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"), oxyShader);
 
         for (OxyModel obj : testObjects) {
             obj.addComponent(new SelectedComponent(false));
@@ -130,8 +119,6 @@ public class Sandbox3D {
         OxyTexture.bindAllTextureSlots();
 
         scene.render(ts, deltaTime);
-        oxyShader.enable();
-        oxyShader.disable();
 
         OpenGLRendererAPI.clearBuffer();
         OpenGLRendererAPI.clearColor(41, 41, 41, 1.0f);
@@ -184,9 +171,7 @@ public class Sandbox3D {
 
     public void dispose() {
         oxyEngine.dispose();
-        oxyShader.dispose();
         scene.dispose();
-        sandBoxMesh.obj.dispose();
         dispatcherThread.joinThread();
     }
 }

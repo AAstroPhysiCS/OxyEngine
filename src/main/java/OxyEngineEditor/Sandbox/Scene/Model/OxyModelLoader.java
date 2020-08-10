@@ -1,5 +1,6 @@
 package OxyEngineEditor.Sandbox.Scene.Model;
 
+import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -92,9 +93,9 @@ public class OxyModelLoader {
         AIString path = AIString.calloc();
         Assimp.aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
         String textPath = path.dataString();
-        OxyTexture texture = null;
+        ImageTexture texture = null;
         if (!textPath.equals("")) {
-            texture = OxyTexture.load(textPath);
+            texture = OxyTexture.loadImage(textPath);
         }
         Vector4f ambient = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, aiTextureType_NONE, 0, color);

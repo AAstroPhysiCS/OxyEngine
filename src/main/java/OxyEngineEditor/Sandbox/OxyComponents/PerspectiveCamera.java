@@ -18,16 +18,12 @@ public class PerspectiveCamera extends OxyCamera {
     public static int zoom = 50;
     public final boolean primary;
 
-    public static final int CAMERA_VIEW_MATRIX_LOCATION = 5;
-    public static final int CAMERA_MODEL_MATRIX_LOCATION = 6;
-    public static final int CAMERA_PROJECTION_MATRIX_LOCATION = 7;
-
     public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
         this(primary, fovY, aspect, zNear, zFar, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), transpose);
     }
 
     public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, Vector3f translation, Vector3f rotation, boolean transpose) {
-        super(CAMERA_VIEW_MATRIX_LOCATION, CAMERA_PROJECTION_MATRIX_LOCATION, CAMERA_MODEL_MATRIX_LOCATION, transpose);
+        super(transpose);
         this.primary = primary;
         this.fovY = fovY;
         this.aspect = aspect;
@@ -75,6 +71,12 @@ public class PerspectiveCamera extends OxyCamera {
         viewMatrix = new Matrix4f();
         viewMatrix.set(projectionMatrix);
         viewMatrix.mul(modelMatrix);
+
+        //For skybox
+        viewMatrixNoTranslation = new Matrix4f();
+        viewMatrixNoTranslation.set(setProjectionMatrix());
+        viewMatrixNoTranslation.rotateX(cameraController.getRotation().x);
+        viewMatrixNoTranslation.rotateY(cameraController.getRotation().y);
     }
 
     public void setAspect(float aspect) {

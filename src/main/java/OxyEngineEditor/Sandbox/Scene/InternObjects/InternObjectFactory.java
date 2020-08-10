@@ -1,7 +1,7 @@
 package OxyEngineEditor.Sandbox.Scene.InternObjects;
 
+import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
@@ -15,7 +15,7 @@ public abstract class InternObjectFactory implements EntityComponent {
 
     public void constructData(OxyInternObject e) {
         OxyColor color = (OxyColor) e.get(OxyColor.class);
-        OxyTexture texture = (OxyTexture) e.get(OxyTexture.class);
+        ImageTexture texture = (ImageTexture) e.get(ImageTexture.class);
         TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()

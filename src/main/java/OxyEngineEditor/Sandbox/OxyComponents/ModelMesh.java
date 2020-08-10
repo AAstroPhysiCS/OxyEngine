@@ -3,7 +3,7 @@ package OxyEngineEditor.Sandbox.OxyComponents;
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 
-import static OxyEngine.System.OxySystem.logOut;
+import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class ModelMesh extends Mesh {
@@ -19,7 +19,8 @@ public class ModelMesh extends Mesh {
     private final float[] vertices, textureCoords, normals;
     private final int[] indices;
 
-    private ModelMesh(BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+    private ModelMesh(OxyShader shader, BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+        this.shader = shader;
         this.vertices = vertices;
         this.indices = indices;
         this.textureCoords = textureCoords;
@@ -46,6 +47,9 @@ public class ModelMesh extends Mesh {
     }
 
     interface ModelMeshBuilder {
+
+        ModelMeshBuilder setShader(OxyShader shader);
+
         ModelMeshBuilder setVertices(float[] vertices);
 
         ModelMeshBuilder setIndices(int[] vertices);
@@ -63,10 +67,17 @@ public class ModelMesh extends Mesh {
 
     public static class ModelMeshBuilderImpl implements ModelMeshBuilder {
 
+        private OxyShader shader;
         private float[] vertices, textureCoords, normals;
         private int[] indices;
         private int mode;
         private BufferTemplate.Usage usage;
+
+        @Override
+        public ModelMeshBuilderImpl setShader(OxyShader shader) {
+            this.shader = shader;
+            return this;
+        }
 
         @Override
         public ModelMeshBuilderImpl setVertices(float[] vertices) {
@@ -106,8 +117,8 @@ public class ModelMesh extends Mesh {
 
         @Override
         public ModelMesh create() {
-            assert textureCoords != null && indices != null && vertices != null : logOut("Data that is given is null.");
-            return new ModelMesh(usage, mode, vertices, indices, textureCoords, normals);
+            assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
+            return new ModelMesh(shader, usage, mode, vertices, indices, textureCoords, normals);
         }
     }
 

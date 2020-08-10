@@ -2,7 +2,7 @@ package OxyEngine.Core.Renderer.Shader;
 
 import OxyEngine.System.OxySystem;
 
-import static OxyEngine.System.OxySystem.logOut;
+import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL20.*;
 
 public final class ShaderUtil {
@@ -33,8 +33,8 @@ public final class ShaderUtil {
         glCompileShader(vertexId);
         glCompileShader(fragmentId);
 
-        assert glGetShaderi(vertexId, GL_COMPILE_STATUS) == GL_TRUE : logOut("Vertex Shader crashed!" + glGetShaderInfoLog(vertexId));
-        assert glGetShaderi(fragmentId, GL_COMPILE_STATUS) == GL_TRUE : logOut("Fragment Shader crashed! " + glGetShaderInfoLog(fragmentId));
+        assert glGetShaderi(vertexId, GL_COMPILE_STATUS) == GL_TRUE : oxyAssert("Vertex Shader crashed!" + glGetShaderInfoLog(vertexId));
+        assert glGetShaderi(fragmentId, GL_COMPILE_STATUS) == GL_TRUE : oxyAssert("Fragment Shader crashed! " + glGetShaderInfoLog(fragmentId));
 
         glAttachShader(program, vertexId);
         glAttachShader(program, fragmentId);

@@ -4,66 +4,70 @@ import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 
-import static OxyEngine.System.OxySystem.logOut;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static OxyEngine.System.OxySystem.oxyAssert;
 
 public class InternObjectMesh extends Mesh {
 
-    public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 10 * Float.BYTES, 0);
-    public static final BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 10 * Float.BYTES, 3 * Float.BYTES);
-    public static final BufferTemplate.Attributes attributesTXSlot = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 10 * Float.BYTES, 5 * Float.BYTES);
-    public static final BufferTemplate.Attributes attributesColors = new BufferTemplate.Attributes(OxyShader.COLOR, 4, GL_FLOAT, false, 10 * Float.BYTES, 6 * Float.BYTES);
-
     public int indicesX, indicesY, indicesZ;
 
-    private InternObjectMesh(int mode, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
+    private InternObjectMesh(OxyShader shader, int mode, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
+        this.shader = shader;
         this.mode = mode;
         this.indexBuffer = indexBuffer;
         this.vertexBuffer = vertexBuffer;
     }
 
-    interface GameObjectMeshBuilder {
+    interface InternMeshBuilder {
 
-        GameObjectMeshBuilder setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers);
+        InternMeshBuilder setShader(OxyShader shader);
 
-        GameObjectMeshBuilder setMode(int mode);
+        InternMeshBuilder setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers);
 
-        GameObjectMeshBuilder setUsage(BufferTemplate.Usage usage);
+        InternMeshBuilder setMode(int mode);
+
+        InternMeshBuilder setUsage(BufferTemplate.Usage usage);
 
         InternObjectMesh create();
     }
 
-    public static class GameObjectMeshBuilderImpl implements GameObjectMeshBuilder {
+    public static class InternMeshBuilderImpl implements InternMeshBuilder {
 
         private BufferTemplate.Attributes[] verticesPointers;
         private int mode = -1;
         private BufferTemplate.Usage usage;
+        private OxyShader shader;
 
         @Override
-        public GameObjectMeshBuilderImpl setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers) {
+        public InternMeshBuilderImpl setShader(OxyShader shader) {
+            this.shader = shader;
+            return this;
+        }
+
+        @Override
+        public InternMeshBuilderImpl setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers) {
             this.verticesPointers = verticesPointers;
             return this;
         }
 
         @Override
-        public GameObjectMeshBuilderImpl setMode(int mode) {
+        public InternMeshBuilderImpl setMode(int mode) {
             this.mode = mode;
             return this;
         }
 
         @Override
-        public GameObjectMeshBuilderImpl setUsage(BufferTemplate.Usage usage) {
+        public InternMeshBuilderImpl setUsage(BufferTemplate.Usage usage) {
             this.usage = usage;
             return this;
         }
 
         @Override
         public InternObjectMesh create() {
-            assert mode != -1 && usage != null : logOut("Some arguments not defined!");
+            assert mode != -1 && usage != null : oxyAssert("Some arguments not defined!");
 
-            return new InternObjectMesh(mode,
+            return new InternObjectMesh(shader, mode,
                     new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-                            .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
+                            .setVerticesStrideSize(verticesPointers[0].stride() / Float.BYTES)
                             .setUsage(usage)
                             .setAttribPointer(verticesPointers)),
                     new IndexBuffer());

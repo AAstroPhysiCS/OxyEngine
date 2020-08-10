@@ -1,5 +1,6 @@
 package OxyEngineEditor.UI.Selector;
 
+import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
@@ -16,14 +17,14 @@ public class OxyGizmo3D {
 
     private static OxyGizmo3D INSTANCE = null;
 
-    public static OxyGizmo3D getInstance(Scene scene) {
-        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(scene);
+    public static OxyGizmo3D getInstance(Scene scene, OxyShader shader) {
+        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(scene, shader);
         return INSTANCE;
     }
 
-    private OxyGizmo3D(Scene scene) {
+    private OxyGizmo3D(Scene scene, OxyShader shader) {
 
-        gizmo = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"));
+        gizmo = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
 
         gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, 0, 0), new Vector3f((float) Math.toRadians(180), 0, 0), 1f), new SelectedComponent(false, true), new OxyColor(new float[]{0f, 1f, 0f, 0.8f}));
         gizmo.get(1).addComponent(new TransformComponent(1f), new SelectedComponent(false, true), new OxyColor(new float[]{1f, 0f, 0f, 0.8f}));

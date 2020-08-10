@@ -124,8 +124,8 @@ void main(){
     }
 }
 
-    //#type vertex
-    #version 460 core
+//#type vertex
+#version 460 core
 
 layout(location = 0) in vec4 pos;
 layout(location = 1) in vec2 tcs;
@@ -133,9 +133,9 @@ layout(location = 2) in float textureSlot;
 layout(location = 3) in vec4 color;
 layout(location = 4) in vec4 normals;
 
-layout(location = 5) uniform mat4 v_Matrix;
-layout(location = 6) uniform mat4 m_Matrix;
-layout(location = 7) uniform mat4 pr_Matrix;
+uniform mat4 v_Matrix;
+uniform mat4 m_Matrix;
+uniform mat4 pr_Matrix;
 
 out vec2 texCoordsOut;
 out float textureSlotOut;

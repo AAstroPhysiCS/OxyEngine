@@ -13,7 +13,7 @@ import OxyEngineEditor.UI.Loader.UIThemeLoader;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static OxyEngine.System.OxySystem.logOut;
+import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -57,7 +57,7 @@ public class OxyEngine implements OxyDisposable {
     public synchronized void start() { thread.start(); }
 
     public void init() {
-        assert glfwInit() : logOut("Can't init GLFW");
+        assert glfwInit() : oxyAssert("Can't init GLFW");
         logger.info("GLFW init successful");
 
         WindowBuilder builder = new WindowBuilder.WindowFactory();

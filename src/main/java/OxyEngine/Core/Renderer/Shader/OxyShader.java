@@ -2,6 +2,8 @@ package OxyEngine.Core.Renderer.Shader;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.System.OxyDisposable;
+import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -13,7 +15,7 @@ import java.util.Map;
 
 import static org.lwjgl.opengl.GL20.*;
 
-public class OxyShader implements OxyDisposable {
+public class OxyShader implements OxyDisposable, EntityComponent {
 
     public static final int VERTICES = 0;
     public static final int TEXTURE_COORDS = 1;
@@ -83,16 +85,27 @@ public class OxyShader implements OxyDisposable {
         glUniform3f(location, vec.x, vec.y, vec.z);
     }
 
-    public void setUniformMatrix4fv(Matrix4f m, int location, boolean transpose) {
+    public void setUniformMatrix4fv(Matrix4f m, String name, boolean transpose){
         m.get(buffer);
-        glUniformMatrix4fv(location, transpose, buffer);
-        buffer.clear();
+        if (!uniformLocations.containsKey(name)) {
+            uniformLocations.put(name, glGetUniformLocation(program, name));
+        }
+        glUniformMatrix4fv((Integer) uniformLocations.get(name), transpose, buffer);
+    }
+
+    public void setUniformMatrix3fv(Matrix3f m, String name, boolean transpose){
+        m.get(buffer);
+        if (!uniformLocations.containsKey(name)) {
+            uniformLocations.put(name, glGetUniformLocation(program, name));
+        }
+        glUniformMatrix3fv((Integer) uniformLocations.get(name), transpose, buffer);
     }
 
     public void setCamera(OxyCamera camera) {
-        setUniformMatrix4fv(camera.getProjectionMatrix(), camera.getProjectionMatrixLocation(), camera.isTranspose());
-        setUniformMatrix4fv(camera.getModelMatrix(), camera.getModelMatrixLocation(), camera.isTranspose());
-        setUniformMatrix4fv(camera.getViewMatrix(), camera.getViewMatrixLocation(), camera.isTranspose());
+        setUniformMatrix4fv(camera.getProjectionMatrix(), "pr_Matrix", camera.isTranspose());
+        setUniformMatrix4fv(camera.getModelMatrix(), "m_Matrix", camera.isTranspose());
+        setUniformMatrix4fv(camera.getViewMatrix(), "v_Matrix", camera.isTranspose());
+        setUniformMatrix4fv(camera.getViewMatrixNoTranslation(), "v_Matrix_NoTransform", camera.isTranspose());
     }
 
     public Map<String, ? super Number> getUniformLocations() {

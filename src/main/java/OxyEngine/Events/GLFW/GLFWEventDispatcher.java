@@ -4,7 +4,7 @@ import imgui.ImGui;
 import imgui.ImGuiIO;
 import org.lwjgl.glfw.*;
 
-import static OxyEngine.System.OxySystem.logOut;
+import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.glfw.GLFW.*;
 
 public interface GLFWEventDispatcher {
@@ -23,7 +23,7 @@ public interface GLFWEventDispatcher {
         public void invoke(long window, int key, int scancode, int action, int mods) {
             keys[key] = action != GLFW.GLFW_RELEASE;
 
-            assert io != null : logOut("ImGui hasn't been instantiated");
+            assert io != null : oxyAssert("ImGui hasn't been instantiated");
 
             if (action == GLFW_PRESS) {
                 io.setKeysDown(key, true);

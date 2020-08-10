@@ -2,6 +2,7 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
@@ -28,14 +29,14 @@ public class OxySelectSystem {
 
     private static OxySelectSystem INSTANCE;
 
-    public static OxySelectSystem getInstance(Scene scene) {
-        if (INSTANCE == null) INSTANCE = new OxySelectSystem(scene);
+    public static OxySelectSystem getInstance(Scene scene, OxyShader shader) {
+        if (INSTANCE == null) INSTANCE = new OxySelectSystem(scene, shader);
         return INSTANCE;
     }
 
-    private OxySelectSystem(Scene scene) {
+    private OxySelectSystem(Scene scene, OxyShader shader) {
         this.renderer = scene.getRenderer();
-        gizmo = OxyGizmo3D.getInstance(scene);
+        gizmo = OxyGizmo3D.getInstance(scene, shader);
         mSelector = MouseSelector.getInstance();
     }
 

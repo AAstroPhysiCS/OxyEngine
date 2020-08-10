@@ -1,11 +1,13 @@
 package OxyEngineEditor.UI.Layers;
 
-import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTextureCoords;
 import OxyEngine.Core.Window.WindowHandle;
+import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
@@ -31,16 +33,18 @@ public class SceneLayer extends UILayer {
     private static SceneLayer INSTANCE = null;
 
     private final Scene scene;
+    private final OxyShader shader;
 
-    public static SceneLayer getInstance(WindowHandle windowHandle, Scene scene) {
-        if (INSTANCE == null) INSTANCE = new SceneLayer(windowHandle, scene);
+    public static SceneLayer getInstance(WindowHandle windowHandle, Scene scene, OxyShader shader) {
+        if (INSTANCE == null) INSTANCE = new SceneLayer(windowHandle, scene, shader);
         return INSTANCE;
     }
 
-    private SceneLayer(WindowHandle windowHandle, Scene scene) {
+    private SceneLayer(WindowHandle windowHandle, Scene scene, OxyShader shader) {
         super(windowHandle, scene);
         this.scene = scene;
-        new WorldGrid(scene, 50);
+        this.shader = shader;
+        new WorldGrid(scene, 25, shader);
     }
 
     @Override
@@ -78,7 +82,7 @@ public class SceneLayer extends UILayer {
         ImGui.getContentRegionAvail(availContentRegionSize);
 
         FrameBuffer frameBuffer = scene.getFrameBuffer();
-        if(frameBuffer != null) {
+        if (frameBuffer != null) {
             ImGui.image(frameBuffer.getColorAttachment(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
 
             if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {
@@ -91,11 +95,11 @@ public class SceneLayer extends UILayer {
         if (ImGui.beginDragDropTarget()) {
             byte[] data = ImGui.acceptDragDropPayload("mousePosViewportLayer");
             if (data != null) {
-                OxyModel model = scene.createModelEntity(new String(data));
+                OxyModel model = scene.createModelEntity(new String(data), shader);
                 //TEMP
-                OxyTexture texture = null;
-                if(PropertiesLayer.lastTexturePath != null){
-                    texture = OxyTexture.load(PropertiesLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
+                ImageTexture texture = null;
+                if (PropertiesLayer.lastTexturePath != null) {
+                    texture = OxyTexture.loadImage(PropertiesLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
                     PropertiesLayer.lastTextureID = texture.getTextureId();
                 }
 

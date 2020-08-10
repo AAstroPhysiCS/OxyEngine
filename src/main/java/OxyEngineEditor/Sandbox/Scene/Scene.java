@@ -6,10 +6,14 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Texture.CubemapTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.OxyComponents.*;
 import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelFactory;
@@ -28,7 +32,6 @@ public class Scene implements OxyDisposable {
     private final Registry registry = new Registry();
 
     private final OxyRenderer3D renderer;
-    private final WindowHandle windowHandle;
     private OxyUISystem oxyUISystem;
 
     private Set<OxyEntity> cachedLightEntities;
@@ -39,7 +42,6 @@ public class Scene implements OxyDisposable {
 
     public Scene(String sceneName, WindowHandle windowHandle, OxyRenderer3D renderer, FrameBuffer frameBuffer) {
         this.renderer = renderer;
-        this.windowHandle = windowHandle;
         this.frameBuffer = frameBuffer;
         this.sceneName = sceneName;
     }
@@ -51,11 +53,11 @@ public class Scene implements OxyDisposable {
         return e;
     }
 
-    public final List<OxyModel> createModelEntities(ModelType type) {
-        return createModelEntities(type.getPath());
+    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
+        return createModelEntities(type.getPath(), shader);
     }
 
-    public final List<OxyModel> createModelEntities(String path) {
+    public final List<OxyModel> createModelEntities(String path, OxyShader shader) {
         List<OxyModel> models = new ArrayList<>();
         OxyModelLoader loader = new OxyModelLoader(path);
 
@@ -63,25 +65,27 @@ public class Scene implements OxyDisposable {
             OxyModel e = new OxyModel(this);
             registry.entityList.put(e, new LinkedHashSet<>(10));
             e.addComponent(
+                    shader,
                     new TransformComponent(),
                     assimpMesh.material.texture(),
                     new OxyColor(assimpMesh.material.diffuseColor()),
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces)
             );
             e.name = assimpMesh.name;
-            assimpMesh.material.setValues(renderer.getShader());
+            assimpMesh.material.setValues(shader);
             e.initData();
             models.add(e);
         }
         return models;
     }
 
-    public final OxyModel createModelEntity(String path) {
+    public final OxyModel createModelEntity(String path, OxyShader shader) {
         OxyModelLoader loader = new OxyModelLoader(path);
         OxyModelLoader.AssimpOxyMesh assimpMesh = loader.meshes.get(0);
         OxyModel e = new OxyModel(this);
         registry.entityList.put(e, new LinkedHashSet<>(10));
         e.addComponent(
+                shader,
                 new TransformComponent(),
                 assimpMesh.material.texture(),
                 new OxyColor(assimpMesh.material.diffuseColor()),
@@ -91,8 +95,12 @@ public class Scene implements OxyDisposable {
         return e;
     }
 
+    CubemapTexture cubemapTexture;
+
     public void build() {
-        oxyUISystem = new OxyUISystem(this, windowHandle);
+        cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyBoxBlue"), this);
+        cubemapTexture.init();
+
         cachedInternMeshes = distinct(InternObjectMesh.class);
         cachedModelMeshes = distinct(ModelMesh.class);
         cachedCameraComponents = distinct(OxyCamera.class);
@@ -131,7 +139,7 @@ public class Scene implements OxyDisposable {
             l.setSpecular(emittingComponent.specular());
             l.setPosition(emittingComponent.position());
             l.setDirection(emittingComponent.direction());
-            l.update(renderer.getShader());
+            l.update((OxyShader) e.get(OxyShader.class));
         }
     }
 
@@ -161,7 +169,7 @@ public class Scene implements OxyDisposable {
             }
 
             for (EntityComponent c : cachedInternMeshes) {
-                render(ts, (Mesh) c);
+                render(ts, (Mesh) c, mainCamera);
             }
         }
         if (frameBuffer != null) frameBuffer.unbind();
@@ -253,5 +261,9 @@ public class Scene implements OxyDisposable {
     @Override
     public void dispose() {
         oxyUISystem.dispose();
+    }
+
+    public void setUISystem(OxyUISystem oxyUISystem) {
+        this.oxyUISystem = oxyUISystem;
     }
 }

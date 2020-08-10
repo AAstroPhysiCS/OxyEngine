@@ -2,9 +2,10 @@ package OxyEngine.Core.Renderer;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 
-import static OxyEngine.System.OxySystem.logOut;
+import static OxyEngine.System.OxySystem.oxyAssert;
 
 public class OxyRenderer3D extends OxyRenderer {
 
@@ -15,6 +16,17 @@ public class OxyRenderer3D extends OxyRenderer {
         type = OxyRendererType.Oxy3D;
     }
 
+    @Override
+    public void begin(OxyShader shader) {
+        currentShader = shader;
+    }
+
+    @Override
+    public void end(OxyShader shader) {
+        currentShader.disable();
+
+    }
+
     public static OxyRenderer3D getInstance(WindowHandle windowHandle) {
         if (INSTANCE == null) INSTANCE = new OxyRenderer3D(windowHandle);
         return INSTANCE;
@@ -22,22 +34,21 @@ public class OxyRenderer3D extends OxyRenderer {
 
     @Override
     public void render(float ts, Mesh mesh, OxyCamera camera) {
-        shader.enable();
-        OxyRenderer.currentBoundedCamera = camera;
-        shader.setUniformVec3("cameraPos", camera.getCameraController().origin);
+        mesh.getShader().enable();
+        mesh.getShader().setUniformVec3("cameraPos", camera.getCameraController().origin);
         camera.finalizeCamera(ts);
-        shader.setCamera(camera);
-        assert shader != null : logOut("Shader is not instantiated.");
+        mesh.getShader().setCamera(camera);
+        OxyRenderer.currentBoundedCamera = camera;
+        assert mesh.getShader() != null : oxyAssert("Shader is not instantiated.");
         if (mesh.empty()) {
             mesh.load();
         }
         mesh.render();
-        shader.disable();
+        mesh.getShader().disable();
     }
 
     @Override
     public void render(float ts, Mesh mesh) {
-        if (currentBoundedCamera != null)
-            render(ts, mesh, currentBoundedCamera);
+        render(ts, mesh, currentBoundedCamera);
     }
 }

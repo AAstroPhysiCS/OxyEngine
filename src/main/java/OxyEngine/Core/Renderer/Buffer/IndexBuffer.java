@@ -15,6 +15,7 @@ public final class IndexBuffer extends Buffer {
 
     @Override
     public void load() {
+        if(indices.length == 0) return;
         if (bufferId == 0) bufferId = glCreateBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
@@ -26,6 +27,7 @@ public final class IndexBuffer extends Buffer {
     }
 
     public void addToBuffer(int[] m_indices){
+        if(m_indices == null) return;
         if(indices == null){
             this.indices = m_indices;
             return;

@@ -2,7 +2,7 @@ package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 
-import static OxyEngine.System.OxySystem.logOut;
+import static OxyEngine.System.OxySystem.oxyAssert;
 
 public class PointLight extends Light {
 
@@ -12,7 +12,7 @@ public class PointLight extends Light {
 
     @Override
     public void update(OxyShader shader) {
-        assert direction == null : logOut("Point Lights should not have a direction");
+        assert direction == null : oxyAssert("Point Lights should not have a direction");
         shader.enable();
         shader.setUniform1f("currentLightIndex", 0);
         shader.setUniformVec3("p_Light.position", position);

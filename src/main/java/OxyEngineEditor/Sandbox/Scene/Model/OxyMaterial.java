@@ -1,11 +1,11 @@
 package OxyEngineEditor.Sandbox.Scene.Model;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-public record OxyMaterial(OxyTexture texture, Vector4f ambientColor, Vector4f diffuseColor, Vector4f specularColor, float reflectance) {
+public record OxyMaterial(ImageTexture texture, Vector4f ambientColor, Vector4f diffuseColor, Vector4f specularColor, float reflectance) {
     public void setValues(OxyShader shader){
         shader.enable();
         shader.setUniformVec3("material.ambient", new Vector3f(ambientColor.x, ambientColor.y, ambientColor.z));

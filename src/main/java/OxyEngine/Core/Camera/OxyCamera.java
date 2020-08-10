@@ -6,16 +6,12 @@ import org.joml.Matrix4f;
 
 public abstract class OxyCamera implements EntityComponent {
 
-    protected final int viewMatrixLocation, projectionMatrixLocation, modelMatrixLocation;
     protected final boolean transpose;
-    protected Matrix4f viewMatrix, modelMatrix, projectionMatrix;
+    protected Matrix4f viewMatrix, modelMatrix, projectionMatrix, viewMatrixNoTranslation;
 
     protected OxyCameraController cameraController;
 
-    public OxyCamera(int viewMatrixLocation, int projectionMatrixLocation, int modelMatrixLocation, boolean transpose) {
-        this.viewMatrixLocation = viewMatrixLocation;
-        this.modelMatrixLocation = modelMatrixLocation;
-        this.projectionMatrixLocation = projectionMatrixLocation;
+    public OxyCamera(boolean transpose) {
         this.transpose = transpose;
     }
 
@@ -33,6 +29,10 @@ public abstract class OxyCamera implements EntityComponent {
         return viewMatrix;
     }
 
+    public Matrix4f getViewMatrixNoTranslation() {
+        return viewMatrixNoTranslation;
+    }
+
     public Matrix4f getProjectionMatrix() {
         return projectionMatrix;
     }
@@ -43,17 +43,5 @@ public abstract class OxyCamera implements EntityComponent {
 
     public OxyCameraController getCameraController() {
         return cameraController;
-    }
-
-    public int getViewMatrixLocation() {
-        return viewMatrixLocation;
-    }
-
-    public int getModelMatrixLocation() {
-        return modelMatrixLocation;
-    }
-
-    public int getProjectionMatrixLocation() {
-        return projectionMatrixLocation;
     }
 }

@@ -2,87 +2,83 @@ package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.System.OxySystem.logOut;
-import static org.lwjgl.opengl.GL45.*;
-import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static OxyEngine.System.OxySystem.oxyAssert;
+import static org.lwjgl.opengl.GL45.glBindTextureUnit;
+import static org.lwjgl.opengl.GL45.glDeleteBuffers;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
-public class OxyTexture implements OxyDisposable, EntityComponent {
+public class OxyTexture {
 
-    private static final List<OxyTexture> allTextures = new ArrayList<>();
-
+    static final List<Texture> allTextures = new ArrayList<>();
     private static int slotCounter = 0;
 
-    private final float[] tcs;
-
-    private final int textureSlot;
-    private final int textureId;
-
-    private final String path;
-
-    private OxyTexture(int slot, String path, float[] tcs) {
-        this.tcs = tcs;
-        this.path = path;
-        this.textureSlot = slot;
-
-        assert slot != 0 : logOut("Slot can not be 0");
-
-        int[] width = new int[1];
-        int[] height = new int[1];
-        int[] channels = new int[1];
-        ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
-        assert buffer != null : logOut("Texture could not be loaded!");
-
-        int internalFormat = GL_RGBA;
-        if (channels[0] == 3)
-            internalFormat = GL_RGB;
-
-        textureId = glGenTextures();
-        glBindTexture(GL_TEXTURE_2D, textureId);
-
-
-        glTextureParameteri(textureId, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTextureParameteri(textureId, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTextureParameteri(textureId, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTextureParameteri(textureId, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTextureParameterf(textureId, GL_TEXTURE_LOD_BIAS, -0.4f);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width[0], height[0], 0, internalFormat, GL_UNSIGNED_BYTE, buffer);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        stbi_image_free(buffer);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        allTextures.add(this);
+    private OxyTexture() {
     }
 
-    public static OxyTexture load(int slot, String path) {
-        assert slot <= slotCounter : logOut("Texture Slot already being used");
-        return new OxyTexture(slot, path, null);
+    static abstract class Texture implements EntityComponent, OxyDisposable {
+
+        protected int textureId;
+        protected int textureSlot;
+        protected String path;
+
+        protected ByteBuffer loadTextureFile(String path, int[] width, int[] height, int[] channels) {
+            ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
+            assert buffer != null : oxyAssert("Texture could not be loaded!");
+            return buffer;
+        }
+
+        @Override
+        public void dispose() {
+            glDeleteBuffers(textureId);
+        }
+
+        public boolean empty() {
+            return textureId == 0;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public int getTextureId() {
+            return textureId;
+        }
+
+        public int getTextureSlot() {
+            return textureSlot;
+        }
     }
 
-    public static OxyTexture load(String path) {
-        slotCounter++;
-        return new OxyTexture(slotCounter, path, null);
+    public static ImageTexture loadImage(int slot, String path) {
+        assert slot <= slotCounter : oxyAssert("Texture Slot already being used");
+        return new ImageTexture(slot, path, null);
     }
 
-    public static OxyTexture load(String path, float[] tcs) {
-        slotCounter++;
-        return new OxyTexture(slotCounter, path, tcs);
+    public static ImageTexture loadImage(String path) {
+        return new ImageTexture(++slotCounter, path, null);
     }
 
-    public static OxyTexture load(int slot, String path, float[] tcs) {
-        assert slot <= slotCounter : logOut("Texture Slot already being used");
-        return new OxyTexture(slot, path, tcs);
+    public static ImageTexture loadImage(String path, float[] tcs) {
+        return new ImageTexture(++slotCounter, path, tcs);
     }
 
-    public static OxyTexture loadCached(int slot) {
-        for (OxyTexture t : allTextures) {
+    public static ImageTexture loadImage(int slot, String path, float[] tcs) {
+        assert slot <= slotCounter : oxyAssert("Texture Slot already being used");
+        return new ImageTexture(slot, path, tcs);
+    }
+
+    public static CubemapTexture loadCubemap(String path, Scene scene) {
+        return new CubemapTexture(++slotCounter, path, scene);
+    }
+
+    public static Texture loadImageCached(int slot) {
+        for (Texture t : allTextures) {
             if (t.getTextureSlot() == slot) {
                 return t;
             }
@@ -91,35 +87,10 @@ public class OxyTexture implements OxyDisposable, EntityComponent {
     }
 
     public static void bindAllTextureSlots() {
-        for (OxyTexture t : allTextures) glBindTextureUnit(t.getTextureSlot(), t.getTextureId());
+        for (Texture t : allTextures) glBindTextureUnit(t.getTextureSlot(), t.getTextureId());
     }
 
     public static void unbindAllTextureSlots() {
         for (int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
-    }
-
-    public float[] getTextureCoords() {
-        return tcs;
-    }
-
-    public boolean empty() {
-        return textureId == 0;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public int getTextureId() {
-        return textureId;
-    }
-
-    public int getTextureSlot() {
-        return textureSlot;
-    }
-
-    @Override
-    public void dispose() {
-        glDeleteTextures(textureId);
     }
 }

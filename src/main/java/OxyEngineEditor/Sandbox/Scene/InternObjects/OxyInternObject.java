@@ -5,7 +5,7 @@ import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
-import static OxyEngine.System.OxySystem.logOut;
+import static OxyEngine.System.OxySystem.oxyAssert;
 
 public class OxyInternObject extends OxyEntity implements Cloneable {
 
@@ -27,14 +27,14 @@ public class OxyInternObject extends OxyEntity implements Cloneable {
     }
 
     public void initData() {
-        assert has(InternObjectFactory.class) && has(Mesh.class) : logOut("Game object need to have a template or a Mesh!");
+        assert has(InternObjectFactory.class) && has(Mesh.class) : oxyAssert("Game object need to have a template or a Mesh!");
 
         Mesh mesh = (Mesh) get(Mesh.class);
 
         factory = (InternObjectFactory) get(InternObjectFactory.class);
         this.type = factory.type;
         factory.constructData(this);
-        assert mesh instanceof InternObjectMesh : logOut("Intern Object needs to have a InternObjectMesh");
+        assert mesh instanceof InternObjectMesh : oxyAssert("Intern Object needs to have a InternObjectMesh");
         factory.initData(this, (InternObjectMesh) mesh);
     }
 

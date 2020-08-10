@@ -1,6 +1,7 @@
 package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.Core.Renderer.OxyRenderer;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
 import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
@@ -18,6 +19,8 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     protected VertexBuffer vertexBuffer;
     protected TextureBuffer textureBuffer;
     protected NormalsBuffer normalsBuffer;
+
+    protected OxyShader shader;
 
     protected final List<OxyEntity> entities = new ArrayList<>();
 
@@ -50,7 +53,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         vertexBuffer.load();
         indexBuffer.load();
 
-        if(normalsBuffer != null) if(normalsBuffer.empty()) normalsBuffer.load();
+        if (normalsBuffer != null) if (normalsBuffer.empty()) normalsBuffer.load();
         if (textureBuffer != null) if (textureBuffer.empty()) textureBuffer.load();
 
         if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC) {
@@ -120,13 +123,17 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         vertexBuffer.updateSingleEntityData(offsetToUpdate, dataToUpdate);
     }
 
+    public OxyShader getShader() {
+        return shader;
+    }
+
     @Override
     public void dispose() {
         vertexBuffer.dispose();
         indexBuffer.dispose();
-        if(textureBuffer != null)
+        if (textureBuffer != null)
             textureBuffer.dispose();
-        if(normalsBuffer != null)
+        if (normalsBuffer != null)
             normalsBuffer.dispose();
         glDeleteVertexArrays(vao);
     }

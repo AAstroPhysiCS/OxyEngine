@@ -42,7 +42,7 @@ public interface OxySystem {
         return stringified;
     }
 
-    static String logOut(String msg){
+    static String oxyAssert(String msg){
         logger.severe(msg);
         return msg;
     }

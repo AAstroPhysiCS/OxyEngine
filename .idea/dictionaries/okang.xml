@@ -4,6 +4,7 @@
       <w>assimp</w>
       <w>attrib</w>
       <w>coords</w>
+      <w>cubemap</w>
       <w>dest</w>
       <w>fovy</w>
       <w>framebuffer</w>
@@ -16,6 +17,7 @@
       <w>renderable</w>
       <w>renderlist</w>
       <w>shaders</w>
+      <w>skybox</w>
       <w>stringified</w>
       <w>texturecoords</w>
       <w>xoffset</w>
