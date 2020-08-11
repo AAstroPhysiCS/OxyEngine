@@ -68,6 +68,7 @@ public class Scene implements OxyDisposable {
             registry.entityList.put(e, new LinkedHashSet<>(10));
             e.addComponent(
                     shader,
+                    new BoundingBoxComponent(assimpMesh.pos, assimpMesh.min, assimpMesh.max),
                     new TransformComponent(),
                     assimpMesh.material.texture(),
                     new OxyColor(assimpMesh.material.diffuseColor()),
@@ -136,14 +137,14 @@ public class Scene implements OxyDisposable {
 
         for (OxyEntity e : cachedLightEntities) {
             if (!e.has(EmittingComponent.class)) continue;
-            Light l = (Light) e.get(Light.class);
-            EmittingComponent emittingComponent = (EmittingComponent) e.get(EmittingComponent.class);
+            Light l = e.get(Light.class);
+            EmittingComponent emittingComponent = e.get(EmittingComponent.class);
             l.setAmbient(emittingComponent.ambient());
             l.setDiffuse(emittingComponent.diffuse());
             l.setSpecular(emittingComponent.specular());
             l.setPosition(emittingComponent.position());
             l.setDirection(emittingComponent.direction());
-            l.update((OxyShader) e.get(OxyShader.class));
+            l.update(e.get(OxyShader.class));
         }
     }
 
@@ -216,7 +217,7 @@ public class Scene implements OxyDisposable {
      * gets the component from the set
      */
 
-    public EntityComponent get(OxyEntity entity, Class<? extends EntityComponent> destClass) {
+    public <T extends EntityComponent> T get(OxyEntity entity, Class<T> destClass) {
         return registry.get(entity, destClass);
     }
     /*

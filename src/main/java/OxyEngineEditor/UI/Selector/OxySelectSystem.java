@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
@@ -49,19 +50,29 @@ public class OxySelectSystem {
             OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
             if (e != null) {
 
-                TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
+                BoundingBoxComponent c = e.get(BoundingBoxComponent.class);
 
                 OxyModel xModel = gizmo.getXModel();
                 OxyModel yModel = gizmo.getYModel();
                 OxyModel zModel = gizmo.getZModel();
 
-                TransformComponent xC = (TransformComponent) xModel.get(TransformComponent.class);
-                TransformComponent yC = (TransformComponent) yModel.get(TransformComponent.class);
-                TransformComponent zC = (TransformComponent) zModel.get(TransformComponent.class);
+                TransformComponent xC = xModel.get(TransformComponent.class);
+                TransformComponent yC = yModel.get(TransformComponent.class);
+                TransformComponent zC = zModel.get(TransformComponent.class);
 
-                xC.position.set(new Vector3f(c.position));
-                yC.position.set(new Vector3f(c.position));
-                zC.position.set(new Vector3f(c.position));
+                BoundingBoxComponent xCB = xModel.get(BoundingBoxComponent.class);
+                BoundingBoxComponent yCB = yModel.get(BoundingBoxComponent.class);
+                BoundingBoxComponent zCB = zModel.get(BoundingBoxComponent.class);
+
+                xC.position.set(new Vector3f(c.pos()));
+                yC.position.set(new Vector3f(c.pos()));
+                zC.position.set(new Vector3f(c.pos()));
+
+                if(xCB != null) {
+                    xCB.pos().set(new Vector3f(c.pos()));
+                    yCB.pos().set(new Vector3f(c.pos()));
+                    zCB.pos().set(new Vector3f(c.pos()));
+                }
 
                 xModel.updateData();
                 yModel.updateData();

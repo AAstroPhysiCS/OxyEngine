@@ -33,10 +33,10 @@ public class OxyModel extends OxyEntity {
     @Override
     public void initData() {
         assert has(ModelFactory.class) : oxyAssert("Models should have a Model Template");
-        factory = (ModelFactory) get(ModelFactory.class);
+        factory = get(ModelFactory.class);
         factory.constructData(this);
         addComponent(new ModelMesh.ModelMeshBuilderImpl()
-                .setShader((OxyShader) get(OxyShader.class))
+                .setShader(get(OxyShader.class))
                 .setMode(GL_TRIANGLES)
                 .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setVertices(vertices)
@@ -49,7 +49,7 @@ public class OxyModel extends OxyEntity {
     @Override
     public void updateData() {
         factory.constructData(this);
-        ((Mesh) get(Mesh.class)).updateSingleEntityData(0, vertices);
+        get(Mesh.class).updateSingleEntityData(0, vertices);
     }
 
     public String getName(){

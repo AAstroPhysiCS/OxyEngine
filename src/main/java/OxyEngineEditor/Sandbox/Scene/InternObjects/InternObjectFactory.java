@@ -14,9 +14,9 @@ public abstract class InternObjectFactory implements EntityComponent {
     protected float[] vertexPos;
 
     public void constructData(OxyInternObject e) {
-        OxyColor color = (OxyColor) e.get(OxyColor.class);
-        ImageTexture texture = (ImageTexture) e.get(ImageTexture.class);
-        TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
+        OxyColor color = e.get(OxyColor.class);
+        ImageTexture texture = e.get(ImageTexture.class);
+        TransformComponent c = e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
                 .scale(c.scale)

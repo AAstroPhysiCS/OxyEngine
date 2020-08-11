@@ -14,8 +14,19 @@ import java.util.List;
 
 import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
 
-public record ModelFactory(List<Vector3f>verticesNonTransformed, List<Vector2f>textureCoords, List<Vector3f>normals,
-                           List<int[]>faces) implements EntityComponent {
+public class ModelFactory implements EntityComponent {
+
+    private final List<Vector3f> verticesNonTransformed, normals;
+    private final List<int[]> faces;
+    private final List<Vector2f> textureCoords;
+
+    public ModelFactory(List<Vector3f> verticesNonTransformed, List<Vector2f> textureCoords, List<Vector3f> normals,
+                        List<int[]> faces) {
+        this.verticesNonTransformed = verticesNonTransformed;
+        this.textureCoords = textureCoords;
+        this.normals = normals;
+        this.faces = faces;
+    }
 
     public void constructData(OxyModel e) {
         e.vertices = new float[verticesNonTransformed.size() * 4 * 8];
@@ -23,9 +34,9 @@ public record ModelFactory(List<Vector3f>verticesNonTransformed, List<Vector2f>t
         e.tcs = new float[verticesNonTransformed.size() * 2 * 4];
         List<Integer> indicesArr = new ArrayList<>();
 
-        OxyColor color = (OxyColor) e.get(OxyColor.class);
-        ImageTexture texture = (ImageTexture) e.get(ImageTexture.class);
-        TransformComponent c = (TransformComponent) e.get(TransformComponent.class);
+        OxyColor color = e.get(OxyColor.class);
+        ImageTexture texture = e.get(ImageTexture.class);
+        TransformComponent c = e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
                 .translate(c.position)

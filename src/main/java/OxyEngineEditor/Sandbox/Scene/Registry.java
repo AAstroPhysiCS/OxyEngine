@@ -43,14 +43,14 @@ public class Registry {
     /*
      * gets the component from the set
      */
-    public EntityComponent get(OxyEntity entity, Class<? extends EntityComponent> destClass) {
+    public <T extends EntityComponent> T get(OxyEntity entity, Class<T> destClass) {
         Set<EntityComponent> set = entityList.get(entity);
         for (EntityComponent c : set) {
             if (c.getClass() == destClass) {
-                return c;
+                return (T) c;
             }
             if (destClass.isInstance(c)) {
-                return c;
+                return (T) c;
             }
         }
         return null;

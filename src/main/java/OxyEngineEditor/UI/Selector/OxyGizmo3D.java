@@ -6,6 +6,7 @@ import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -20,13 +21,17 @@ public class OxyGizmo3D {
         return INSTANCE;
     }
 
+    public static OxyGizmo3D getInstance() {
+        return INSTANCE;
+    }
+
     private OxyGizmo3D(Scene scene, OxyShader shader) {
 
         gizmo = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
 
-        gizmo.get(0).addComponent(new TransformComponent(1f), new SelectedComponent(false, true));
-        gizmo.get(1).addComponent(new TransformComponent(1f), new SelectedComponent(false, true));
-        gizmo.get(2).addComponent(new TransformComponent(1f), new SelectedComponent(false, true));
+        gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 0.8f), new SelectedComponent(false, true));
+        gizmo.get(1).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 0.8f), new SelectedComponent(false, true));
+        gizmo.get(2).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 0.8f), new SelectedComponent(false, true));
 
         gizmo.get(0).updateData();
         gizmo.get(1).updateData();

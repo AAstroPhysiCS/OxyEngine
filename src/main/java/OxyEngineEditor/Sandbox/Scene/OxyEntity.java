@@ -47,7 +47,7 @@ public abstract class OxyEntity {
     /*
      * gets the component from the set
      */
-    public EntityComponent get(Class<? extends EntityComponent> destClass) {
+    public <T extends EntityComponent> T get(Class<T> destClass) {
         return scene.get(this, destClass);
     }
 

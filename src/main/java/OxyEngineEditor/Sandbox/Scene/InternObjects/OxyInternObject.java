@@ -29,9 +29,9 @@ public class OxyInternObject extends OxyEntity implements Cloneable {
     public void initData() {
         assert has(InternObjectFactory.class) && has(Mesh.class) : oxyAssert("Game object need to have a template or a Mesh!");
 
-        Mesh mesh = (Mesh) get(Mesh.class);
+        Mesh mesh = get(Mesh.class);
 
-        factory = (InternObjectFactory) get(InternObjectFactory.class);
+        factory = get(InternObjectFactory.class);
         this.type = factory.type;
         factory.constructData(this);
         assert mesh instanceof InternObjectMesh : oxyAssert("Intern Object needs to have a InternObjectMesh");
@@ -41,7 +41,7 @@ public class OxyInternObject extends OxyEntity implements Cloneable {
     @Override
     public void updateData() {
         factory.constructData(this);
-        ((Mesh) get(Mesh.class)).updateSingleEntityData(scene, this);
+        get(Mesh.class).updateSingleEntityData(scene, this);
     }
 
     public ObjectType getType() {
