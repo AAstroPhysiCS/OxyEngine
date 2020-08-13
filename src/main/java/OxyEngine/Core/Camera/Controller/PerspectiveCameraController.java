@@ -14,7 +14,7 @@ public class PerspectiveCameraController extends OxyCameraController {
     }
 
     public PerspectiveCameraController(Ref<Vector3f> translationRef, Ref<Vector3f> rotationRef) {
-        super(translationRef, rotationRef, 0.05f, 15f, 15f);
+        super(translationRef, rotationRef, 0.05f, 7f, 7f);
     }
 
     private void rotate() {
@@ -33,7 +33,7 @@ public class PerspectiveCameraController extends OxyCameraController {
     }
 
     private void updateRotationSwipe() {
-        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_1] && SceneLayer.focusedWindowDragging)
+        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_MIDDLE] && SceneLayer.focusedWindowDragging)
             rotate();
 
         oldMouseX = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos();

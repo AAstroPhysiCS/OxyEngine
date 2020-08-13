@@ -19,7 +19,7 @@ public interface ObjectSelector {
     Vector3f getObjectPosRelativeToCamera(float width, float height, Vector2f mousePos, OxyCamera camera);
 
     //It's better to not summarize this method with the other ones...
-    default OxyEntity selectObject(Set<OxyEntity> entities, Vector3f center, Vector3f direction) {
+    default OxyEntity selectObject(Set<OxyEntity> entities, Vector3f origin, Vector3f direction) {
         reset();
         OxyEntity selectedEntity = null;
         float closestDistance = Float.POSITIVE_INFINITY;
@@ -35,16 +35,12 @@ public interface ObjectSelector {
 
             selected.selected = false;
 
-            if(boundingBox != null) {
-                min.set(boundingBox.pos());
-                max.set(boundingBox.pos());
-            } else {
-                min.set(c.position);
-                max.set(c.position);
-            }
-            min.add(-c.scale, -c.scale, -c.scale);
-            max.add(c.scale, c.scale, c.scale);
-            if (Intersectionf.intersectRayAab(center, direction, min, max, nearFar) && nearFar.x < closestDistance) {
+            min.set(boundingBox.pos());
+            max.set(boundingBox.pos());
+            min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
+            max.add(new Vector3f(boundingBox.max()).mul(c.scale));
+
+            if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar) && nearFar.x < closestDistance) {
                 closestDistance = nearFar.x;
                 selectedEntity = entity;
                 selected.selected = true;
@@ -53,9 +49,9 @@ public interface ObjectSelector {
         return selectedEntity;
     }
 
-    default OxyEntity selectObject(OxyEntity entity, Vector3f center, Vector3f direction) {
+    default OxyEntity selectObject(OxyEntity entity, Vector3f origin, Vector3f direction) {
         reset();
-        if (center == null || direction == null || !entity.has(SelectedComponent.class) || !entity.has(TransformComponent.class))
+        if (origin == null || direction == null || !entity.has(SelectedComponent.class) || !entity.has(TransformComponent.class))
             return null;
 
         OxyEntity selectedEntity = null;
@@ -64,16 +60,13 @@ public interface ObjectSelector {
         BoundingBoxComponent boundingBox = entity.get(BoundingBoxComponent.class);
 
         selected.selected = false;
-        if(boundingBox != null) {
-            min.set(boundingBox.pos());
-            max.set(boundingBox.pos());
-        } else {
-            min.set(c.position);
-            max.set(c.position);
-        }
-        min.add(-c.scale, -c.scale, -c.scale);
-        max.add(c.scale, c.scale, c.scale);
-        if (Intersectionf.intersectRayAab(center, direction, min, max, nearFar)) {
+
+        min.set(boundingBox.pos());
+        max.set(boundingBox.pos());
+        min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
+        max.add(new Vector3f(boundingBox.max()).mul(c.scale));
+
+        if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar)) {
             selectedEntity = entity;
             selected.selected = true;
         }

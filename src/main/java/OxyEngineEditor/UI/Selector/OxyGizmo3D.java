@@ -29,28 +29,28 @@ public class OxyGizmo3D {
 
         gizmo = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
 
-        gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 0.8f), new SelectedComponent(false, true));
-        gizmo.get(1).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 0.8f), new SelectedComponent(false, true));
-        gizmo.get(2).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 0.8f), new SelectedComponent(false, true));
+        gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
+        gizmo.get(1).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
+        gizmo.get(2).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
 
         gizmo.get(0).updateData();
         gizmo.get(1).updateData();
         gizmo.get(2).updateData();
 
-        gizmo.get(0).addEventListener(new OxyGizmoController(scene, gizmo.get(0), gizmo.get(1), gizmo.get(2)));
-        gizmo.get(1).addEventListener(new OxyGizmoController(scene, gizmo.get(0), gizmo.get(1), gizmo.get(2)));
-        gizmo.get(2).addEventListener(new OxyGizmoController(scene, gizmo.get(0), gizmo.get(1), gizmo.get(2)));
+        gizmo.get(0).addEventListener(new OxyGizmoController(scene, this));
+        gizmo.get(1).addEventListener(new OxyGizmoController(scene, this));
+        gizmo.get(2).addEventListener(new OxyGizmoController(scene, this));
     }
 
     public OxyModel getXModel() {
-        return gizmo.get(0);
-    }
-
-    public OxyModel getZModel() {
         return gizmo.get(1);
     }
 
     public OxyModel getYModel() {
+        return gizmo.get(0);
+    }
+
+    public OxyModel getZModel() {
         return gizmo.get(2);
     }
 }

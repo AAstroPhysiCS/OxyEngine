@@ -3,9 +3,7 @@ package OxyEngine.Events;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngine.Core.Renderer.OxyRenderer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class OxyEventDispatcherThread extends Thread {
@@ -44,6 +42,7 @@ public final class OxyEventDispatcherThread extends Thread {
                     if (l instanceof OxyMouseListener m) {
                         if (OxyRenderer.currentBoundedCamera != null) {
                             m.dispatch(entity);
+                            break;
                         }
                     }
                 }

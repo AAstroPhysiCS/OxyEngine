@@ -75,7 +75,7 @@ public class SceneLayer extends UILayer {
         x = windowPos.x;
         y = windowPos.y;
 
-        focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(0);
+        focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
         focusedWindow = ImGui.isWindowFocused();
 
         ImVec2 availContentRegionSize = new ImVec2();

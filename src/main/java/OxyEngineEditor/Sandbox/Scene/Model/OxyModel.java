@@ -48,11 +48,13 @@ public class OxyModel extends OxyEntity {
 
     @Override
     public void updateData() {
+        //TODO: SHOULD NOT BE RECALCULATED EVERY FRAME!
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(0, vertices);
     }
 
-    public String getName(){
+
+    public String getName() {
         return name;
     }
 }

@@ -5,8 +5,8 @@ import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import OxyEngineEditor.UI.OxyUISystem;
@@ -18,7 +18,7 @@ import org.joml.Vector3f;
 
 import java.util.Set;
 
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_3;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class OxySelectSystem {
 
@@ -43,13 +43,15 @@ public class OxySelectSystem {
     static Vector3f direction = new Vector3f();
 
     public void start(Set<OxyEntity> entities, OxyCamera camera) {
-        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_3] && SceneLayer.focusedWindow) {
+        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_LEFT] && SceneLayer.focusedWindow) {
             ImVec2 mousePos = new ImVec2();
             ImGui.getMousePos(mousePos);
             direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), renderer.getCamera());
             OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
+            System.out.println(e);
             if (e != null) {
 
+                TransformComponent t = e.get(TransformComponent.class);
                 BoundingBoxComponent c = e.get(BoundingBoxComponent.class);
 
                 OxyModel xModel = gizmo.getXModel();
@@ -64,15 +66,12 @@ public class OxySelectSystem {
                 BoundingBoxComponent yCB = yModel.get(BoundingBoxComponent.class);
                 BoundingBoxComponent zCB = zModel.get(BoundingBoxComponent.class);
 
-                xC.position.set(new Vector3f(c.pos()));
-                yC.position.set(new Vector3f(c.pos()));
-                zC.position.set(new Vector3f(c.pos()));
-
-                if(xCB != null) {
-                    xCB.pos().set(new Vector3f(c.pos()));
-                    yCB.pos().set(new Vector3f(c.pos()));
-                    zCB.pos().set(new Vector3f(c.pos()));
-                }
+                xC.position.set(new Vector3f(c.pos()).mul(t.scale));
+                yC.position.set(new Vector3f(c.pos()).mul(t.scale));
+                zC.position.set(new Vector3f(c.pos()).mul(t.scale));
+                xCB.pos().set(new Vector3f(xC.position).add(xCB.originPos()));
+                yCB.pos().set(new Vector3f(yC.position).add(yCB.originPos()));
+                zCB.pos().set(new Vector3f(zC.position).add(zCB.originPos()));
 
                 xModel.updateData();
                 yModel.updateData();

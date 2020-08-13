@@ -21,6 +21,7 @@ import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModelLoader;
 import OxyEngineEditor.UI.OxyUISystem;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -68,7 +69,13 @@ public class Scene implements OxyDisposable {
             registry.entityList.put(e, new LinkedHashSet<>(10));
             e.addComponent(
                     shader,
-                    new BoundingBoxComponent(assimpMesh.pos, assimpMesh.min, assimpMesh.max),
+                    new BoundingBoxComponent(
+                            assimpMesh,
+                            assimpMesh.pos,
+                            assimpMesh.min,
+                            assimpMesh.max,
+                            new Vector3f(assimpMesh.pos)
+                    ),
                     new TransformComponent(),
                     assimpMesh.material.texture(),
                     new OxyColor(assimpMesh.material.diffuseColor()),
@@ -89,6 +96,13 @@ public class Scene implements OxyDisposable {
         registry.entityList.put(e, new LinkedHashSet<>(10));
         e.addComponent(
                 shader,
+                new BoundingBoxComponent(
+                        assimpMesh,
+                        assimpMesh.pos,
+                        assimpMesh.min,
+                        assimpMesh.max,
+                        new Vector3f(assimpMesh.pos)
+                ),
                 new TransformComponent(),
                 assimpMesh.material.texture(),
                 new OxyColor(assimpMesh.material.diffuseColor()),

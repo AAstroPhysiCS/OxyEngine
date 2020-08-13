@@ -32,7 +32,7 @@ public interface OxyMouseListener extends OxyEventListener {
             mouseNoAction();
             return;
         }
-        if (e.equals(entity)) dispatchMethods(entity);
+        if (e.equals(entity)) dispatchMethods(e);
     }
 
     private void dispatchMethods(OxyEntity e) {

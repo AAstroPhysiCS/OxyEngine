@@ -10,10 +10,10 @@ import org.lwjgl.assimp.*;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent.*;
 import static org.lwjgl.assimp.Assimp.*;
 
 public class OxyModelLoader {
@@ -56,39 +56,15 @@ public class OxyModelLoader {
             AIMaterial material = AIMaterial.create(Objects.requireNonNull(materials).get(aiMesh.mMaterialIndex()));
             addMesh(aiMesh, oxyMesh);
             addMaterial(material, oxyMesh);
-            calcPos(oxyMesh);
+            float[][] sortedVertices = sort(oxyMesh);
+            calcPos(oxyMesh, sortedVertices);
+            calcMax(oxyMesh, sortedVertices);
+            calcMin(oxyMesh, sortedVertices);
             this.meshes.add(oxyMesh);
         }
     }
 
-    private void calcPos(AssimpOxyMesh oxyMesh) {
-        float[] allVerticesX = new float[oxyMesh.vertices.size()];
-        int ptr = 0;
-        for(Vector3f v : oxyMesh.vertices){
-            allVerticesX[ptr++] = v.x;
-        }
-        Arrays.sort(allVerticesX);
 
-        float[] allVerticesY = new float[oxyMesh.vertices.size()];
-        int ptr2 = 0;
-        for(Vector3f v : oxyMesh.vertices){
-            allVerticesY[ptr2++] = v.y;
-        }
-        Arrays.sort(allVerticesY);
-
-        float[] allVerticesZ = new float[oxyMesh.vertices.size()];
-        int ptr3 = 0;
-        for(Vector3f v : oxyMesh.vertices){
-            allVerticesZ[ptr3++] = v.z;
-        }
-        Arrays.sort(allVerticesZ);
-
-        oxyMesh.pos = new Vector3f(
-                (allVerticesX[0] + allVerticesX[allVerticesX.length - 1]) / 2,
-                (allVerticesY[0] + allVerticesY[allVerticesY.length - 1]) / 2,
-                (allVerticesZ[0] + allVerticesZ[allVerticesZ.length - 1]) / 2
-        );
-    }
 
     private void addMesh(AIMesh mesh, AssimpOxyMesh oxyMesh) {
 

@@ -35,8 +35,8 @@ public class OxyRenderer3D extends OxyRenderer {
     @Override
     public void render(float ts, Mesh mesh, OxyCamera camera) {
         mesh.getShader().enable();
-        mesh.getShader().setUniformVec3("cameraPos", camera.getCameraController().origin);
         camera.finalizeCamera(ts);
+        mesh.getShader().setUniformVec3("cameraPos", camera.getCameraController().origin);
         mesh.getShader().setCamera(camera);
         OxyRenderer.currentBoundedCamera = camera;
         assert mesh.getShader() != null : oxyAssert("Shader is not instantiated.");
