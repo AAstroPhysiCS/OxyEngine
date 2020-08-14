@@ -42,7 +42,6 @@ public final class OxyEventDispatcherThread extends Thread {
                     if (l instanceof OxyMouseListener m) {
                         if (OxyRenderer.currentBoundedCamera != null) {
                             m.dispatch(entity);
-                            break;
                         }
                     }
                 }

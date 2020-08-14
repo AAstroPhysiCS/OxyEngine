@@ -69,9 +69,9 @@ public class OxySelectSystem {
                 xC.position.set(new Vector3f(c.pos()).mul(t.scale));
                 yC.position.set(new Vector3f(c.pos()).mul(t.scale));
                 zC.position.set(new Vector3f(c.pos()).mul(t.scale));
-                xCB.pos().set(new Vector3f(xC.position).add(xCB.originPos()));
-                yCB.pos().set(new Vector3f(yC.position).add(yCB.originPos()));
-                zCB.pos().set(new Vector3f(zC.position).add(zCB.originPos()));
+                xCB.pos().set(new Vector3f(xC.position).add(new Vector3f(xCB.originPos()).mul(xC.scale, 1, 1)));
+                yCB.pos().set(new Vector3f(yC.position).add(new Vector3f(yCB.originPos()).mul(1, yC.scale, 1)));
+                zCB.pos().set(new Vector3f(zC.position).add(new Vector3f(zCB.originPos()).mul(1, 1, zC.scale)));
 
                 xModel.updateData();
                 yModel.updateData();
