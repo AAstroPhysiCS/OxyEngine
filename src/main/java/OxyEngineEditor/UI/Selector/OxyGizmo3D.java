@@ -32,9 +32,9 @@ public class OxyGizmo3D {
 
         gizmo = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
 
-        gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 10f), new SelectedComponent(false, true));
-        gizmo.get(1).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 10f), new SelectedComponent(false, true));
-        gizmo.get(2).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 10f), new SelectedComponent(false, true));
+        gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
+        gizmo.get(1).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
+        gizmo.get(2).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
 
         gizmo.get(0).updateData();
         gizmo.get(1).updateData();
@@ -71,7 +71,7 @@ public class OxyGizmo3D {
     }
 
     private void scale(OxyModel model){
-        if(model.get(SelectedComponent.class).fixedValue) model.get(TransformComponent.class).scale = zoom * 0.03f;
+        if(model.get(SelectedComponent.class).fixedValue && zoom >= 60) model.get(TransformComponent.class).scale = zoom * 0.03f;
     }
 
     public OxyModel getXModel() {

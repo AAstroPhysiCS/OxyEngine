@@ -1,5 +1,6 @@
 package OxyEngineEditor.UI.Selector;
 
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.Events.OxyMouseListener;
@@ -23,6 +24,8 @@ public class OxyGizmoController implements OxyMouseListener {
     final OxyGizmo3D gizmo;
     final Scene scene;
 
+    boolean pressedX, pressedY, pressedZ;
+
     private static OxyEntity currentEntitySelected;
 
     OxyGizmoController(Scene scene, OxyGizmo3D gizmo) {
@@ -36,19 +39,14 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseClicked(OxyEntity selectedEntity, OxyMouseEvent mouseEvent) {
-        oldMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
     }
 
     @Override
     public void mouseDown(OxyEntity selectedEntity, OxyMouseEvent mouseEvent) {
-        OxyModel xAxis = gizmo.getXModel();
-        OxyModel yAxis = gizmo.getYModel();
-        OxyModel zAxis = gizmo.getZModel();
-
-        if (mouseEvent.getButton() == ImGuiMouseButton.Right && currentEntitySelected != null) {
-
-            Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
-            Vector2d directionVector = nowMousePos.sub(oldMousePos);
+        if (mouseEvent.getButton() == ImGuiMouseButton.Right) {
+            OxyModel xAxis = gizmo.getXModel();
+            OxyModel yAxis = gizmo.getYModel();
+            OxyModel zAxis = gizmo.getZModel();
 
             TransformComponent xC = xAxis.get(TransformComponent.class);
             TransformComponent yC = yAxis.get(TransformComponent.class);
@@ -61,72 +59,53 @@ public class OxyGizmoController implements OxyMouseListener {
             TransformComponent currC = currentEntitySelected.get(TransformComponent.class);
             BoundingBoxComponent currCB = currentEntitySelected.get(BoundingBoxComponent.class);
 
+            Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
+            Vector2d delta = nowMousePos.sub(oldMousePos);
+            float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
+            float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale); // xC bcs x,y,z has the same scale, so it does not matter!
+            float deltaY = (float) ((delta.y * mouseSpeed) * xC.scale);
+            System.out.println("X: " + deltaX);
+            System.out.println("Y: " + deltaY);
+
+            if (deltaX <= -1f || deltaX >= 1f) deltaX = 0; // for safety reasons
+            if (deltaY <= -1f || deltaY >= 1f) deltaY = 0;
+
             if (selectedEntity == zAxis) {
-                if (directionVector.x > 0) {
-                    xC.position.add(0, 0, -0.15f);
-                    yC.position.add(0, 0, -0.15f);
-                    zC.position.add(0, 0, -0.15f);
-                    xCB.pos().add(0, 0, -0.15f);
-                    yCB.pos().add(0, 0, -0.15f);
-                    zCB.pos().add(0, 0, -0.15f);
-                    currC.position.add(0, 0, -0.15f);
-                    currCB.pos().add(0, 0, -0.15f);
-                } else if (directionVector.x < 0) {
-                    xC.position.add(0, 0, 0.15f);
-                    yC.position.add(0, 0, 0.15f);
-                    zC.position.add(0, 0, 0.15f);
-                    xCB.pos().add(0, 0, 0.15f);
-                    yCB.pos().add(0, 0, 0.15f);
-                    zCB.pos().add(0, 0, 0.15f);
-                    currC.position.add(0, 0, 0.15f);
-                    currCB.pos().add(0, 0, 0.15f);
-                }
+                pressedZ = true;
+                xC.position.add(0, 0, -deltaX);
+                yC.position.add(0, 0, -deltaX);
+                zC.position.add(0, 0, -deltaX);
+                xCB.pos().add(0, 0, -deltaX);
+                yCB.pos().add(0, 0, -deltaX);
+                zCB.pos().add(0, 0, -deltaX);
+                currC.position.add(0, 0, -deltaX);
+                currCB.pos().add(0, 0, -deltaX);
             } else if (selectedEntity == yAxis) {
-                if (directionVector.y > 0) {
-                    xC.position.add(0, 0.15f, 0);
-                    yC.position.add(0, 0.15f, 0);
-                    zC.position.add(0, 0.15f, 0);
-                    xCB.pos().add(0, 0.15f, 0);
-                    yCB.pos().add(0, 0.15f, 0);
-                    zCB.pos().add(0, 0.15f, 0);
-                    currC.position.add(0, 0.15f, 0);
-                    currCB.pos().add(0, 0.15f, 0);
-                } else if (directionVector.y < 0) {
-                    xC.position.add(0, -0.15f, 0);
-                    yC.position.add(0, -0.15f, 0);
-                    zC.position.add(0, -0.15f, 0);
-                    xCB.pos().add(0, -0.15f, 0);
-                    yCB.pos().add(0, -0.15f, 0);
-                    zCB.pos().add(0, -0.15f, 0);
-                    currC.position.add(0, -0.15f, 0);
-                    currCB.pos().add(0, -0.15f, 0);
-                }
+                pressedY = true;
+                xC.position.add(0, deltaY, 0);
+                yC.position.add(0, deltaY, 0);
+                zC.position.add(0, deltaY, 0);
+                xCB.pos().add(0, deltaY, 0);
+                yCB.pos().add(0, deltaY, 0);
+                zCB.pos().add(0, deltaY, 0);
+                currC.position.add(0, deltaY, 0);
+                currCB.pos().add(0, deltaY, 0);
             } else if (selectedEntity == xAxis) {
-                if (directionVector.x > 0) {
-                    xC.position.add(0.15f, 0, 0);
-                    yC.position.add(0.15f, 0, 0);
-                    zC.position.add(0.15f, 0, 0);
-                    xCB.pos().add(0.15f, 0, 0);
-                    yCB.pos().add(0.15f, 0, 0);
-                    zCB.pos().add(0.15f, 0, 0);
-                    currC.position.add(0.15f, 0, 0);
-                    currCB.pos().add(0.15f, 0, 0);
-                } else if (directionVector.x < 0) {
-                    xC.position.add(-0.15f, 0, 0);
-                    yC.position.add(-0.15f, 0, 0);
-                    zC.position.add(-0.15f, 0, 0);
-                    xCB.pos().add(-0.15f, 0, 0);
-                    yCB.pos().add(-0.15f, 0, 0);
-                    zCB.pos().add(-0.15f, 0, 0);
-                    currC.position.add(-0.15f, 0, 0);
-                    currCB.pos().add(-0.15f, 0, 0);
-                }
+                pressedX = true;
+                xC.position.add(deltaX, 0, 0);
+                yC.position.add(deltaX, 0, 0);
+                zC.position.add(deltaX, 0, 0);
+                xCB.pos().add(deltaX, 0, 0);
+                yCB.pos().add(deltaX, 0, 0);
+                zCB.pos().add(deltaX, 0, 0);
+                currC.position.add(deltaX, 0, 0);
+                currCB.pos().add(deltaX, 0, 0);
             }
-            currentEntitySelected.updateData();
+            if (currentEntitySelected != null) currentEntitySelected.updateData();
+            xAxis.updateData();
+            yAxis.updateData();
+            zAxis.updateData();
         }
-        xAxis.updateData();
-        yAxis.updateData();
-        zAxis.updateData();
     }
 
     @Override
@@ -150,6 +129,7 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseDragged(OxyEntity selectedEntity, OxyMouseEvent mouseEvent) {
+        oldMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
     }
 
     @Override

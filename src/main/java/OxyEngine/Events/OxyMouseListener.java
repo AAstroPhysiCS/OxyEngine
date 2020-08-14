@@ -1,7 +1,7 @@
 package OxyEngine.Events;
 
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngine.Core.Renderer.OxyRenderer;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import OxyEngineEditor.UI.OxyUISystem;
 import OxyEngineEditor.UI.Selector.Tools.MouseSelector;
@@ -11,6 +11,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public interface OxyMouseListener extends OxyEventListener {
+
     void mouseClicked(OxyEntity selectedEntity, OxyMouseEvent mouseEvent);
 
     void mouseDragged(OxyEntity selectedEntity, OxyMouseEvent mouseEvent);
@@ -28,15 +29,16 @@ public interface OxyMouseListener extends OxyEventListener {
         ImGui.getMousePos(mousePos);
         Vector3f direction = MouseSelector.getInstance().getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), OxyRenderer.currentBoundedCamera);
         OxyEntity e = MouseSelector.getInstance().selectObject(entity, OxyRenderer.currentBoundedCamera.getCameraController().origin, direction);
-        if(e == null || !SceneLayer.focusedWindow) {
+        if (e == null || !SceneLayer.focusedWindow) {
             mouseNoAction();
             return;
         }
+        mouseEvent.getLastRayPosition().set(MouseSelector.getInstance().nearFar);
         if (e.equals(entity)) dispatchMethods(e);
     }
 
     private void dispatchMethods(OxyEntity e) {
-        if(ImGui.isAnyMouseDown())
+        if (ImGui.isAnyMouseDown())
             mouseDown(e, mouseEvent);
         for (int i = 0; i < 3; i++) { //goes through the imgui supported buttons (0 to 2)
             if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[i]) {
@@ -44,7 +46,7 @@ public interface OxyMouseListener extends OxyEventListener {
                     mouseClicked(e, mouseEvent);
                 if (ImGui.isMouseDragging(i))
                     mouseDragged(e, mouseEvent);
-                OxyMouseEvent.buttonId = i;
+                mouseEvent.buttonId = i;
             }
         }
         mouseHovered(e, mouseEvent);

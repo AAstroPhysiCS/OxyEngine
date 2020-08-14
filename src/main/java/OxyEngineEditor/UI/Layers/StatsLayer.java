@@ -26,8 +26,8 @@ public class StatsLayer extends Layer {
 
     @Override
     public void renderLayer() {
-        ImGui.setNextWindowSize(windowHandle.getWidth() / 4f, windowHandle.getHeight() / 4f, ImGuiCond.Once);
-        ImGui.setNextWindowPos(windowHandle.getWidth() / 4f, windowHandle.getHeight() / 4f, ImGuiCond.Once);
+        ImGui.setNextWindowSize(windowHandle.getWidth() / 8f, windowHandle.getHeight() / 4f, ImGuiCond.Once);
+        ImGui.setNextWindowPos(windowHandle.getWidth() / 8f, windowHandle.getHeight() / 4f, ImGuiCond.Once);
 
         ImGui.begin("Stats");
 

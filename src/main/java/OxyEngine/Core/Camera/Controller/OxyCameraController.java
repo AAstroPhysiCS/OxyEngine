@@ -43,5 +43,9 @@ public abstract class OxyCameraController {
         return positionRef.obj;
     }
 
+    public float getMouseSpeed() {
+        return mouseSpeed;
+    }
+
     public abstract void update(float ts, Mode mode);
 }

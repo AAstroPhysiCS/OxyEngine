@@ -48,7 +48,6 @@ public class OxySelectSystem {
             ImGui.getMousePos(mousePos);
             direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), renderer.getCamera());
             OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
-            System.out.println(e);
             if (e != null) {
 
                 TransformComponent t = e.get(TransformComponent.class);
