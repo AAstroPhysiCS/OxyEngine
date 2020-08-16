@@ -44,9 +44,9 @@ public class OxySelectSystem {
         if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_LEFT] && SceneLayer.focusedWindow) {
             direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.windowSize.x - SceneLayer.offset.x, SceneLayer.windowSize.y - SceneLayer.offset.y, new Vector2f(SceneLayer.mousePos.x - SceneLayer.windowPos.x - SceneLayer.offset.x, SceneLayer.mousePos.y - SceneLayer.windowPos.y - SceneLayer.offset.y), renderer.getCamera());
             OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
-            OxyModel xModel = gizmo.getXModel();
-            OxyModel yModel = gizmo.getYModel();
-            OxyModel zModel = gizmo.getZModel();
+            OxyModel xModel = gizmo.getXModelTranslation();
+            OxyModel yModel = gizmo.getYModelTranslation();
+            OxyModel zModel = gizmo.getZModelTranslation();
 
             if (e != null) {
                 BoundingBoxComponent c = e.get(BoundingBoxComponent.class);

@@ -47,7 +47,6 @@ public interface ObjectSelector {
                     closestDistance = nearFar.x;
                     selectedEntity = entity;
                     selected.selected = true;
-                    continue;
                 }
             }
 

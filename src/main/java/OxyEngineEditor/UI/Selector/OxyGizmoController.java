@@ -40,15 +40,15 @@ public class OxyGizmoController implements OxyMouseListener {
     @Override
     public void mouseClicked(OxyEntity selectedEntity, OxyMouseEvent mouseEvent) {
         if (mouseEvent.getButton() == ImGuiMouseButton.Right) {
-            if (selectedEntity == gizmo.getXModel()) {
+            if (selectedEntity == gizmo.getXModelTranslation()) {
                 pressedX = true;
                 pressedY = false;
                 pressedZ = false;
-            } else if (selectedEntity == gizmo.getYModel()) {
+            } else if (selectedEntity == gizmo.getYModelTranslation()) {
                 pressedY = true;
                 pressedX = false;
                 pressedZ = false;
-            } else if (selectedEntity == gizmo.getZModel()) {
+            } else if (selectedEntity == gizmo.getZModelTranslation()) {
                 pressedZ = true;
                 pressedX = false;
                 pressedY = false;
@@ -59,9 +59,9 @@ public class OxyGizmoController implements OxyMouseListener {
     @Override
     public void mouseDown(OxyEntity selectedEntity, OxyMouseEvent mouseEvent) {
         if (mouseEvent.getButton() == ImGuiMouseButton.Right && currentEntitySelected != null) {
-            OxyModel xAxis = gizmo.getXModel();
-            OxyModel yAxis = gizmo.getYModel();
-            OxyModel zAxis = gizmo.getZModel();
+            OxyModel xAxis = gizmo.getXModelTranslation();
+            OxyModel yAxis = gizmo.getYModelTranslation();
+            OxyModel zAxis = gizmo.getZModelTranslation();
 
             TransformComponent xC = xAxis.get(TransformComponent.class);
             TransformComponent yC = yAxis.get(TransformComponent.class);
