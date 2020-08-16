@@ -18,9 +18,10 @@ public class TransformComponent implements EntityComponent {
         this.rotation = rotation;
     }
 
-    public void invalidate(OxyEntity model){
-        if(model != null && model.has(BoundingBoxComponent.class) && model.has(TransformComponent.class)){ //safety
-            model.get(BoundingBoxComponent.class).pos().add((new Vector3f(model.get(TransformComponent.class).position)).mul(model.get(TransformComponent.class).scale));
+    public void validate(OxyEntity entity){
+        if(entity != null && entity.has(BoundingBoxComponent.class) && entity.has(TransformComponent.class)){ // safety
+            Vector3f scaledPos = new Vector3f(entity.get(TransformComponent.class).position);
+            entity.get(BoundingBoxComponent.class).pos().mul(entity.get(TransformComponent.class).scale).add(scaledPos);
         }
     }
 

@@ -76,6 +76,7 @@ public class OxyGizmoController implements OxyMouseListener {
 
             Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
             Vector2d delta = nowMousePos.sub(oldMousePos);
+
             float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
             float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale) / 16f;
             float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale) / 16f;

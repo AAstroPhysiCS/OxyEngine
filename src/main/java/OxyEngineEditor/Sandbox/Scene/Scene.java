@@ -50,7 +50,7 @@ public class Scene implements OxyDisposable {
 
     public final OxyInternObject createInternObjectEntity() {
         OxyInternObject e = new OxyInternObject(this);
-        registry.entityList.put(e, new LinkedHashSet<>(10));
+        registry.entityList.put(e, new LinkedHashSet<>(15));
         e.addComponent(new TransformComponent());
         return e;
     }
@@ -65,7 +65,7 @@ public class Scene implements OxyDisposable {
 
         for (OxyModelLoader.AssimpOxyMesh assimpMesh : loader.meshes) {
             OxyModel e = new OxyModel(this);
-            registry.entityList.put(e, new LinkedHashSet<>(10));
+            registry.entityList.put(e, new LinkedHashSet<>(15));
             e.addComponent(
                     shader,
                     new BoundingBoxComponent(
@@ -78,9 +78,9 @@ public class Scene implements OxyDisposable {
                     new TransformComponent(),
                     assimpMesh.material.texture(),
                     new OxyColor(assimpMesh.material.diffuseColor()),
-                    new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces)
+                    new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
+                    new TagComponent(assimpMesh.name)
             );
-            e.name = assimpMesh.name;
             assimpMesh.material.setValues(shader);
             e.initData();
             models.add(e);
@@ -92,7 +92,7 @@ public class Scene implements OxyDisposable {
         OxyModelLoader loader = new OxyModelLoader(path);
         OxyModelLoader.AssimpOxyMesh assimpMesh = loader.meshes.get(0);
         OxyModel e = new OxyModel(this);
-        registry.entityList.put(e, new LinkedHashSet<>(10));
+        registry.entityList.put(e, new LinkedHashSet<>(15));
         e.addComponent(
                 shader,
                 new BoundingBoxComponent(

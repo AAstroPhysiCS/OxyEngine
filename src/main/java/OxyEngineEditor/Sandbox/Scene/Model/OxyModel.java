@@ -27,7 +27,6 @@ public class OxyModel extends OxyEntity {
         this.indices = other.indices;
         this.normals = other.normals;
         this.type = other.type;
-        this.name = other.name;
     }
 
     @Override
@@ -50,10 +49,5 @@ public class OxyModel extends OxyEntity {
     public void updateData() {
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(0, vertices);
-    }
-
-
-    public String getName() {
-        return name;
     }
 }

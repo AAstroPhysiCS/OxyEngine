@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Selector.Tools;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.TagComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import org.joml.Intersectionf;
@@ -32,6 +33,7 @@ public interface ObjectSelector {
             TransformComponent c = entity.get(TransformComponent.class);
             SelectedComponent selected = entity.get(SelectedComponent.class);
             BoundingBoxComponent boundingBox = entity.get(BoundingBoxComponent.class);
+            TagComponent tag = entity.get(TagComponent.class);
 
             selected.selected = false;
 
@@ -40,10 +42,21 @@ public interface ObjectSelector {
             min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
             max.add(new Vector3f(boundingBox.max()).mul(c.scale));
 
-            if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar) && nearFar.x < closestDistance) {
-                closestDistance = nearFar.x;
-                selectedEntity = entity;
-                selected.selected = true;
+            if(tag.tag().startsWith("Sphere")){
+                if (Intersectionf.intersectRaySphere(origin, direction, boundingBox.pos(), boundingBox.max().y * boundingBox.max().y * c.scale * c.scale, nearFar) && nearFar.x < closestDistance) {
+                    closestDistance = nearFar.x;
+                    selectedEntity = entity;
+                    selected.selected = true;
+                    continue;
+                }
+            }
+
+            if(tag.tag().startsWith("Cube") || tag.tag().startsWith("Cone")){
+                if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar) && nearFar.x < closestDistance) {
+                    closestDistance = nearFar.x;
+                    selectedEntity = entity;
+                    selected.selected = true;
+                }
             }
         }
         return selectedEntity;

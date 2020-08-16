@@ -117,8 +117,4 @@ public class Registry {
         }
         return allDistinctComponents;
     }
-
-    public Map<OxyEntity, Set<EntityComponent>> getEntityList() {
-        return entityList;
-    }
 }

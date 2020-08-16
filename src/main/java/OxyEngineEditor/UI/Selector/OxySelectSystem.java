@@ -2,7 +2,6 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
@@ -27,14 +26,14 @@ public class OxySelectSystem {
 
     private static OxySelectSystem INSTANCE;
 
-    public static OxySelectSystem getInstance(Scene scene, OxyShader shader) {
-        if (INSTANCE == null) INSTANCE = new OxySelectSystem(scene, shader);
+    public static OxySelectSystem getInstance(Scene scene) {
+        if (INSTANCE == null) INSTANCE = new OxySelectSystem(scene);
         return INSTANCE;
     }
 
-    private OxySelectSystem(Scene scene, OxyShader shader) {
+    private OxySelectSystem(Scene scene) {
         this.renderer = scene.getRenderer();
-        gizmo = OxyGizmo3D.getInstance(scene, shader);
+        gizmo = OxyGizmo3D.getInstance(scene);
         mSelector = MouseSelector.getInstance();
     }
 
@@ -43,8 +42,7 @@ public class OxySelectSystem {
     public void start(Set<OxyEntity> entities, OxyCamera camera) {
         if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_LEFT] && SceneLayer.focusedWindow) {
             direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.windowSize.x - SceneLayer.offset.x, SceneLayer.windowSize.y - SceneLayer.offset.y, new Vector2f(SceneLayer.mousePos.x - SceneLayer.windowPos.x - SceneLayer.offset.x, SceneLayer.mousePos.y - SceneLayer.windowPos.y - SceneLayer.offset.y), renderer.getCamera());
-            OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
-            if (e != null) {
+            OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);if (e != null) {
 
                 TransformComponent t = e.get(TransformComponent.class);
                 BoundingBoxComponent c = e.get(BoundingBoxComponent.class);
@@ -57,9 +55,9 @@ public class OxySelectSystem {
                 TransformComponent yC = yModel.get(TransformComponent.class);
                 TransformComponent zC = zModel.get(TransformComponent.class);
 
-                xC.position.set(new Vector3f(c.pos()).mul(t.scale));
-                yC.position.set(new Vector3f(c.pos()).mul(t.scale));
-                zC.position.set(new Vector3f(c.pos()).mul(t.scale));
+                xC.position.set(new Vector3f(c.pos()));
+                yC.position.set(new Vector3f(c.pos()));
+                zC.position.set(new Vector3f(c.pos()));
 
                 gizmo.recalculateBoundingBox();
 

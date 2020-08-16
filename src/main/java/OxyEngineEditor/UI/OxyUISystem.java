@@ -1,7 +1,6 @@
 package OxyEngineEditor.UI;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
@@ -41,12 +40,12 @@ public class OxyUISystem {
 
     private final long[] mouseCursors = new long[ImGuiMouseCursor.COUNT];
 
-    public OxyUISystem(Scene scene, WindowHandle windowHandle, OxyShader shader) {
+    public OxyUISystem(Scene scene, WindowHandle windowHandle) {
         this.windowHandle = windowHandle;
         imGuiRenderer = new ImGuiImplGl3();
         dispatcherThread = new OxyEventDispatcherThread();
         dispatcherThread.startThread();
-        selectSystem = OxySelectSystem.getInstance(scene, shader);
+        selectSystem = OxySelectSystem.getInstance(scene);
         init();
     }
 

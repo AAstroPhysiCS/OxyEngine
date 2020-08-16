@@ -20,8 +20,8 @@ public class OxyGizmo3D {
 
     private static OxyGizmo3D INSTANCE = null;
 
-    public static OxyGizmo3D getInstance(Scene scene, OxyShader shader) {
-        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(scene, shader);
+    public static OxyGizmo3D getInstance(Scene scene) {
+        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(scene);
         return INSTANCE;
     }
 
@@ -29,9 +29,9 @@ public class OxyGizmo3D {
         return INSTANCE;
     }
 
-    private OxyGizmo3D(Scene scene, OxyShader shader) {
+    private OxyGizmo3D(Scene scene) {
 
-        gizmoTranslate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
+        gizmoTranslate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), new OxyShader("shaders/gizmo.glsl"));
 
         gizmoTranslate.get(0).addComponent(new TransformComponent(new Vector3f(0, 0, 0), 3f), new SelectedComponent(false, true));
         gizmoTranslate.get(1).addComponent(new TransformComponent(new Vector3f(0, 0, 0), 3f), new SelectedComponent(false, true));
@@ -68,7 +68,6 @@ public class OxyGizmo3D {
         OxyModel xModel = getXModel();
         OxyModel yModel = getYModel();
         OxyModel zModel = getZModel();
-
 
         TransformComponent xC = xModel.get(TransformComponent.class);
         TransformComponent yC = yModel.get(TransformComponent.class);

@@ -19,7 +19,6 @@ public abstract class OxyEntity {
     public int[] indices;
 
     protected final Scene scene;
-    protected String name;
 
     public OxyEntity(Scene scene) {
         this.scene = scene;
@@ -35,8 +34,8 @@ public abstract class OxyEntity {
             if (c instanceof Mesh m) {
                 m.addToList(this);
             }
-            if(c instanceof TransformComponent t && !t.position.equals(0, 0, 0)){ //if someone decides to add a seperate TransformComponent with new values, then update it
-                t.invalidate(this);
+            if(c instanceof TransformComponent t){ //if someone decides to add a seperate TransformComponent, then validate it
+                t.validate(this);
             }
         }
     }

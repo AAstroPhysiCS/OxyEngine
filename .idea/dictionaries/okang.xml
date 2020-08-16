@@ -18,6 +18,7 @@
       <w>renderlist</w>
       <w>shaders</w>
       <w>skybox</w>
+      <w>skyboxtexture</w>
       <w>stringified</w>
       <w>texturecoords</w>
       <w>xoffset</w>

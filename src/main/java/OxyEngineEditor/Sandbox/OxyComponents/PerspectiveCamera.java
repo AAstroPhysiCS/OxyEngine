@@ -71,7 +71,8 @@ public class PerspectiveCamera extends OxyCamera {
         ImGuiIO io = ImGui.getIO();
         if (SceneLayer.focusedWindow) {
             zoom += io.getMouseWheel();
-//            OxyGizmo3D.getInstance().scaleIt();
+            OxyGizmo3D.getInstance().scaleIt();
+            OxyGizmo3D.getInstance().recalculateBoundingBox();
         }
 
         cameraController.update(ts, OxyCameraController.Mode.SWIPE);
@@ -84,8 +85,6 @@ public class PerspectiveCamera extends OxyCamera {
 
         //For skybox
         setViewMatrixNoTranslation();
-        //For gizmo
-        OxyGizmo3D.getInstance().recalculateBoundingBox();
     }
 
     public void setAspect(float aspect) {
