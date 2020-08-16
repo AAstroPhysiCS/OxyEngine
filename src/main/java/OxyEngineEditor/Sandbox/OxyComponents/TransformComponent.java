@@ -1,5 +1,6 @@
 package OxyEngineEditor.Sandbox.OxyComponents;
 
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -15,6 +16,12 @@ public class TransformComponent implements EntityComponent {
         this.scale = scale;
         this.position = position;
         this.rotation = rotation;
+    }
+
+    public void invalidate(OxyEntity model){
+        if(model != null && model.has(BoundingBoxComponent.class) && model.has(TransformComponent.class)){ //safety
+            model.get(BoundingBoxComponent.class).pos().add((new Vector3f(model.get(TransformComponent.class).position)).mul(model.get(TransformComponent.class).scale));
+        }
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation){

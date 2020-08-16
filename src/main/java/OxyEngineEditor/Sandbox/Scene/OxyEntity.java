@@ -3,6 +3,7 @@ package OxyEngineEditor.Sandbox.Scene;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.InternObjects.ObjectType;
 
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ public abstract class OxyEntity {
         for (EntityComponent c : component) {
             if (c instanceof Mesh m) {
                 m.addToList(this);
+            }
+            if(c instanceof TransformComponent t && !t.position.equals(0, 0, 0)){ //if someone decides to add a seperate TransformComponent with new values, then update it
+                t.invalidate(this);
             }
         }
     }

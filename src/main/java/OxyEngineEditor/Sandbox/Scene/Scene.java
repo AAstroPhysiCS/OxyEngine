@@ -10,7 +10,6 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.CubemapTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxySystem;
@@ -43,7 +42,7 @@ public class Scene implements OxyDisposable {
     private final FrameBuffer frameBuffer;
     private final String sceneName;
 
-    public Scene(String sceneName, WindowHandle windowHandle, OxyRenderer3D renderer, FrameBuffer frameBuffer) {
+    public Scene(String sceneName, OxyRenderer3D renderer, FrameBuffer frameBuffer) {
         this.renderer = renderer;
         this.frameBuffer = frameBuffer;
         this.sceneName = sceneName;
@@ -112,7 +111,7 @@ public class Scene implements OxyDisposable {
         return e;
     }
 
-    CubemapTexture cubemapTexture;
+    private CubemapTexture cubemapTexture; //skyboxtexture
 
     public void build() {
 
@@ -123,7 +122,6 @@ public class Scene implements OxyDisposable {
         cachedModelMeshes = distinct(ModelMesh.class);
         cachedCameraComponents = distinct(OxyCamera.class);
         cachedLightEntities = view(Light.class);
-
 
         //Prep
         {

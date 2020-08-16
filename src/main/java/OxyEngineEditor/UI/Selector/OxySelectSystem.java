@@ -11,8 +11,6 @@ import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Layers.SceneLayer;
 import OxyEngineEditor.UI.OxyUISystem;
 import OxyEngineEditor.UI.Selector.Tools.MouseSelector;
-import imgui.ImGui;
-import imgui.ImVec2;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -44,9 +42,7 @@ public class OxySelectSystem {
 
     public void start(Set<OxyEntity> entities, OxyCamera camera) {
         if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_LEFT] && SceneLayer.focusedWindow) {
-            ImVec2 mousePos = new ImVec2();
-            ImGui.getMousePos(mousePos);
-            direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.width, SceneLayer.height, new Vector2f(mousePos.x - SceneLayer.x, mousePos.y - SceneLayer.y), renderer.getCamera());
+            direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.windowSize.x - SceneLayer.offset.x, SceneLayer.windowSize.y - SceneLayer.offset.y, new Vector2f(SceneLayer.mousePos.x - SceneLayer.windowPos.x - SceneLayer.offset.x, SceneLayer.mousePos.y - SceneLayer.windowPos.y - SceneLayer.offset.y), renderer.getCamera());
             OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
             if (e != null) {
 
@@ -61,16 +57,11 @@ public class OxySelectSystem {
                 TransformComponent yC = yModel.get(TransformComponent.class);
                 TransformComponent zC = zModel.get(TransformComponent.class);
 
-                BoundingBoxComponent xCB = xModel.get(BoundingBoxComponent.class);
-                BoundingBoxComponent yCB = yModel.get(BoundingBoxComponent.class);
-                BoundingBoxComponent zCB = zModel.get(BoundingBoxComponent.class);
-
                 xC.position.set(new Vector3f(c.pos()).mul(t.scale));
                 yC.position.set(new Vector3f(c.pos()).mul(t.scale));
                 zC.position.set(new Vector3f(c.pos()).mul(t.scale));
-                xCB.pos().set(new Vector3f(xC.position).add(new Vector3f(xCB.originPos()).mul(xC.scale, 1, 1)));
-                yCB.pos().set(new Vector3f(yC.position).add(new Vector3f(yCB.originPos()).mul(1, yC.scale, 1)));
-                zCB.pos().set(new Vector3f(zC.position).add(new Vector3f(zCB.originPos()).mul(1, 1, zC.scale)));
+
+                gizmo.recalculateBoundingBox();
 
                 xModel.updateData();
                 yModel.updateData();

@@ -1,12 +1,10 @@
 package OxyEngine.Core.Renderer;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Line.OxyInfoLine;
-import OxyEngine.Tools.Ref;
 import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
 import OxyEngineEditor.Sandbox.Sandbox3D;
 
@@ -31,13 +29,6 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
     public abstract void render(float ts, Mesh mesh);
 
     public abstract void end(OxyShader shader);
-
-    /**
-     * All global meshes should be here!
-     */
-    public interface MeshSystem {
-        Ref<InternObjectMesh> worldGridMesh = new Ref<>(null);
-    }
 
     public static record Stats() {
 

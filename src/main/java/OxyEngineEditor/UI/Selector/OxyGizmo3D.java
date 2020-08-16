@@ -15,7 +15,8 @@ import static OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera.zoom;
 
 public class OxyGizmo3D {
 
-    private final List<OxyModel> gizmo;
+    private final List<OxyModel> gizmoTranslate;
+//    private final List<OxyModel> gizmoRotate;
 
     private static OxyGizmo3D INSTANCE = null;
 
@@ -30,32 +31,44 @@ public class OxyGizmo3D {
 
     private OxyGizmo3D(Scene scene, OxyShader shader) {
 
-        gizmo = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
+        gizmoTranslate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
 
-        gizmo.get(0).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
-        gizmo.get(1).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
-        gizmo.get(2).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 1f), new SelectedComponent(false, true));
+        gizmoTranslate.get(0).addComponent(new TransformComponent(new Vector3f(0, 0, 0), 3f), new SelectedComponent(false, true));
+        gizmoTranslate.get(1).addComponent(new TransformComponent(new Vector3f(0, 0, 0), 3f), new SelectedComponent(false, true));
+        gizmoTranslate.get(2).addComponent(new TransformComponent(new Vector3f(0, 0, 0), 3f), new SelectedComponent(false, true));
 
-        gizmo.get(0).updateData();
-        gizmo.get(1).updateData();
-        gizmo.get(2).updateData();
+        /*gizmoRotate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmoRotation.obj"), shader);
+        gizmoRotate.get(0).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 3f), new SelectedComponent(false));
+        gizmoRotate.get(1).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 3f), new SelectedComponent(false));
+        gizmoRotate.get(2).addComponent(new TransformComponent(new Vector3f(0, -30, 0), 3f), new SelectedComponent(false));*/
 
-        gizmo.get(0).addEventListener(new OxyGizmoController(scene, this));
-        gizmo.get(1).addEventListener(new OxyGizmoController(scene, this));
-        gizmo.get(2).addEventListener(new OxyGizmoController(scene, this));
+        gizmoTranslate.get(0).updateData();
+        gizmoTranslate.get(1).updateData();
+        gizmoTranslate.get(2).updateData();
+
+        recalculateBoundingBox();
+
+        /*gizmoRotate.get(0).updateData();
+        gizmoRotate.get(1).updateData();
+        gizmoRotate.get(2).updateData();*/
+
+        gizmoTranslate.get(0).addEventListener(new OxyGizmoController(scene, this));
+        gizmoTranslate.get(1).addEventListener(new OxyGizmoController(scene, this));
+        gizmoTranslate.get(2).addEventListener(new OxyGizmoController(scene, this));
     }
 
-    public void scaleIt(){
-        scale(gizmo.get(0));
-        scale(gizmo.get(1));
-        scale(gizmo.get(2));
+    public void scaleIt() {
+        scale(gizmoTranslate.get(0));
+        scale(gizmoTranslate.get(1));
+        scale(gizmoTranslate.get(2));
     }
 
-    public void recalculateBoundingBox(){
+    public void recalculateBoundingBox() {
 
         OxyModel xModel = getXModel();
         OxyModel yModel = getYModel();
         OxyModel zModel = getZModel();
+
 
         TransformComponent xC = xModel.get(TransformComponent.class);
         TransformComponent yC = yModel.get(TransformComponent.class);
@@ -68,21 +81,26 @@ public class OxyGizmo3D {
         xCB.pos().set(new Vector3f(xC.position).add(new Vector3f(xCB.originPos()).mul(xC.scale, 1, 1)));
         yCB.pos().set(new Vector3f(yC.position).add(new Vector3f(yCB.originPos()).mul(1, yC.scale, 1)));
         zCB.pos().set(new Vector3f(zC.position).add(new Vector3f(zCB.originPos()).mul(1, 1, zC.scale)));
+
+        gizmoTranslate.get(0).updateData();
+        gizmoTranslate.get(1).updateData();
+        gizmoTranslate.get(2).updateData();
     }
 
-    private void scale(OxyModel model){
-        if(model.get(SelectedComponent.class).fixedValue && zoom >= 60) model.get(TransformComponent.class).scale = zoom * 0.03f;
+    private void scale(OxyModel model) {
+        if (model.get(SelectedComponent.class).fixedValue && zoom >= 60)
+            model.get(TransformComponent.class).scale = zoom * 0.05f;
     }
 
     public OxyModel getXModel() {
-        return gizmo.get(1);
+        return gizmoTranslate.get(2);
     }
 
     public OxyModel getYModel() {
-        return gizmo.get(0);
+        return gizmoTranslate.get(0);
     }
 
     public OxyModel getZModel() {
-        return gizmo.get(2);
+        return gizmoTranslate.get(1);
     }
 }

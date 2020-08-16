@@ -49,7 +49,6 @@ public class PerspectiveCamera extends OxyCamera {
         m.rotateX(cameraController.getRotation().x);
         m.rotateY(cameraController.getRotation().y);
         m.translate(-cameraController.getPosition().x, -cameraController.getPosition().y, -cameraController.getPosition().z);
-        m.origin(cameraController.origin);
         return m;
     }
 
@@ -60,13 +59,19 @@ public class PerspectiveCamera extends OxyCamera {
         return m;
     }
 
+    public void setViewMatrixNoTranslation() {
+        viewMatrixNoTranslation = new Matrix4f();
+        viewMatrixNoTranslation.set(setProjectionMatrix());
+        viewMatrixNoTranslation.rotateX(cameraController.getRotation().x);
+        viewMatrixNoTranslation.rotateY(cameraController.getRotation().y);
+    }
+
     @Override
     public void finalizeCamera(float ts) {
         ImGuiIO io = ImGui.getIO();
-        if (SceneLayer.focusedWindow){
+        if (SceneLayer.focusedWindow) {
             zoom += io.getMouseWheel();
-            OxyGizmo3D.getInstance().scaleIt();
-            OxyGizmo3D.getInstance().recalculateBoundingBox();
+//            OxyGizmo3D.getInstance().scaleIt();
         }
 
         cameraController.update(ts, OxyCameraController.Mode.SWIPE);
@@ -75,12 +80,12 @@ public class PerspectiveCamera extends OxyCamera {
         viewMatrix = new Matrix4f();
         viewMatrix.set(projectionMatrix);
         viewMatrix.mul(modelMatrix);
+        viewMatrix.origin(cameraController.origin);
 
         //For skybox
-        viewMatrixNoTranslation = new Matrix4f();
-        viewMatrixNoTranslation.set(setProjectionMatrix());
-        viewMatrixNoTranslation.rotateX(cameraController.getRotation().x);
-        viewMatrixNoTranslation.rotateY(cameraController.getRotation().y);
+        setViewMatrixNoTranslation();
+        //For gizmo
+        OxyGizmo3D.getInstance().recalculateBoundingBox();
     }
 
     public void setAspect(float aspect) {

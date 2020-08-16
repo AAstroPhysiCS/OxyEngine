@@ -56,10 +56,9 @@ public class Sandbox3D {
     private void init() {
         oxyEngine.init();
 
-
         OxyShader oxyShader = new OxyShader("shaders/world.glsl");
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
-        scene = new Scene("Test Scene 1", windowHandle, oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
+        scene = new Scene("Test Scene 1", oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
         scene.setUISystem(new OxyUISystem(scene, windowHandle, oxyShader));
 
         OxyEntity cameraEntity = scene.createInternObjectEntity();
@@ -98,11 +97,16 @@ public class Sandbox3D {
         oxyShader.disable();
 
         List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"), oxyShader);
+//        List<OxyModel> gizmoRotate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxyGizmoRotation.obj"), oxyShader);
 
         for (OxyModel obj : testObjects) {
-            obj.addComponent(new SelectedComponent(false), new TransformComponent(1f));
+            obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0), 1f));
             obj.updateData();
         }
+        /*for (OxyModel obj : gizmoRotate) {
+            obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, -35, 0)));
+            obj.updateData();
+        }*/
         scene.build();
     }
 

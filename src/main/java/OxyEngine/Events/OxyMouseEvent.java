@@ -6,7 +6,7 @@ import org.joml.Vector2f;
 public class OxyMouseEvent {
 
     int buttonId = -1; //not initialized
-    Vector2f lastRayPosition = new Vector2f();
+    final Vector2f lastRayPosition = new Vector2f();
 
     OxyMouseEvent() {
     }

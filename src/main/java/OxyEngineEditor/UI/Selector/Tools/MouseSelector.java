@@ -37,6 +37,7 @@ public class MouseSelector implements ObjectSelector {
         invModelMatrix.set(camera.getModelMatrix());
         invModelMatrix.invert();
         clipPos.mul(invModelMatrix);
+        clipPos.normalize();
 
         return new Vector3f(clipPos.x, clipPos.y, clipPos.z);
     }

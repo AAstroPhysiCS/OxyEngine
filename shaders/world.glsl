@@ -3,8 +3,6 @@
 
 layout(location = 0) out vec4 color;
 
-uniform vec4 colorInput;
-
 in vec2 texCoordsOut;
 in float textureSlotOut;
 in vec4 colorOut;

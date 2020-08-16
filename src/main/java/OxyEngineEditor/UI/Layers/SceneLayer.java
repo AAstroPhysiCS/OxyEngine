@@ -27,8 +27,10 @@ public class SceneLayer extends UILayer {
 
     public static boolean focusedWindowDragging, focusedWindow;
 
-    public static float width, height;
-    public static float x, y;
+    public static final ImVec2 windowSize = new ImVec2();
+    public static final ImVec2 windowPos = new ImVec2();
+    public static final ImVec2 mousePos = new ImVec2();
+    public static final ImVec2 offset = new ImVec2(); //Window position relative to the window... means that it subtracts the tab
 
     private static SceneLayer INSTANCE = null;
 
@@ -55,7 +57,7 @@ public class SceneLayer extends UILayer {
 
     @Override
     public void renderLayer() {
-        ImGui.setNextWindowSize(windowHandle.getWidth() / 1.3f, windowHandle.getHeight() / 1.3f, ImGuiCond.Once);
+        ImGui.setNextWindowSize(windowHandle.getWidth() / 1.2f, windowHandle.getHeight() / 1.2f, ImGuiCond.Once);
         ImGui.setNextWindowPos(40, 40, ImGuiCond.Once);
 
         ImGui.pushStyleColor(ImGuiCol.ChildBg, normalizeColor(20), normalizeColor(20), normalizeColor(20), 1.0f);
@@ -63,17 +65,13 @@ public class SceneLayer extends UILayer {
         ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, 0);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowMinSize, 50, 50);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0, 0);
-        ImGui.begin("Viewport", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoTitleBar);
 
-        ImVec2 windowSize = new ImVec2();
+        ImGui.begin("Scene", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoTitleBar);
+
         ImGui.getWindowSize(windowSize);
-        width = windowSize.x;
-        height = windowSize.y;
-
-        ImVec2 windowPos = new ImVec2();
         ImGui.getWindowPos(windowPos);
-        x = windowPos.x;
-        y = windowPos.y;
+        ImGui.getMousePos(mousePos);
+        ImGui.getCursorPos(offset);
 
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
         focusedWindow = ImGui.isWindowFocused();

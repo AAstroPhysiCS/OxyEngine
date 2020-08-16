@@ -24,7 +24,7 @@ public class OxyGizmoController implements OxyMouseListener {
     final OxyGizmo3D gizmo;
     final Scene scene;
 
-    boolean pressedX, pressedY, pressedZ;
+    static boolean pressedX, pressedY, pressedZ;
 
     private static OxyEntity currentEntitySelected;
 
@@ -39,11 +39,26 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseClicked(OxyEntity selectedEntity, OxyMouseEvent mouseEvent) {
+        if (mouseEvent.getButton() == ImGuiMouseButton.Right) {
+            if (selectedEntity == gizmo.getXModel()) {
+                pressedX = true;
+                pressedY = false;
+                pressedZ = false;
+            } else if (selectedEntity == gizmo.getYModel()) {
+                pressedY = true;
+                pressedX = false;
+                pressedZ = false;
+            } else if (selectedEntity == gizmo.getZModel()) {
+                pressedZ = true;
+                pressedX = false;
+                pressedY = false;
+            }
+        }
     }
 
     @Override
     public void mouseDown(OxyEntity selectedEntity, OxyMouseEvent mouseEvent) {
-        if (mouseEvent.getButton() == ImGuiMouseButton.Right) {
+        if (mouseEvent.getButton() == ImGuiMouseButton.Right && currentEntitySelected != null) {
             OxyModel xAxis = gizmo.getXModel();
             OxyModel yAxis = gizmo.getYModel();
             OxyModel zAxis = gizmo.getZModel();
@@ -62,16 +77,15 @@ public class OxyGizmoController implements OxyMouseListener {
             Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
             Vector2d delta = nowMousePos.sub(oldMousePos);
             float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
-            float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale); // xC bcs x,y,z has the same scale, so it does not matter!
-            float deltaY = (float) ((delta.y * mouseSpeed) * xC.scale);
-            System.out.println("X: " + deltaX);
-            System.out.println("Y: " + deltaY);
+            float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale) / 16f;
+            float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale) / 16f;
+            if (deltaX <= -1f * xC.scale / 8f || deltaX >= 1f * xC.scale / 8f) deltaX = 0; // for safety reasons
+            if (deltaY <= -1f * yC.scale / 8f || deltaY >= 1f * yC.scale / 8f) deltaY = 0;
 
-            if (deltaX <= -1f || deltaX >= 1f) deltaX = 0; // for safety reasons
-            if (deltaY <= -1f || deltaY >= 1f) deltaY = 0;
+//            System.out.println("X: " + deltaX);
+//            System.out.println("Y: " + deltaY);
 
-            if (selectedEntity == zAxis) {
-                pressedZ = true;
+            if (pressedZ) {
                 xC.position.add(0, 0, -deltaX);
                 yC.position.add(0, 0, -deltaX);
                 zC.position.add(0, 0, -deltaX);
@@ -80,8 +94,7 @@ public class OxyGizmoController implements OxyMouseListener {
                 zCB.pos().add(0, 0, -deltaX);
                 currC.position.add(0, 0, -deltaX);
                 currCB.pos().add(0, 0, -deltaX);
-            } else if (selectedEntity == yAxis) {
-                pressedY = true;
+            } else if (pressedY) {
                 xC.position.add(0, deltaY, 0);
                 yC.position.add(0, deltaY, 0);
                 zC.position.add(0, deltaY, 0);
@@ -90,8 +103,7 @@ public class OxyGizmoController implements OxyMouseListener {
                 zCB.pos().add(0, deltaY, 0);
                 currC.position.add(0, deltaY, 0);
                 currCB.pos().add(0, deltaY, 0);
-            } else if (selectedEntity == xAxis) {
-                pressedX = true;
+            } else if (pressedX) {
                 xC.position.add(deltaX, 0, 0);
                 yC.position.add(deltaX, 0, 0);
                 zC.position.add(deltaX, 0, 0);
@@ -101,7 +113,7 @@ public class OxyGizmoController implements OxyMouseListener {
                 currC.position.add(deltaX, 0, 0);
                 currCB.pos().add(deltaX, 0, 0);
             }
-            if (currentEntitySelected != null) currentEntitySelected.updateData();
+            currentEntitySelected.updateData();
             xAxis.updateData();
             yAxis.updateData();
             zAxis.updateData();
@@ -109,7 +121,7 @@ public class OxyGizmoController implements OxyMouseListener {
     }
 
     @Override
-    public void mouseHovered(OxyEntity hoveredEntity, OxyMouseEvent mouseEvent) {
+    public void mouseHovered(OxyEntity hoveredEntity) {
         if (hoveredEntity instanceof OxyModel) {
             if (!init) {
                 OxyColor color = hoveredEntity.get(OxyColor.class);
