@@ -3,6 +3,7 @@ package OxyEngineEditor.Sandbox.Scene.Model;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngineEditor.Sandbox.OxyComponents.IsRenderable;
 import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
@@ -36,6 +37,7 @@ public class OxyModel extends OxyEntity {
         factory.constructData(this);
         addComponent(new ModelMesh.ModelMeshBuilderImpl()
                 .setShader(get(OxyShader.class))
+                .isRenderable(get(IsRenderable.class).renderable)
                 .setMode(GL_TRIANGLES)
                 .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setVertices(vertices)
@@ -47,6 +49,7 @@ public class OxyModel extends OxyEntity {
 
     @Override
     public void updateData() {
+        get(Mesh.class).renderable = get(IsRenderable.class).renderable;
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(0, vertices);
     }

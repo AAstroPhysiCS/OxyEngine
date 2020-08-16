@@ -21,6 +21,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     protected NormalsBuffer normalsBuffer;
 
     protected OxyShader shader;
+    public boolean renderable = true;
 
     protected final List<OxyEntity> entities = new ArrayList<>();
 

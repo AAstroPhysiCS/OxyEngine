@@ -19,13 +19,14 @@ public class ModelMesh extends Mesh {
     private final float[] vertices, textureCoords, normals;
     private final int[] indices;
 
-    private ModelMesh(OxyShader shader, BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+    private ModelMesh(OxyShader shader, BufferTemplate.Usage usage, int mode, boolean renderable, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
         this.shader = shader;
         this.vertices = vertices;
         this.indices = indices;
         this.textureCoords = textureCoords;
         this.normals = normals;
         this.mode = mode;
+        this.renderable = renderable;
 
         vertexBuffer = new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                 .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
@@ -62,6 +63,8 @@ public class ModelMesh extends Mesh {
 
         ModelMeshBuilder setUsage(BufferTemplate.Usage usage);
 
+        ModelMeshBuilder isRenderable(boolean renderable);
+
         ModelMesh create();
     }
 
@@ -72,6 +75,7 @@ public class ModelMesh extends Mesh {
         private int[] indices;
         private int mode;
         private BufferTemplate.Usage usage;
+        private boolean renderable = true;
 
         @Override
         public ModelMeshBuilderImpl setShader(OxyShader shader) {
@@ -116,9 +120,15 @@ public class ModelMesh extends Mesh {
         }
 
         @Override
+        public ModelMeshBuilderImpl isRenderable(boolean renderable) {
+            this.renderable = renderable;
+            return this;
+        }
+
+        @Override
         public ModelMesh create() {
             assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
-            return new ModelMesh(shader, usage, mode, vertices, indices, textureCoords, normals);
+            return new ModelMesh(shader, usage, mode, renderable, vertices, indices, textureCoords, normals);
         }
     }
 
@@ -136,5 +146,9 @@ public class ModelMesh extends Mesh {
 
     public int[] getIndices() {
         return indices;
+    }
+
+    public boolean isRenderable() {
+        return renderable;
     }
 }

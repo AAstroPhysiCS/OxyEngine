@@ -10,7 +10,8 @@ public class InternObjectMesh extends Mesh {
 
     public int indicesX, indicesY, indicesZ;
 
-    private InternObjectMesh(OxyShader shader, int mode, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
+    private InternObjectMesh(OxyShader shader, int mode, boolean renderable, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
+        this.renderable = renderable;
         this.shader = shader;
         this.mode = mode;
         this.indexBuffer = indexBuffer;
@@ -27,6 +28,8 @@ public class InternObjectMesh extends Mesh {
 
         InternMeshBuilder setUsage(BufferTemplate.Usage usage);
 
+        InternMeshBuilder isRenderable(boolean renderable);
+
         InternObjectMesh create();
     }
 
@@ -36,6 +39,7 @@ public class InternObjectMesh extends Mesh {
         private int mode = -1;
         private BufferTemplate.Usage usage;
         private OxyShader shader;
+        private boolean renderable = true;
 
         @Override
         public InternMeshBuilderImpl setShader(OxyShader shader) {
@@ -62,10 +66,16 @@ public class InternObjectMesh extends Mesh {
         }
 
         @Override
+        public InternMeshBuilderImpl isRenderable(boolean renderable) {
+            this.renderable = renderable;
+            return this;
+        }
+
+        @Override
         public InternObjectMesh create() {
             assert mode != -1 && usage != null : oxyAssert("Some arguments not defined!");
 
-            return new InternObjectMesh(shader, mode,
+            return new InternObjectMesh(shader, mode, renderable,
                     new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                             .setVerticesStrideSize(verticesPointers[0].stride() / Float.BYTES)
                             .setUsage(usage)

@@ -26,7 +26,7 @@ public class OxyGizmoController implements OxyMouseListener {
 
     static boolean pressedX, pressedY, pressedZ;
 
-    private static OxyEntity currentEntitySelected;
+    public static OxyEntity currentEntitySelected;
 
     OxyGizmoController(Scene scene, OxyGizmo3D gizmo) {
         this.gizmo = gizmo;

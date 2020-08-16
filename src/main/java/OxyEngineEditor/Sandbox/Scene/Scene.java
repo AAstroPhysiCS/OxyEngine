@@ -51,7 +51,7 @@ public class Scene implements OxyDisposable {
     public final OxyInternObject createInternObjectEntity() {
         OxyInternObject e = new OxyInternObject(this);
         registry.entityList.put(e, new LinkedHashSet<>(15));
-        e.addComponent(new TransformComponent());
+        e.addComponent(new TransformComponent(), new IsRenderable(true));
         return e;
     }
 
@@ -79,7 +79,8 @@ public class Scene implements OxyDisposable {
                     assimpMesh.material.texture(),
                     new OxyColor(assimpMesh.material.diffuseColor()),
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
-                    new TagComponent(assimpMesh.name)
+                    new TagComponent(assimpMesh.name),
+                    new IsRenderable(true)
             );
             assimpMesh.material.setValues(shader);
             e.initData();
@@ -105,7 +106,9 @@ public class Scene implements OxyDisposable {
                 new TransformComponent(),
                 assimpMesh.material.texture(),
                 new OxyColor(assimpMesh.material.diffuseColor()),
-                new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces)
+                new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
+                new TagComponent(assimpMesh.name),
+                new IsRenderable(true)
         );
         e.initData();
         return e;
@@ -181,20 +184,23 @@ public class Scene implements OxyDisposable {
         //Rendering
         {
             for (EntityComponent c : cachedModelMeshes) {
-                if (c != null && mainCamera != null)
-                    render(ts, (Mesh) c, mainCamera);
+                Mesh mesh = (Mesh) c;
+                if (c != null && mainCamera != null && mesh.renderable)
+                    render(ts, mesh, mainCamera);
             }
 
             for (EntityComponent c : cachedInternMeshes) {
                 Mesh mesh = (Mesh) c;
-                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class))) {
+                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && mesh.renderable) {
                     //skybox
                     glDepthMask(false);
-                    render(ts, (Mesh) c, mainCamera);
+                    render(ts, mesh, mainCamera);
                     glDepthMask(true);
-                } else {
-                    render(ts, (Mesh) c, mainCamera);
+                    continue;
                 }
+
+                if(mesh.renderable)
+                    render(ts, mesh, mainCamera);
             }
         }
         if (frameBuffer != null) frameBuffer.unbind();

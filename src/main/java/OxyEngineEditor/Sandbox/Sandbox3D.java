@@ -97,16 +97,16 @@ public class Sandbox3D {
         oxyShader.disable();
 
         List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"), oxyShader);
-        List<OxyModel> gizmoRotate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"), oxyShader);
+//        List<OxyModel> gizmoRotate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"), oxyShader);
 
         for (OxyModel obj : testObjects) {
-            obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0), 1f));
+            obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(20, 0, 0), 5f));
             obj.updateData();
         }
-        for (OxyModel obj : gizmoRotate) {
+        /*for (OxyModel obj : gizmoRotate) {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, -35, 0), 5f));
             obj.updateData();
-        }
+        }*/
         scene.build();
     }
 
