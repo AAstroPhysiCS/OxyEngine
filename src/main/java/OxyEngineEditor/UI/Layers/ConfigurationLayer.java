@@ -5,7 +5,6 @@ import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiStyleVar;
 import imgui.type.ImBoolean;
 
@@ -30,9 +29,6 @@ public class ConfigurationLayer extends UILayer {
 
     @Override
     public void renderLayer() {
-        ImGui.setNextWindowSize(windowHandle.getWidth() / 5f, windowHandle.getHeight() - 300, ImGuiCond.Once);
-        ImGui.setNextWindowPos(0, 40, ImGuiCond.Once);
-
         ImGui.pushStyleColor(ImGuiCol.WindowBg, bgC[0], bgC[1], bgC[2], bgC[3]);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding | ImGuiStyleVar.WindowBorderSize, 0);
 

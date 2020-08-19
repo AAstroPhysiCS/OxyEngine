@@ -2,6 +2,7 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.Events.OxyMouseListener;
 import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
@@ -23,14 +24,16 @@ public class OxyGizmoController implements OxyMouseListener {
 
     final OxyGizmo3D gizmo;
     final Scene scene;
+    final WindowHandle windowHandle;
 
     static boolean pressedX, pressedY, pressedZ;
 
     public static OxyEntity currentEntitySelected;
 
-    OxyGizmoController(Scene scene, OxyGizmo3D gizmo) {
+    OxyGizmoController(WindowHandle windowHandle, Scene scene, OxyGizmo3D gizmo) {
         this.gizmo = gizmo;
         this.scene = scene;
+        this.windowHandle = windowHandle;
     }
 
     public static void setCurrentEntitySelected(OxyEntity currentEntitySelected) {
@@ -44,11 +47,13 @@ public class OxyGizmoController implements OxyMouseListener {
                 pressedX = true;
                 pressedY = false;
                 pressedZ = false;
-            } else if (selectedEntity == gizmo.getYModelTranslation()) {
+            }
+            if (selectedEntity == gizmo.getYModelTranslation()) {
                 pressedY = true;
                 pressedX = false;
                 pressedZ = false;
-            } else if (selectedEntity == gizmo.getZModelTranslation()) {
+            }
+            if (selectedEntity == gizmo.getZModelTranslation()) {
                 pressedZ = true;
                 pressedX = false;
                 pressedY = false;

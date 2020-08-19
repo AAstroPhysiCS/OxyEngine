@@ -1,6 +1,7 @@
 package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
@@ -20,8 +21,8 @@ public class OxyGizmo3D {
 
     private static OxyGizmo3D INSTANCE = null;
 
-    public static OxyGizmo3D getInstance(Scene scene) {
-        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(scene);
+    public static OxyGizmo3D getInstance(WindowHandle windowHandle, Scene scene) {
+        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(windowHandle, scene);
         return INSTANCE;
     }
 
@@ -29,14 +30,14 @@ public class OxyGizmo3D {
         return INSTANCE;
     }
 
-    private OxyGizmo3D(Scene scene) {
+    private OxyGizmo3D(WindowHandle windowHandle, Scene scene) {
         OxyShader shader = new OxyShader("shaders/gizmo.glsl");
         gizmoTranslate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmo.obj"), shader);
         gizmoRotate = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/intern/oxygizmoRotation.obj"), shader);
 
         for (OxyModel gizmoT : gizmoTranslate) {
             gizmoT.addComponent(new TransformComponent(new Vector3f(0, 0, 0), 3f), new SelectedComponent(false, true));
-            gizmoT.addEventListener(new OxyGizmoController(scene, this));
+            gizmoT.addEventListener(new OxyGizmoController(windowHandle, scene, this));
         }
         recalculateBoundingBox();
         for (OxyModel gizmoT : gizmoTranslate) {
@@ -98,15 +99,15 @@ public class OxyGizmo3D {
         return gizmoTranslate.get(1);
     }
 
-    public OxyModel getRedGizmoRotation(){
+    public OxyModel getRedGizmoRotation() {
         return gizmoRotate.get(0);
     }
 
-    public OxyModel getBlueGizmoRotation(){
+    public OxyModel getBlueGizmoRotation() {
         return gizmoRotate.get(1);
     }
 
-    public OxyModel getGreenGizmoRotation(){
+    public OxyModel getGreenGizmoRotation() {
         return gizmoRotate.get(2);
     }
 }

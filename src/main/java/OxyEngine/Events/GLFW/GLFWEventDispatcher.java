@@ -61,6 +61,8 @@ public interface GLFWEventDispatcher {
     final class MouseEvent extends GLFWMouseButtonCallback implements GLFWEventDispatcher {
 
         private final boolean[] buttons = new boolean[10];
+        private final boolean[] isMouseClicked = new boolean[3];
+        private final boolean[] isMouseRelease = new boolean[3];
 
         private final ImGuiIO io;
 
@@ -85,6 +87,14 @@ public interface GLFWEventDispatcher {
 
         public boolean[] getButtons() {
             return buttons;
+        }
+
+        public boolean[] getIsMouseClicked() {
+            return isMouseClicked;
+        }
+
+        public boolean[] getIsMouseRelease() {
+            return isMouseRelease;
         }
     }
 

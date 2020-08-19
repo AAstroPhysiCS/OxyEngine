@@ -62,7 +62,7 @@ public class Sandbox3D {
         scene.setUISystem(new OxyUISystem(scene, windowHandle));
 
         OxyEntity cameraEntity = scene.createInternObjectEntity();
-        PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(5.6f, 2.3f, 0));
+        PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.5f, 5.4f, 0));
         cameraEntity.addComponent(camera);
 
         /*OxyEntity pointLightEntity = scene.createInternObjectEntity();
@@ -99,10 +99,9 @@ public class Sandbox3D {
         List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"), oxyShader);
 
         for (OxyModel obj : testObjects) {
-            obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 20, 0), 1f));
+            obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0), 2f));
             obj.updateData();
         }
-
         scene.build();
     }
 

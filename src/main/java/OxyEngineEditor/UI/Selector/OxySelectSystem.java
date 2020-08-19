@@ -2,8 +2,9 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.IsRenderable;
+import OxyEngineEditor.Sandbox.OxyComponents.RenderableComponent;
 import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
@@ -27,14 +28,14 @@ public class OxySelectSystem {
 
     private static OxySelectSystem INSTANCE;
 
-    public static OxySelectSystem getInstance(Scene scene) {
-        if (INSTANCE == null) INSTANCE = new OxySelectSystem(scene);
+    public static OxySelectSystem getInstance(WindowHandle windowHandle, Scene scene) {
+        if (INSTANCE == null) INSTANCE = new OxySelectSystem(windowHandle, scene);
         return INSTANCE;
     }
 
-    private OxySelectSystem(Scene scene) {
+    private OxySelectSystem(WindowHandle windowHandle, Scene scene) {
         this.renderer = scene.getRenderer();
-        gizmo = OxyGizmo3D.getInstance(scene);
+        gizmo = OxyGizmo3D.getInstance(windowHandle, scene);
         mSelector = MouseSelector.getInstance();
     }
 
@@ -62,9 +63,9 @@ public class OxySelectSystem {
                 //recalculate bounding box, but it is being done in the camera class
             }
 
-            xModel.get(IsRenderable.class).renderable = e != null;
-            yModel.get(IsRenderable.class).renderable = e != null;
-            zModel.get(IsRenderable.class).renderable = e != null;
+            xModel.get(RenderableComponent.class).renderable = e != null;
+            yModel.get(RenderableComponent.class).renderable = e != null;
+            zModel.get(RenderableComponent.class).renderable = e != null;
 
             xModel.updateData();
             yModel.updateData();

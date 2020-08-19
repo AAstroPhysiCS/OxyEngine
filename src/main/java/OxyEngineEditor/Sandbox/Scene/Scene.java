@@ -51,7 +51,7 @@ public class Scene implements OxyDisposable {
     public final OxyInternObject createInternObjectEntity() {
         OxyInternObject e = new OxyInternObject(this);
         registry.entityList.put(e, new LinkedHashSet<>(15));
-        e.addComponent(new TransformComponent(), new IsRenderable(true));
+        e.addComponent(new TransformComponent(), new RenderableComponent(true));
         return e;
     }
 
@@ -80,7 +80,7 @@ public class Scene implements OxyDisposable {
                     new OxyColor(assimpMesh.material.diffuseColor()),
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
                     new TagComponent(assimpMesh.name),
-                    new IsRenderable(true)
+                    new RenderableComponent(true)
             );
             assimpMesh.material.setValues(shader);
             e.initData();
@@ -108,7 +108,7 @@ public class Scene implements OxyDisposable {
                 new OxyColor(assimpMesh.material.diffuseColor()),
                 new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
                 new TagComponent(assimpMesh.name),
-                new IsRenderable(true)
+                new RenderableComponent(true)
         );
         e.initData();
         return e;
@@ -119,7 +119,7 @@ public class Scene implements OxyDisposable {
     public void build() {
 
         Set<EntityComponent> cachedShaders = distinct(OxyShader.class);
-        cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyBoxBlue"), this);
+        cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), this);
         cubemapTexture.init(cachedShaders);
         cachedInternMeshes = distinct(InternObjectMesh.class);
         cachedModelMeshes = distinct(ModelMesh.class);

@@ -8,7 +8,9 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Window.WindowHint;
 import OxyEngine.OpenGL.OpenGLContext;
 import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.OxySystem;
 import OxyEngineEditor.UI.Loader.UIThemeLoader;
+import imgui.ImGui;
 
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -77,6 +79,8 @@ public class OxyEngine implements OxyDisposable {
 
     @Override
     public void dispose() {
+        ImGui.saveIniSettingsToDisk(OxySystem.FileSystem.getResourceByPath("/ini/imgui.ini"));
+
         glfwFreeCallbacks(windowHandle.getPointer());
         glfwDestroyWindow(windowHandle.getPointer());
 

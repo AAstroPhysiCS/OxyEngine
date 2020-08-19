@@ -16,7 +16,6 @@ import OxyEngineEditor.Sandbox.Scene.WorldGrid;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector3f;
@@ -42,6 +41,10 @@ public class SceneLayer extends UILayer {
         return INSTANCE;
     }
 
+    public static SceneLayer getInstance(){
+        return INSTANCE;
+    }
+
     private SceneLayer(WindowHandle windowHandle, Scene scene, OxyShader shader) {
         super(windowHandle, scene);
         this.scene = scene;
@@ -57,8 +60,6 @@ public class SceneLayer extends UILayer {
 
     @Override
     public void renderLayer() {
-        ImGui.setNextWindowSize(windowHandle.getWidth() / 1.2f, windowHandle.getHeight() / 1.2f, ImGuiCond.Once);
-        ImGui.setNextWindowPos(40, 40, ImGuiCond.Once);
 
         ImGui.pushStyleColor(ImGuiCol.ChildBg, normalizeColor(20), normalizeColor(20), normalizeColor(20), 1.0f);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0);

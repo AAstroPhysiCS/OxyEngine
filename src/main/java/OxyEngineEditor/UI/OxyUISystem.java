@@ -6,6 +6,7 @@ import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
 import OxyEngine.Events.OxyEventDispatcherThread;
 import OxyEngine.OxyEngine;
+import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.Font.FontLoader;
@@ -45,7 +46,7 @@ public class OxyUISystem {
         imGuiRenderer = new ImGuiImplGl3();
         dispatcherThread = new OxyEventDispatcherThread();
         dispatcherThread.startThread();
-        selectSystem = OxySelectSystem.getInstance(scene);
+        selectSystem = OxySelectSystem.getInstance(windowHandle, scene);
         init();
     }
 
@@ -61,8 +62,9 @@ public class OxyUISystem {
 
     private void init() {
         ImGui.createContext();
-        io = ImGui.getIO();
+        ImGui.loadIniSettingsFromDisk(OxySystem.FileSystem.getResourceByPath("/ini/imgui.ini"));
 
+        io = ImGui.getIO();
         ImGui.getStyle().setColors(OxyEngine.getLoadedTheme());
 
         io.setIniFilename(null);

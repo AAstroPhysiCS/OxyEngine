@@ -2,7 +2,7 @@ package OxyEngineEditor.Sandbox.Scene.InternObjects;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.IsRenderable;
+import OxyEngineEditor.Sandbox.OxyComponents.RenderableComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
@@ -41,7 +41,7 @@ public class OxyInternObject extends OxyEntity implements Cloneable {
 
     @Override
     public void updateData() {
-        get(Mesh.class).renderable = get(IsRenderable.class).renderable;
+        get(Mesh.class).renderable = get(RenderableComponent.class).renderable;
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(scene, this);
     }

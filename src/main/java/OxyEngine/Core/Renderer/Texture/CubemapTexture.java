@@ -69,7 +69,7 @@ public class CubemapTexture extends OxyTexture.Texture {
 
     private final Scene scene;
     private OxyShader shader;
-    private static final List<String> fileStructure = Arrays.asList("right", "left", "top", "bottom", "back", "front");
+    private static final List<String> fileStructure = Arrays.asList("right", "left", "bottom", "top", "front", "back");
     private static final List<String> totalFiles = new ArrayList<>();
 
     CubemapTexture(int slot, String path, Scene scene) {

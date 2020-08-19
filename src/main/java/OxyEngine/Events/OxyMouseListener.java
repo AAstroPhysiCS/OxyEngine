@@ -33,6 +33,7 @@ public interface OxyMouseListener extends OxyEventListener {
         dispatchMethods(e);
     }
 
+
     private void dispatchMethods(OxyEntity e) {
         mouseHovered(e);
         for (int i = 0; i < 3; i++) { //goes through the imgui supported buttons

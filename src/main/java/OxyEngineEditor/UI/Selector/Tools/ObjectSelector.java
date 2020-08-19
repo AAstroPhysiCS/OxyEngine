@@ -42,7 +42,7 @@ public interface ObjectSelector {
             min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
             max.add(new Vector3f(boundingBox.max()).mul(c.scale));
 
-            if(tag.tag().startsWith("Sphere")){
+            if (tag.tag().startsWith("Sphere")) {
                 if (Intersectionf.intersectRaySphere(origin, direction, boundingBox.pos(), boundingBox.max().y * boundingBox.max().y * c.scale * c.scale, nearFar) && nearFar.x < closestDistance) {
                     closestDistance = nearFar.x;
                     selectedEntity = entity;
@@ -50,17 +50,38 @@ public interface ObjectSelector {
                 }
             }
 
-            if(tag.tag().startsWith("Cube") || tag.tag().startsWith("Cone")){
+            if (tag.tag().startsWith("Cube")) {
                 if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar) && nearFar.x < closestDistance) {
                     closestDistance = nearFar.x;
                     selectedEntity = entity;
                     selected.selected = true;
                 }
             }
+
+            if (tag.tag().startsWith("Circle") || tag.tag().startsWith("Cone")) {
+                float result;
+                for (int i = 0; i < entity.vertices.length; ) {
+                    if (i >= entity.vertices.length - 18) break;
+                    Vector3f firstVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                    i += 5;
+                    Vector3f secondVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                    i += 5;
+                    Vector3f thirdVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                    i += 5;
+                    if ((result = Intersectionf.intersectRayTriangle(origin, direction, firstVertex, secondVertex, thirdVertex, 0f)) != -1) {
+                        if (result < closestDistance) {
+                            closestDistance = result;
+                            selectedEntity = entity;
+                            selected.selected = true;
+                        }
+                    }
+                }
+            }
         }
         return selectedEntity;
     }
 
+    //mainly for gizmo
     default OxyEntity selectObject(OxyEntity entity, Vector3f origin, Vector3f direction) {
         reset();
         if (origin == null || direction == null || !entity.has(SelectedComponent.class) || !entity.has(TransformComponent.class))
@@ -70,6 +91,7 @@ public interface ObjectSelector {
         TransformComponent c = entity.get(TransformComponent.class);
         SelectedComponent selected = entity.get(SelectedComponent.class);
         BoundingBoxComponent boundingBox = entity.get(BoundingBoxComponent.class);
+        TagComponent tag = entity.get(TagComponent.class);
 
         selected.selected = false;
 
@@ -78,10 +100,11 @@ public interface ObjectSelector {
         min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
         max.add(new Vector3f(boundingBox.max()).mul(c.scale));
 
-        if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar)) {
+        if ((Intersectionf.intersectRayAab(origin, direction, min, max, nearFar))) {
             selectedEntity = entity;
             selected.selected = true;
         }
+
         return selectedEntity;
     }
 
