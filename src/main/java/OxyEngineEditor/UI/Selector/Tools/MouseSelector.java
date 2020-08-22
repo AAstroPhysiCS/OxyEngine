@@ -19,12 +19,21 @@ public class MouseSelector implements ObjectSelector {
     }
 
     @Override
-    public Vector3f getObjectPosRelativeToCamera(float width, float height, Vector2f mousePos, OxyCamera camera) {
-        if(camera.getProjectionMatrix() == null || camera.getModelMatrix() == null) return new Vector3f(0,0,0);
-
+    public Vector3f toClipSpace(float width, float height, Vector2f mousePos) {
         float x = (2 * mousePos.x) / width - 1.0f;
         float y = 1.0f - (2 * mousePos.y) / height;
         float z = -1.0f;
+        return new Vector3f(x, y, z);
+    }
+
+    @Override
+    public Vector3f getObjectPosRelativeToCamera(float width, float height, Vector2f mousePos, OxyCamera camera) {
+        if(camera.getProjectionMatrix() == null || camera.getModelMatrix() == null) return new Vector3f(0,0,0);
+
+        Vector3f clipSpace = toClipSpace(width, height, mousePos);
+        float x = clipSpace.x;
+        float y = clipSpace.y;
+        float z = clipSpace.z;
 
         invProjectionMatrix.set(camera.getProjectionMatrix());
         invProjectionMatrix.invert();

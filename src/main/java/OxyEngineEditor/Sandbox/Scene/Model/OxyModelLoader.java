@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent.*;
+import static OxyEngineEditor.Sandbox.Components.BoundingBoxComponent.*;
 import static org.lwjgl.assimp.Assimp.*;
 
 public class OxyModelLoader {

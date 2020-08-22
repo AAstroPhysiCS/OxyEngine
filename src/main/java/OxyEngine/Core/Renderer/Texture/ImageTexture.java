@@ -24,9 +24,9 @@ public class ImageTexture extends OxyTexture.Texture {
         int[] height = new int[1];
         int[] channels = new int[1];
         ByteBuffer buffer = loadTextureFile(path, width, height, channels);
-        int internalFormat = GL_RGBA;
+        int alFormat = GL_RGBA;
         if (channels[0] == 3)
-            internalFormat = GL_RGB;
+            alFormat = GL_RGB;
 
         textureId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureId);
@@ -37,7 +37,7 @@ public class ImageTexture extends OxyTexture.Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.4f);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, width[0], height[0], 0, internalFormat, GL_UNSIGNED_BYTE, buffer);
+        glTexImage2D(GL_TEXTURE_2D, 0, alFormat, width[0], height[0], 0, alFormat, GL_UNSIGNED_BYTE, buffer);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         stbi_image_free(buffer);

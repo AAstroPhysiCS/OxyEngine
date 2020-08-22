@@ -2,8 +2,8 @@ package OxyEngineEditor.Sandbox.Scene.Model;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -40,10 +40,10 @@ public class ModelFactory implements EntityComponent {
 
         c.transform = new Matrix4f()
                 .translate(c.position)
-                .scale(c.scale)
                 .rotateX(c.rotation.x)
                 .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z);
+                .rotateZ(c.rotation.z)
+                .scale(c.scale);
 
         int slot = 0;
         if (texture != null)

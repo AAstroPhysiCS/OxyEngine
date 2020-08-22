@@ -1,23 +1,23 @@
-package OxyEngineEditor.Sandbox.Scene.InternObjects;
+package OxyEngineEditor.Sandbox.Scene.NativeObjects;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
-import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.RenderableComponent;
+import OxyEngineEditor.Sandbox.Components.NativeObjectMesh;
+import OxyEngineEditor.Sandbox.Components.RenderableComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-public class OxyInternObject extends OxyEntity implements Cloneable {
+public class OxyNativeObject extends OxyEntity implements Cloneable {
 
-    private InternObjectFactory factory;
+    private NativeObjectFactory factory;
     public ObjectType type;
 
-    public OxyInternObject(Scene scene) {
+    public OxyNativeObject(Scene scene) {
         super(scene);
     }
 
-    OxyInternObject(OxyInternObject other) {
+    OxyNativeObject(OxyNativeObject other) {
         this(other.scene);
         this.vertices = other.vertices;
         this.factory = other.factory;
@@ -28,15 +28,15 @@ public class OxyInternObject extends OxyEntity implements Cloneable {
     }
 
     public void initData() {
-        assert has(InternObjectFactory.class) && has(Mesh.class) : oxyAssert("Game object need to have a template or a Mesh!");
+        assert has(NativeObjectFactory.class) && has(Mesh.class) : oxyAssert("Game object need to have a template or a Mesh!");
 
         Mesh mesh = get(Mesh.class);
 
-        factory = get(InternObjectFactory.class);
+        factory = get(NativeObjectFactory.class);
         this.type = factory.type;
         factory.constructData(this);
-        assert mesh instanceof InternObjectMesh : oxyAssert("Intern Object needs to have a InternObjectMesh");
-        factory.initData(this, (InternObjectMesh) mesh);
+        assert mesh instanceof NativeObjectMesh : oxyAssert("Native Object needs to have a NativeObjectMesh");
+        factory.initData(this, (NativeObjectMesh) mesh);
     }
 
     @Override

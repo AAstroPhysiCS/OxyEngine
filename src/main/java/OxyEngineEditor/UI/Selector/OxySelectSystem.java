@@ -3,9 +3,9 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.RenderableComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.Components.BoundingBoxComponent;
+import OxyEngineEditor.Sandbox.Components.RenderableComponent;
+import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
@@ -17,6 +17,7 @@ import org.joml.Vector3f;
 
 import java.util.Set;
 
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
 
 public class OxySelectSystem {
@@ -39,39 +40,83 @@ public class OxySelectSystem {
         mSelector = MouseSelector.getInstance();
     }
 
-    static Vector3f direction = new Vector3f();
+    static boolean switchC = false;
 
     public void start(Set<OxyEntity> entities, OxyCamera camera) {
-        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_LEFT] && SceneLayer.focusedWindow) {
-            direction = mSelector.getObjectPosRelativeToCamera(SceneLayer.windowSize.x - SceneLayer.offset.x, SceneLayer.windowSize.y - SceneLayer.offset.y, new Vector2f(SceneLayer.mousePos.x - SceneLayer.windowPos.x - SceneLayer.offset.x, SceneLayer.mousePos.y - SceneLayer.windowPos.y - SceneLayer.offset.y), renderer.getCamera());
-            OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
-            OxyModel xModel = gizmo.getXModelTranslation();
-            OxyModel yModel = gizmo.getYModelTranslation();
-            OxyModel zModel = gizmo.getZModelTranslation();
-
-            if (e != null) {
-                BoundingBoxComponent c = e.get(BoundingBoxComponent.class);
-
-                TransformComponent xC = xModel.get(TransformComponent.class);
-                TransformComponent yC = yModel.get(TransformComponent.class);
-                TransformComponent zC = zModel.get(TransformComponent.class);
-
-                xC.position.set(new Vector3f(c.pos()));
-                yC.position.set(new Vector3f(c.pos()));
-                zC.position.set(new Vector3f(c.pos()));
-
-                //recalculate bounding box, but it is being done in the camera class
+        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_C] && SceneLayer.focusedWindow && !switchC) {
+            if (gizmo.mode == OxyGizmo3D.GizmoMode.Translation) {
+                gizmo.mode = OxyGizmo3D.GizmoMode.Scale;
+                for (int i = 0; i < 3; i++) {
+                    gizmo.mode.component.models.get(i).get(RenderableComponent.class).renderable = true;
+                    OxyGizmo3D.GizmoMode.Translation.component.models.get(i).get(RenderableComponent.class).renderable = false;
+                }
+            } else {
+                gizmo.mode = OxyGizmo3D.GizmoMode.Translation;
+                for (int i = 0; i < 3; i++) {
+                    gizmo.mode.component.models.get(i).get(RenderableComponent.class).renderable = true;
+                    OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(RenderableComponent.class).renderable = false;
+                }
             }
+            switchC = true;
+        }
+        if (!OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_C]) {
+            switchC = false;
+        }
+        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_LEFT] && SceneLayer.focusedWindow) {
+            Vector3f direction = mSelector.getObjectPosRelativeToCamera(
+                    SceneLayer.windowSize.x - SceneLayer.offset.x,
+                    SceneLayer.windowSize.y - SceneLayer.offset.y,
+                    new Vector2f(
+                            SceneLayer.mousePos.x - SceneLayer.windowPos.x - SceneLayer.offset.x,
+                            SceneLayer.mousePos.y - SceneLayer.windowPos.y - SceneLayer.offset.y),
+                    renderer.getCamera()
+            );
 
-            xModel.get(RenderableComponent.class).renderable = e != null;
-            yModel.get(RenderableComponent.class).renderable = e != null;
-            zModel.get(RenderableComponent.class).renderable = e != null;
-
-            xModel.updateData();
-            yModel.updateData();
-            zModel.updateData();
+            OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
+            nStart(OxyGizmo3D.GizmoMode.Translation.component, e);
+            nStart(OxyGizmo3D.GizmoMode.Scale.component, e);
             moveEntity(e);
         }
+    }
+
+    private void nStart(OxyGizmo3D.Component component, OxyEntity e) {
+
+        OxyModel xModel = null, yModel = null, zModel = null;
+
+        if (component instanceof OxyGizmo3D.Translation t) {
+            xModel = t.getXModelTranslation();
+            yModel = t.getYModelTranslation();
+            zModel = t.getZModelTranslation();
+            for (OxyModel m : component.models){
+                m.get(RenderableComponent.class).renderable = e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Translation;
+            }
+        } else if (component instanceof OxyGizmo3D.Scaling s) {
+            xModel = s.getXModelScale();
+            yModel = s.getYModelScale();
+            zModel = s.getZModelScale();
+            for (OxyModel m : component.models){
+                m.get(RenderableComponent.class).renderable = e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Scale;
+            }
+        }
+
+        if (xModel == null || yModel == null || zModel == null) return;
+
+        if (e != null) {
+            BoundingBoxComponent c = e.get(BoundingBoxComponent.class);
+
+            TransformComponent xC = xModel.get(TransformComponent.class);
+            TransformComponent yC = yModel.get(TransformComponent.class);
+            TransformComponent zC = zModel.get(TransformComponent.class);
+
+            xC.position.set(new Vector3f(c.pos()));
+            yC.position.set(new Vector3f(c.pos()));
+            zC.position.set(new Vector3f(c.pos()));
+            //recalculate bounding box, but it is being done in the camera class
+        }
+
+        xModel.updateData();
+        yModel.updateData();
+        zModel.updateData();
     }
 
     public void moveEntity(OxyEntity e) {

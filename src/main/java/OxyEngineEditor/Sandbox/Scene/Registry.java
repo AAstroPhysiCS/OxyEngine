@@ -1,6 +1,6 @@
 package OxyEngineEditor.Sandbox.Scene;
 
-import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.Components.EntityComponent;
 
 import java.util.*;
 

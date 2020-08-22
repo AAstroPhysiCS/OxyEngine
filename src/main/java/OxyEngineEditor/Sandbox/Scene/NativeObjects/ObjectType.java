@@ -1,4 +1,4 @@
-package OxyEngineEditor.Sandbox.Scene.InternObjects;
+package OxyEngineEditor.Sandbox.Scene.NativeObjects;
 
 public enum ObjectType {
     Grid(40, 6);

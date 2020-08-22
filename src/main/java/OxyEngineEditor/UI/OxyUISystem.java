@@ -4,7 +4,7 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
-import OxyEngine.Events.OxyEventDispatcherThread;
+import OxyEngine.Events.OxyEventDispatcher;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
@@ -44,8 +44,7 @@ public class OxyUISystem {
     public OxyUISystem(Scene scene, WindowHandle windowHandle) {
         this.windowHandle = windowHandle;
         imGuiRenderer = new ImGuiImplGl3();
-        dispatcherThread = new OxyEventDispatcherThread();
-        dispatcherThread.startThread();
+        eventDispatcher = new OxyEventDispatcher();
         selectSystem = OxySelectSystem.getInstance(windowHandle, scene);
         init();
     }
@@ -57,7 +56,7 @@ public class OxyUISystem {
         public static GLFWEventDispatcher.KeyCharEvent keyCharDispatcher;
         public static GLFWEventDispatcher.MouseScrollEvent mouseScrollDispatcher;
 
-        public static OxyEventDispatcherThread dispatcherThread;
+        public static OxyEventDispatcher eventDispatcher;
     }
 
     private void init() {
@@ -72,7 +71,7 @@ public class OxyUISystem {
         io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors);
         io.setBackendPlatformName("imgui_java_impl_glfw");
 
-        setIndices();
+        setKeymap();
 
         mouseButtonDispatcher = (GLFWEventDispatcher.MouseEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseEvent, io);
         mouseCursorPosDispatcher = (GLFWEventDispatcher.MouseCursorPosEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseCursorPosEvent, io);
@@ -125,6 +124,7 @@ public class OxyUISystem {
     }
 
     public void start(Set<OxyEntity> entityList, OxyCamera camera) {
+        eventDispatcher.dispatch();
         selectSystem.start(entityList, camera);
     }
 
@@ -140,7 +140,7 @@ public class OxyUISystem {
         ImGui.destroyContext();
     }
 
-    private void setIndices() {
+    private void setKeymap() {
         final int[] keyMap = new int[ImGuiKey.COUNT];
         //unfortunately can't use a for loop here
         keyMap[ImGuiKey.Tab] = GLFW_KEY_TAB;

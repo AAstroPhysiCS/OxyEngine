@@ -2,16 +2,16 @@ package OxyEngineEditor.Sandbox.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
-import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.InternObjects.ObjectType;
+import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Sandbox.Components.TransformComponent;
+import OxyEngineEditor.Sandbox.Scene.NativeObjects.ObjectType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static OxyEngine.System.Globals.Globals.toPrimitiveFloat;
 import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
-import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.dispatcherThread;
+import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.eventDispatcher;
 
 public abstract class OxyEntity {
 
@@ -34,7 +34,7 @@ public abstract class OxyEntity {
             if (c instanceof Mesh m) {
                 m.addToList(this);
             }
-            if(c instanceof TransformComponent t){ //if someone decides to add a seperate TransformComponent, then validate it
+            if (c instanceof TransformComponent t) { //if someone decides to add a seperate TransformComponent, then validate it
                 t.validate(this);
             }
         }
@@ -97,7 +97,7 @@ public abstract class OxyEntity {
     }
 
     public void addEventListener(OxyEventListener listener) {
-        dispatcherThread.addDispatchersToThread(this, listener);
+        eventDispatcher.addDispatchersToThread(this, listener);
     }
 
     public float[] getVertices() {

@@ -1,4 +1,4 @@
-package OxyEngineEditor.Sandbox.OxyComponents;
+package OxyEngineEditor.Sandbox.Components;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;

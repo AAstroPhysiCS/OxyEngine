@@ -1,4 +1,4 @@
-package OxyEngineEditor.Sandbox.OxyComponents;
+package OxyEngineEditor.Sandbox.Components;
 
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModelLoader;
 import org.joml.Vector3f;

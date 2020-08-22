@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
+import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
@@ -29,7 +29,7 @@ public class TextureBuffer extends Buffer {
         }
     }
 
-    public void addToBuffer(OxyInternObject oxyEntity) {
+    public void addToBuffer(OxyNativeObject oxyEntity) {
         addToBuffer(oxyEntity.getVertices());
     }
 

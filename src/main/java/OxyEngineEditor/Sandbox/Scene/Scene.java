@@ -13,8 +13,8 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Sandbox.OxyComponents.*;
-import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
+import OxyEngineEditor.Sandbox.Components.*;
+import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelFactory;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
@@ -37,7 +37,7 @@ public class Scene implements OxyDisposable {
     private OxyUISystem oxyUISystem;
 
     private Set<OxyEntity> cachedLightEntities;
-    private Set<EntityComponent> cachedInternMeshes, cachedModelMeshes, cachedCameraComponents;
+    private Set<EntityComponent> cachedNativeMeshes, cachedModelMeshes, cachedCameraComponents;
 
     private final FrameBuffer frameBuffer;
     private final String sceneName;
@@ -48,8 +48,8 @@ public class Scene implements OxyDisposable {
         this.sceneName = sceneName;
     }
 
-    public final OxyInternObject createInternObjectEntity() {
-        OxyInternObject e = new OxyInternObject(this);
+    public final OxyNativeObject createNativeObjectEntity() {
+        OxyNativeObject e = new OxyNativeObject(this);
         registry.entityList.put(e, new LinkedHashSet<>(15));
         e.addComponent(new TransformComponent(), new RenderableComponent(true));
         return e;
@@ -121,14 +121,14 @@ public class Scene implements OxyDisposable {
         Set<EntityComponent> cachedShaders = distinct(OxyShader.class);
         cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), this);
         cubemapTexture.init(cachedShaders);
-        cachedInternMeshes = distinct(InternObjectMesh.class);
+        cachedNativeMeshes = distinct(NativeObjectMesh.class);
         cachedModelMeshes = distinct(ModelMesh.class);
         cachedCameraComponents = distinct(OxyCamera.class);
         cachedLightEntities = view(Light.class);
 
         //Prep
         {
-            for (EntityComponent e : cachedInternMeshes) {
+            for (EntityComponent e : cachedNativeMeshes) {
                 ((Mesh) e).initList();
             }
             for (EntityComponent model : cachedModelMeshes) {
@@ -189,7 +189,7 @@ public class Scene implements OxyDisposable {
                     render(ts, mesh, mainCamera);
             }
 
-            for (EntityComponent c : cachedInternMeshes) {
+            for (EntityComponent c : cachedNativeMeshes) {
                 Mesh mesh = (Mesh) c;
                 if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && mesh.renderable) {
                     //skybox

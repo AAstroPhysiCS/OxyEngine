@@ -5,11 +5,10 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Core.Renderer.Texture.OxyTextureCoords;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
-import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.Components.PerspectiveCamera;
+import OxyEngineEditor.Sandbox.Components.SelectedComponent;
+import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.Sandbox.Scene.WorldGrid;
@@ -98,7 +97,7 @@ public class SceneLayer extends UILayer {
                 //TEMP
                 ImageTexture texture = null;
                 if (PropertiesLayer.lastTexturePath != null) {
-                    texture = OxyTexture.loadImage(PropertiesLayer.lastTexturePath, OxyTextureCoords.FULL.getTcs());
+                    texture = OxyTexture.loadImage(PropertiesLayer.lastTexturePath);
                     PropertiesLayer.lastTextureID = texture.getTextureId();
                 }
 

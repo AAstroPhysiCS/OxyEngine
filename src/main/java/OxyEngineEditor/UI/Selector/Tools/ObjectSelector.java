@@ -1,10 +1,10 @@
 package OxyEngineEditor.UI.Selector.Tools;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngineEditor.Sandbox.OxyComponents.BoundingBoxComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.SelectedComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TagComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.Components.BoundingBoxComponent;
+import OxyEngineEditor.Sandbox.Components.SelectedComponent;
+import OxyEngineEditor.Sandbox.Components.TagComponent;
+import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import org.joml.Intersectionf;
 import org.joml.Vector2f;
@@ -16,6 +16,8 @@ public interface ObjectSelector {
 
     Vector3f min = new Vector3f(), max = new Vector3f();
     Vector2f nearFar = new Vector2f();
+
+    Vector3f toClipSpace(float width, float height, Vector2f mousePos);
 
     Vector3f getObjectPosRelativeToCamera(float width, float height, Vector2f mousePos, OxyCamera camera);
 
@@ -37,28 +39,23 @@ public interface ObjectSelector {
 
             selected.selected = false;
 
-            min.set(boundingBox.pos());
-            max.set(boundingBox.pos());
-            min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
-            max.add(new Vector3f(boundingBox.max()).mul(c.scale));
-
             if (tag.tag().startsWith("Sphere")) {
-                if (Intersectionf.intersectRaySphere(origin, direction, boundingBox.pos(), boundingBox.max().y * boundingBox.max().y * c.scale * c.scale, nearFar) && nearFar.x < closestDistance) {
+                if (Intersectionf.intersectRaySphere(origin, direction, boundingBox.pos(), boundingBox.max().y * boundingBox.max().y * c.scale.y * c.scale.y, nearFar) && nearFar.x < closestDistance) {
                     closestDistance = nearFar.x;
                     selectedEntity = entity;
                     selected.selected = true;
                 }
-            }
-
-            if (tag.tag().startsWith("Cube")) {
+            } else if (tag.tag().startsWith("Cube")) {
+                min.set(boundingBox.pos());
+                max.set(boundingBox.pos());
+                min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
+                max.add(new Vector3f(boundingBox.max()).mul(c.scale));
                 if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar) && nearFar.x < closestDistance) {
                     closestDistance = nearFar.x;
                     selectedEntity = entity;
                     selected.selected = true;
                 }
-            }
-
-            if (tag.tag().startsWith("Circle") || tag.tag().startsWith("Cone")) {
+            } else if (tag.tag().startsWith("Cone")) {
                 float result;
                 for (int i = 0; i < entity.vertices.length; ) {
                     if (i >= entity.vertices.length - 18) break;
@@ -68,7 +65,7 @@ public interface ObjectSelector {
                     i += 5;
                     Vector3f thirdVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
                     i += 5;
-                    if ((result = Intersectionf.intersectRayTriangle(origin, direction, firstVertex, secondVertex, thirdVertex, 0f)) != -1) {
+                    if ((result = Intersectionf.intersectRayTriangle(origin, direction, firstVertex, secondVertex, thirdVertex, 0.000001f)) != -1) {
                         if (result < closestDistance) {
                             closestDistance = result;
                             selectedEntity = entity;
@@ -95,16 +92,35 @@ public interface ObjectSelector {
 
         selected.selected = false;
 
-        min.set(boundingBox.pos());
-        max.set(boundingBox.pos());
-        min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
-        max.add(new Vector3f(boundingBox.max()).mul(c.scale));
-
-        if ((Intersectionf.intersectRayAab(origin, direction, min, max, nearFar))) {
-            selectedEntity = entity;
-            selected.selected = true;
+        if (tag.tag().startsWith("Circle")) {
+            float result;
+            float closestDistance = Float.POSITIVE_INFINITY;
+            for (int i = 0; i < entity.vertices.length; ) {
+                if (i >= entity.vertices.length - 18) break;
+                Vector3f firstVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                i += 5;
+                Vector3f secondVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                i += 5;
+                Vector3f thirdVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                i += 5;
+                if ((result = Intersectionf.intersectRayTriangle(origin, direction, firstVertex, secondVertex, thirdVertex, 0.000001f)) != -1) {
+                    if (result < closestDistance) {
+                        closestDistance = result;
+                        selectedEntity = entity;
+                        selected.selected = true;
+                    }
+                }
+            }
+        } else {
+            min.set(boundingBox.pos());
+            max.set(boundingBox.pos());
+            min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
+            max.add(new Vector3f(boundingBox.max()).mul(c.scale));
+            if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar)) {
+                selectedEntity = entity;
+                selected.selected = true;
+            }
         }
-
         return selectedEntity;
     }
 

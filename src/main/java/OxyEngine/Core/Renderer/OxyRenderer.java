@@ -5,7 +5,7 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Line.OxyInfoLine;
-import OxyEngineEditor.Sandbox.OxyComponents.PerspectiveCamera;
+import OxyEngineEditor.Sandbox.Components.PerspectiveCamera;
 import OxyEngineEditor.Sandbox.Sandbox3D;
 
 import static org.lwjgl.opengl.GL11.*;

@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
+import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL20.*;
@@ -44,7 +44,7 @@ public final class VertexBuffer extends Buffer {
         glBufferData(GL_ARRAY_BUFFER, vertices.length * implementation.getStrideSize(), GL_DYNAMIC_DRAW);
     }
 
-    public void addToBuffer(OxyInternObject oxyEntity) {
+    public void addToBuffer(OxyNativeObject oxyEntity) {
         addToBuffer(oxyEntity.getVertices());
     }
 

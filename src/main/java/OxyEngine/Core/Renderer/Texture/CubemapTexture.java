@@ -2,9 +2,9 @@ package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
-import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
+import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Sandbox.Components.NativeObjectMesh;
+import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 
 import java.io.File;
@@ -99,10 +99,10 @@ public class CubemapTexture extends OxyTexture.Texture {
             int[] height = new int[1];
             int[] channels = new int[1];
             ByteBuffer buffer = loadTextureFile(totalFiles.get(i), width, height, channels);
-            int internalFormat = GL_RGBA;
+            int alFormat = GL_RGBA;
             if (channels[0] == 3)
-                internalFormat = GL_RGB;
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width[0], height[0], 0, internalFormat, GL_UNSIGNED_BYTE, buffer);
+                alFormat = GL_RGB;
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, alFormat, width[0], height[0], 0, alFormat, GL_UNSIGNED_BYTE, buffer);
             stbi_image_free(buffer);
         }
 
@@ -115,7 +115,7 @@ public class CubemapTexture extends OxyTexture.Texture {
         allTextures.add(this);
     }
 
-    private OxyInternObject cube;
+    private OxyNativeObject cube;
 
     public void init(Set<EntityComponent> allOtherShaders) {
 
@@ -135,14 +135,14 @@ public class CubemapTexture extends OxyTexture.Texture {
 
             BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0);
 
-            InternObjectMesh mesh = new InternObjectMesh.InternMeshBuilderImpl()
+            NativeObjectMesh mesh = new NativeObjectMesh.NativeMeshBuilderImpl()
                     .setShader(shader)
                     .setMode(GL_TRIANGLES)
                     .setUsage(BufferTemplate.Usage.STATIC)
                     .setVerticesBufferAttributes(attributesVert)
                     .create();
 
-            cube = scene.createInternObjectEntity();
+            cube = scene.createNativeObjectEntity();
             cube.vertices = skyboxVertices;
             int[] indices = new int[skyboxVertices.length];
             for (int i = 0; i < skyboxVertices.length; i++) {
@@ -154,7 +154,7 @@ public class CubemapTexture extends OxyTexture.Texture {
         }
     }
 
-    public OxyInternObject getCube() {
+    public OxyNativeObject getCube() {
         return cube;
     }
 }

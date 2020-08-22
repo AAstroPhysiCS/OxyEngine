@@ -1,16 +1,16 @@
-package OxyEngineEditor.Sandbox.OxyComponents;
+package OxyEngineEditor.Sandbox.Components;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Sandbox.Scene.InternObjects.OxyInternObject;
+import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-public class InternObjectMesh extends Mesh {
+public class NativeObjectMesh extends Mesh {
 
     public int indicesX, indicesY, indicesZ;
 
-    private InternObjectMesh(OxyShader shader, int mode, boolean renderable, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
+    private NativeObjectMesh(OxyShader shader, int mode, boolean renderable, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
         this.renderable = renderable;
         this.shader = shader;
         this.mode = mode;
@@ -18,22 +18,22 @@ public class InternObjectMesh extends Mesh {
         this.vertexBuffer = vertexBuffer;
     }
 
-    interface InternMeshBuilder {
+    interface NativeMeshBuilder {
 
-        InternMeshBuilder setShader(OxyShader shader);
+        NativeMeshBuilder setShader(OxyShader shader);
 
-        InternMeshBuilder setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers);
+        NativeMeshBuilder setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers);
 
-        InternMeshBuilder setMode(int mode);
+        NativeMeshBuilder setMode(int mode);
 
-        InternMeshBuilder setUsage(BufferTemplate.Usage usage);
+        NativeMeshBuilder setUsage(BufferTemplate.Usage usage);
 
-        InternMeshBuilder isRenderable(boolean renderable);
+        NativeMeshBuilder isRenderable(boolean renderable);
 
-        InternObjectMesh create();
+        NativeObjectMesh create();
     }
 
-    public static class InternMeshBuilderImpl implements InternMeshBuilder {
+    public static class NativeMeshBuilderImpl implements NativeMeshBuilder {
 
         private BufferTemplate.Attributes[] verticesPointers;
         private int mode = -1;
@@ -42,40 +42,40 @@ public class InternObjectMesh extends Mesh {
         private boolean renderable = true;
 
         @Override
-        public InternMeshBuilderImpl setShader(OxyShader shader) {
+        public NativeMeshBuilderImpl setShader(OxyShader shader) {
             this.shader = shader;
             return this;
         }
 
         @Override
-        public InternMeshBuilderImpl setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers) {
+        public NativeMeshBuilderImpl setVerticesBufferAttributes(BufferTemplate.Attributes... verticesPointers) {
             this.verticesPointers = verticesPointers;
             return this;
         }
 
         @Override
-        public InternMeshBuilderImpl setMode(int mode) {
+        public NativeMeshBuilderImpl setMode(int mode) {
             this.mode = mode;
             return this;
         }
 
         @Override
-        public InternMeshBuilderImpl setUsage(BufferTemplate.Usage usage) {
+        public NativeMeshBuilderImpl setUsage(BufferTemplate.Usage usage) {
             this.usage = usage;
             return this;
         }
 
         @Override
-        public InternMeshBuilderImpl isRenderable(boolean renderable) {
+        public NativeMeshBuilderImpl isRenderable(boolean renderable) {
             this.renderable = renderable;
             return this;
         }
 
         @Override
-        public InternObjectMesh create() {
+        public NativeObjectMesh create() {
             assert mode != -1 && usage != null : oxyAssert("Some arguments not defined!");
 
-            return new InternObjectMesh(shader, mode, renderable,
+            return new NativeObjectMesh(shader, mode, renderable,
                     new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                             .setVerticesStrideSize(verticesPointers[0].stride() / Float.BYTES)
                             .setUsage(usage)
@@ -84,7 +84,7 @@ public class InternObjectMesh extends Mesh {
         }
     }
 
-    public void addToBuffer(OxyInternObject oxyEntity) {
+    public void addToBuffer(OxyNativeObject oxyEntity) {
         entities.add(oxyEntity);
         vertexBuffer.addToBuffer(oxyEntity);
         indexBuffer.addToBuffer(oxyEntity);

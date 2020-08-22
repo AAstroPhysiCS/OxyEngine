@@ -3,8 +3,8 @@ package OxyEngineEditor.Sandbox.Scene.Model;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Sandbox.OxyComponents.ModelMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.RenderableComponent;
+import OxyEngineEditor.Sandbox.Components.ModelMesh;
+import OxyEngineEditor.Sandbox.Components.RenderableComponent;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 

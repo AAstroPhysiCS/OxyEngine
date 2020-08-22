@@ -1,4 +1,4 @@
-package OxyEngineEditor.Sandbox.OxyComponents;
+package OxyEngineEditor.Sandbox.Components;
 
 /*
  A tagging interface

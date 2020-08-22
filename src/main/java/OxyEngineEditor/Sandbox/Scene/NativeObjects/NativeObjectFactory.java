@@ -1,19 +1,19 @@
-package OxyEngineEditor.Sandbox.Scene.InternObjects;
+package OxyEngineEditor.Sandbox.Scene.NativeObjects;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
-import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
-import OxyEngineEditor.Sandbox.OxyComponents.TransformComponent;
+import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Sandbox.Components.NativeObjectMesh;
+import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
-public abstract class InternObjectFactory implements EntityComponent {
+public abstract class NativeObjectFactory implements EntityComponent {
 
     ObjectType type;
     protected float[] vertexPos;
 
-    public void constructData(OxyInternObject e) {
+    public void constructData(OxyNativeObject e) {
         OxyColor color = e.get(OxyColor.class);
         ImageTexture texture = e.get(ImageTexture.class);
         TransformComponent c = e.get(TransformComponent.class);
@@ -59,6 +59,6 @@ public abstract class InternObjectFactory implements EntityComponent {
         }
     }
 
-    abstract void initData(OxyInternObject e, InternObjectMesh mesh);
+    abstract void initData(OxyNativeObject e, NativeObjectMesh mesh);
 }
 

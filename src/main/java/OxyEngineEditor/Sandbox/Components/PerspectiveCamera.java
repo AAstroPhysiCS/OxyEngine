@@ -1,4 +1,4 @@
-package OxyEngineEditor.Sandbox.OxyComponents;
+package OxyEngineEditor.Sandbox.Components;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
 import OxyEngine.Core.Camera.Controller.PerspectiveCameraController;
@@ -17,7 +17,7 @@ public class PerspectiveCamera extends OxyCamera {
     protected final float fovY, zNear, zFar;
     protected float aspect;
 
-    public static int zoom = 150;
+    public static int zoom = 90;
     public final boolean primary;
 
     public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
@@ -73,8 +73,8 @@ public class PerspectiveCamera extends OxyCamera {
         if (SceneLayer.focusedWindow) {
             zoom += io.getMouseWheel();
             if (OxyGizmoController.currentEntitySelected != null) {
-                OxyGizmo3D.getInstance().scaleIt();
-                OxyGizmo3D.getInstance().recalculateBoundingBox();
+                OxyGizmo3D.getInstance().scaleAll();
+                OxyGizmo3D.getInstance().recalculateAll();
             }
         }
 

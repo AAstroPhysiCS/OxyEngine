@@ -1,8 +1,8 @@
-package OxyEngineEditor.Sandbox.Scene.InternObjects;
+package OxyEngineEditor.Sandbox.Scene.NativeObjects;
 
-import OxyEngineEditor.Sandbox.OxyComponents.InternObjectMesh;
+import OxyEngineEditor.Sandbox.Components.NativeObjectMesh;
 
-public class GridFactory extends InternObjectFactory {
+public class GridFactory extends NativeObjectFactory {
 
     public GridFactory() {
         type = ObjectType.Grid;
@@ -15,7 +15,7 @@ public class GridFactory extends InternObjectFactory {
     }
 
     @Override
-    public void initData(OxyInternObject e, InternObjectMesh mesh) {
+    public void initData(OxyNativeObject e, NativeObjectMesh mesh) {
         e.indices = new int[]{
                 mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,
                 3 + mesh.indicesX, mesh.indicesY, 2 + mesh.indicesZ,

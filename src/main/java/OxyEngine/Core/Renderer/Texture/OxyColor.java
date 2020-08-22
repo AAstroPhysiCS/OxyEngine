@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Texture;
 
-import OxyEngineEditor.Sandbox.OxyComponents.EntityComponent;
+import OxyEngineEditor.Sandbox.Components.EntityComponent;
 import org.joml.Vector4f;
 
 import java.awt.*;
