@@ -4,7 +4,6 @@ import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.OxyMouseListener;
-import OxyEngineEditor.Sandbox.Components.BoundingBoxComponent;
 import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
@@ -12,8 +11,6 @@ import OxyEngineEditor.Sandbox.Scene.Scene;
 import OxyEngineEditor.UI.OxyUISystem;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
-
-import static OxyEngineEditor.UI.Selector.OxyGizmo3D.recalculateBoundingBox;
 
 public class OxyGizmoController implements OxyMouseListener {
 
@@ -136,13 +133,7 @@ public class OxyGizmoController implements OxyMouseListener {
         TransformComponent xC = xAxis.get(TransformComponent.class);
         TransformComponent yC = yAxis.get(TransformComponent.class);
         TransformComponent zC = zAxis.get(TransformComponent.class);
-
-        BoundingBoxComponent xCB = xAxis.get(BoundingBoxComponent.class);
-        BoundingBoxComponent yCB = yAxis.get(BoundingBoxComponent.class);
-        BoundingBoxComponent zCB = zAxis.get(BoundingBoxComponent.class);
-
         TransformComponent currC = currentEntitySelected.get(TransformComponent.class);
-        BoundingBoxComponent currCB = currentEntitySelected.get(BoundingBoxComponent.class);
 
         Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
         Vector2d delta = nowMousePos.sub(oldMousePos);
@@ -156,34 +147,22 @@ public class OxyGizmoController implements OxyMouseListener {
             xC.position.add(0, 0, -deltaX);
             yC.position.add(0, 0, -deltaX);
             zC.position.add(0, 0, -deltaX);
-            xCB.pos().add(0, 0, -deltaX);
-            yCB.pos().add(0, 0, -deltaX);
-            zCB.pos().add(0, 0, -deltaX);
             currC.position.add(0, 0, -deltaX);
-            currCB.pos().add(0, 0, -deltaX);
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(0, 0, -deltaX);
         } else if (pressedYTranslation) {
             xC.position.add(0, deltaY, 0);
             yC.position.add(0, deltaY, 0);
             zC.position.add(0, deltaY, 0);
-            xCB.pos().add(0, deltaY, 0);
-            yCB.pos().add(0, deltaY, 0);
-            zCB.pos().add(0, deltaY, 0);
             currC.position.add(0, deltaY, 0);
-            currCB.pos().add(0, deltaY, 0);
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(0, deltaY, 0);
         } else if (pressedXTranslation) {
             xC.position.add(deltaX, 0, 0);
             yC.position.add(deltaX, 0, 0);
             zC.position.add(deltaX, 0, 0);
-            xCB.pos().add(deltaX, 0, 0);
-            yCB.pos().add(deltaX, 0, 0);
-            zCB.pos().add(deltaX, 0, 0);
             currC.position.add(deltaX, 0, 0);
-            currCB.pos().add(deltaX, 0, 0);
-            for(int i = 0; i < 3; i++)
+            for (int i = 0; i < 3; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(deltaX, 0, 0);
         }
         currentEntitySelected.updateData();
@@ -203,12 +182,7 @@ public class OxyGizmoController implements OxyMouseListener {
         TransformComponent yC = yAxis.get(TransformComponent.class);
         TransformComponent zC = zAxis.get(TransformComponent.class);
 
-        BoundingBoxComponent xCB = xAxis.get(BoundingBoxComponent.class);
-        BoundingBoxComponent yCB = yAxis.get(BoundingBoxComponent.class);
-        BoundingBoxComponent zCB = zAxis.get(BoundingBoxComponent.class);
-
         TransformComponent currC = currentEntitySelected.get(TransformComponent.class);
-        BoundingBoxComponent currCB = currentEntitySelected.get(BoundingBoxComponent.class);
 
         Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
         Vector2d delta = nowMousePos.sub(oldMousePos);
@@ -221,20 +195,19 @@ public class OxyGizmoController implements OxyMouseListener {
 
         if (pressedZScale) {
             currC.scale.x += -deltaX;
-            if(currC.scale.x <= 0) currC.scale.x = 0;
+            if (currC.scale.x <= 0) currC.scale.x = 0;
         } else if (pressedYScale) {
             currC.scale.y += -deltaY;
-            if(currC.scale.y <= 0) currC.scale.y = 0;
+            if (currC.scale.y <= 0) currC.scale.y = 0;
         } else if (pressedXScale) {
             currC.scale.z += deltaX;
-            if(currC.scale.z <= 0) currC.scale.z = 0;
+            if (currC.scale.z <= 0) currC.scale.z = 0;
         }
 
         currentEntitySelected.updateData();
         xAxis.updateData();
         yAxis.updateData();
         zAxis.updateData();
-        recalculateBoundingBox(s.getXModelScale(), s.getYModelScale(), s.getZModelScale());
     }
 
     private void handleScalingSwitch(OxyEntity selectedEntity) {

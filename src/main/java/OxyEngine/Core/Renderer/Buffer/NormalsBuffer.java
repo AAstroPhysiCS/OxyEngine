@@ -35,8 +35,4 @@ public class NormalsBuffer extends Buffer {
     public void dispose() {
         glDeleteBuffers(bufferId);
     }
-
-    public void clear() {
-        normals = new float[0];
-    }
 }

@@ -2,9 +2,7 @@ package OxyEngineEditor.Sandbox.Scene.Model;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import org.joml.*;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
@@ -45,7 +43,11 @@ public class OxyModelLoader {
     }
 
     void processData() {
-        int flag = aiProcess_JoinIdenticalVertices | aiProcess_Triangulate | aiProcess_FixInfacingNormals;
+        int flag = aiProcess_JoinIdenticalVertices
+                | aiProcess_Triangulate
+                | aiProcess_FixInfacingNormals
+                | aiProcess_OptimizeMeshes;
+
         AIScene aiScene = aiImportFile(objPath, flag);
         PointerBuffer materials = Objects.requireNonNull(aiScene).mMaterials();
         PointerBuffer meshes = Objects.requireNonNull(aiScene).mMeshes();
@@ -62,9 +64,18 @@ public class OxyModelLoader {
             calcMin(oxyMesh, sortedVertices);
             this.meshes.add(oxyMesh);
         }
+
+        //transforming to 0,0,0
+        for(AssimpOxyMesh oxyMesh : this.meshes){
+            Matrix4f transform = new Matrix4f()
+                    .translate(new Vector3f(oxyMesh.pos).negate());
+            for(int j = 0; j < oxyMesh.vertices.size(); j++){
+                Vector3f vertices3f = oxyMesh.vertices.get(j);
+                Vector4f t4f = new Vector4f(vertices3f, 1.0f).mul(transform);
+                vertices3f.set(t4f.x, t4f.y, t4f.z);
+            }
+        }
     }
-
-
 
     private void addMesh(AIMesh mesh, AssimpOxyMesh oxyMesh) {
 

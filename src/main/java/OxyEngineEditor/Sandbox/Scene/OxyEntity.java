@@ -5,6 +5,7 @@ import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Sandbox.Components.EntityComponent;
 import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.NativeObjects.ObjectType;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public abstract class OxyEntity {
     public float[] vertices, tcs, normals;
     public int[] indices;
 
+    public Vector3f originPos;
     protected final Scene scene;
 
     public OxyEntity(Scene scene) {

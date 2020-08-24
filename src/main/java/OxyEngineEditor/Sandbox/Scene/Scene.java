@@ -66,16 +66,14 @@ public class Scene implements OxyDisposable {
         for (OxyModelLoader.AssimpOxyMesh assimpMesh : loader.meshes) {
             OxyModel e = new OxyModel(this);
             registry.entityList.put(e, new LinkedHashSet<>(15));
+            e.originPos = new Vector3f(assimpMesh.pos);
             e.addComponent(
                     shader,
                     new BoundingBoxComponent(
-                            assimpMesh,
-                            assimpMesh.pos,
                             assimpMesh.min,
-                            assimpMesh.max,
-                            new Vector3f(assimpMesh.pos)
+                            assimpMesh.max
                     ),
-                    new TransformComponent(),
+                    new TransformComponent(new Vector3f(assimpMesh.pos)),
                     assimpMesh.material.texture(),
                     new OxyColor(assimpMesh.material.diffuseColor()),
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
@@ -94,22 +92,21 @@ public class Scene implements OxyDisposable {
         OxyModelLoader.AssimpOxyMesh assimpMesh = loader.meshes.get(0);
         OxyModel e = new OxyModel(this);
         registry.entityList.put(e, new LinkedHashSet<>(15));
+        e.originPos = new Vector3f(assimpMesh.pos);
         e.addComponent(
                 shader,
                 new BoundingBoxComponent(
-                        assimpMesh,
-                        assimpMesh.pos,
                         assimpMesh.min,
-                        assimpMesh.max,
-                        new Vector3f(assimpMesh.pos)
+                        assimpMesh.max
                 ),
-                new TransformComponent(),
+                new TransformComponent(new Vector3f(assimpMesh.pos)),
                 assimpMesh.material.texture(),
                 new OxyColor(assimpMesh.material.diffuseColor()),
                 new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
                 new TagComponent(assimpMesh.name),
                 new RenderableComponent(true)
         );
+        assimpMesh.material.setValues(shader);
         e.initData();
         return e;
     }

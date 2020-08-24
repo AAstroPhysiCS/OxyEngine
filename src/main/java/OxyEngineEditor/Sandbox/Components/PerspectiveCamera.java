@@ -74,7 +74,7 @@ public class PerspectiveCamera extends OxyCamera {
             zoom += io.getMouseWheel();
             if (OxyGizmoController.currentEntitySelected != null) {
                 OxyGizmo3D.getInstance().scaleAll();
-                OxyGizmo3D.getInstance().recalculateAll();
+                OxyGizmo3D.getInstance().updateAll(OxyGizmoController.currentEntitySelected);
             }
         }
 

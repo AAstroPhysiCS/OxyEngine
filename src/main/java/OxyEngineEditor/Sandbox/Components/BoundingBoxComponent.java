@@ -5,8 +5,7 @@ import org.joml.Vector3f;
 
 import java.util.Arrays;
 
-public record BoundingBoxComponent(OxyModelLoader.AssimpOxyMesh assimpMesh, Vector3f pos, Vector3f min, Vector3f max,
-                                   Vector3f originPos) implements EntityComponent {
+public record BoundingBoxComponent(Vector3f min, Vector3f max) implements EntityComponent {
 
     //0 = x
     //1 = y
@@ -60,24 +59,4 @@ public record BoundingBoxComponent(OxyModelLoader.AssimpOxyMesh assimpMesh, Vect
         Arrays.sort(allVerticesZ);
         return new float[][]{allVerticesX, allVerticesY, allVerticesZ};
     }
-
-    public static float[][] sort(float[] vertices) {
-        float[] allVerticesX = new float[vertices.length / 7];
-        float[] allVerticesY = new float[vertices.length / 7];
-        float[] allVerticesZ = new float[vertices.length / 7];
-
-        int index = 0;
-        for (int i = 0; i < vertices.length; ) {
-            allVerticesX[index] = vertices[i++];
-            allVerticesY[index] = vertices[i++];
-            allVerticesZ[index] = vertices[i++];
-            i += 5;
-            index++;
-        }
-        Arrays.sort(allVerticesX);
-        Arrays.sort(allVerticesY);
-        Arrays.sort(allVerticesZ);
-        return new float[][]{allVerticesX, allVerticesY, allVerticesZ};
-    }
 }
-

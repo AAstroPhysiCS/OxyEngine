@@ -24,8 +24,7 @@ public class TransformComponent implements EntityComponent {
 
     public void validate(OxyEntity entity){
         if(entity != null && entity.has(BoundingBoxComponent.class) && entity.has(TransformComponent.class)){ // safety
-            Vector3f scaledPos = new Vector3f(entity.get(TransformComponent.class).position);
-            entity.get(BoundingBoxComponent.class).pos().mul(entity.get(TransformComponent.class).scale).add(scaledPos);
+            entity.get(TransformComponent.class).position.add(entity.originPos).mul(new Vector3f(entity.get(TransformComponent.class).scale));
         }
     }
 

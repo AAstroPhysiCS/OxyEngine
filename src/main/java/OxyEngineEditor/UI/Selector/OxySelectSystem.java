@@ -3,7 +3,6 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.Components.BoundingBoxComponent;
 import OxyEngineEditor.Sandbox.Components.RenderableComponent;
 import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
@@ -87,14 +86,14 @@ public class OxySelectSystem {
             xModel = t.getXModelTranslation();
             yModel = t.getYModelTranslation();
             zModel = t.getZModelTranslation();
-            for (OxyModel m : component.models){
+            for (OxyModel m : component.models) {
                 m.get(RenderableComponent.class).renderable = e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Translation;
             }
         } else if (component instanceof OxyGizmo3D.Scaling s) {
             xModel = s.getXModelScale();
             yModel = s.getYModelScale();
             zModel = s.getZModelScale();
-            for (OxyModel m : component.models){
+            for (OxyModel m : component.models) {
                 m.get(RenderableComponent.class).renderable = e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Scale;
             }
         }
@@ -102,16 +101,15 @@ public class OxySelectSystem {
         if (xModel == null || yModel == null || zModel == null) return;
 
         if (e != null) {
-            BoundingBoxComponent c = e.get(BoundingBoxComponent.class);
+            TransformComponent c = e.get(TransformComponent.class);
 
             TransformComponent xC = xModel.get(TransformComponent.class);
             TransformComponent yC = yModel.get(TransformComponent.class);
             TransformComponent zC = zModel.get(TransformComponent.class);
 
-            xC.position.set(new Vector3f(c.pos()));
-            yC.position.set(new Vector3f(c.pos()));
-            zC.position.set(new Vector3f(c.pos()));
-            //recalculate bounding box, but it is being done in the camera class
+            xC.position.set(new Vector3f(xModel.originPos).mul(xC.scale).add(c.position));
+            yC.position.set(new Vector3f(yModel.originPos).mul(yC.scale).add(c.position));
+            zC.position.set(new Vector3f(zModel.originPos).mul(zC.scale).add(c.position));
         }
 
         xModel.updateData();

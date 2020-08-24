@@ -37,17 +37,19 @@ public interface ObjectSelector {
             BoundingBoxComponent boundingBox = entity.get(BoundingBoxComponent.class);
             TagComponent tag = entity.get(TagComponent.class);
 
+            Vector3f position = new Vector3f(c.position);
+
             selected.selected = false;
 
             if (tag.tag().startsWith("Sphere")) {
-                if (Intersectionf.intersectRaySphere(origin, direction, boundingBox.pos(), boundingBox.max().y * boundingBox.max().y * c.scale.y * c.scale.y, nearFar) && nearFar.x < closestDistance) {
+                if (Intersectionf.intersectRaySphere(origin, direction, position, boundingBox.max().y * boundingBox.max().y * c.scale.y * c.scale.y, nearFar) && nearFar.x < closestDistance) {
                     closestDistance = nearFar.x;
                     selectedEntity = entity;
                     selected.selected = true;
                 }
             } else if (tag.tag().startsWith("Cube")) {
-                min.set(boundingBox.pos());
-                max.set(boundingBox.pos());
+                min.set(position);
+                max.set(position);
                 min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
                 max.add(new Vector3f(boundingBox.max()).mul(c.scale));
                 if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar) && nearFar.x < closestDistance) {
@@ -90,6 +92,8 @@ public interface ObjectSelector {
         BoundingBoxComponent boundingBox = entity.get(BoundingBoxComponent.class);
         TagComponent tag = entity.get(TagComponent.class);
 
+        Vector3f position = new Vector3f(c.position);
+
         selected.selected = false;
 
         if (tag.tag().startsWith("Circle")) {
@@ -112,8 +116,8 @@ public interface ObjectSelector {
                 }
             }
         } else {
-            min.set(boundingBox.pos());
-            max.set(boundingBox.pos());
+            min.set(position);
+            max.set(position);
             min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
             max.add(new Vector3f(boundingBox.max()).mul(c.scale));
             if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar)) {

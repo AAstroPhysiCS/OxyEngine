@@ -3,10 +3,10 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Sandbox.Components.BoundingBoxComponent;
 import OxyEngineEditor.Sandbox.Components.SelectedComponent;
 import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
+import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
 import org.joml.Vector3f;
 
@@ -47,15 +47,13 @@ public class OxyGizmo3D {
         public Component(String path, WindowHandle windowHandle, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
             models = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath(path), shader);
             for (OxyModel m : models) {
-                m.addComponent(new TransformComponent(new Vector3f(0, 0, 0), 3f), new SelectedComponent(false, true));
+                m.addComponent(new TransformComponent(3f), new SelectedComponent(false, true));
                 m.addEventListener(new OxyGizmoController(windowHandle, scene, gizmo3D));
             }
-            recalculate();
         }
 
         abstract void scaleIt();
-
-        abstract void recalculate();
+        abstract void update(OxyEntity e);
     }
 
     static class Translation extends Component {
@@ -72,8 +70,12 @@ public class OxyGizmo3D {
         }
 
         @Override
-        public void recalculate() {
-            recalculateBoundingBox(getXModelTranslation(), getYModelTranslation(), getZModelTranslation());
+        void update(OxyEntity e) {
+            for (OxyModel gizmoT : models) {
+                TransformComponent xC = gizmoT.get(TransformComponent.class);
+                xC.position.set(new Vector3f(gizmoT.originPos).mul(xC.scale).add(e.get(TransformComponent.class).position));
+                gizmoT.updateData();
+            }
         }
 
         public OxyModel getXModelTranslation() {
@@ -103,8 +105,12 @@ public class OxyGizmo3D {
         }
 
         @Override
-        public void recalculate() {
-            recalculateBoundingBox(getXModelScale(), getYModelScale(), getZModelScale());
+        void update(OxyEntity e) {
+            for (OxyModel gizmoS : models) {
+                TransformComponent xC = gizmoS.get(TransformComponent.class);
+                xC.position.set(new Vector3f(gizmoS.originPos).mul(xC.scale).add(e.get(TransformComponent.class).position));
+                gizmoS.updateData();
+            }
         }
 
         public OxyModel getXModelScale() {
@@ -135,28 +141,9 @@ public class OxyGizmo3D {
         GizmoMode.Scale.component.scaleIt();
     }
 
-    public void recalculateAll() {
-        GizmoMode.Translation.component.recalculate();
-        GizmoMode.Scale.component.recalculate();
-    }
-
-    public static void recalculateBoundingBox(OxyModel xModel, OxyModel yModel, OxyModel zModel) {
-
-        TransformComponent xC = xModel.get(TransformComponent.class);
-        TransformComponent yC = yModel.get(TransformComponent.class);
-        TransformComponent zC = zModel.get(TransformComponent.class);
-
-        BoundingBoxComponent xCB = xModel.get(BoundingBoxComponent.class);
-        BoundingBoxComponent yCB = yModel.get(BoundingBoxComponent.class);
-        BoundingBoxComponent zCB = zModel.get(BoundingBoxComponent.class);
-
-        xCB.pos().set(new Vector3f(xC.position).add(new Vector3f(xCB.originPos()).mul(xC.scale)));
-        yCB.pos().set(new Vector3f(yC.position).add(new Vector3f(yCB.originPos()).mul(yC.scale)));
-        zCB.pos().set(new Vector3f(zC.position).add(new Vector3f(zCB.originPos()).mul(zC.scale)));
-
-        xModel.updateData();
-        yModel.updateData();
-        zModel.updateData();
+    public void updateAll(OxyEntity e){
+        GizmoMode.Translation.component.update(e);
+        GizmoMode.Scale.component.update(e);
     }
 
     private static void scale(OxyModel model) {

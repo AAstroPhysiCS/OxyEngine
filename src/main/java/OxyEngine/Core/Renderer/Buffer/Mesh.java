@@ -98,11 +98,6 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         load();
     }
 
-    public void clear() {
-        vertexBuffer.clear();
-        indexBuffer.clear();
-    }
-
     public void render() {
         bind();
         draw();
