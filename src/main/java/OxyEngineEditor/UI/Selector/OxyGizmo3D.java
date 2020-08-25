@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxySystem;
+import OxyEngineEditor.Sandbox.Components.RenderableComponent;
 import OxyEngineEditor.Sandbox.Components.SelectedComponent;
 import OxyEngineEditor.Sandbox.Components.TransformComponent;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
@@ -47,12 +48,23 @@ public class OxyGizmo3D {
         public Component(String path, WindowHandle windowHandle, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
             models = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath(path), shader);
             for (OxyModel m : models) {
-                m.addComponent(new TransformComponent(3f), new SelectedComponent(false, true));
+                m.addComponent(new TransformComponent(3f), new SelectedComponent(false, true), new RenderableComponent(true, true));
                 m.addEventListener(new OxyGizmoController(windowHandle, scene, gizmo3D));
             }
         }
 
+        public void switchRenderableState(boolean value) {
+            for (OxyModel model : models) model.get(RenderableComponent.class).renderable = value;
+        }
+
+
+        protected static void scale(OxyModel model) {
+            if (model.get(SelectedComponent.class).fixedValue && zoom >= 150)
+                model.get(TransformComponent.class).scale.set(zoom * 0.05f);
+        }
+
         abstract void scaleIt();
+
         abstract void update(OxyEntity e);
     }
 
@@ -94,7 +106,7 @@ public class OxyGizmo3D {
     static class Scaling extends Component {
 
         Scaling(WindowHandle windowHandle, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
-            super("/models/native/oxygizmoScale.obj", windowHandle, scene, shader, gizmo3D);
+            super("/models/native/oxygizmoScale2.obj", windowHandle, scene, shader, gizmo3D);
         }
 
         @Override
@@ -114,15 +126,19 @@ public class OxyGizmo3D {
         }
 
         public OxyModel getXModelScale() {
-            return models.get(1);
+            return models.get(2);
         }
 
         public OxyModel getYModelScale() {
-            return models.get(2);
+            return models.get(1);
         }
 
         public OxyModel getZModelScale() {
             return models.get(0);
+        }
+
+        public OxyModel getScalingCube() {
+            return models.get(3);
         }
     }
 
@@ -141,13 +157,8 @@ public class OxyGizmo3D {
         GizmoMode.Scale.component.scaleIt();
     }
 
-    public void updateAll(OxyEntity e){
+    public void updateAll(OxyEntity e) {
         GizmoMode.Translation.component.update(e);
         GizmoMode.Scale.component.update(e);
-    }
-
-    private static void scale(OxyModel model) {
-        if (model.get(SelectedComponent.class).fixedValue && zoom >= 150)
-            model.get(TransformComponent.class).scale.set(zoom * 0.05f);
     }
 }

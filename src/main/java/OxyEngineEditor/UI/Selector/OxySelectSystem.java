@@ -45,16 +45,12 @@ public class OxySelectSystem {
         if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_C] && SceneLayer.focusedWindow && !switchC) {
             if (gizmo.mode == OxyGizmo3D.GizmoMode.Translation) {
                 gizmo.mode = OxyGizmo3D.GizmoMode.Scale;
-                for (int i = 0; i < 3; i++) {
-                    gizmo.mode.component.models.get(i).get(RenderableComponent.class).renderable = true;
-                    OxyGizmo3D.GizmoMode.Translation.component.models.get(i).get(RenderableComponent.class).renderable = false;
-                }
+                gizmo.mode.component.switchRenderableState(true);
+                OxyGizmo3D.GizmoMode.Translation.component.switchRenderableState(false);
             } else {
                 gizmo.mode = OxyGizmo3D.GizmoMode.Translation;
-                for (int i = 0; i < 3; i++) {
-                    gizmo.mode.component.models.get(i).get(RenderableComponent.class).renderable = true;
-                    OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(RenderableComponent.class).renderable = false;
-                }
+                gizmo.mode.component.switchRenderableState(true);
+                OxyGizmo3D.GizmoMode.Scale.component.switchRenderableState(false);
             }
             switchC = true;
         }

@@ -17,16 +17,6 @@ public class OxyNativeObject extends OxyEntity implements Cloneable {
         super(scene);
     }
 
-    OxyNativeObject(OxyNativeObject other) {
-        this(other.scene);
-        this.vertices = other.vertices;
-        this.factory = other.factory;
-        this.tcs = other.tcs;
-        this.indices = other.indices;
-        this.normals = other.normals;
-        this.type = other.type;
-    }
-
     public void initData() {
         assert has(NativeObjectFactory.class) && has(Mesh.class) : oxyAssert("Game object need to have a template or a Mesh!");
 
@@ -41,7 +31,8 @@ public class OxyNativeObject extends OxyEntity implements Cloneable {
 
     @Override
     public void updateData() {
-        get(Mesh.class).renderable = get(RenderableComponent.class).renderable;
+        get(Mesh.class).renderableComponent.maskedRendering = get(RenderableComponent.class).maskedRendering;
+        get(Mesh.class).renderableComponent.renderable = get(RenderableComponent.class).renderable;
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(scene, this);
     }

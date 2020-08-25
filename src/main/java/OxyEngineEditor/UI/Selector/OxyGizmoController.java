@@ -14,6 +14,10 @@ import org.joml.Vector2d;
 
 public class OxyGizmoController implements OxyMouseListener {
 
+    /*
+     * It is a pretty mess... so TODO: REFACTOR SOMETIME IN THE FUTURE
+     */
+
     OxyEntity hoveredGameObject = null;
     OxyColor standardColor = null;
     boolean init = false;
@@ -25,7 +29,7 @@ public class OxyGizmoController implements OxyMouseListener {
     static WindowHandle windowHandle;
 
     static boolean pressedXTranslation, pressedYTranslation, pressedZTranslation;
-    static boolean pressedXScale, pressedYScale, pressedZScale;
+    static boolean pressedXScale, pressedYScale, pressedZScale, pressedScaleFactor;
 
     public static OxyEntity currentEntitySelected;
 
@@ -105,6 +109,7 @@ public class OxyGizmoController implements OxyMouseListener {
             pressedXScale = false;
             pressedYScale = false;
             pressedZScale = false;
+            pressedScaleFactor = false;
         }
         if (selectedEntity == t.getYModelTranslation()) {
             pressedYTranslation = true;
@@ -113,6 +118,7 @@ public class OxyGizmoController implements OxyMouseListener {
             pressedXScale = false;
             pressedYScale = false;
             pressedZScale = false;
+            pressedScaleFactor = false;
         }
         if (selectedEntity == t.getZModelTranslation()) {
             pressedZTranslation = true;
@@ -121,6 +127,7 @@ public class OxyGizmoController implements OxyMouseListener {
             pressedXScale = false;
             pressedYScale = false;
             pressedZScale = false;
+            pressedScaleFactor = false;
         }
     }
 
@@ -176,11 +183,9 @@ public class OxyGizmoController implements OxyMouseListener {
 
         OxyModel xAxis = s.getXModelScale();
         OxyModel yAxis = s.getYModelScale();
-        OxyModel zAxis = s.getZModelScale();
 
         TransformComponent xC = xAxis.get(TransformComponent.class);
         TransformComponent yC = yAxis.get(TransformComponent.class);
-        TransformComponent zC = zAxis.get(TransformComponent.class);
 
         TransformComponent currC = currentEntitySelected.get(TransformComponent.class);
 
@@ -202,12 +207,16 @@ public class OxyGizmoController implements OxyMouseListener {
         } else if (pressedXScale) {
             currC.scale.z += deltaX;
             if (currC.scale.z <= 0) currC.scale.z = 0;
+        } else if(pressedScaleFactor){
+            currC.scale.add(deltaX, deltaX, deltaX);
+            if (currC.scale.x <= 0) currC.scale.x = 0;
+            if (currC.scale.y <= 0) currC.scale.y = 0;
+            if (currC.scale.z <= 0) currC.scale.z = 0;
         }
 
         currentEntitySelected.updateData();
         xAxis.updateData();
         yAxis.updateData();
-        zAxis.updateData();
     }
 
     private void handleScalingSwitch(OxyEntity selectedEntity) {
@@ -216,6 +225,7 @@ public class OxyGizmoController implements OxyMouseListener {
             pressedXScale = true;
             pressedYScale = false;
             pressedZScale = false;
+            pressedScaleFactor = false;
             pressedXTranslation = false;
             pressedYTranslation = false;
             pressedZTranslation = false;
@@ -224,12 +234,23 @@ public class OxyGizmoController implements OxyMouseListener {
             pressedYScale = true;
             pressedXScale = false;
             pressedZScale = false;
+            pressedScaleFactor = false;
             pressedXTranslation = false;
             pressedYTranslation = false;
             pressedZTranslation = false;
         }
         if (selectedEntity == s.getZModelScale()) {
             pressedZScale = true;
+            pressedXScale = false;
+            pressedYScale = false;
+            pressedScaleFactor = false;
+            pressedXTranslation = false;
+            pressedYTranslation = false;
+            pressedZTranslation = false;
+        }
+        if(selectedEntity == s.getScalingCube()){
+            pressedScaleFactor = true;
+            pressedZScale = false;
             pressedXScale = false;
             pressedYScale = false;
             pressedXTranslation = false;

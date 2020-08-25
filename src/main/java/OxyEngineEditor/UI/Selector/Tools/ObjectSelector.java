@@ -42,10 +42,30 @@ public interface ObjectSelector {
             selected.selected = false;
 
             if (tag.tag().startsWith("Sphere")) {
-                if (Intersectionf.intersectRaySphere(origin, direction, position, boundingBox.max().y * boundingBox.max().y * c.scale.y * c.scale.y, nearFar) && nearFar.x < closestDistance) {
-                    closestDistance = nearFar.x;
-                    selectedEntity = entity;
-                    selected.selected = true;
+                if (c.scale.x == c.scale.y && c.scale.x == c.scale.z) {
+                    if (Intersectionf.intersectRaySphere(origin, direction, position, boundingBox.max().y * boundingBox.max().y * c.scale.y * c.scale.y, nearFar) && nearFar.x < closestDistance) {
+                        closestDistance = nearFar.x;
+                        selectedEntity = entity;
+                        selected.selected = true;
+                    }
+                } else {
+                    float result;
+                    for (int i = 0; i < entity.vertices.length; ) {
+                        if (i >= entity.vertices.length - 18) break;
+                        Vector3f firstVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                        i += 5;
+                        Vector3f secondVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                        i += 5;
+                        Vector3f thirdVertex = new Vector3f(entity.vertices[i++], entity.vertices[i++], entity.vertices[i++]);
+                        i += 5;
+                        if ((result = Intersectionf.intersectRayTriangle(origin, direction, firstVertex, secondVertex, thirdVertex, 0.000001f)) != -1) {
+                            if (result < closestDistance) {
+                                closestDistance = result;
+                                selectedEntity = entity;
+                                selected.selected = true;
+                            }
+                        }
+                    }
                 }
             } else if (tag.tag().startsWith("Cube")) {
                 min.set(position);

@@ -19,14 +19,14 @@ public class ModelMesh extends Mesh {
     private final float[] vertices, textureCoords, normals;
     private final int[] indices;
 
-    private ModelMesh(OxyShader shader, BufferTemplate.Usage usage, int mode, boolean renderable, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+    private ModelMesh(OxyShader shader, BufferTemplate.Usage usage, int mode, RenderableComponent renderableComponent, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
         this.shader = shader;
         this.vertices = vertices;
         this.indices = indices;
         this.textureCoords = textureCoords;
         this.normals = normals;
         this.mode = mode;
-        this.renderable = renderable;
+        this.renderableComponent = renderableComponent;
 
         vertexBuffer = new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                 .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
@@ -63,7 +63,7 @@ public class ModelMesh extends Mesh {
 
         ModelMeshBuilder setUsage(BufferTemplate.Usage usage);
 
-        ModelMeshBuilder isRenderable(boolean renderable);
+        ModelMeshBuilder setRenderableComponent(RenderableComponent renderable);
 
         ModelMesh create();
     }
@@ -75,7 +75,7 @@ public class ModelMesh extends Mesh {
         private int[] indices;
         private int mode;
         private BufferTemplate.Usage usage;
-        private boolean renderable = true;
+        private RenderableComponent component = new RenderableComponent(true);
 
         @Override
         public ModelMeshBuilderImpl setShader(OxyShader shader) {
@@ -120,15 +120,15 @@ public class ModelMesh extends Mesh {
         }
 
         @Override
-        public ModelMeshBuilderImpl isRenderable(boolean renderable) {
-            this.renderable = renderable;
+        public ModelMeshBuilderImpl setRenderableComponent(RenderableComponent component) {
+            this.component = component;
             return this;
         }
 
         @Override
         public ModelMesh create() {
             assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
-            return new ModelMesh(shader, usage, mode, renderable, vertices, indices, textureCoords, normals);
+            return new ModelMesh(shader, usage, mode, component, vertices, indices, textureCoords, normals);
         }
     }
 
@@ -148,7 +148,7 @@ public class ModelMesh extends Mesh {
         return indices;
     }
 
-    public boolean isRenderable() {
-        return renderable;
+    public RenderableComponent getRenderableComponent() {
+        return renderableComponent;
     }
 }

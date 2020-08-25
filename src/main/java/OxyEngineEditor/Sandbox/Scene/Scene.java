@@ -14,11 +14,11 @@ import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Sandbox.Components.*;
-import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelFactory;
 import OxyEngineEditor.Sandbox.Scene.Model.ModelType;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
 import OxyEngineEditor.Sandbox.Scene.Model.OxyModelLoader;
+import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 import OxyEngineEditor.UI.OxyUISystem;
 import org.joml.Vector3f;
 
@@ -37,7 +37,7 @@ public class Scene implements OxyDisposable {
     private OxyUISystem oxyUISystem;
 
     private Set<OxyEntity> cachedLightEntities;
-    private Set<EntityComponent> cachedNativeMeshes, cachedModelMeshes, cachedCameraComponents;
+    private Set<EntityComponent> cachedNativeMeshes, cachedModelMeshes, cachedCameraComponents/*, cachedModelMeshesMasked*/;
 
     private final FrameBuffer frameBuffer;
     private final String sceneName;
@@ -160,6 +160,8 @@ public class Scene implements OxyDisposable {
         }
     }
 
+//    static OxyShader outlineShader = new OxyShader("D:\\programming\\Java\\OxyEngine\\shaders\\outline.glsl");
+
     public void render(float ts, float deltaTime) {
 
         if (frameBuffer != null) frameBuffer.bind();
@@ -182,21 +184,36 @@ public class Scene implements OxyDisposable {
         {
             for (EntityComponent c : cachedModelMeshes) {
                 Mesh mesh = (Mesh) c;
-                if (c != null && mainCamera != null && mesh.renderable)
-                    render(ts, mesh, mainCamera);
+                RenderableComponent rC = mesh.renderableComponent;
+                if (rC.renderable) render(ts, mesh, mainCamera);
+                /*glEnable(GL_STENCIL_TEST);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+                glStencilMask(0xFF);
+                glClear(GL_STENCIL_BUFFER_BIT);
+
+                glStencilFunc(GL_ALWAYS, 1, 0xFF);
+                if (rC.renderable) render(ts, mesh, mainCamera);
+                outlineShader.enable();
+                mesh.scaleUp(1.01f);
+                glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+                glStencilMask(0x00);
+                render(ts, mesh, mainCamera, outlineShader); // draw with the outline shader
+                mesh.finalizeScaleUp();
+                glDisable(GL_STENCIL_TEST);*/
             }
 
             for (EntityComponent c : cachedNativeMeshes) {
                 Mesh mesh = (Mesh) c;
-                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && mesh.renderable) {
+                RenderableComponent rC = mesh.renderableComponent;
+                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && rC.renderable) {
                     //skybox
                     glDepthMask(false);
                     render(ts, mesh, mainCamera);
                     glDepthMask(true);
                     continue;
                 }
-
-                if(mesh.renderable)
+                if (rC.renderable)
                     render(ts, mesh, mainCamera);
             }
         }
@@ -258,6 +275,11 @@ public class Scene implements OxyDisposable {
 
     private void render(float ts, Mesh mesh, OxyCamera camera) {
         renderer.render(ts, mesh, camera);
+        OxyRenderer.Stats.totalShapeCount = registry.entityList.keySet().size();
+    }
+
+    private void render(float ts, Mesh mesh, OxyCamera camera, OxyShader shader) {
+        renderer.render(ts, mesh, camera, shader);
         OxyRenderer.Stats.totalShapeCount = registry.entityList.keySet().size();
     }
 

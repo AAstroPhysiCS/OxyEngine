@@ -14,20 +14,9 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 public class OxyModel extends OxyEntity {
 
     private ModelFactory factory;
-    private ModelType type;
 
     public OxyModel(Scene scene) {
         super(scene);
-    }
-
-    public OxyModel(OxyModel other) {
-        this(other.scene);
-        this.factory = other.factory;
-        this.vertices = other.vertices;
-        this.tcs = other.tcs;
-        this.indices = other.indices;
-        this.normals = other.normals;
-        this.type = other.type;
     }
 
     @Override
@@ -37,7 +26,7 @@ public class OxyModel extends OxyEntity {
         factory.constructData(this);
         addComponent(new ModelMesh.ModelMeshBuilderImpl()
                 .setShader(get(OxyShader.class))
-                .isRenderable(get(RenderableComponent.class).renderable)
+                .setRenderableComponent(get(RenderableComponent.class))
                 .setMode(GL_TRIANGLES)
                 .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setVertices(vertices)
@@ -49,7 +38,8 @@ public class OxyModel extends OxyEntity {
 
     @Override
     public void updateData() {
-        get(Mesh.class).renderable = get(RenderableComponent.class).renderable;
+        get(Mesh.class).renderableComponent.maskedRendering = get(RenderableComponent.class).maskedRendering;
+        get(Mesh.class).renderableComponent.renderable = get(RenderableComponent.class).renderable;
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(0, vertices);
     }

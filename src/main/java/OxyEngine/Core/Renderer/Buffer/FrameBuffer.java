@@ -10,7 +10,7 @@ import static org.lwjgl.opengl.GL45.glCreateTextures;
 
 public class FrameBuffer extends Buffer {
 
-    private int colorAttachmentId, depthAttachment;
+    private int colorAttachmentId, depthAttachment, renderBufferObject;
     private final boolean primary = false;
 
     private int width;
@@ -53,7 +53,7 @@ public class FrameBuffer extends Buffer {
     }
 
     public void bind() {
-        if(!windowMinized){
+        if (!windowMinized) {
             glBindFramebuffer(GL_FRAMEBUFFER, bufferId);
             glViewport(0, 0, width, height);
         }

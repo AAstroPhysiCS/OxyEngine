@@ -1,6 +1,9 @@
 package OxyEngineEditor.Sandbox.Components;
 
-import OxyEngine.Core.Renderer.Buffer.*;
+import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
+import OxyEngine.Core.Renderer.Buffer.IndexBuffer;
+import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 
@@ -10,8 +13,8 @@ public class NativeObjectMesh extends Mesh {
 
     public int indicesX, indicesY, indicesZ;
 
-    private NativeObjectMesh(OxyShader shader, int mode, boolean renderable, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
-        this.renderable = renderable;
+    private NativeObjectMesh(OxyShader shader, int mode, RenderableComponent component, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
+        this.renderableComponent = component;
         this.shader = shader;
         this.mode = mode;
         this.indexBuffer = indexBuffer;
@@ -28,7 +31,7 @@ public class NativeObjectMesh extends Mesh {
 
         NativeMeshBuilder setUsage(BufferTemplate.Usage usage);
 
-        NativeMeshBuilder isRenderable(boolean renderable);
+        NativeMeshBuilder setRenderableComponent(RenderableComponent renderable);
 
         NativeObjectMesh create();
     }
@@ -39,7 +42,7 @@ public class NativeObjectMesh extends Mesh {
         private int mode = -1;
         private BufferTemplate.Usage usage;
         private OxyShader shader;
-        private boolean renderable = true;
+        private RenderableComponent component = new RenderableComponent(true);
 
         @Override
         public NativeMeshBuilderImpl setShader(OxyShader shader) {
@@ -66,8 +69,8 @@ public class NativeObjectMesh extends Mesh {
         }
 
         @Override
-        public NativeMeshBuilderImpl isRenderable(boolean renderable) {
-            this.renderable = renderable;
+        public NativeMeshBuilderImpl setRenderableComponent(RenderableComponent component) {
+            this.component = component;
             return this;
         }
 
@@ -75,7 +78,7 @@ public class NativeObjectMesh extends Mesh {
         public NativeObjectMesh create() {
             assert mode != -1 && usage != null : oxyAssert("Some arguments not defined!");
 
-            return new NativeObjectMesh(shader, mode, renderable,
+            return new NativeObjectMesh(shader, mode, component,
                     new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                             .setVerticesStrideSize(verticesPointers[0].stride() / Float.BYTES)
                             .setUsage(usage)

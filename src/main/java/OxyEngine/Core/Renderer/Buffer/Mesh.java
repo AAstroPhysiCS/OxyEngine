@@ -4,6 +4,7 @@ import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Sandbox.Components.RenderableComponent;
 import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
 import OxyEngineEditor.Sandbox.Scene.OxyEntity;
 import OxyEngineEditor.Sandbox.Scene.Scene;
@@ -21,7 +22,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     protected NormalsBuffer normalsBuffer;
 
     protected OxyShader shader;
-    public boolean renderable = true;
+    public RenderableComponent renderableComponent;
 
     protected final List<OxyEntity> entities = new ArrayList<>();
 
@@ -103,6 +104,24 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         draw();
         unbind();
     }
+
+    /*float[] verticesNonScaled;
+    boolean init = false;
+
+    public void scaleUp(float scaleFactor){
+        if(!init){
+            verticesNonScaled = vertexBuffer.getVertices().clone();
+            init = true;
+        }
+        float[] vertices = verticesNonScaled.clone();
+        for(int i = 0; i < vertices.length; i++)
+            vertices[i] *= scaleFactor;
+        updateSingleEntityData(0, vertices);
+    }
+
+    public void finalizeScaleUp(){
+        updateSingleEntityData(0, verticesNonScaled);
+    }*/
 
     public void updateSingleEntityData(Scene scene, OxyNativeObject e) {
         int i = 0;

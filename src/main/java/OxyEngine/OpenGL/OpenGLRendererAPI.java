@@ -3,13 +3,13 @@ package OxyEngine.OpenGL;
 import OxyEngine.Core.Window.WindowHandle;
 
 import static OxyEngine.System.Globals.Globals.normalizeColor;
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class OpenGLRendererAPI {
 
-    private OpenGLRendererAPI(){}
+    private OpenGLRendererAPI() {
+    }
 
     public static void clearColor(float r, float g, float b, float a) {
         if (r > 1 || b > 1 || g > 1 || a > 1) {
@@ -21,15 +21,15 @@ public class OpenGLRendererAPI {
         glClearColor(r, g, b, a);
     }
 
-    public static void clearBuffer(){
+    public static void clearBuffer() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public static void swapBuffer(WindowHandle handle){
+    public static void swapBuffer(WindowHandle handle) {
         glfwSwapBuffers(handle.getPointer());
     }
 
-    public static void pollEvents(){
+    public static void pollEvents() {
         glfwPollEvents();
     }
 }
