@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Components.EntityComponent;
 import org.joml.Vector3f;
 
 public abstract class Light implements EntityComponent {

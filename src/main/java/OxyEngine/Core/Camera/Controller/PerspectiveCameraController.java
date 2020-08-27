@@ -1,7 +1,7 @@
 package OxyEngine.Core.Camera.Controller;
 
 import OxyEngine.Tools.Ref;
-import OxyEngineEditor.UI.Layers.SceneLayer;
+import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.OxyUISystem;
 import org.joml.Vector3f;
 
@@ -26,14 +26,14 @@ public class PerspectiveCameraController extends OxyCameraController {
     }
 
     private void updateRotationFree() {
-        if (SceneLayer.focusedWindowDragging) rotate();
+        if (ScenePanel.focusedWindowDragging) rotate();
 
         oldMouseX = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos();
         oldMouseY = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos();
     }
 
     private void updateRotationSwipe() {
-        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_MIDDLE] && SceneLayer.focusedWindowDragging)
+        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_MIDDLE] && ScenePanel.focusedWindowDragging)
             rotate();
 
         oldMouseX = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos();
@@ -41,7 +41,7 @@ public class PerspectiveCameraController extends OxyCameraController {
     }
 
     private void updatePosition(float ts) {
-        if (!SceneLayer.focusedWindow) return;
+        if (!ScenePanel.focusedWindow) return;
         float angle90 = (float) (rotationRef.obj.y + (Math.PI / 2));
         float angle = rotationRef.obj.y;
         if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_W]) {

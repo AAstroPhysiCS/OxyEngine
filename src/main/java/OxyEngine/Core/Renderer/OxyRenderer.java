@@ -4,13 +4,12 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngine.Core.Line.OxyInfoLine;
-import OxyEngineEditor.Sandbox.Components.PerspectiveCamera;
-import OxyEngineEditor.Sandbox.Sandbox3D;
+import OxyEngineEditor.OxyApplication;
+import OxyEngineEditor.Components.PerspectiveCamera;
 
 import static org.lwjgl.opengl.GL11.*;
 
-public abstract class OxyRenderer implements OxyInfoLine<String> {
+public abstract class OxyRenderer {
 
     public static OxyCamera currentBoundedCamera;
     protected final WindowHandle windowHandle;
@@ -22,13 +21,9 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
         this.windowHandle = windowHandle;
     }
 
-    public abstract void begin(OxyShader shader);
-
     public abstract void render(float ts, Mesh mesh, OxyCamera camera);
 
     public abstract void render(float ts, Mesh mesh);
-
-    public abstract void end(OxyShader shader);
 
     public static record Stats() {
 
@@ -64,7 +59,7 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
                         Z: %s
                     Zoom: %s
                     """.formatted(
-                    Sandbox3D.FPS,
+                    OxyApplication.FPS,
                     drawCalls,
                     totalShapeCount,
                     totalVertexCount,
@@ -85,11 +80,6 @@ public abstract class OxyRenderer implements OxyInfoLine<String> {
             reset();
             return s;
         }
-    }
-
-    @Override
-    public String info() {
-        return Stats.getStats();
     }
 
     public OxyCamera getCamera() {

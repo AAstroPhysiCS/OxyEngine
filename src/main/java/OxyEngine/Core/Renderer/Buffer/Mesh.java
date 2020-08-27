@@ -3,11 +3,11 @@ package OxyEngine.Core.Renderer.Buffer;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Sandbox.Components.EntityComponent;
-import OxyEngineEditor.Sandbox.Components.RenderableComponent;
-import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
-import OxyEngineEditor.Sandbox.Scene.Scene;
+import OxyEngineEditor.Components.EntityComponent;
+import OxyEngineEditor.Components.RenderableComponent;
+import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
+import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.Scene;
 
 import java.util.ArrayList;
 import java.util.List;

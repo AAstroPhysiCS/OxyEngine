@@ -2,10 +2,10 @@ package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Sandbox.Components.EntityComponent;
-import OxyEngineEditor.Sandbox.Components.NativeObjectMesh;
-import OxyEngineEditor.Sandbox.Scene.NativeObjects.OxyNativeObject;
-import OxyEngineEditor.Sandbox.Scene.Scene;
+import OxyEngineEditor.Components.EntityComponent;
+import OxyEngineEditor.Components.NativeObjectMesh;
+import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
+import OxyEngineEditor.Scene.Scene;
 
 import java.io.File;
 import java.nio.ByteBuffer;

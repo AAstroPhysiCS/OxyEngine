@@ -1,8 +1,8 @@
 package OxyEngine.Events;
 
 import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
-import OxyEngineEditor.UI.Layers.SceneLayer;
+import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.Selector.Tools.MouseSelector;
 import imgui.ImGui;
 import org.joml.Vector2f;
@@ -20,14 +20,9 @@ public interface OxyMouseListener extends OxyEventListener {
 
     void mouseReleased(OxyEntity selectedEntity, int mouseButton);
 
-    void mouseNoAction();
-
     default void dispatch(OxyEntity entity) {
-        Vector3f direction = MouseSelector.getInstance().getObjectPosRelativeToCamera(SceneLayer.windowSize.x - SceneLayer.offset.x, SceneLayer.windowSize.y - SceneLayer.offset.y, new Vector2f(SceneLayer.mousePos.x - SceneLayer.windowPos.x - SceneLayer.offset.x, SceneLayer.mousePos.y - SceneLayer.windowPos.y - SceneLayer.offset.y), OxyRenderer.currentBoundedCamera);
+        Vector3f direction = MouseSelector.getInstance().getObjectPosRelativeToCamera(ScenePanel.windowSize.x - ScenePanel.offset.x, ScenePanel.windowSize.y - ScenePanel.offset.y, new Vector2f(ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x, ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y), OxyRenderer.currentBoundedCamera);
         OxyEntity e = MouseSelector.getInstance().selectObject(entity, OxyRenderer.currentBoundedCamera.getCameraController().origin, direction);
-        if (e == null) {
-            mouseNoAction();
-        }
         dispatchMethods(e);
     }
 
@@ -40,7 +35,7 @@ public interface OxyMouseListener extends OxyEventListener {
                 mouseDragged(e, i);
             if (ImGui.isMouseClicked(i))
                 mouseClicked(e, i);
-            if(ImGui.isMouseReleased(i))
+            if (ImGui.isMouseReleased(i))
                 mouseReleased(e, i);
         }
     }

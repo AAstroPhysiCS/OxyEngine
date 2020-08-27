@@ -1,7 +1,7 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
-import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Components.EntityComponent;
 import org.joml.Matrix4f;
 
 public abstract class OxyCamera implements EntityComponent {

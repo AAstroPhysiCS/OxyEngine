@@ -1,11 +1,11 @@
 package OxyEngineEditor.UI.Selector.Tools;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngineEditor.Sandbox.Components.BoundingBoxComponent;
-import OxyEngineEditor.Sandbox.Components.SelectedComponent;
-import OxyEngineEditor.Sandbox.Components.TagComponent;
-import OxyEngineEditor.Sandbox.Components.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
+import OxyEngineEditor.Components.BoundingBoxComponent;
+import OxyEngineEditor.Components.SelectedComponent;
+import OxyEngineEditor.Components.TagComponent;
+import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Scene.OxyEntity;
 import org.joml.Intersectionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -103,7 +103,7 @@ public interface ObjectSelector {
     //mainly for gizmo
     default OxyEntity selectObject(OxyEntity entity, Vector3f origin, Vector3f direction) {
         reset();
-        if (origin == null || direction == null || !entity.has(SelectedComponent.class) || !entity.has(TransformComponent.class))
+        if (!entity.has(SelectedComponent.class) || !entity.has(TransformComponent.class))
             return null;
 
         OxyEntity selectedEntity = null;

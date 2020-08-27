@@ -4,10 +4,10 @@ import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.OxyMouseListener;
-import OxyEngineEditor.Sandbox.Components.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
-import OxyEngineEditor.Sandbox.Scene.Scene;
+import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Scene.Model.OxyModel;
+import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.OxyUISystem;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
@@ -22,7 +22,7 @@ public class OxyGizmoController implements OxyMouseListener {
     OxyColor standardColor = null;
     boolean init = false;
 
-    Vector2d oldMousePos = new Vector2d();
+    static Vector2d oldMousePos = new Vector2d();
 
     static OxyGizmo3D gizmo;
     static Scene scene;
@@ -65,14 +65,15 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseHovered(OxyEntity hoveredEntity) {
+        if (hoveredEntity == null && hoveredGameObject != null) {
+            OxyColor hoveredColor = hoveredGameObject.get(OxyColor.class);
+            hoveredColor.setColorRGBA(standardColor.getNumbers());
+            hoveredGameObject.updateData();
+        }
         if (hoveredEntity instanceof OxyModel) {
             if (!init) {
                 OxyColor color = hoveredEntity.get(OxyColor.class);
-                try {
-                    standardColor = (OxyColor) color.clone();
-                } catch (CloneNotSupportedException e) {
-                    e.printStackTrace();
-                }
+                standardColor = (OxyColor) color.clone();
                 init = true;
             }
             hoveredGameObject = hoveredEntity;
@@ -89,15 +90,6 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseReleased(OxyEntity selectedEntity, int mouseButton) {
-    }
-
-    @Override
-    public void mouseNoAction() {
-        if (hoveredGameObject != null) {
-            OxyColor hoveredColor = hoveredGameObject.get(OxyColor.class);
-            hoveredColor.setColorRGBA(standardColor.getNumbers());
-            hoveredGameObject.updateData();
-        }
     }
 
     private void handleTranslationSwitch(OxyEntity selectedEntity) {
@@ -146,36 +138,38 @@ public class OxyGizmoController implements OxyMouseListener {
         Vector2d delta = nowMousePos.sub(oldMousePos);
 
         float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
-        float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 16f;
-        float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 16f;
-        if (deltaX <= -1f * xC.scale.x / 16f || deltaX >= 1f * xC.scale.x / 16f) deltaX = 0; // for safety reasons
-        if (deltaY <= -1f * yC.scale.y / 16f || deltaY >= 1f * yC.scale.y / 16f) deltaY = 0;
+        float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 8f;
+        float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 8f;
+        if (deltaX <= -1f * xC.scale.x / 8f || deltaX >= 1f * xC.scale.x / 8f) deltaX = 0; // for safety reasons
+        if (deltaY <= -1f * yC.scale.y / 8f || deltaY >= 1f * yC.scale.y / 8f) deltaY = 0;
         if (pressedZTranslation) {
             xC.position.add(0, 0, -deltaX);
             yC.position.add(0, 0, -deltaX);
             zC.position.add(0, 0, -deltaX);
             currC.position.add(0, 0, -deltaX);
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(0, 0, -deltaX);
         } else if (pressedYTranslation) {
             xC.position.add(0, deltaY, 0);
             yC.position.add(0, deltaY, 0);
             zC.position.add(0, deltaY, 0);
             currC.position.add(0, deltaY, 0);
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(0, deltaY, 0);
         } else if (pressedXTranslation) {
             xC.position.add(deltaX, 0, 0);
             yC.position.add(deltaX, 0, 0);
             zC.position.add(deltaX, 0, 0);
             currC.position.add(deltaX, 0, 0);
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(deltaX, 0, 0);
         }
         currentEntitySelected.updateData();
         xAxis.updateData();
         yAxis.updateData();
         zAxis.updateData();
+        for (int i = 0; i < 4; i++)
+            OxyGizmo3D.GizmoMode.Scale.component.models.get(i).updateData();
     }
 
     private void handleScaling() {
@@ -193,10 +187,10 @@ public class OxyGizmoController implements OxyMouseListener {
         Vector2d delta = nowMousePos.sub(oldMousePos);
 
         float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
-        float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 16f;
-        float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 16f;
-        if (deltaX <= -1f * xC.scale.x / 16f || deltaX >= 1f * xC.scale.x / 16f) deltaX = 0; // for safety reasons
-        if (deltaY <= -1f * yC.scale.y / 16f || deltaY >= 1f * yC.scale.y / 16f) deltaY = 0;
+        float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 8f;
+        float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 8f;
+        if (deltaX <= -1f * xC.scale.x / 8f || deltaX >= 1f * xC.scale.x / 8f) deltaX = 0; // for safety reasons
+        if (deltaY <= -1f * yC.scale.y / 8f || deltaY >= 1f * yC.scale.y / 8f) deltaY = 0;
 
         if (pressedZScale) {
             currC.scale.x += -deltaX;
@@ -215,8 +209,6 @@ public class OxyGizmoController implements OxyMouseListener {
         }
 
         currentEntitySelected.updateData();
-        xAxis.updateData();
-        yAxis.updateData();
     }
 
     private void handleScalingSwitch(OxyEntity selectedEntity) {

@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Texture;
 
-import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Components.EntityComponent;
 import org.joml.Vector4f;
 
 import java.awt.*;
@@ -47,8 +47,13 @@ public class OxyColor implements Cloneable, EntityComponent {
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public float[] getNumbers() {

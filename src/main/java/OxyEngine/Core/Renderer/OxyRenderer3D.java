@@ -16,17 +16,6 @@ public class OxyRenderer3D extends OxyRenderer {
         type = OxyRendererType.Oxy3D;
     }
 
-    @Override
-    public void begin(OxyShader shader) {
-        currentShader = shader;
-    }
-
-    @Override
-    public void end(OxyShader shader) {
-        currentShader.disable();
-
-    }
-
     public static OxyRenderer3D getInstance(WindowHandle windowHandle) {
         if (INSTANCE == null) INSTANCE = new OxyRenderer3D(windowHandle);
         return INSTANCE;

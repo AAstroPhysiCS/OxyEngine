@@ -1,6 +1,6 @@
 package OxyEngine.System;
 
-import OxyEngineEditor.Sandbox.Sandbox3D;
+import OxyEngine.EntryPoint;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -65,7 +65,7 @@ public interface OxySystem {
         }
 
         static String getResourceByPath(String path){
-            String fullPath = Sandbox3D.class.getResource(path).getPath();
+            String fullPath = EntryPoint.class.getResource(path).getPath();
             return (String) fullPath.subSequence(1, fullPath.length());
         }
     }

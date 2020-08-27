@@ -2,7 +2,7 @@ package OxyEngine.Core.Renderer.Shader;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Sandbox.Components.EntityComponent;
+import OxyEngineEditor.Components.EntityComponent;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

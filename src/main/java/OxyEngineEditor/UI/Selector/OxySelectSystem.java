@@ -3,12 +3,12 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.Sandbox.Components.RenderableComponent;
-import OxyEngineEditor.Sandbox.Components.TransformComponent;
-import OxyEngineEditor.Sandbox.Scene.Model.OxyModel;
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
-import OxyEngineEditor.Sandbox.Scene.Scene;
-import OxyEngineEditor.UI.Layers.SceneLayer;
+import OxyEngineEditor.Components.RenderableComponent;
+import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Scene.Model.OxyModel;
+import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.OxyUISystem;
 import OxyEngineEditor.UI.Selector.Tools.MouseSelector;
 import org.joml.Vector2f;
@@ -42,7 +42,7 @@ public class OxySelectSystem {
     static boolean switchC = false;
 
     public void start(Set<OxyEntity> entities, OxyCamera camera) {
-        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_C] && SceneLayer.focusedWindow && !switchC) {
+        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_C] && ScenePanel.focusedWindow && !switchC) {
             if (gizmo.mode == OxyGizmo3D.GizmoMode.Translation) {
                 gizmo.mode = OxyGizmo3D.GizmoMode.Scale;
                 gizmo.mode.component.switchRenderableState(true);
@@ -57,13 +57,13 @@ public class OxySelectSystem {
         if (!OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_C]) {
             switchC = false;
         }
-        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_LEFT] && SceneLayer.focusedWindow) {
+        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_LEFT] && ScenePanel.focusedWindow) {
             Vector3f direction = mSelector.getObjectPosRelativeToCamera(
-                    SceneLayer.windowSize.x - SceneLayer.offset.x,
-                    SceneLayer.windowSize.y - SceneLayer.offset.y,
+                    ScenePanel.windowSize.x - ScenePanel.offset.x,
+                    ScenePanel.windowSize.y - ScenePanel.offset.y,
                     new Vector2f(
-                            SceneLayer.mousePos.x - SceneLayer.windowPos.x - SceneLayer.offset.x,
-                            SceneLayer.mousePos.y - SceneLayer.windowPos.y - SceneLayer.offset.y),
+                            ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x,
+                            ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y),
                     renderer.getCamera()
             );
 
@@ -82,31 +82,33 @@ public class OxySelectSystem {
             xModel = t.getXModelTranslation();
             yModel = t.getYModelTranslation();
             zModel = t.getZModelTranslation();
-            for (OxyModel m : component.models) {
+            for (OxyModel m : component.models)
                 m.get(RenderableComponent.class).renderable = e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Translation;
-            }
         } else if (component instanceof OxyGizmo3D.Scaling s) {
             xModel = s.getXModelScale();
             yModel = s.getYModelScale();
             zModel = s.getZModelScale();
-            for (OxyModel m : component.models) {
+            for (OxyModel m : component.models)
                 m.get(RenderableComponent.class).renderable = e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Scale;
+            OxyModel scalingFactor = s.getScalingCube();
+            if (e != null) {
+                TransformComponent sF = scalingFactor.get(TransformComponent.class);
+                sF.position.set(new Vector3f(scalingFactor.originPos).mul(sF.scale).add(e.get(TransformComponent.class).position));
+                scalingFactor.updateData();
             }
         }
 
-        if (xModel == null || yModel == null || zModel == null) return;
+        if (xModel == null || yModel == null || zModel == null || e == null) return;
 
-        if (e != null) {
-            TransformComponent c = e.get(TransformComponent.class);
+        TransformComponent c = e.get(TransformComponent.class);
 
-            TransformComponent xC = xModel.get(TransformComponent.class);
-            TransformComponent yC = yModel.get(TransformComponent.class);
-            TransformComponent zC = zModel.get(TransformComponent.class);
+        TransformComponent xC = xModel.get(TransformComponent.class);
+        TransformComponent yC = yModel.get(TransformComponent.class);
+        TransformComponent zC = zModel.get(TransformComponent.class);
 
-            xC.position.set(new Vector3f(xModel.originPos).mul(xC.scale).add(c.position));
-            yC.position.set(new Vector3f(yModel.originPos).mul(yC.scale).add(c.position));
-            zC.position.set(new Vector3f(zModel.originPos).mul(zC.scale).add(c.position));
-        }
+        xC.position.set(new Vector3f(xModel.originPos).mul(xC.scale).add(c.position));
+        yC.position.set(new Vector3f(yModel.originPos).mul(yC.scale).add(c.position));
+        zC.position.set(new Vector3f(zModel.originPos).mul(zC.scale).add(c.position));
 
         xModel.updateData();
         yModel.updateData();

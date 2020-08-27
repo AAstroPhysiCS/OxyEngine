@@ -1,7 +1,7 @@
 package OxyEngine.Events;
 
 import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngineEditor.Sandbox.Scene.OxyEntity;
+import OxyEngineEditor.Scene.OxyEntity;
 
 import java.util.*;
 
@@ -12,7 +12,7 @@ public final class OxyEventDispatcher {
     public OxyEventDispatcher() {
     }
 
-    public void addDispatchersToThread(OxyEntity entity, OxyEventListener listener) {
+    public void addListeners(OxyEntity entity, OxyEventListener listener) {
         if (!listeners.containsKey(entity))
             listeners.put(entity, new ArrayList<>());
         if (!listeners.get(entity).contains(listener))
