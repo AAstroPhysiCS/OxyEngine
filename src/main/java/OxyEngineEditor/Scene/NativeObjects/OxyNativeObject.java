@@ -31,7 +31,7 @@ public class OxyNativeObject extends OxyEntity implements Cloneable {
 
     @Override
     public void updateData() {
-        get(Mesh.class).renderableComponent.maskedRendering = get(RenderableComponent.class).maskedRendering;
+        get(Mesh.class).renderableComponent.noZBufferRendering = get(RenderableComponent.class).noZBufferRendering;
         get(Mesh.class).renderableComponent.renderable = get(RenderableComponent.class).renderable;
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(scene, this);

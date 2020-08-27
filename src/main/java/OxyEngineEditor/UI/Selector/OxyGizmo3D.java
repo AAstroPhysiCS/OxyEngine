@@ -73,10 +73,16 @@ public class OxyGizmo3D {
         }
 
         private void scale(OxyModel model, OxyEntity e) {
-            if (model.get(SelectedComponent.class).fixedValue && zoom >= 150) {
-                model.get(TransformComponent.class).scale.set(zoom * 0.05f);
+            if (model.get(SelectedComponent.class).fixedValue && zoom >= 100) {
+                model.get(TransformComponent.class).scale.set(zoom * 0.03f);
                 update(model, e);
+            } else {
+                if(zoom < 150 && model.get(TransformComponent.class).scale.x != 3){ //does not matter if x or y or z
+                    model.get(TransformComponent.class).scale.set(3);
+                    update(model, e);
+                }
             }
+            if(zoom >= 500) zoom = 500;
         }
 
         abstract void update(OxyModel model, OxyEntity e);
@@ -145,7 +151,7 @@ public class OxyGizmo3D {
         GizmoMode.Translation.init(windowHandle, scene, shader, this);
         GizmoMode.Scale.init(windowHandle, scene, shader, this);
 
-        mode = GizmoMode.Translation; // default
+        mode = GizmoMode.None; // default
     }
 
     public void scaleAll(OxyEntity e) {

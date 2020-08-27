@@ -37,7 +37,7 @@ public class OxyModel extends OxyEntity {
     }
 
     public void updateComponents(){
-        get(Mesh.class).renderableComponent.maskedRendering = get(RenderableComponent.class).maskedRendering; //later
+        get(Mesh.class).renderableComponent.noZBufferRendering = get(RenderableComponent.class).noZBufferRendering; //later
         get(Mesh.class).renderableComponent.renderable = get(RenderableComponent.class).renderable;
     }
 

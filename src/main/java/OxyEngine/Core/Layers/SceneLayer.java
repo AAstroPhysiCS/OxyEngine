@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.lwjgl.opengl.GL11.glDepthMask;
+import static org.lwjgl.opengl.GL11.*;
 
 public class SceneLayer extends Layer {
 
@@ -101,10 +101,28 @@ public class SceneLayer extends Layer {
 
         //Rendering
         {
+            for (EntityComponent c : cachedNativeMeshes) {
+                Mesh mesh = (Mesh) c;
+                RenderableComponent rC = mesh.renderableComponent;
+                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && rC.renderable) {
+                    //skybox
+                    glDepthMask(false);
+                    render(ts, mesh, mainCamera);
+                    glDepthMask(true);
+                    continue;
+                }
+                if (rC.renderable)
+                    render(ts, mesh, mainCamera);
+            }
             for (EntityComponent c : cachedModelMeshes) {
                 Mesh mesh = (Mesh) c;
                 RenderableComponent rC = mesh.renderableComponent;
-                if (rC.renderable) render(ts, mesh, mainCamera);
+                if (rC.renderable && !rC.noZBufferRendering) render(ts, mesh, mainCamera);
+                if (rC.renderable && rC.noZBufferRendering){
+                    glDisable(GL_DEPTH_TEST);
+                    render(ts, mesh, mainCamera);
+                    glEnable(GL_DEPTH_TEST);
+                }
                 /*glEnable(GL_STENCIL_TEST);
                 glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
@@ -120,20 +138,6 @@ public class SceneLayer extends Layer {
                 render(ts, mesh, mainCamera, outlineShader); // draw with the outline shader
                 mesh.finalizeScaleUp();
                 glDisable(GL_STENCIL_TEST);*/
-            }
-
-            for (EntityComponent c : cachedNativeMeshes) {
-                Mesh mesh = (Mesh) c;
-                RenderableComponent rC = mesh.renderableComponent;
-                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && rC.renderable) {
-                    //skybox
-                    glDepthMask(false);
-                    render(ts, mesh, mainCamera);
-                    glDepthMask(true);
-                    continue;
-                }
-                if (rC.renderable)
-                    render(ts, mesh, mainCamera);
             }
         }
         if (scene.getFrameBuffer() != null) scene.getFrameBuffer().unbind();
