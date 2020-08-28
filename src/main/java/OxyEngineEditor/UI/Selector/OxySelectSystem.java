@@ -2,6 +2,7 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Components.RenderableComponent;
 import OxyEngineEditor.Components.TransformComponent;
@@ -45,12 +46,12 @@ public class OxySelectSystem {
         if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_C] && ScenePanel.focusedWindow && !switchC) {
             if (gizmo.mode == OxyGizmo3D.GizmoMode.Translation) {
                 gizmo.mode = OxyGizmo3D.GizmoMode.Scale;
-                gizmo.mode.component.switchRenderableState(true);
-                OxyGizmo3D.GizmoMode.Translation.component.switchRenderableState(false);
+                gizmo.mode.component.switchRenderableState(RenderingMode.NoZBuffer);
+                OxyGizmo3D.GizmoMode.Translation.component.switchRenderableState(RenderingMode.None);
             } else {
                 gizmo.mode = OxyGizmo3D.GizmoMode.Translation;
-                gizmo.mode.component.switchRenderableState(true);
-                OxyGizmo3D.GizmoMode.Scale.component.switchRenderableState(false);
+                gizmo.mode.component.switchRenderableState(RenderingMode.NoZBuffer);
+                OxyGizmo3D.GizmoMode.Scale.component.switchRenderableState(RenderingMode.None);
             }
             switchC = true;
         }
@@ -82,14 +83,24 @@ public class OxySelectSystem {
             xModel = t.getXModelTranslation();
             yModel = t.getYModelTranslation();
             zModel = t.getZModelTranslation();
-            for (OxyModel m : component.models)
-                m.get(RenderableComponent.class).renderable = e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Translation;
+            for (OxyModel m : component.models){
+                if(e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Translation){
+                    m.get(RenderableComponent.class).mode = RenderingMode.NoZBuffer;
+                } else {
+                    m.get(RenderableComponent.class).mode = RenderingMode.None;
+                }
+            }
         } else if (component instanceof OxyGizmo3D.Scaling s) {
             xModel = s.getXModelScale();
             yModel = s.getYModelScale();
             zModel = s.getZModelScale();
-            for (OxyModel m : component.models)
-                m.get(RenderableComponent.class).renderable = e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Scale;
+            for (OxyModel m : component.models) {
+                if (e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Scale) {
+                    m.get(RenderableComponent.class).mode = RenderingMode.NoZBuffer;
+                } else {
+                    m.get(RenderableComponent.class).mode = RenderingMode.None;
+                }
+            }
             OxyModel scalingFactor = s.getScalingCube();
             if (e != null) {
                 TransformComponent sF = scalingFactor.get(TransformComponent.class);

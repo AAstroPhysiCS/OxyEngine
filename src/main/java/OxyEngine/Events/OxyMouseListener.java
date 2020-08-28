@@ -8,6 +8,8 @@ import imgui.ImGui;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.util.Set;
+
 public interface OxyMouseListener extends OxyEventListener {
 
     void mouseClicked(OxyEntity selectedEntity, int mouseButton);
@@ -20,9 +22,9 @@ public interface OxyMouseListener extends OxyEventListener {
 
     void mouseReleased(OxyEntity selectedEntity, int mouseButton);
 
-    default void dispatch(OxyEntity entity) {
+    default void dispatch(Set<OxyEntity> entities) {
         Vector3f direction = MouseSelector.getInstance().getObjectPosRelativeToCamera(ScenePanel.windowSize.x - ScenePanel.offset.x, ScenePanel.windowSize.y - ScenePanel.offset.y, new Vector2f(ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x, ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y), OxyRenderer.currentBoundedCamera);
-        OxyEntity e = MouseSelector.getInstance().selectObject(entity, OxyRenderer.currentBoundedCamera.getCameraController().origin, direction);
+        OxyEntity e = MouseSelector.getInstance().selectObjectGizmo(entities, OxyRenderer.currentBoundedCamera.getCameraController().origin, direction);
         dispatchMethods(e);
     }
 

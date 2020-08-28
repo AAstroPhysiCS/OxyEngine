@@ -1,6 +1,7 @@
 package OxyEngineEditor.Components;
 
 import OxyEngine.Core.Renderer.Buffer.*;
+import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -75,7 +76,7 @@ public class ModelMesh extends Mesh {
         private int[] indices;
         private int mode;
         private BufferTemplate.Usage usage;
-        private RenderableComponent component = new RenderableComponent(true);
+        private RenderableComponent component = new RenderableComponent(RenderingMode.Normal);
 
         @Override
         public ModelMeshBuilderImpl setShader(OxyShader shader) {

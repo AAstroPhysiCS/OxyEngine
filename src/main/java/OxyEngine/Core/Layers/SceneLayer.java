@@ -4,6 +4,7 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.OxyRenderer;
+import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.CubemapTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
@@ -22,7 +23,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class SceneLayer extends Layer {
 
     private Set<OxyEntity> cachedLightEntities;
-    private Set<EntityComponent> cachedNativeMeshes, cachedModelMeshes, cachedCameraComponents/*, cachedModelMeshesMasked*/;
+    private Set<EntityComponent> cachedNativeMeshes, cachedModelNormalMeshes, cachedCameraComponents;
 
     public SceneLayer(Scene scene) {
         super(scene);
@@ -37,7 +38,7 @@ public class SceneLayer extends Layer {
         cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), scene);
         cubemapTexture.init(cachedShaders);
         cachedNativeMeshes = scene.distinct(NativeObjectMesh.class);
-        cachedModelMeshes = scene.distinct(ModelMesh.class);
+        cachedModelNormalMeshes = scene.distinct(ModelMesh.class);
         cachedCameraComponents = scene.distinct(OxyCamera.class);
         cachedLightEntities = scene.view(Light.class);
 
@@ -46,7 +47,7 @@ public class SceneLayer extends Layer {
             for (EntityComponent e : cachedNativeMeshes) {
                 ((Mesh) e).initList();
             }
-            for (EntityComponent model : cachedModelMeshes) {
+            for (EntityComponent model : cachedModelNormalMeshes) {
                 ((ModelMesh) model).initList();
             }
         }
@@ -54,10 +55,10 @@ public class SceneLayer extends Layer {
 
     @Override
     public void rebuild() {
-        cachedModelMeshes = scene.distinct(ModelMesh.class);
+        cachedModelNormalMeshes = scene.distinct(ModelMesh.class);
         //Prep
         {
-            List<EntityComponent> cachedConverted = new ArrayList<>(cachedModelMeshes);
+            List<EntityComponent> cachedConverted = new ArrayList<>(cachedModelNormalMeshes);
             ModelMesh mesh = (ModelMesh) cachedConverted.get(cachedConverted.size() - 1);
             mesh.initList();
         }
@@ -104,40 +105,25 @@ public class SceneLayer extends Layer {
             for (EntityComponent c : cachedNativeMeshes) {
                 Mesh mesh = (Mesh) c;
                 RenderableComponent rC = mesh.renderableComponent;
-                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && rC.renderable) {
+                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && rC.mode == RenderingMode.Normal) {
                     //skybox
                     glDepthMask(false);
                     render(ts, mesh, mainCamera);
                     glDepthMask(true);
                     continue;
                 }
-                if (rC.renderable)
+                if (rC.mode == RenderingMode.Normal)
                     render(ts, mesh, mainCamera);
             }
-            for (EntityComponent c : cachedModelMeshes) {
+            for (EntityComponent c : cachedModelNormalMeshes) {
                 Mesh mesh = (Mesh) c;
-                RenderableComponent rC = mesh.renderableComponent;
-                if (rC.renderable && !rC.noZBufferRendering) render(ts, mesh, mainCamera);
-                if (rC.renderable && rC.noZBufferRendering){
+                if(mesh.renderableComponent.mode == RenderingMode.Normal)
+                    render(ts, mesh, mainCamera);
+                if(mesh.renderableComponent.mode == RenderingMode.NoZBuffer){
                     glDisable(GL_DEPTH_TEST);
                     render(ts, mesh, mainCamera);
                     glEnable(GL_DEPTH_TEST);
                 }
-                /*glEnable(GL_STENCIL_TEST);
-                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-                glStencilMask(0xFF);
-                glClear(GL_STENCIL_BUFFER_BIT);
-
-                glStencilFunc(GL_ALWAYS, 1, 0xFF);
-                if (rC.renderable) render(ts, mesh, mainCamera);
-                outlineShader.enable();
-                mesh.scaleUp(1.01f);
-                glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-                glStencilMask(0x00);
-                render(ts, mesh, mainCamera, outlineShader); // draw with the outline shader
-                mesh.finalizeScaleUp();
-                glDisable(GL_STENCIL_TEST);*/
             }
         }
         if (scene.getFrameBuffer() != null) scene.getFrameBuffer().unbind();
@@ -158,4 +144,19 @@ public class SceneLayer extends Layer {
         scene.getRenderer().render(ts, mesh);
         OxyRenderer.Stats.totalShapeCount = scene.getShapeCount();
     }
+    /*glEnable(GL_STENCIL_TEST);
+                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+                glStencilMask(0xFF);
+                glClear(GL_STENCIL_BUFFER_BIT);
+
+                glStencilFunc(GL_ALWAYS, 1, 0xFF);
+                if (rC.renderable) render(ts, mesh, mainCamera);
+                outlineShader.enable();
+                mesh.scaleUp(1.01f);
+                glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+                glStencilMask(0x00);
+                render(ts, mesh, mainCamera, outlineShader); // draw with the outline shader
+                mesh.finalizeScaleUp();
+                glDisable(GL_STENCIL_TEST);*/
 }

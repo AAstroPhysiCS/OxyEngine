@@ -2,7 +2,10 @@ package OxyEngineEditor.Scene;
 
 import OxyEngineEditor.Components.EntityComponent;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 
 /*
  * Entity Component System (ECS)
@@ -18,7 +21,7 @@ public class Registry {
      */
     public final void addComponent(OxyEntity entity, EntityComponent... component) {
         for (EntityComponent c : component) {
-            if(c != null) {
+            if (c != null) {
                 Set<EntityComponent> entityComponentSet = entityList.get(entity);
                 entityComponentSet.removeIf(entityComponent -> entityComponent.getClass().equals(c.getClass()) || entityComponent.getClass().isInstance(c));
                 entityList.get(entity).add(c);
@@ -67,7 +70,7 @@ public class Registry {
             for (EntityComponent c : value) {
                 if (c.getClass() == destClass) {
                     list.add(entity);
-                } else if(destClass.isInstance(c)){
+                } else if (destClass.isInstance(c)) {
                     list.add(entity);
                 }
             }
@@ -89,7 +92,7 @@ public class Registry {
                 for (var destClass : destClasses) {
                     if (c.getClass() == destClass) {
                         counter++;
-                        if(counter == destClasses.length){
+                        if (counter == destClasses.length) {
                             list.add(entity);
                         }
                     }
@@ -108,7 +111,28 @@ public class Registry {
                 for (var destClass : destClasses) {
                     if (c.getClass() == destClass || destClass.isInstance(c)) {
                         counter++;
-                        if(counter == destClasses.length){
+                        if (counter == destClasses.length) {
+                            allDistinctComponents.add(c);
+                        }
+                    }
+                }
+            }
+        }
+        return allDistinctComponents;
+    }
+
+    @SafeVarargs
+    public final <U extends EntityComponent> Set<EntityComponent> distinct(RegistryPredicate<Boolean, U> predicate, Class<U> type, Class<? extends EntityComponent>... destClasses) {
+        Set<EntityComponent> allDistinctComponents = new LinkedHashSet<>();
+        for (var entrySet : entityList.entrySet()) {
+            var value = entrySet.getValue();
+            var entity = entrySet.getKey();
+            int counter = 0;
+            for (EntityComponent c : value) {
+                for (var destClass : destClasses) {
+                    if (c.getClass() == destClass || destClass.isInstance(c)) {
+                        counter++;
+                        if (counter == destClasses.length && predicate.test(entity.get(type))) {
                             allDistinctComponents.add(c);
                         }
                     }

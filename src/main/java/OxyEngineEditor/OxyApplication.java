@@ -83,7 +83,7 @@ public class OxyApplication implements OxyDisposable {
         List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"), oxyShader);
         for (OxyModel obj : testObjects) {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0), 2f));
-            obj.updateData();
+            obj.constructData();
         }
 
         int[] samplers = new int[32];

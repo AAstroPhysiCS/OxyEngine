@@ -4,6 +4,7 @@ import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.IndexBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
+import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
 
@@ -42,7 +43,7 @@ public class NativeObjectMesh extends Mesh {
         private int mode = -1;
         private BufferTemplate.Usage usage;
         private OxyShader shader;
-        private RenderableComponent component = new RenderableComponent(true);
+        private RenderableComponent component = new RenderableComponent(RenderingMode.Normal);
 
         @Override
         public NativeMeshBuilderImpl setShader(OxyShader shader) {

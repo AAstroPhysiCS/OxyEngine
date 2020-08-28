@@ -7,28 +7,23 @@ import java.util.*;
 
 public final class OxyEventDispatcher {
 
-    private static final Map<OxyEntity, List<OxyEventListener>> listeners = new HashMap<>();
+    private static final Map<OxyEventListener, Set<OxyEntity>> listeners = new HashMap<>();
 
     public OxyEventDispatcher() {
     }
 
     public void addListeners(OxyEntity entity, OxyEventListener listener) {
-        if (!listeners.containsKey(entity))
-            listeners.put(entity, new ArrayList<>());
-        if (!listeners.get(entity).contains(listener))
-            listeners.get(entity).add(listener);
+        if (!listeners.containsKey(listener))
+            listeners.put(listener, new LinkedHashSet<>());
+        listeners.get(listener).add(entity);
     }
 
     public void dispatch() {
         for (var entrySet : listeners.entrySet()) {
-            OxyEntity entity = entrySet.getKey();
-            List<OxyEventListener> listeners = entrySet.getValue();
-            for (OxyEventListener l : listeners) {
-                if (l instanceof OxyMouseListener m) {
-                    if (OxyRenderer.currentBoundedCamera != null) {
-                        m.dispatch(entity);
-                    }
-                }
+            OxyEventListener listener = entrySet.getKey();
+            Set<OxyEntity> entities = entrySet.getValue();
+            if (listener instanceof OxyMouseListener m && OxyRenderer.currentBoundedCamera != null) {
+                m.dispatch(entities);
             }
         }
     }

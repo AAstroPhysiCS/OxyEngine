@@ -2,6 +2,7 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.System.OxyDisposable;
@@ -38,7 +39,7 @@ public class Scene implements OxyDisposable {
     public final OxyNativeObject createNativeObjectEntity() {
         OxyNativeObject e = new OxyNativeObject(this);
         registry.entityList.put(e, new LinkedHashSet<>(15));
-        e.addComponent(new TransformComponent(), new RenderableComponent(true));
+        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
         return e;
     }
 
@@ -65,7 +66,7 @@ public class Scene implements OxyDisposable {
                     new OxyColor(assimpMesh.material.diffuseColor()),
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
                     new TagComponent(assimpMesh.name),
-                    new RenderableComponent(true)
+                    new RenderableComponent(RenderingMode.Normal)
             );
             assimpMesh.material.setValues(shader);
             e.initData();
@@ -91,7 +92,7 @@ public class Scene implements OxyDisposable {
                 new OxyColor(assimpMesh.material.diffuseColor()),
                 new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
                 new TagComponent(assimpMesh.name),
-                new RenderableComponent(true)
+                new RenderableComponent(RenderingMode.Normal)
         );
         assimpMesh.material.setValues(shader);
         e.initData();
@@ -150,11 +151,18 @@ public class Scene implements OxyDisposable {
         return registry.distinct(destClasses);
     }
 
+    @SafeVarargs
+    public final <U extends EntityComponent> Set<EntityComponent> distinct(RegistryPredicate<Boolean, U> predicate, Class<U> type, Class<? extends EntityComponent>... destClasses) {
+        return registry.distinct(predicate, type, destClasses);
+    }
+
     public void setUISystem(OxyUISystem oxyUISystem) {
         this.oxyUISystem = oxyUISystem;
     }
 
-    public int getShapeCount() { return registry.entityList.keySet().size(); }
+    public int getShapeCount() {
+        return registry.entityList.keySet().size();
+    }
 
     public OxyRenderer3D getRenderer() {
         return renderer;

@@ -28,6 +28,8 @@ public class OxyGizmoController implements OxyMouseListener {
     static Scene scene;
     static WindowHandle windowHandle;
 
+    static boolean dragging;
+
     static boolean pressedXTranslation, pressedYTranslation, pressedZTranslation;
     static boolean pressedXScale, pressedYScale, pressedZScale, pressedScaleFactor;
 
@@ -55,11 +57,12 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseDown(OxyEntity selectedEntity, int mouseButton) {
-        if (mouseButton == ImGuiMouseButton.Right && currentEntitySelected != null) {
+        if (mouseButton == ImGuiMouseButton.Right && currentEntitySelected != null && dragging) {
             switch (gizmo.mode) {
                 case Translation -> handleTranslation();
                 case Scale -> handleScaling();
             }
+            dragging = false;
         }
     }
 
@@ -86,6 +89,7 @@ public class OxyGizmoController implements OxyMouseListener {
     @Override
     public void mouseDragged(OxyEntity selectedEntity, int mouseButton) {
         oldMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
+        dragging = true;
     }
 
     @Override
@@ -138,10 +142,11 @@ public class OxyGizmoController implements OxyMouseListener {
         Vector2d delta = nowMousePos.sub(oldMousePos);
 
         float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
-        float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 8f;
-        float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 8f;
-        if (deltaX <= -1f * xC.scale.x / 8f || deltaX >= 1f * xC.scale.x / 8f) deltaX = 0; // for safety reasons
-        if (deltaY <= -1f * yC.scale.y / 8f || deltaY >= 1f * yC.scale.y / 8f) deltaY = 0;
+        float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 4f;
+        float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 4f;
+        if (deltaX <= -1f * xC.scale.x / 16f || deltaX >= 1f * xC.scale.x / 16f) deltaX = 0; // for safety reasons
+        if (deltaY <= -1f * yC.scale.y / 16f || deltaY >= 1f * yC.scale.y / 16f) deltaY = 0;
+
         if (pressedZTranslation) {
             xC.position.add(0, 0, -deltaX);
             yC.position.add(0, 0, -deltaX);
@@ -149,6 +154,7 @@ public class OxyGizmoController implements OxyMouseListener {
             currC.position.add(0, 0, -deltaX);
             for (int i = 0; i < 4; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(0, 0, -deltaX);
+            currentEntitySelected.updateData();
         } else if (pressedYTranslation) {
             xC.position.add(0, deltaY, 0);
             yC.position.add(0, deltaY, 0);
@@ -156,6 +162,7 @@ public class OxyGizmoController implements OxyMouseListener {
             currC.position.add(0, deltaY, 0);
             for (int i = 0; i < 4; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(0, deltaY, 0);
+            currentEntitySelected.updateData();
         } else if (pressedXTranslation) {
             xC.position.add(deltaX, 0, 0);
             yC.position.add(deltaX, 0, 0);
@@ -163,52 +170,8 @@ public class OxyGizmoController implements OxyMouseListener {
             currC.position.add(deltaX, 0, 0);
             for (int i = 0; i < 4; i++)
                 OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(deltaX, 0, 0);
+            currentEntitySelected.updateData();
         }
-        currentEntitySelected.updateData();
-        xAxis.updateData();
-        yAxis.updateData();
-        zAxis.updateData();
-        for (int i = 0; i < 4; i++)
-            OxyGizmo3D.GizmoMode.Scale.component.models.get(i).updateData();
-    }
-
-    private void handleScaling() {
-        OxyGizmo3D.Scaling s = (OxyGizmo3D.Scaling) gizmo.mode.component;
-
-        OxyModel xAxis = s.getXModelScale();
-        OxyModel yAxis = s.getYModelScale();
-
-        TransformComponent xC = xAxis.get(TransformComponent.class);
-        TransformComponent yC = yAxis.get(TransformComponent.class);
-
-        TransformComponent currC = currentEntitySelected.get(TransformComponent.class);
-
-        Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
-        Vector2d delta = nowMousePos.sub(oldMousePos);
-
-        float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
-        float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 8f;
-        float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 8f;
-        if (deltaX <= -1f * xC.scale.x / 8f || deltaX >= 1f * xC.scale.x / 8f) deltaX = 0; // for safety reasons
-        if (deltaY <= -1f * yC.scale.y / 8f || deltaY >= 1f * yC.scale.y / 8f) deltaY = 0;
-
-        if (pressedZScale) {
-            currC.scale.x += -deltaX;
-            if (currC.scale.x <= 0) currC.scale.x = 0;
-        } else if (pressedYScale) {
-            currC.scale.y += -deltaY;
-            if (currC.scale.y <= 0) currC.scale.y = 0;
-        } else if (pressedXScale) {
-            currC.scale.z += deltaX;
-            if (currC.scale.z <= 0) currC.scale.z = 0;
-        } else if(pressedScaleFactor){
-            currC.scale.add(deltaX, deltaX, deltaX);
-            if (currC.scale.x <= 0) currC.scale.x = 0;
-            if (currC.scale.y <= 0) currC.scale.y = 0;
-            if (currC.scale.z <= 0) currC.scale.z = 0;
-        }
-
-        currentEntitySelected.updateData();
     }
 
     private void handleScalingSwitch(OxyEntity selectedEntity) {
@@ -240,7 +203,7 @@ public class OxyGizmoController implements OxyMouseListener {
             pressedYTranslation = false;
             pressedZTranslation = false;
         }
-        if(selectedEntity == s.getScalingCube()){
+        if (selectedEntity == s.getScalingCube()) {
             pressedScaleFactor = true;
             pressedZScale = false;
             pressedXScale = false;
@@ -248,6 +211,47 @@ public class OxyGizmoController implements OxyMouseListener {
             pressedXTranslation = false;
             pressedYTranslation = false;
             pressedZTranslation = false;
+        }
+    }
+
+    private void handleScaling() {
+        OxyGizmo3D.Scaling s = (OxyGizmo3D.Scaling) gizmo.mode.component;
+
+        OxyModel xAxis = s.getXModelScale();
+        OxyModel yAxis = s.getYModelScale();
+
+        TransformComponent xC = xAxis.get(TransformComponent.class);
+        TransformComponent yC = yAxis.get(TransformComponent.class);
+
+        TransformComponent currC = currentEntitySelected.get(TransformComponent.class);
+
+        Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
+        Vector2d delta = nowMousePos.sub(oldMousePos);
+
+        float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
+        float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 4f;
+        float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 4f;
+        if (deltaX <= -1f * xC.scale.x / 16f || deltaX >= 1f * xC.scale.x / 16f) deltaX = 0; // for safety reasons
+        if (deltaY <= -1f * yC.scale.y / 16f || deltaY >= 1f * yC.scale.y / 16f) deltaY = 0;
+
+        if (pressedZScale) {
+            currC.scale.x += -deltaX;
+            if (currC.scale.x <= 0) currC.scale.x = 0;
+            currentEntitySelected.updateData();
+        } else if (pressedYScale) {
+            currC.scale.y += -deltaY;
+            if (currC.scale.y <= 0) currC.scale.y = 0;
+            currentEntitySelected.updateData();
+        } else if (pressedXScale) {
+            currC.scale.z += deltaX;
+            if (currC.scale.z <= 0) currC.scale.z = 0;
+            currentEntitySelected.updateData();
+        } else if (pressedScaleFactor) {
+            currC.scale.add(deltaX, deltaX, deltaX);
+            if (currC.scale.x <= 0) currC.scale.x = 0;
+            if (currC.scale.y <= 0) currC.scale.y = 0;
+            if (currC.scale.z <= 0) currC.scale.z = 0;
+            currentEntitySelected.updateData();
         }
     }
 }

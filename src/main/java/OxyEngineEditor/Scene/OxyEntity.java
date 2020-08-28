@@ -28,6 +28,8 @@ public abstract class OxyEntity {
 
     protected abstract void initData();
 
+    public abstract void constructData();
+
     public abstract void updateData();
 
     public final void addComponent(EntityComponent... component) {

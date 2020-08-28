@@ -2,7 +2,6 @@ package OxyEngineEditor.Scene.NativeObjects;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngineEditor.Components.NativeObjectMesh;
-import OxyEngineEditor.Components.RenderableComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
@@ -30,11 +29,13 @@ public class OxyNativeObject extends OxyEntity implements Cloneable {
     }
 
     @Override
+    public void constructData() {
+        throw new NullPointerException("CONSTRUCT DATA NOT IMPLEMENTED");
+    }
+
+    @Override
     public void updateData() {
-        get(Mesh.class).renderableComponent.noZBufferRendering = get(RenderableComponent.class).noZBufferRendering;
-        get(Mesh.class).renderableComponent.renderable = get(RenderableComponent.class).renderable;
-        factory.constructData(this);
-        get(Mesh.class).updateSingleEntityData(scene, this);
+        throw new NullPointerException("UPDATE DATA NOT IMPLEMENTED");
     }
 
     public ObjectType getType() {

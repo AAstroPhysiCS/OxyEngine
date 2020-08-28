@@ -1,5 +1,6 @@
 package OxyEngineEditor.UI.Selector;
 
+import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxySystem;
@@ -50,15 +51,16 @@ public class OxyGizmo3D {
         public Component(String path, WindowHandle windowHandle, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
             models = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath(path), shader);
             for (OxyModel m : models) {
-                m.addComponent(new TransformComponent(3f), new SelectedComponent(false, true), new RenderableComponent(true, true));
+                m.addComponent(new TransformComponent(3f), new SelectedComponent(false, true), new RenderableComponent(RenderingMode.None));
                 m.addEventListener(new OxyGizmoController(windowHandle, scene, gizmo3D));
+                m.constructData();
             }
             oldZoom = zoom; //default
         }
 
-        public void switchRenderableState(boolean value) {
+        public void switchRenderableState(RenderingMode value) {
             for (OxyModel model : models) {
-                model.get(RenderableComponent.class).renderable = value;
+                model.get(RenderableComponent.class).mode = value;
                 model.updateComponents();
             }
         }
