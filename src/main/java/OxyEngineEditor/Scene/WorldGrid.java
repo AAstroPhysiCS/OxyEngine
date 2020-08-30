@@ -2,12 +2,13 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Components.NativeObjectMesh;
 import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.NativeObjects.GridFactory;
 import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static OxyEngineEditor.Components.NativeObjectMesh.*;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
@@ -39,7 +40,7 @@ public class WorldGrid {
         for (int x = -size; x < size; x++) {
             for (int z = -size; z < size; z++) {
                 OxyNativeObject e = scene.createNativeObjectEntity();
-                e.addComponent(worldGridMesh, new GridFactory(), new OxyColor(1.0f, 1.0f, 1.0f, 0.2f), new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
+                e.addComponent(worldGridMesh, new GridFactory(), new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 0.2f)), new TransformComponent(new Vector3f(x, 0, z), new Vector3f(0, 0, 0), 20f));
                 e.initData();
             }
         }

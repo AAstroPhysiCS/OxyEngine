@@ -5,6 +5,7 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.OxyMouseListener;
 import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
@@ -69,18 +70,18 @@ public class OxyGizmoController implements OxyMouseListener {
     @Override
     public void mouseHovered(OxyEntity hoveredEntity) {
         if (hoveredEntity == null && hoveredGameObject != null) {
-            OxyColor hoveredColor = hoveredGameObject.get(OxyColor.class);
+            OxyColor hoveredColor = hoveredGameObject.get(OxyMaterial.class).diffuseColor;
             hoveredColor.setColorRGBA(standardColor.getNumbers());
             hoveredGameObject.updateData();
         }
         if (hoveredEntity instanceof OxyModel) {
             if (!init) {
-                OxyColor color = hoveredEntity.get(OxyColor.class);
+                OxyColor color = hoveredEntity.get(OxyMaterial.class).diffuseColor;
                 standardColor = (OxyColor) color.clone();
                 init = true;
             }
             hoveredGameObject = hoveredEntity;
-            OxyColor hoveredColor = hoveredGameObject.get(OxyColor.class);
+            OxyColor hoveredColor = hoveredGameObject.get(OxyMaterial.class).diffuseColor;
             hoveredColor.setColorRGBA(new float[]{1.0f, 1.0f, 0.0f, 1.0f});
             hoveredGameObject.updateData();
         }
@@ -97,7 +98,7 @@ public class OxyGizmoController implements OxyMouseListener {
     }
 
     private void handleTranslationSwitch(OxyEntity selectedEntity) {
-        OxyGizmo3D.Translation t = (OxyGizmo3D.Translation) gizmo.mode.component;
+        OxyGizmo3D.Translation t = (OxyGizmo3D.Translation) gizmo.mode.gizmoComponent;
         if (selectedEntity == t.getXModelTranslation()) {
             pressedXTranslation = true;
             pressedYTranslation = false;
@@ -128,7 +129,7 @@ public class OxyGizmoController implements OxyMouseListener {
     }
 
     private void handleTranslation() {
-        OxyGizmo3D.Translation t = (OxyGizmo3D.Translation) gizmo.mode.component;
+        OxyGizmo3D.Translation t = (OxyGizmo3D.Translation) gizmo.mode.gizmoComponent;
         OxyModel xAxis = t.getXModelTranslation();
         OxyModel yAxis = t.getYModelTranslation();
         OxyModel zAxis = t.getZModelTranslation();
@@ -144,8 +145,8 @@ public class OxyGizmoController implements OxyMouseListener {
         float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
         float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 4f;
         float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 4f;
-        if (deltaX <= -1f * xC.scale.x / 16f || deltaX >= 1f * xC.scale.x / 16f) deltaX = 0; // for safety reasons
-        if (deltaY <= -1f * yC.scale.y / 16f || deltaY >= 1f * yC.scale.y / 16f) deltaY = 0;
+        if (deltaX <= -1f * xC.scale.x / 4f || deltaX >= 1f * xC.scale.x / 4f) deltaX = 0; // for safety reasons
+        if (deltaY <= -1f * yC.scale.y / 4f || deltaY >= 1f * yC.scale.y / 4f) deltaY = 0;
 
         if (pressedZTranslation) {
             xC.position.add(0, 0, -deltaX);
@@ -153,7 +154,7 @@ public class OxyGizmoController implements OxyMouseListener {
             zC.position.add(0, 0, -deltaX);
             currC.position.add(0, 0, -deltaX);
             for (int i = 0; i < 4; i++)
-                OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(0, 0, -deltaX);
+                OxyGizmo3D.GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(0, 0, -deltaX);
             currentEntitySelected.updateData();
         } else if (pressedYTranslation) {
             xC.position.add(0, deltaY, 0);
@@ -161,7 +162,7 @@ public class OxyGizmoController implements OxyMouseListener {
             zC.position.add(0, deltaY, 0);
             currC.position.add(0, deltaY, 0);
             for (int i = 0; i < 4; i++)
-                OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(0, deltaY, 0);
+                OxyGizmo3D.GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(0, deltaY, 0);
             currentEntitySelected.updateData();
         } else if (pressedXTranslation) {
             xC.position.add(deltaX, 0, 0);
@@ -169,13 +170,13 @@ public class OxyGizmoController implements OxyMouseListener {
             zC.position.add(deltaX, 0, 0);
             currC.position.add(deltaX, 0, 0);
             for (int i = 0; i < 4; i++)
-                OxyGizmo3D.GizmoMode.Scale.component.models.get(i).get(TransformComponent.class).position.add(deltaX, 0, 0);
+                OxyGizmo3D.GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(deltaX, 0, 0);
             currentEntitySelected.updateData();
         }
     }
 
     private void handleScalingSwitch(OxyEntity selectedEntity) {
-        OxyGizmo3D.Scaling s = (OxyGizmo3D.Scaling) gizmo.mode.component;
+        OxyGizmo3D.Scaling s = (OxyGizmo3D.Scaling) gizmo.mode.gizmoComponent;
         if (selectedEntity == s.getXModelScale()) {
             pressedXScale = true;
             pressedYScale = false;
@@ -215,7 +216,7 @@ public class OxyGizmoController implements OxyMouseListener {
     }
 
     private void handleScaling() {
-        OxyGizmo3D.Scaling s = (OxyGizmo3D.Scaling) gizmo.mode.component;
+        OxyGizmo3D.Scaling s = (OxyGizmo3D.Scaling) gizmo.mode.gizmoComponent;
 
         OxyModel xAxis = s.getXModelScale();
         OxyModel yAxis = s.getYModelScale();
@@ -231,8 +232,8 @@ public class OxyGizmoController implements OxyMouseListener {
         float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
         float deltaX = (float) ((delta.x * mouseSpeed) * xC.scale.x) / 4f;
         float deltaY = (float) ((delta.y * mouseSpeed) * yC.scale.y) / 4f;
-        if (deltaX <= -1f * xC.scale.x / 16f || deltaX >= 1f * xC.scale.x / 16f) deltaX = 0; // for safety reasons
-        if (deltaY <= -1f * yC.scale.y / 16f || deltaY >= 1f * yC.scale.y / 16f) deltaY = 0;
+        if (deltaX <= -1f * xC.scale.x / 4f || deltaX >= 1f * xC.scale.x / 4f) deltaX = 0; // for safety reasons
+        if (deltaY <= -1f * yC.scale.y / 4f || deltaY >= 1f * yC.scale.y / 4f) deltaY = 0;
 
         if (pressedZScale) {
             currC.scale.x += -deltaX;

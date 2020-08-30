@@ -1,5 +1,6 @@
 package OxyEngineEditor;
 
+import OxyEngine.Core.Layers.*;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererType;
@@ -13,11 +14,6 @@ import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.PerspectiveCamera;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TransformComponent;
-import OxyEngine.Core.Layers.Layer;
-import OxyEngine.Core.Layers.LayerStack;
-import OxyEngine.Core.Layers.OverlayPanelLayer;
-import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngineEditor.Scene.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.OxyUISystem;
@@ -43,14 +39,14 @@ public class OxyApplication implements OxyDisposable {
 
     public static int FPS = 0;
 
-    public OxyApplication(){
+    public OxyApplication() {
         windowHandle = new WindowHandle("OxyEngine - Editor", 1366, 768, WindowHandle.WindowMode.WINDOWEDFULLSCREEN);
         oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, OxyRendererType.Oxy3D);
         layerStack = new LayerStack(); // every app should have a layer stack
         oxyEngine.start();
     }
 
-    public void init(){
+    public void init() {
         oxyEngine.init();
 
         OxyShader oxyShader = new OxyShader("shaders/world.glsl");
@@ -64,24 +60,24 @@ public class OxyApplication implements OxyDisposable {
         /*OxyEntity pointLightEntity = scene.createNativeObjectEntity();
         Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
         pointLightEntity.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
-                new Vector3f(-5, -25, 0),
+                new Vector3f(0, -33, -1.8f),
                 null,
-                new Vector3f(0.2f, 0.2f, 0.2f),
+                new Vector3f(2f, 2f, 2f),
                 new Vector3f(10f, 10f, 10f),
-                new Vector3f(1.0f, 1.0f, 1.0f)));*/
+                new Vector3f(10f, 10f, 10f)));*/
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
         directionalLightEntity.addComponent(oxyShader, directionalLightComponent, new EmittingComponent(
                 null,
-                new Vector3f(33, -17, -32),
+                new Vector3f(152, -9.8f, -0.14f),
                 new Vector3f(0.5f, 0.5f, 0.5f),
                 new Vector3f(5.0f, 5.0f, 5.0f),
                 new Vector3f(0f, 0f, 0f)));*/
 
 
-        List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene2.obj"), oxyShader);
-        for (OxyModel obj : testObjects) {
+        List<OxyEntity> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene3.obj"), oxyShader);
+        for (OxyEntity obj : testObjects) {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0), 2f));
             obj.constructData();
         }
@@ -93,33 +89,33 @@ public class OxyApplication implements OxyDisposable {
         oxyShader.disable();
 
         //order matters!
-        scene.setUISystem(new OxyUISystem(scene, windowHandle));
-
+        scene.setUISystem(new OxyUISystem(windowHandle));
         SceneLayer sceneLayer = new SceneLayer(scene);
+        GizmoLayer gizmoLayer = new GizmoLayer(scene, windowHandle);
         OverlayPanelLayer overlayPanelLayer = new OverlayPanelLayer(windowHandle, scene);
 
-        overlayPanelLayer.addPanel(StatsPanel.getInstance(windowHandle));
-        overlayPanelLayer.addPanel(ToolbarPanel.getInstance(windowHandle));
-        overlayPanelLayer.addPanel(ConfigurationPanel.getInstance(windowHandle, sceneLayer));
-        overlayPanelLayer.addPanel(ScenePanel.getInstance(windowHandle, sceneLayer, oxyShader));
-        overlayPanelLayer.addPanel(PropertiesPanel.getInstance(windowHandle));
+        overlayPanelLayer.addPanel(StatsPanel.getInstance());
+        overlayPanelLayer.addPanel(ToolbarPanel.getInstance());
+        overlayPanelLayer.addPanel(SceneHierarchyPanel.getInstance(sceneLayer, oxyShader));
+        overlayPanelLayer.addPanel(ScenePanel.getInstance(sceneLayer, oxyShader));
+        overlayPanelLayer.addPanel(PropertiesPanel.getInstance());
 
-        layerStack.pushLayer(sceneLayer, overlayPanelLayer);
-        for(Layer l : layerStack.getLayerStack()){
+        layerStack.pushLayer(sceneLayer, gizmoLayer, overlayPanelLayer);
+        for (Layer l : layerStack.getLayerStack()) {
             l.build();
         }
     }
 
-    public void update(float ts, float deltaTime){
-        for(Layer l : layerStack.getLayerStack()){
+    public void update(float ts, float deltaTime) {
+        for (Layer l : layerStack.getLayerStack()) {
             l.update(ts, deltaTime);
         }
     }
 
-    public void render(float ts, float deltaTime){
+    public void render(float ts, float deltaTime) {
         OxyTexture.bindAllTextureSlots();
 
-        for(Layer l : layerStack.getLayerStack())
+        for (Layer l : layerStack.getLayerStack())
             l.render(ts, deltaTime);
 
         OpenGLRendererAPI.swapBuffer(windowHandle);

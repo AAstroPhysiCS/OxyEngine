@@ -40,7 +40,7 @@ public interface ObjectSelector {
 
             selected.selected = false;
 
-            if (tag.tag().startsWith("Sphere")) {
+            if (tag.tag().contains("Sphere")) {
                 if (c.scale.x == c.scale.y && c.scale.x == c.scale.z) {
                     if (Intersectionf.intersectRaySphere(origin, direction, position, boundingBox.max().y * boundingBox.max().y * c.scale.y * c.scale.y, nearFar) && nearFar.x < closestDistance) {
                         closestDistance = nearFar.x;
@@ -66,7 +66,7 @@ public interface ObjectSelector {
                         }
                     }
                 }
-            } else if (tag.tag().startsWith("Cube")) {
+            } else if (tag.tag().contains("Cube")) {
                 min.set(position);
                 max.set(position);
                 min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));
@@ -76,7 +76,7 @@ public interface ObjectSelector {
                     selectedEntity = entity;
                     selected.selected = true;
                 }
-            } else if (tag.tag().startsWith("Cone")) {
+            } else {
                 float result;
                 for (int i = 0; i < entity.vertices.length; ) {
                     if (i >= entity.vertices.length - 18) break;

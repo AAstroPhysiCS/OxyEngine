@@ -1,6 +1,7 @@
 package OxyEngineEditor.Scene.Model;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import org.joml.*;
 import org.lwjgl.PointerBuffer;
@@ -51,7 +52,6 @@ public class OxyModelLoader {
         AIScene aiScene = aiImportFile(objPath, flag);
         PointerBuffer materials = Objects.requireNonNull(aiScene).mMaterials();
         PointerBuffer meshes = Objects.requireNonNull(aiScene).mMeshes();
-
         for (int i = 0; i < aiScene.mNumMeshes(); i++) {
             AIMesh aiMesh = AIMesh.create(Objects.requireNonNull(meshes).get(i));
             AssimpOxyMesh oxyMesh = new AssimpOxyMesh(aiMesh.mName().dataString());
@@ -111,7 +111,7 @@ public class OxyModelLoader {
     private void addMaterial(AIMaterial aiMaterial, AssimpOxyMesh oxyMesh) {
         AIColor4D color = AIColor4D.create();
         AIString path = AIString.calloc();
-        Assimp.aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
+        aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
         String textPath = path.dataString();
         ImageTexture texture = null;
         if (!textPath.equals("")) {
@@ -134,6 +134,6 @@ public class OxyModelLoader {
         if (result == 0) {
             specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
-        oxyMesh.material = new OxyMaterial(texture, ambient, diffuse, specular, 128f);
+        oxyMesh.material = new OxyMaterial(texture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 1f);
     }
 }

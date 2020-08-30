@@ -1,7 +1,6 @@
 package OxyEngineEditor.Scene.Model;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.TransformComponent;
 import org.joml.Matrix4f;
@@ -34,8 +33,8 @@ public class ModelFactory implements EntityComponent {
         e.tcs = new float[verticesNonTransformed.size() * 2 * 4];
         List<Integer> indicesArr = new ArrayList<>();
 
-        OxyColor color = e.get(OxyColor.class);
-        ImageTexture texture = e.get(ImageTexture.class);
+        OxyMaterial material = e.get(OxyMaterial.class);
+        ImageTexture texture = material.texture;
         TransformComponent c = e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
@@ -56,11 +55,11 @@ public class ModelFactory implements EntityComponent {
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
-            if (color != null) {
-                e.vertices[vertPtr++] = color.getNumbers()[0];
-                e.vertices[vertPtr++] = color.getNumbers()[1];
-                e.vertices[vertPtr++] = color.getNumbers()[2];
-                e.vertices[vertPtr++] = color.getNumbers()[3];
+            if (material.diffuseColor != null) {
+                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[0];
+                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[1];
+                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[2];
+                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[3];
             } else vertPtr += 4;
         }
 
@@ -86,8 +85,8 @@ public class ModelFactory implements EntityComponent {
     }
 
     public void updateData(OxyModel e) {
-        OxyColor color = e.get(OxyColor.class);
-        ImageTexture texture = e.get(ImageTexture.class);
+        OxyMaterial material = e.get(OxyMaterial.class);
+        ImageTexture texture = material.texture;
         TransformComponent c = e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
@@ -108,11 +107,11 @@ public class ModelFactory implements EntityComponent {
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
-            if (color != null) {
-                e.vertices[vertPtr++] = color.getNumbers()[0];
-                e.vertices[vertPtr++] = color.getNumbers()[1];
-                e.vertices[vertPtr++] = color.getNumbers()[2];
-                e.vertices[vertPtr++] = color.getNumbers()[3];
+            if (material.diffuseColor != null) {
+                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[0];
+                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[1];
+                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[2];
+                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[3];
             } else vertPtr += 4;
         }
     }

@@ -2,26 +2,16 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Components.PerspectiveCamera;
-import OxyEngineEditor.Components.SelectedComponent;
-import OxyEngineEditor.Components.TransformComponent;
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngineEditor.Scene.Model.OxyModel;
 import OxyEngineEditor.Scene.WorldGrid;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
-import org.joml.Vector3f;
 
-import static OxyEngine.System.Globals.Globals.normalizeColor;
-
-public class ScenePanel extends UIPanel {
+public class ScenePanel extends Panel {
 
     public static boolean focusedWindowDragging, focusedWindow;
 
@@ -33,19 +23,16 @@ public class ScenePanel extends UIPanel {
     private static ScenePanel INSTANCE = null;
 
     private final SceneLayer sceneLayer;
-    private final OxyShader shader;
 
-    public static ScenePanel getInstance(WindowHandle windowHandle, SceneLayer sceneLayer, OxyShader shader) {
-        if (INSTANCE == null) INSTANCE = new ScenePanel(windowHandle, sceneLayer, shader);
+    public static ScenePanel getInstance(SceneLayer sceneLayer, OxyShader shader) {
+        if (INSTANCE == null) INSTANCE = new ScenePanel(sceneLayer, shader);
         return INSTANCE;
     }
 
     public static ScenePanel getInstance() { return INSTANCE; }
 
-    private ScenePanel(WindowHandle windowHandle, SceneLayer sceneLayer, OxyShader shader) {
-        super(windowHandle);
+    private ScenePanel(SceneLayer sceneLayer, OxyShader shader) {
         this.sceneLayer = sceneLayer;
-        this.shader = shader;
         new WorldGrid(sceneLayer.getScene(), 25, shader);
     }
 
@@ -53,12 +40,10 @@ public class ScenePanel extends UIPanel {
     public void preload() {
     }
 
-    static int counter = 1;
-
     @Override
     public void renderPanel() {
 
-        ImGui.pushStyleColor(ImGuiCol.ChildBg, normalizeColor(20), normalizeColor(20), normalizeColor(20), 1.0f);
+        ImGui.pushStyleColor(ImGuiCol.ChildBg, bgC[0], bgC[1], bgC[2], bgC[3]);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0);
         ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, 0);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowMinSize, 50, 50);
@@ -86,25 +71,6 @@ public class ScenePanel extends UIPanel {
                 if (sceneLayer.getScene().getRenderer().getCamera() instanceof PerspectiveCamera p)
                     p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
             }
-        }
-
-        if (ImGui.beginDragDropTarget()) {
-            byte[] data = ImGui.acceptDragDropPayload("mousePosViewportLayer");
-            if (data != null) {
-                OxyModel model = sceneLayer.getScene().createModelEntity(new String(data), shader);
-                //TEMP
-                ImageTexture texture = null;
-                if (PropertiesPanel.lastTexturePath != null) {
-                    texture = OxyTexture.loadImage(PropertiesPanel.lastTexturePath);
-                    PropertiesPanel.lastTextureID = texture.getTextureId();
-                }
-
-                OxyColor color = new OxyColor(PropertiesPanel.diffuseColor);
-                model.addComponent(new SelectedComponent(false), texture, color, new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
-                model.updateData();
-                sceneLayer.rebuild();
-            }
-            ImGui.endDragDropTarget();
         }
 
         ImGui.popStyleVar();

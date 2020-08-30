@@ -1,6 +1,17 @@
 # Blender MTL File: 'None'
 # Material Count: 5
 
+newmtl Material.001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd D:\\programming\\Java\\OxyEngine\\src\\main\\resources\\images\\worldmap.jpg
+
 newmtl Material.002
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
@@ -11,26 +22,15 @@ Ni 1.450000
 d 1.000000
 illum 2
 
-newmtl Material.003
+newmtl Material.004
 Ns 225.000000
 Ka 1.000000 1.000000 1.000000
 Kd 0.013639 0.800000 0.000000
-Ks 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-
-newmtl Material.005
-Ns 900.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 1.000000
-illum 1
-map_Kd D:\\programming\\Java\\OxyEngine\\src\\main\\resources\\images\\worldmap.jpg
 
 newmtl Material.006
 Ns 225.000000

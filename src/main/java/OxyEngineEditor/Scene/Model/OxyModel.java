@@ -36,20 +36,14 @@ public class OxyModel extends OxyEntity {
                 .create());
     }
 
-    public void updateComponents(){
-        get(Mesh.class).renderableComponent.mode = get(RenderableComponent.class).mode;
-    }
-
     @Override
     public void constructData() {
-        updateComponents();
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(0, vertices);
     }
 
     @Override
     public void updateData() {
-        updateComponents();
         factory.updateData(this);
         get(Mesh.class).updateSingleEntityData(0, vertices);
     }

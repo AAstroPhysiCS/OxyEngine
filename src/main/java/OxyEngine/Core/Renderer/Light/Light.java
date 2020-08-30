@@ -9,10 +9,6 @@ public abstract class Light implements EntityComponent {
     protected Vector3f position, direction;
     protected Vector3f ambient, diffuse, specular;
 
-    public Light() {
-
-    }
-
     public void setPosition(Vector3f position) {
         this.position = position;
     }

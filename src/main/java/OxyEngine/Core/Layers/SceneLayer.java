@@ -11,6 +11,7 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.*;
+import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
@@ -18,12 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.lwjgl.opengl.GL11.*;
-
 public class SceneLayer extends Layer {
 
     private Set<OxyEntity> cachedLightEntities;
-    private Set<EntityComponent> cachedNativeMeshes, cachedModelNormalMeshes, cachedCameraComponents;
+    private Set<EntityComponent> cachedNativeMeshes, cachedCameraComponents;
+    private Set<OxyEntity> allModelEntities;
 
     public SceneLayer(Scene scene) {
         super(scene);
@@ -37,29 +37,31 @@ public class SceneLayer extends Layer {
         Set<EntityComponent> cachedShaders = scene.distinct(OxyShader.class);
         cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), scene);
         cubemapTexture.init(cachedShaders);
+
         cachedNativeMeshes = scene.distinct(NativeObjectMesh.class);
-        cachedModelNormalMeshes = scene.distinct(ModelMesh.class);
         cachedCameraComponents = scene.distinct(OxyCamera.class);
+
         cachedLightEntities = scene.view(Light.class);
+        allModelEntities = scene.view(ModelMesh.class);
 
         //Prep
         {
             for (EntityComponent e : cachedNativeMeshes) {
                 ((Mesh) e).initList();
             }
-            for (EntityComponent model : cachedModelNormalMeshes) {
-                ((ModelMesh) model).initList();
+            for (OxyEntity e : allModelEntities) {
+                e.get(ModelMesh.class).initList();
             }
         }
     }
 
     @Override
     public void rebuild() {
-        cachedModelNormalMeshes = scene.distinct(ModelMesh.class);
+        allModelEntities = scene.view(ModelMesh.class);
         //Prep
         {
-            List<EntityComponent> cachedConverted = new ArrayList<>(cachedModelNormalMeshes);
-            ModelMesh mesh = (ModelMesh) cachedConverted.get(cachedConverted.size() - 1);
+            List<OxyEntity> cachedConverted = new ArrayList<>(allModelEntities);
+            ModelMesh mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMesh.class);
             mesh.initList();
         }
     }
@@ -84,7 +86,7 @@ public class SceneLayer extends Layer {
     @Override
     public void render(float ts, float deltaTime) {
 
-        if (scene.getFrameBuffer() != null) scene.getFrameBuffer().bind();
+        scene.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();
 
         //Camera
@@ -105,29 +107,20 @@ public class SceneLayer extends Layer {
             for (EntityComponent c : cachedNativeMeshes) {
                 Mesh mesh = (Mesh) c;
                 RenderableComponent rC = mesh.renderableComponent;
-                if (mesh.getShader().equals(cubemapTexture.getCube().get(OxyShader.class)) && rC.mode == RenderingMode.Normal) {
-                    //skybox
-                    glDepthMask(false);
-                    render(ts, mesh, mainCamera);
-                    glDepthMask(true);
-                    continue;
-                }
                 if (rC.mode == RenderingMode.Normal)
                     render(ts, mesh, mainCamera);
             }
-            for (EntityComponent c : cachedModelNormalMeshes) {
-                Mesh mesh = (Mesh) c;
-                if(mesh.renderableComponent.mode == RenderingMode.Normal)
-                    render(ts, mesh, mainCamera);
-                if(mesh.renderableComponent.mode == RenderingMode.NoZBuffer){
-                    glDisable(GL_DEPTH_TEST);
-                    render(ts, mesh, mainCamera);
-                    glEnable(GL_DEPTH_TEST);
-                }
+            for (OxyEntity e : allModelEntities) {
+                RenderableComponent renderableComponent = e.get(RenderableComponent.class);
+                if (renderableComponent.mode != RenderingMode.Normal) continue;
+                ModelMesh modelMesh = e.get(ModelMesh.class);
+                OxyMaterial material = e.get(OxyMaterial.class);
+                material.push(modelMesh.getShader());
+                render(ts, modelMesh, mainCamera);
+                material.pop(modelMesh.getShader());
             }
         }
-        if (scene.getFrameBuffer() != null) scene.getFrameBuffer().unbind();
-        scene.getOxyUISystem().start(scene.getEntities(), OxyRenderer.currentBoundedCamera);
+        scene.getFrameBuffer().unbind();
     }
 
     private void render(float ts, Mesh mesh, OxyCamera camera) {

@@ -1,17 +1,13 @@
 package OxyEngineEditor.UI;
 
-import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
 import OxyEngine.Events.OxyEventDispatcher;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Font.FontLoader;
 import OxyEngineEditor.UI.Font.OxyFontSystem;
-import OxyEngineEditor.UI.Selector.OxySelectSystem;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
@@ -24,7 +20,6 @@ import imgui.gl3.ImGuiImplGl3;
 
 import java.io.File;
 import java.util.Objects;
-import java.util.Set;
 
 import static OxyEngine.System.OxySystem.gl_Version;
 import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.*;
@@ -37,15 +32,12 @@ public class OxyUISystem {
     private final ImGuiImplGl3 imGuiRenderer;
     private final WindowHandle windowHandle;
 
-    private final OxySelectSystem selectSystem;
-
     private final long[] mouseCursors = new long[ImGuiMouseCursor.COUNT];
 
-    public OxyUISystem(Scene scene, WindowHandle windowHandle) {
+    public OxyUISystem(WindowHandle windowHandle) {
         this.windowHandle = windowHandle;
         imGuiRenderer = new ImGuiImplGl3();
         eventDispatcher = new OxyEventDispatcher();
-        selectSystem = OxySelectSystem.getInstance(windowHandle, scene);
         init();
     }
 
@@ -123,12 +115,11 @@ public class OxyUISystem {
         glfwSetInputMode(windowHandle.getPointer(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
-    public void start(Set<OxyEntity> entityList, OxyCamera camera) {
+    public void dispatchEvents() {
         eventDispatcher.dispatch();
-        selectSystem.start(entityList, camera);
     }
 
-    public void updateImGuiRenderer() {
+    public void renderDrawData() {
         imGuiRenderer.render(ImGui.getDrawData());
     }
 

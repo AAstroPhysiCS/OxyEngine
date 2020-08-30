@@ -1,10 +1,10 @@
 package OxyEngineEditor.Scene.NativeObjects;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.NativeObjectMesh;
 import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Scene.Model.OxyMaterial;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -14,8 +14,8 @@ public abstract class NativeObjectFactory implements EntityComponent {
     protected float[] vertexPos;
 
     public void constructData(OxyNativeObject e) {
-        OxyColor color = e.get(OxyColor.class);
-        ImageTexture texture = e.get(ImageTexture.class);
+        OxyMaterial material = e.get(OxyMaterial.class);
+        ImageTexture texture = material.texture;
         TransformComponent c = e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
@@ -49,11 +49,11 @@ public abstract class NativeObjectFactory implements EntityComponent {
                 e.vertices[i++] = tcs[texIndex++];
             } else i += 2;
             e.vertices[i++] = slot;
-            if (color != null && slot == 0) {
-                e.vertices[i++] = color.getNumbers()[0];
-                e.vertices[i++] = color.getNumbers()[1];
-                e.vertices[i++] = color.getNumbers()[2];
-                e.vertices[i++] = color.getNumbers()[3];
+            if (material.diffuseColor != null && slot == 0) {
+                e.vertices[i++] = material.diffuseColor.getNumbers()[0];
+                e.vertices[i++] = material.diffuseColor.getNumbers()[1];
+                e.vertices[i++] = material.diffuseColor.getNumbers()[2];
+                e.vertices[i++] = material.diffuseColor.getNumbers()[3];
             } else i += 4;
             ptr++;
         }

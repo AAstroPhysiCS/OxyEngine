@@ -8,12 +8,13 @@ import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
+import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngineEditor.UI.Panels.UIPanel.bgC;
+import static OxyEngineEditor.UI.Panels.Panel.bgC;
 
 public class OverlayPanelLayer extends Layer {
 
@@ -50,7 +51,7 @@ public class OverlayPanelLayer extends Layer {
     @Override
     public void render(float ts, float deltaTime) {
         OpenGLRendererAPI.clearBuffer();
-        OpenGLRendererAPI.clearColor(41, 41, 41, 1.0f);
+        OpenGLRendererAPI.clearColor(32, 32, 32, 1.0f);
         ImGui.newFrame();
 
         ImGui.setNextWindowPos(0, 30, ImGuiCond.Always);
@@ -59,6 +60,7 @@ public class OverlayPanelLayer extends Layer {
 
         ImGui.pushStyleColor(ImGuiCol.DockingEmptyBg, bgC[0], bgC[1], bgC[2], bgC[3]);
         ImGui.pushFont(OxyFontSystem.getAllFonts().get(0));
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 4, 8);
         ImGui.begin("Main", ImGuiWindowFlags.NoResize |
                 ImGuiWindowFlags.NoBackground |
                 ImGuiWindowFlags.NoTitleBar |
@@ -74,8 +76,9 @@ public class OverlayPanelLayer extends Layer {
 
         ImGui.end();
         ImGui.popFont();
+        ImGui.popStyleVar();
 
         ImGui.render();
-        scene.getOxyUISystem().updateImGuiRenderer();
+        scene.getOxyUISystem().renderDrawData();
     }
 }

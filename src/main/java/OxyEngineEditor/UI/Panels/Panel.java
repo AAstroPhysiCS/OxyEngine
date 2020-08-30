@@ -1,14 +1,8 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Window.WindowHandle;
-
 public abstract class Panel {
 
-    protected final WindowHandle windowHandle;
-
-    public Panel(WindowHandle windowHandle) {
-        this.windowHandle = windowHandle;
-    }
+    public static final float[] bgC = new float[]{32 / 255f, 32 / 255f, 32 / 255f, 1.0f};
 
     public abstract void preload();
 

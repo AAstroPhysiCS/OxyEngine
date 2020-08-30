@@ -1,21 +1,18 @@
 package OxyEngineEditor.UI.Selector;
 
-import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
-import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Components.RenderableComponent;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.OxyUISystem;
+import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.Selector.Tools.MouseSelector;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-
-import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
@@ -26,32 +23,34 @@ public class OxySelectSystem {
     private static MouseSelector mSelector;
 
     private final OxyRenderer3D renderer;
+    private final Scene scene;
 
     private static OxySelectSystem INSTANCE;
 
-    public static OxySelectSystem getInstance(WindowHandle windowHandle, Scene scene) {
-        if (INSTANCE == null) INSTANCE = new OxySelectSystem(windowHandle, scene);
+    public static OxySelectSystem getInstance(Scene scene, OxyGizmo3D gizmo) {
+        if (INSTANCE == null) INSTANCE = new OxySelectSystem(scene, gizmo);
         return INSTANCE;
     }
 
-    private OxySelectSystem(WindowHandle windowHandle, Scene scene) {
+    private OxySelectSystem(Scene scene, OxyGizmo3D gizmo) {
+        OxySelectSystem.gizmo = gizmo;
         this.renderer = scene.getRenderer();
-        gizmo = OxyGizmo3D.getInstance(windowHandle, scene);
+        this.scene = scene;
         mSelector = MouseSelector.getInstance();
     }
 
     static boolean switchC = false;
 
-    public void start(Set<OxyEntity> entities, OxyCamera camera) {
+    public void controlRenderableStates() {
         if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_C] && ScenePanel.focusedWindow && !switchC) {
             if (gizmo.mode == OxyGizmo3D.GizmoMode.Translation) {
                 gizmo.mode = OxyGizmo3D.GizmoMode.Scale;
-                gizmo.mode.component.switchRenderableState(RenderingMode.NoZBuffer);
-                OxyGizmo3D.GizmoMode.Translation.component.switchRenderableState(RenderingMode.None);
+                gizmo.mode.gizmoComponent.switchRenderableState(RenderingMode.Normal);
+                OxyGizmo3D.GizmoMode.Translation.gizmoComponent.switchRenderableState(RenderingMode.None);
             } else {
                 gizmo.mode = OxyGizmo3D.GizmoMode.Translation;
-                gizmo.mode.component.switchRenderableState(RenderingMode.NoZBuffer);
-                OxyGizmo3D.GizmoMode.Scale.component.switchRenderableState(RenderingMode.None);
+                gizmo.mode.gizmoComponent.switchRenderableState(RenderingMode.Normal);
+                OxyGizmo3D.GizmoMode.Scale.gizmoComponent.switchRenderableState(RenderingMode.None);
             }
             switchC = true;
         }
@@ -68,35 +67,35 @@ public class OxySelectSystem {
                     renderer.getCamera()
             );
 
-            OxyEntity e = mSelector.selectObject(entities, camera.getCameraController().origin, direction);
-            nStart(OxyGizmo3D.GizmoMode.Translation.component, e);
-            nStart(OxyGizmo3D.GizmoMode.Scale.component, e);
+            OxyEntity e = mSelector.selectObject(scene.getEntities(), OxyRenderer.currentBoundedCamera.getCameraController().origin, direction);
+            nStart(OxyGizmo3D.GizmoMode.Translation.gizmoComponent, e);
+            nStart(OxyGizmo3D.GizmoMode.Scale.gizmoComponent, e);
             moveEntity(e);
         }
     }
 
-    private void nStart(OxyGizmo3D.Component component, OxyEntity e) {
+    private void nStart(OxyGizmo3D.GizmoComponent gizmoComponent, OxyEntity e) {
 
         OxyModel xModel = null, yModel = null, zModel = null;
 
-        if (component instanceof OxyGizmo3D.Translation t) {
+        if (gizmoComponent instanceof OxyGizmo3D.Translation t) {
             xModel = t.getXModelTranslation();
             yModel = t.getYModelTranslation();
             zModel = t.getZModelTranslation();
-            for (OxyModel m : component.models){
-                if(e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Translation){
-                    m.get(RenderableComponent.class).mode = RenderingMode.NoZBuffer;
+            for (OxyModel m : gizmoComponent.models) {
+                if (e != null && OxySelectSystem.gizmo.mode == OxyGizmo3D.GizmoMode.Translation) {
+                    m.get(RenderableComponent.class).mode = RenderingMode.Normal;
                 } else {
                     m.get(RenderableComponent.class).mode = RenderingMode.None;
                 }
             }
-        } else if (component instanceof OxyGizmo3D.Scaling s) {
+        } else if (gizmoComponent instanceof OxyGizmo3D.Scaling s) {
             xModel = s.getXModelScale();
             yModel = s.getYModelScale();
             zModel = s.getZModelScale();
-            for (OxyModel m : component.models) {
-                if (e != null && gizmo.mode == OxyGizmo3D.GizmoMode.Scale) {
-                    m.get(RenderableComponent.class).mode = RenderingMode.NoZBuffer;
+            for (OxyModel m : gizmoComponent.models) {
+                if (e != null && OxySelectSystem.gizmo.mode == OxyGizmo3D.GizmoMode.Scale) {
+                    m.get(RenderableComponent.class).mode = RenderingMode.Normal;
                 } else {
                     m.get(RenderableComponent.class).mode = RenderingMode.None;
                 }

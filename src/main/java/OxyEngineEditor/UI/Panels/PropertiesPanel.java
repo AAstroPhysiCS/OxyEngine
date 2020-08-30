@@ -1,22 +1,18 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Window.WindowHandle;
 import imgui.ImGui;
 import imgui.flag.*;
+import imgui.type.ImBoolean;
 import imgui.type.ImString;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
-public class PropertiesPanel extends UIPanel {
-
-    public PropertiesPanel(WindowHandle windowHandle) {
-        super(windowHandle);
-    }
+public class PropertiesPanel extends Panel {
 
     private static PropertiesPanel INSTANCE = null;
 
-    public static PropertiesPanel getInstance(WindowHandle windowHandle) {
-        if (INSTANCE == null) INSTANCE = new PropertiesPanel(windowHandle);
+    public static PropertiesPanel getInstance() {
+        if (INSTANCE == null) INSTANCE = new PropertiesPanel();
         return INSTANCE;
     }
 
@@ -26,6 +22,7 @@ public class PropertiesPanel extends UIPanel {
     static final float[] diffuseColor = new float[]{0f, 0.0f, 0.0f, 0.0f};
     static final float[] specularColor = new float[]{0f, 0.0f, 0.0f, 0.0f};
     static final float[] ambientColor = new float[]{0f, 0.0f, 0.0f, 0.0f};
+    private static final ImBoolean helpWindowBool = new ImBoolean();
 
     @Override
     public void preload() {
@@ -100,6 +97,9 @@ public class PropertiesPanel extends UIPanel {
                 NativeFileDialog.nNFD_Free(buffer.get());
             }
         }
+
+        ImGui.checkbox("Demo", helpWindowBool);
+        if (helpWindowBool.get()) ImGui.showDemoWindow();
 
         ImGui.end();
         ImGui.popStyleColor();

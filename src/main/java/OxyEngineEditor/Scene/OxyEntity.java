@@ -32,7 +32,7 @@ public abstract class OxyEntity {
 
     public abstract void updateData();
 
-    public final void addComponent(EntityComponent... component) {
+    public void addComponent(EntityComponent... component) {
         scene.addComponent(this, component);
         for (EntityComponent c : component) {
             if (c instanceof Mesh m) {

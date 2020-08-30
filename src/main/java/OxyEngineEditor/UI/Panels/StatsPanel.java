@@ -1,7 +1,6 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.Core.Window.WindowHandle;
 import imgui.ImGui;
 
 import static OxyEngine.System.Globals.Globals.normalizeColor;
@@ -10,13 +9,9 @@ public class StatsPanel extends Panel {
 
     private static StatsPanel INSTANCE = null;
 
-    public static StatsPanel getInstance(WindowHandle windowHandle) {
-        if (INSTANCE == null) INSTANCE = new StatsPanel(windowHandle);
+    public static StatsPanel getInstance() {
+        if (INSTANCE == null) INSTANCE = new StatsPanel();
         return INSTANCE;
-    }
-
-    private StatsPanel(WindowHandle windowHandle) {
-        super(windowHandle);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Window.WindowHandle;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
@@ -8,17 +7,13 @@ import imgui.flag.ImGuiStyleVar;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
-public class ToolbarPanel extends UIPanel {
+public class ToolbarPanel extends Panel {
 
     private static ToolbarPanel INSTANCE = null;
 
-    public static ToolbarPanel getInstance(WindowHandle windowHandle) {
-        if (INSTANCE == null) INSTANCE = new ToolbarPanel(windowHandle);
+    public static ToolbarPanel getInstance() {
+        if (INSTANCE == null) INSTANCE = new ToolbarPanel();
         return INSTANCE;
-    }
-
-    private ToolbarPanel(WindowHandle windowHandle) {
-        super(windowHandle);
     }
 
     @Override

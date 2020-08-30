@@ -1,7 +1,6 @@
 package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Scene.Scene;
 
 import java.nio.ByteBuffer;
@@ -21,7 +20,7 @@ public class OxyTexture {
     private OxyTexture() {
     }
 
-    static abstract class Texture implements EntityComponent, OxyDisposable {
+    static abstract class Texture implements OxyDisposable {
 
         protected int textureId;
         protected int textureSlot;
