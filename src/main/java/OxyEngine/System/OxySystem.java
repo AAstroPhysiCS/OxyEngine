@@ -1,14 +1,11 @@
 package OxyEngine.System;
 
-import OxyEngine.EntryPoint;
+import OxyEngineEditor.EntryPoint;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -33,13 +30,6 @@ public interface OxySystem {
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new OxyLogger());
         logger.addHandler(handler);
-    }
-
-    static String[] getSystemDrives() {
-        List<File> allDrives = new ArrayList<>(Arrays.asList(File.listRoots()));
-        String[] stringified = new String[allDrives.size()];
-        for (int i = 0; i < allDrives.size(); i++) stringified[i] = allDrives.get(i).getPath();
-        return stringified;
     }
 
     static String oxyAssert(String msg){

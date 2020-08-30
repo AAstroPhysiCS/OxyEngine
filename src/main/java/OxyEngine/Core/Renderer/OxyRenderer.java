@@ -4,7 +4,7 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.OxyApplication;
+import OxyEngineEditor.EditorApplication;
 import OxyEngineEditor.Components.PerspectiveCamera;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -59,7 +59,7 @@ public abstract class OxyRenderer {
                         Z: %s
                     Zoom: %s
                     """.formatted(
-                    OxyApplication.FPS,
+                    EditorApplication.FPS,
                     drawCalls,
                     totalShapeCount,
                     totalVertexCount,

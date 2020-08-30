@@ -1,11 +1,10 @@
-package OxyEngine;
+package OxyEngineEditor;
 
-import OxyEngineEditor.OxyApplication;
 import OxyEngine.System.OxySystem;
 
 public class EntryPoint {
     public static void main(String[] args) {
         OxySystem.init();
-        new OxyApplication();
+        new EditorApplication();
     }
 }

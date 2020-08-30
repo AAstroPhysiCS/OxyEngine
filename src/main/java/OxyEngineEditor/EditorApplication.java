@@ -8,8 +8,8 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
+import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.PerspectiveCamera;
 import OxyEngineEditor.Components.SelectedComponent;
@@ -29,23 +29,18 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
 import static org.lwjgl.opengl.GL11.glGetError;
 
-public class OxyApplication implements OxyDisposable {
+public class EditorApplication extends OxyApplication {
 
     private final WindowHandle windowHandle;
-    private final LayerStack layerStack;
-    private Scene scene;
 
-    private final OxyEngine oxyEngine;
-
-    public static int FPS = 0;
-
-    public OxyApplication() {
+    public EditorApplication() {
         windowHandle = new WindowHandle("OxyEngine - Editor", 1366, 768, WindowHandle.WindowMode.WINDOWEDFULLSCREEN);
         oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, OxyRendererType.Oxy3D);
-        layerStack = new LayerStack(); // every app should have a layer stack
+        layerStack = new LayerStack();
         oxyEngine.start();
     }
 
+    @Override
     public void init() {
         oxyEngine.init();
 
@@ -106,12 +101,13 @@ public class OxyApplication implements OxyDisposable {
         }
     }
 
+    @Override
     public void update(float ts, float deltaTime) {
-        for (Layer l : layerStack.getLayerStack()) {
+        for (Layer l : layerStack.getLayerStack())
             l.update(ts, deltaTime);
-        }
     }
 
+    @Override
     public void render(float ts, float deltaTime) {
         OxyTexture.bindAllTextureSlots();
 
@@ -123,7 +119,7 @@ public class OxyApplication implements OxyDisposable {
         OxyTexture.unbindAllTextureSlots();
     }
 
-    private Runnable run() {
+    protected Runnable run() {
         return () -> {
 
             init();
@@ -155,10 +151,6 @@ public class OxyApplication implements OxyDisposable {
             }
             dispose();
         };
-    }
-
-    public WindowHandle getWindowHandle() {
-        return windowHandle;
     }
 
     @Override
