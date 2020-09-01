@@ -6,10 +6,8 @@ import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Font.OxyFontSystem;
 import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
-import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiCond;
-import imgui.flag.ImGuiStyleVar;
-import imgui.flag.ImGuiWindowFlags;
+import imgui.ImGuiViewport;
+import imgui.flag.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,15 +50,18 @@ public class OverlayPanelLayer extends Layer {
     public void render(float ts, float deltaTime) {
         OpenGLRendererAPI.clearBuffer();
         OpenGLRendererAPI.clearColor(32, 32, 32, 1.0f);
+
+        scene.getOxyUISystem().newFrameGLFW();
         ImGui.newFrame();
 
-        ImGui.setNextWindowPos(0, 30, ImGuiCond.Always);
-        ImGui.setNextWindowSize(windowHandle.getWidth(), windowHandle.getHeight() - 30, ImGuiCond.Always);
-        ImGui.setNextWindowDockID(1);
+        final ImGuiViewport viewport = ImGui.getMainViewport();
+        ImGui.setNextWindowPos(viewport.getWorkPosX(), viewport.getWorkPosY(), ImGuiCond.Always);
+        ImGui.setNextWindowSize(viewport.getWorkSizeX(), viewport.getWorkSizeY(), ImGuiCond.Always);
 
         ImGui.pushStyleColor(ImGuiCol.DockingEmptyBg, bgC[0], bgC[1], bgC[2], bgC[3]);
         ImGui.pushFont(OxyFontSystem.getAllFonts().get(0));
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 4, 8);
+
         ImGui.begin("Main", ImGuiWindowFlags.NoResize |
                 ImGuiWindowFlags.NoBackground |
                 ImGuiWindowFlags.NoTitleBar |
@@ -68,7 +69,8 @@ public class OverlayPanelLayer extends Layer {
                 ImGuiWindowFlags.NoBringToFrontOnFocus |
                 ImGuiWindowFlags.NoDecoration);
         ImGui.popStyleColor();
-        ImGui.dockSpace(1);
+        int id = ImGui.getID("MyDockSpace");
+        ImGui.dockSpace(id, 0, 0, ImGuiDockNodeFlags.PassthruCentralNode);
 
         for (Panel panel : panelList) {
             panel.renderPanel();

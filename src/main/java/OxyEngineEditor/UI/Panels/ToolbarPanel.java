@@ -22,14 +22,13 @@ public class ToolbarPanel extends Panel {
 
     @Override
     public void renderPanel() {
-
         ImGui.pushStyleColor(ImGuiCol.MenuBarBg, bgC[0], bgC[1], bgC[2], bgC[3]);
         ImGui.pushStyleVar(ImGuiStyleVar.FramePadding, 0f, 10);
 
         if (ImGui.beginMainMenuBar()) {
             ImVec2 pos = new ImVec2();
             ImGui.getWindowPos(pos);
-            ImGui.setCursorPosY(pos.y - 3f);
+            ImGui.setCursorPosY(pos.y - 20f);
             if (ImGui.beginMenu("File")) {
                 if (ImGui.beginMenu("New")) {
                     ImGui.menuItem("New Scene");

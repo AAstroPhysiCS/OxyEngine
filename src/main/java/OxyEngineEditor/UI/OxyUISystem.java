@@ -10,13 +10,12 @@ import OxyEngineEditor.UI.Font.FontLoader;
 import OxyEngineEditor.UI.Font.OxyFontSystem;
 import imgui.ImGui;
 import imgui.ImGuiIO;
+import imgui.ImGuiStyle;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
-import imgui.flag.ImGuiBackendFlags;
-import imgui.flag.ImGuiConfigFlags;
-import imgui.flag.ImGuiKey;
-import imgui.flag.ImGuiMouseCursor;
+import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
+import imgui.glfw.ImGuiImplGlfw;
 
 import java.io.File;
 import java.util.Objects;
@@ -30,6 +29,7 @@ public class OxyUISystem {
     private ImGuiIO io;
 
     private final ImGuiImplGl3 imGuiRenderer;
+    private final ImGuiImplGlfw imGuiGlfw;
     private final WindowHandle windowHandle;
 
     private final long[] mouseCursors = new long[ImGuiMouseCursor.COUNT];
@@ -37,6 +37,7 @@ public class OxyUISystem {
     public OxyUISystem(WindowHandle windowHandle) {
         this.windowHandle = windowHandle;
         imGuiRenderer = new ImGuiImplGl3();
+        imGuiGlfw = new ImGuiImplGlfw();
         eventDispatcher = new OxyEventDispatcher();
         init();
     }
@@ -58,11 +59,10 @@ public class OxyUISystem {
         io = ImGui.getIO();
         ImGui.getStyle().setColors(OxyEngine.getLoadedTheme());
 
-        io.setIniFilename(null);
-        io.setConfigFlags(ImGuiConfigFlags.NavEnableKeyboard | ImGuiConfigFlags.DockingEnable);
-        io.setBackendFlags(ImGuiBackendFlags.HasMouseCursors);
-        io.setBackendPlatformName("imgui_java_impl_glfw");
-
+        io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard);
+        io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
+        io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+        io.setConfigViewportsNoTaskBarIcon(true);
         setKeymap();
 
         mouseButtonDispatcher = (GLFWEventDispatcher.MouseEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseEvent, io);
@@ -98,6 +98,13 @@ public class OxyUISystem {
         for (File f : file) OxyFontSystem.load(io, f.getPath(), 15, f.getName().split("\\.")[0]);
 
         imGuiRenderer.init(gl_Version);
+        imGuiGlfw.init(windowHandle.getPointer(), true);
+
+        if (io.hasConfigFlags(ImGuiConfigFlags.ViewportsEnable)) {
+            final ImGuiStyle style = ImGui.getStyle();
+            style.setWindowRounding(0.0f);
+            style.setColor(ImGuiCol.WindowBg, ImGui.getColorU32(ImGuiCol.WindowBg, 1));
+        }
     }
 
     public void updateImGuiContext(float deltaTime) {
@@ -119,8 +126,18 @@ public class OxyUISystem {
         eventDispatcher.dispatch();
     }
 
+    public void newFrameGLFW(){
+        imGuiGlfw.newFrame();
+    }
+
     public void renderDrawData() {
-        imGuiRenderer.render(ImGui.getDrawData());
+        imGuiRenderer.renderDrawData(ImGui.getDrawData());
+        if (ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable)) {
+            final long backupWindowPtr = glfwGetCurrentContext();
+            ImGui.updatePlatformWindows();
+            ImGui.renderPlatformWindowsDefault();
+            glfwMakeContextCurrent(backupWindowPtr);
+        }
     }
 
     public void dispose() {

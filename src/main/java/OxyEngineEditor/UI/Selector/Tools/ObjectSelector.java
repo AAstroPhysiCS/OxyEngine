@@ -45,7 +45,6 @@ public interface ObjectSelector {
                     if (Intersectionf.intersectRaySphere(origin, direction, position, boundingBox.max().y * boundingBox.max().y * c.scale.y * c.scale.y, nearFar) && nearFar.x < closestDistance) {
                         closestDistance = nearFar.x;
                         selectedEntity = entity;
-                        selected.selected = true;
                     }
                 } else {
                     float result;
@@ -61,7 +60,6 @@ public interface ObjectSelector {
                             if (result < closestDistance) {
                                 closestDistance = result;
                                 selectedEntity = entity;
-                                selected.selected = true;
                             }
                         }
                     }
@@ -74,7 +72,6 @@ public interface ObjectSelector {
                 if (Intersectionf.intersectRayAab(origin, direction, min, max, nearFar) && nearFar.x < closestDistance) {
                     closestDistance = nearFar.x;
                     selectedEntity = entity;
-                    selected.selected = true;
                 }
             } else {
                 float result;
@@ -90,7 +87,6 @@ public interface ObjectSelector {
                         if (result < closestDistance) {
                             closestDistance = result;
                             selectedEntity = entity;
-                            selected.selected = true;
                         }
                     }
                 }

@@ -25,7 +25,9 @@ public class SceneHierarchyPanel extends Panel {
     private final SceneLayer sceneLayer;
     private final OxyShader shader;
 
-    private OxyEntity selectedContextEntity;
+    public static boolean focusedWindow, focusedWindowDragging;
+
+    public static OxyEntity selectedContextEntity;
 
     public static SceneHierarchyPanel getInstance(SceneLayer scene, OxyShader shader) {
         if (INSTANCE == null) INSTANCE = new SceneHierarchyPanel(scene, shader);
@@ -51,11 +53,15 @@ public class SceneHierarchyPanel extends Panel {
                     ImGui.treePop();
                 }
                 if (ImGui.isItemClicked()) {
+                    //quick trick lol
+                    if (selectedContextEntity != null)
+                        selectedContextEntity.get(SelectedComponent.class).selected = false;
                     selectedContextEntity = entity;
+                    selectedContextEntity.get(SelectedComponent.class).selected = true;
                 }
                 entityTagCounter++;
             }
-        }, ModelMesh.class, TagComponent.class); //all entities that have a TagComponent and ModelMesh
+        }, ModelMesh.class, TagComponent.class, SelectedComponent.class); //all entities that have x
         entityTagCounter = 0;
     }
 
@@ -65,8 +71,10 @@ public class SceneHierarchyPanel extends Panel {
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding | ImGuiStyleVar.WindowBorderSize, 0);
 
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, -1, 8);
+
         ImGui.begin("Scene Hierarchy");
-        ImGui.beginChild("Entities");
+        focusedWindow = ImGui.isWindowFocused();
+        focusedWindowDragging = focusedWindow && ImGui.isMouseDragging(2);
 
         updateEntityPanel();
 
@@ -76,7 +84,6 @@ public class SceneHierarchyPanel extends Panel {
             ImGui.endPopup();
         }
         ImGui.popStyleVar();
-        ImGui.endChild();
 
         ImGui.end();
         ImGui.popStyleColor();

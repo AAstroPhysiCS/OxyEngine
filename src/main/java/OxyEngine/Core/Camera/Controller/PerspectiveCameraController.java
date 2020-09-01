@@ -1,6 +1,7 @@
 package OxyEngine.Core.Camera.Controller;
 
 import OxyEngine.Tools.Ref;
+import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.OxyUISystem;
 import org.joml.Vector3f;
@@ -33,7 +34,7 @@ public class PerspectiveCameraController extends OxyCameraController {
     }
 
     private void updateRotationSwipe() {
-        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_MIDDLE] && ScenePanel.focusedWindowDragging)
+        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_MIDDLE] && (ScenePanel.focusedWindowDragging || SceneHierarchyPanel.focusedWindowDragging))
             rotate();
 
         oldMouseX = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos();

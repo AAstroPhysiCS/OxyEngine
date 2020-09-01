@@ -189,7 +189,7 @@ public class Scene implements OxyDisposable {
     }
 
     @SafeVarargs
-    public final <U extends EntityComponent> void each(RegistryEach.SingleWithClass<OxyEntity> registryEach, Class<? extends U>... destClass) {
+    public final <U extends EntityComponent> void each(RegistryEach.Single<OxyEntity> registryEach, Class<? extends U>... destClass) {
         Set<OxyEntity> entities = group(destClass);
         Stream<OxyEntity> stream = entities.stream();
         stream.forEach(registryEach::each);

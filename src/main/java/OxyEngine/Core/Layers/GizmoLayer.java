@@ -28,7 +28,6 @@ public class GizmoLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
-        scene.getOxyUISystem().dispatchEvents();
         selectSystem.controlRenderableStates();
     }
 

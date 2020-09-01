@@ -11,9 +11,6 @@ public interface RegistryEach {
     interface View<U, K extends EntityComponent>{
         void each(U entity, K obj);
     }
-    interface SingleWithClass<U> {
-        void each(U entity);
-    }
     interface Single<U>{
         void each(U entity);
     }

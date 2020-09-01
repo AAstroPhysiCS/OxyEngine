@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static org.lwjgl.opengl.GL11.*;
+
 public class SceneLayer extends Layer {
 
     private Set<OxyEntity> cachedLightEntities;
@@ -29,13 +31,14 @@ public class SceneLayer extends Layer {
         super(scene);
     }
 
-    private CubemapTexture cubemapTexture; //skyboxtexture
-//    static OxyShader outlineShader = new OxyShader("D:\\programming\\Java\\OxyEngine\\shaders\\outline.glsl");
+    static final OxyShader outlineShader = new OxyShader("D:\\programming\\Java\\OxyEngine\\shaders\\outline.glsl");
 
     @Override
     public void build() {
+
         Set<EntityComponent> cachedShaders = scene.distinct(OxyShader.class);
-        cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), scene);
+        //skyboxtexture
+        CubemapTexture cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), scene);
         cubemapTexture.init(cachedShaders);
 
         cachedNativeMeshes = scene.distinct(NativeObjectMesh.class);
@@ -68,6 +71,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
+        scene.getOxyUISystem().dispatchEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
 
         for (OxyEntity e : cachedLightEntities) {
@@ -85,7 +89,6 @@ public class SceneLayer extends Layer {
 
     @Override
     public void render(float ts, float deltaTime) {
-
         scene.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();
 
@@ -107,16 +110,40 @@ public class SceneLayer extends Layer {
             for (EntityComponent c : cachedNativeMeshes) {
                 Mesh mesh = (Mesh) c;
                 RenderableComponent rC = mesh.renderableComponent;
-                if (rC.mode == RenderingMode.Normal)
-                    render(ts, mesh, mainCamera);
+                if (rC.mode != RenderingMode.Normal) continue;
+                render(ts, mesh, mainCamera);
             }
             for (OxyEntity e : allModelEntities) {
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
                 ModelMesh modelMesh = e.get(ModelMesh.class);
                 OxyMaterial material = e.get(OxyMaterial.class);
+                SelectedComponent s = e.get(SelectedComponent.class);
                 material.push(modelMesh.getShader());
-                render(ts, modelMesh, mainCamera);
+                if (s.selected) {
+                    glEnable(GL_STENCIL_TEST);
+                    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+                    glStencilMask(0xFF);
+                    glClear(GL_STENCIL_BUFFER_BIT);
+                    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+
+                    render(ts, modelMesh, mainCamera);
+                    outlineShader.enable();
+                    e.get(TransformComponent.class).scale.add(0.10f, 0.10f, 0.10f);
+                    e.updateData();
+
+                    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+                    glStencilMask(0x00);
+
+                    render(ts, modelMesh, mainCamera, outlineShader); // draw with the outline shader
+                    outlineShader.disable();
+                    e.get(TransformComponent.class).scale.sub(0.10f, 0.10f, 0.10f);
+                    e.updateData();
+
+                    glDisable(GL_STENCIL_TEST);
+                } else {
+                    render(ts, modelMesh, mainCamera);
+                }
                 material.pop(modelMesh.getShader());
             }
         }
@@ -137,19 +164,4 @@ public class SceneLayer extends Layer {
         scene.getRenderer().render(ts, mesh);
         OxyRenderer.Stats.totalShapeCount = scene.getShapeCount();
     }
-    /*glEnable(GL_STENCIL_TEST);
-                glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-                glStencilMask(0xFF);
-                glClear(GL_STENCIL_BUFFER_BIT);
-
-                glStencilFunc(GL_ALWAYS, 1, 0xFF);
-                if (rC.renderable) render(ts, mesh, mainCamera);
-                outlineShader.enable();
-                mesh.scaleUp(1.01f);
-                glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-                glStencilMask(0x00);
-                render(ts, mesh, mainCamera, outlineShader); // draw with the outline shader
-                mesh.finalizeScaleUp();
-                glDisable(GL_STENCIL_TEST);*/
 }
