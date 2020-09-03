@@ -4,18 +4,22 @@ import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.IndexBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
-import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class NativeObjectMesh extends Mesh {
 
+
+    public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 8 * Float.BYTES, 0);
+    public static final BufferTemplate.Attributes attributesTXSlot = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 8 * Float.BYTES, 3 * Float.BYTES);
+    public static final BufferTemplate.Attributes attributesColors = new BufferTemplate.Attributes(OxyShader.COLOR, 4, GL_FLOAT, false, 8 * Float.BYTES, 4 * Float.BYTES);
+
     public int indicesX, indicesY, indicesZ;
 
-    private NativeObjectMesh(OxyShader shader, int mode, RenderableComponent component, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
-        this.renderableComponent = component;
+    private NativeObjectMesh(OxyShader shader, int mode, VertexBuffer vertexBuffer, IndexBuffer indexBuffer) {
         this.shader = shader;
         this.mode = mode;
         this.indexBuffer = indexBuffer;
@@ -32,8 +36,6 @@ public class NativeObjectMesh extends Mesh {
 
         NativeMeshBuilder setUsage(BufferTemplate.Usage usage);
 
-        NativeMeshBuilder setRenderableComponent(RenderableComponent renderable);
-
         NativeObjectMesh create();
     }
 
@@ -43,7 +45,6 @@ public class NativeObjectMesh extends Mesh {
         private int mode = -1;
         private BufferTemplate.Usage usage;
         private OxyShader shader;
-        private RenderableComponent component = new RenderableComponent(RenderingMode.Normal);
 
         @Override
         public NativeMeshBuilderImpl setShader(OxyShader shader) {
@@ -70,18 +71,12 @@ public class NativeObjectMesh extends Mesh {
         }
 
         @Override
-        public NativeMeshBuilderImpl setRenderableComponent(RenderableComponent component) {
-            this.component = component;
-            return this;
-        }
-
-        @Override
         public NativeObjectMesh create() {
             assert mode != -1 && usage != null : oxyAssert("Some arguments not defined!");
 
-            return new NativeObjectMesh(shader, mode, component,
+            return new NativeObjectMesh(shader, mode,
                     new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-                            .setVerticesStrideSize(verticesPointers[0].stride() / Float.BYTES)
+                            .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
                             .setUsage(usage)
                             .setAttribPointer(verticesPointers)),
                     new IndexBuffer());

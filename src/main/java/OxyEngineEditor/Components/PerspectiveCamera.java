@@ -7,11 +7,12 @@ import OxyEngine.Tools.Ref;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.Selector.OxyGizmo3D;
-import OxyEngineEditor.UI.Selector.OxyGizmoController;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
+import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
 
 public class PerspectiveCamera extends OxyCamera {
 
@@ -73,9 +74,10 @@ public class PerspectiveCamera extends OxyCamera {
         ImGuiIO io = ImGui.getIO();
         if (ScenePanel.focusedWindow || SceneHierarchyPanel.focusedWindow) {
             zoom += io.getMouseWheel();
-            if (OxyGizmoController.currentEntitySelected != null) {
-                OxyGizmo3D.getInstance().scaleAll(OxyGizmoController.currentEntitySelected);
+            if (entityContext != null) {
+                OxyGizmo3D.getInstance().scaleAll(entityContext);
             }
+            if(zoom >= 500) zoom = 500;
         }
 
         cameraController.update(ts, OxyCameraController.Mode.SWIPE);

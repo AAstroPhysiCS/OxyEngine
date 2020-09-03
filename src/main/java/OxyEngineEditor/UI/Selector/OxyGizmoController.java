@@ -9,9 +9,13 @@ import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.UI.OxyUISystem;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
+
+import static OxyEngineEditor.UI.OxyEventSystem.keyEventDispatcher;
+import static OxyEngineEditor.UI.OxyEventSystem.mouseCursorPosDispatcher;
+import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 
 public class OxyGizmoController implements OxyMouseListener {
 
@@ -34,21 +38,15 @@ public class OxyGizmoController implements OxyMouseListener {
     static boolean pressedXTranslation, pressedYTranslation, pressedZTranslation;
     static boolean pressedXScale, pressedYScale, pressedZScale, pressedScaleFactor;
 
-    public static OxyEntity currentEntitySelected;
-
     OxyGizmoController(WindowHandle windowHandle, Scene scene, OxyGizmo3D gizmo) {
         OxyGizmoController.gizmo = gizmo;
         OxyGizmoController.scene = scene;
         OxyGizmoController.windowHandle = windowHandle;
     }
 
-    public static void setCurrentEntitySelected(OxyEntity currentEntitySelected) {
-        OxyGizmoController.currentEntitySelected = currentEntitySelected;
-    }
-
     @Override
     public void mouseClicked(OxyEntity selectedEntity, int mouseButton) {
-        if (mouseButton == ImGuiMouseButton.Right) {
+        if (mouseButton == ImGuiMouseButton.Right && !keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT]) {
             switch (gizmo.mode) {
                 case Translation -> handleTranslationSwitch(selectedEntity);
                 case Scale -> handleScalingSwitch(selectedEntity);
@@ -58,7 +56,7 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseDown(OxyEntity selectedEntity, int mouseButton) {
-        if (mouseButton == ImGuiMouseButton.Right && currentEntitySelected != null && dragging) {
+        if (mouseButton == ImGuiMouseButton.Right && entityContext != null && dragging && !keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT]) {
             switch (gizmo.mode) {
                 case Translation -> handleTranslation();
                 case Scale -> handleScaling();
@@ -89,7 +87,7 @@ public class OxyGizmoController implements OxyMouseListener {
 
     @Override
     public void mouseDragged(OxyEntity selectedEntity, int mouseButton) {
-        oldMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
+        oldMousePos = new Vector2d(mouseCursorPosDispatcher.getXPos(), mouseCursorPosDispatcher.getYPos());
         dragging = true;
     }
 
@@ -98,7 +96,7 @@ public class OxyGizmoController implements OxyMouseListener {
     }
 
     private void handleTranslationSwitch(OxyEntity selectedEntity) {
-        OxyGizmo3D.Translation t = (OxyGizmo3D.Translation) gizmo.mode.gizmoComponent;
+        GizmoMode.Translation t = (GizmoMode.Translation) gizmo.mode.gizmoComponent;
         if (selectedEntity == t.getXModelTranslation()) {
             pressedXTranslation = true;
             pressedYTranslation = false;
@@ -129,7 +127,7 @@ public class OxyGizmoController implements OxyMouseListener {
     }
 
     private void handleTranslation() {
-        OxyGizmo3D.Translation t = (OxyGizmo3D.Translation) gizmo.mode.gizmoComponent;
+        GizmoMode.Translation t = (GizmoMode.Translation) gizmo.mode.gizmoComponent;
         OxyModel xAxis = t.getXModelTranslation();
         OxyModel yAxis = t.getYModelTranslation();
         OxyModel zAxis = t.getZModelTranslation();
@@ -137,9 +135,9 @@ public class OxyGizmoController implements OxyMouseListener {
         TransformComponent xC = xAxis.get(TransformComponent.class);
         TransformComponent yC = yAxis.get(TransformComponent.class);
         TransformComponent zC = zAxis.get(TransformComponent.class);
-        TransformComponent currC = currentEntitySelected.get(TransformComponent.class);
+        TransformComponent currC = entityContext.get(TransformComponent.class);
 
-        Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
+        Vector2d nowMousePos = new Vector2d(mouseCursorPosDispatcher.getXPos(), mouseCursorPosDispatcher.getYPos());
         Vector2d delta = nowMousePos.sub(oldMousePos);
 
         float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
@@ -154,29 +152,29 @@ public class OxyGizmoController implements OxyMouseListener {
             zC.position.add(0, 0, -deltaX);
             currC.position.add(0, 0, -deltaX);
             for (int i = 0; i < 4; i++)
-                OxyGizmo3D.GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(0, 0, -deltaX);
-            currentEntitySelected.updateData();
+                GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(0, 0, -deltaX);
+            entityContext.updateData();
         } else if (pressedYTranslation) {
             xC.position.add(0, deltaY, 0);
             yC.position.add(0, deltaY, 0);
             zC.position.add(0, deltaY, 0);
             currC.position.add(0, deltaY, 0);
             for (int i = 0; i < 4; i++)
-                OxyGizmo3D.GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(0, deltaY, 0);
-            currentEntitySelected.updateData();
+                GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(0, deltaY, 0);
+            entityContext.updateData();
         } else if (pressedXTranslation) {
             xC.position.add(deltaX, 0, 0);
             yC.position.add(deltaX, 0, 0);
             zC.position.add(deltaX, 0, 0);
             currC.position.add(deltaX, 0, 0);
             for (int i = 0; i < 4; i++)
-                OxyGizmo3D.GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(deltaX, 0, 0);
-            currentEntitySelected.updateData();
+                GizmoMode.Scale.gizmoComponent.models.get(i).get(TransformComponent.class).position.add(deltaX, 0, 0);
+            entityContext.updateData();
         }
     }
 
     private void handleScalingSwitch(OxyEntity selectedEntity) {
-        OxyGizmo3D.Scaling s = (OxyGizmo3D.Scaling) gizmo.mode.gizmoComponent;
+        GizmoMode.Scaling s = (GizmoMode.Scaling) gizmo.mode.gizmoComponent;
         if (selectedEntity == s.getXModelScale()) {
             pressedXScale = true;
             pressedYScale = false;
@@ -216,7 +214,7 @@ public class OxyGizmoController implements OxyMouseListener {
     }
 
     private void handleScaling() {
-        OxyGizmo3D.Scaling s = (OxyGizmo3D.Scaling) gizmo.mode.gizmoComponent;
+        GizmoMode.Scaling s = (GizmoMode.Scaling) gizmo.mode.gizmoComponent;
 
         OxyModel xAxis = s.getXModelScale();
         OxyModel yAxis = s.getYModelScale();
@@ -224,9 +222,9 @@ public class OxyGizmoController implements OxyMouseListener {
         TransformComponent xC = xAxis.get(TransformComponent.class);
         TransformComponent yC = yAxis.get(TransformComponent.class);
 
-        TransformComponent currC = currentEntitySelected.get(TransformComponent.class);
+        TransformComponent currC = entityContext.get(TransformComponent.class);
 
-        Vector2d nowMousePos = new Vector2d(OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
+        Vector2d nowMousePos = new Vector2d(mouseCursorPosDispatcher.getXPos(), mouseCursorPosDispatcher.getYPos());
         Vector2d delta = nowMousePos.sub(oldMousePos);
 
         float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
@@ -238,21 +236,21 @@ public class OxyGizmoController implements OxyMouseListener {
         if (pressedZScale) {
             currC.scale.x += -deltaX;
             if (currC.scale.x <= 0) currC.scale.x = 0;
-            currentEntitySelected.updateData();
+            entityContext.updateData();
         } else if (pressedYScale) {
             currC.scale.y += -deltaY;
             if (currC.scale.y <= 0) currC.scale.y = 0;
-            currentEntitySelected.updateData();
+            entityContext.updateData();
         } else if (pressedXScale) {
             currC.scale.z += deltaX;
             if (currC.scale.z <= 0) currC.scale.z = 0;
-            currentEntitySelected.updateData();
+            entityContext.updateData();
         } else if (pressedScaleFactor) {
             currC.scale.add(deltaX, deltaX, deltaX);
             if (currC.scale.x <= 0) currC.scale.x = 0;
             if (currC.scale.y <= 0) currC.scale.y = 0;
             if (currC.scale.z <= 0) currC.scale.z = 0;
-            currentEntitySelected.updateData();
+            entityContext.updateData();
         }
     }
 }

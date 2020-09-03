@@ -4,7 +4,6 @@ import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Components.RenderableComponent;
 import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
@@ -22,7 +21,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     protected NormalsBuffer normalsBuffer;
 
     protected OxyShader shader;
-    public RenderableComponent renderableComponent;
+    protected String path;
 
     protected final List<OxyEntity> entities = new ArrayList<>();
 
@@ -46,6 +45,10 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
 
     public NormalsBuffer getNormalsBuffer() {
         return normalsBuffer;
+    }
+
+    public String getPath() {
+        return path;
     }
 
     public void load() {
@@ -105,24 +108,6 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         unbind();
     }
 
-    /*float[] verticesNonScaled;
-    boolean init = false;
-
-    public void scaleUp(float scaleFactor){
-        if(!init){
-            verticesNonScaled = vertexBuffer.getVertices().clone();
-            init = true;
-        }
-        float[] vertices = verticesNonScaled.clone();
-        for(int i = 0; i < vertices.length; i++)
-            vertices[i] *= scaleFactor;
-        updateSingleEntityData(0, vertices);
-    }
-
-    public void finalizeScaleUp(){
-        updateSingleEntityData(0, verticesNonScaled);
-    }*/
-
     public void updateSingleEntityData(Scene scene, OxyNativeObject e) {
         int i = 0;
         for (OxyEntity entity : scene.getEntities()) {
@@ -144,6 +129,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
 
     @Override
     public void dispose() {
+        entities.clear();
         vertexBuffer.dispose();
         indexBuffer.dispose();
         if (textureBuffer != null)

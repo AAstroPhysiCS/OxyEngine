@@ -46,6 +46,11 @@ public class TextureBuffer extends Buffer {
 
     @Override
     public void dispose() {
+        textureCoords = null;
         glDeleteBuffers(bufferId);
+    }
+
+    public float[] getTextureCoords() {
+        return textureCoords;
     }
 }

@@ -136,4 +136,8 @@ public class OxyModelLoader {
         }
         oxyMesh.material = new OxyMaterial(texture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 1f);
     }
+
+    public String getPath() {
+        return objPath;
+    }
 }

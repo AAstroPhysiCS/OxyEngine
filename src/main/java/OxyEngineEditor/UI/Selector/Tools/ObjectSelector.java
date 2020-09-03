@@ -6,9 +6,7 @@ import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.OxyEntity;
-import org.joml.Intersectionf;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
+import org.joml.*;
 
 import java.util.Set;
 
@@ -38,8 +36,6 @@ public interface ObjectSelector {
 
             Vector3f position = new Vector3f(c.position);
 
-            selected.selected = false;
-
             if (tag.tag().contains("Sphere")) {
                 if (c.scale.x == c.scale.y && c.scale.x == c.scale.z) {
                     if (Intersectionf.intersectRaySphere(origin, direction, position, boundingBox.max().y * boundingBox.max().y * c.scale.y * c.scale.y, nearFar) && nearFar.x < closestDistance) {
@@ -65,6 +61,7 @@ public interface ObjectSelector {
                     }
                 }
             } else if (tag.tag().contains("Cube")) {
+                //TODO: ROTATION DOESN OT WORK
                 min.set(position);
                 max.set(position);
                 min.add(new Vector3f(boundingBox.min()).negate().mul(c.scale));

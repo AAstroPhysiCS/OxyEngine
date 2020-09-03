@@ -1,6 +1,7 @@
 package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -16,6 +17,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+
+import static OxyEngine.System.OxySystem.oxyAssert;
 
 public class Scene implements OxyDisposable {
 
@@ -36,7 +39,6 @@ public class Scene implements OxyDisposable {
     public final OxyNativeObject createNativeObjectEntity() {
         OxyNativeObject e = new OxyNativeObject(this);
         registry.entityList.put(e, new LinkedHashSet<>(15));
-        OxyModel a = new OxyModel(this);
         e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
         return e;
     }
@@ -71,7 +73,7 @@ public class Scene implements OxyDisposable {
                             assimpMesh.material.reflectance
                     )
             );
-            e.initData();
+            e.initData(path);
             models.add(e);
         }
         return models;
@@ -101,12 +103,14 @@ public class Scene implements OxyDisposable {
                         assimpMesh.material.reflectance
                 )
         );
-        e.initData();
+        e.initData(path);
         return e;
     }
 
-    public final void deleteEntity(OxyEntity e){
-        registry.entityList.remove(e);
+    public final void removeEntity(OxyEntity e) {
+        e.get(Mesh.class).dispose();
+        var value = registry.entityList.remove(e);
+        assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");
     }
 
     public final OxyEntity getEntityByIndex(int index) {
@@ -126,6 +130,7 @@ public class Scene implements OxyDisposable {
     public final void addComponent(OxyEntity entity, EntityComponent... component) {
         registry.addComponent(entity, component);
     }
+
     /*
      * returns true if the component is already in the set
      */
@@ -171,9 +176,8 @@ public class Scene implements OxyDisposable {
     @SafeVarargs
     public final <U extends EntityComponent, K extends U> void each(RegistryEach.Group<OxyEntity, K> registryEach, Class<? extends K>... destClasses) {
         Set<OxyEntity> entities = group(destClasses);
-        Stream<OxyEntity> stream = entities.stream();
         Set<K> components = new LinkedHashSet<>();
-        stream.forEach(oxyEntity -> {
+        entities.forEach(oxyEntity -> {
             for (Class<? extends K> classes : destClasses) {
                 K c = oxyEntity.get(classes);
                 components.add(c);
@@ -184,15 +188,13 @@ public class Scene implements OxyDisposable {
 
     public final <U extends EntityComponent, K extends U> void each(RegistryEach.View<OxyEntity, K> registryEach, Class<K> destClass) {
         Set<OxyEntity> entities = view(destClass);
-        Stream<OxyEntity> stream = entities.stream();
-        stream.forEach(oxyEntity -> registryEach.each(oxyEntity, oxyEntity.get(destClass)));
+        entities.forEach(oxyEntity -> registryEach.each(oxyEntity, oxyEntity.get(destClass)));
     }
 
     @SafeVarargs
     public final <U extends EntityComponent> void each(RegistryEach.Single<OxyEntity> registryEach, Class<? extends U>... destClass) {
         Set<OxyEntity> entities = group(destClass);
-        Stream<OxyEntity> stream = entities.stream();
-        stream.forEach(registryEach::each);
+        entities.forEach(registryEach::each);
     }
 
     public final void each(RegistryEach.Single<OxyEntity> registryEach) {

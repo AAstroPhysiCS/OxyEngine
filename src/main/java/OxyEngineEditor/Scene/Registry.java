@@ -2,10 +2,7 @@ package OxyEngineEditor.Scene;
 
 import OxyEngineEditor.Components.EntityComponent;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /*
  * Entity Component System (ECS)
@@ -24,7 +21,7 @@ public class Registry {
             if (c != null) {
                 Set<EntityComponent> entityComponentSet = entityList.get(entity);
                 entityComponentSet.removeIf(entityComponent -> entityComponent.getClass().equals(c.getClass()) || entityComponent.getClass().isInstance(c));
-                entityList.get(entity).add(c);
+                entityComponentSet.add(c);
             }
         }
     }

@@ -7,21 +7,21 @@ import OxyEngineEditor.Scene.Scene;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-public class OxyNativeObject extends OxyEntity implements Cloneable {
+public class OxyNativeObject extends OxyEntity {
 
-    private NativeObjectFactory factory;
     public ObjectType type;
 
     public OxyNativeObject(Scene scene) {
         super(scene);
     }
 
-    public void initData() {
+    @Override
+    public void initData(String path) {
         assert has(NativeObjectFactory.class) && has(Mesh.class) : oxyAssert("Game object need to have a template or a Mesh!");
 
         Mesh mesh = get(Mesh.class);
 
-        factory = get(NativeObjectFactory.class);
+        NativeObjectFactory factory = get(NativeObjectFactory.class);
         this.type = factory.type;
         factory.constructData(this);
         assert mesh instanceof NativeObjectMesh : oxyAssert("Native Object needs to have a NativeObjectMesh");

@@ -4,7 +4,6 @@ import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.ModelMesh;
-import OxyEngineEditor.Components.RenderableComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
@@ -20,13 +19,13 @@ public class OxyModel extends OxyEntity {
     }
 
     @Override
-    public void initData() {
+    public void initData(String path) {
         assert has(ModelFactory.class) : oxyAssert("Models should have a Model Template");
         factory = get(ModelFactory.class);
         factory.constructData(this);
         addComponent(new ModelMesh.ModelMeshBuilderImpl()
+                .setPath(path)
                 .setShader(get(OxyShader.class))
-                .setRenderableComponent(get(RenderableComponent.class))
                 .setMode(GL_TRIANGLES)
                 .setUsage(BufferTemplate.Usage.DYNAMIC)
                 .setVertices(vertices)

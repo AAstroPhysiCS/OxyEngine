@@ -1,7 +1,6 @@
 package OxyEngineEditor.Components;
 
 import OxyEngine.Core.Renderer.Buffer.*;
-import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -20,14 +19,16 @@ public class ModelMesh extends Mesh {
     private final float[] vertices, textureCoords, normals;
     private final int[] indices;
 
-    private ModelMesh(OxyShader shader, BufferTemplate.Usage usage, int mode, RenderableComponent renderableComponent, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+    private final String path;
+
+    private ModelMesh(String path, OxyShader shader, BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+        this.path = path;
         this.shader = shader;
         this.vertices = vertices;
         this.indices = indices;
         this.textureCoords = textureCoords;
         this.normals = normals;
         this.mode = mode;
-        this.renderableComponent = renderableComponent;
 
         vertexBuffer = new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                 .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
@@ -64,7 +65,7 @@ public class ModelMesh extends Mesh {
 
         ModelMeshBuilder setUsage(BufferTemplate.Usage usage);
 
-        ModelMeshBuilder setRenderableComponent(RenderableComponent renderable);
+        ModelMeshBuilder setPath(String path);
 
         ModelMesh create();
     }
@@ -76,7 +77,7 @@ public class ModelMesh extends Mesh {
         private int[] indices;
         private int mode;
         private BufferTemplate.Usage usage;
-        private RenderableComponent component = new RenderableComponent(RenderingMode.Normal);
+        private String path;
 
         @Override
         public ModelMeshBuilderImpl setShader(OxyShader shader) {
@@ -121,15 +122,15 @@ public class ModelMesh extends Mesh {
         }
 
         @Override
-        public ModelMeshBuilderImpl setRenderableComponent(RenderableComponent component) {
-            this.component = component;
+        public ModelMeshBuilderImpl setPath(String path) {
+            this.path = path;
             return this;
         }
 
         @Override
         public ModelMesh create() {
             assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
-            return new ModelMesh(shader, usage, mode, component, vertices, indices, textureCoords, normals);
+            return new ModelMesh(path, shader, usage, mode, vertices, indices, textureCoords, normals);
         }
     }
 
@@ -149,7 +150,7 @@ public class ModelMesh extends Mesh {
         return indices;
     }
 
-    public RenderableComponent getRenderableComponent() {
-        return renderableComponent;
+    public String getPath() {
+        return path;
     }
 }

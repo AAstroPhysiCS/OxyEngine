@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Panels;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
+import imgui.flag.ImGuiConfigFlags;
 import imgui.flag.ImGuiStyleVar;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
@@ -28,7 +29,7 @@ public class ToolbarPanel extends Panel {
         if (ImGui.beginMainMenuBar()) {
             ImVec2 pos = new ImVec2();
             ImGui.getWindowPos(pos);
-            ImGui.setCursorPosY(pos.y - 20f);
+            ImGui.setCursorPosY(ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable) ? pos.y - 20f : pos.y + 3);
             if (ImGui.beginMenu("File")) {
                 if (ImGui.beginMenu("New")) {
                     ImGui.menuItem("New Scene");

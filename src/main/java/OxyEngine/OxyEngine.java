@@ -8,15 +8,13 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Core.Window.WindowHint;
 import OxyEngine.OpenGL.OpenGLContext;
 import OxyEngine.System.OxyDisposable;
-import OxyEngine.System.OxySystem;
 import OxyEngineEditor.UI.Loader.UIThemeLoader;
-import imgui.ImGui;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngine.System.OxySystem.logger;
+import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -38,7 +36,7 @@ public class OxyEngine implements OxyDisposable {
         this.antialiasing = antialiasing;
         this.vSync = vSync;
 
-        if(type == OxyRendererType.Oxy3D)
+        if (type == OxyRendererType.Oxy3D)
             renderer = OxyRenderer3D.getInstance(windowHandle);
         //OxyRenderer2D is not a thing... but will be a thing (hopefully)
     }
@@ -47,7 +45,8 @@ public class OxyEngine implements OxyDisposable {
         ON(4), OFF(0);
 
         private final int level;
-        Antialiasing(int level){
+
+        Antialiasing(int level) {
             this.level = level;
         }
 
@@ -56,7 +55,9 @@ public class OxyEngine implements OxyDisposable {
         }
     }
 
-    public synchronized void start() { thread.start(); }
+    public synchronized void start() {
+        thread.start();
+    }
 
     public void init() {
         assert glfwInit() : oxyAssert("Can't init GLFW");
@@ -68,7 +69,7 @@ public class OxyEngine implements OxyDisposable {
                 .resizable(GLFW_TRUE)
                 .doubleBuffered(GLFW_TRUE);
         windowHint.create();
-        windowHandle.setPointer(switch(windowHandle.getMode()){
+        windowHandle.setPointer(switch (windowHandle.getMode()) {
             case WINDOWED -> builder.createOpenGLWindow(windowHandle.getWidth(), windowHandle.getHeight(), windowHandle.getTitle());
             case FULLSCREEN -> builder.createFullscreenOpenGLWindow(windowHandle.getTitle());
             case WINDOWEDFULLSCREEN -> builder.createWindowedFullscreenOpenGLWindow(windowHandle.getTitle());
@@ -79,8 +80,6 @@ public class OxyEngine implements OxyDisposable {
 
     @Override
     public void dispose() {
-        ImGui.saveIniSettingsToDisk(OxySystem.FileSystem.getResourceByPath("/ini/imgui.ini"));
-
         glfwFreeCallbacks(windowHandle.getPointer());
         glfwDestroyWindow(windowHandle.getPointer());
 

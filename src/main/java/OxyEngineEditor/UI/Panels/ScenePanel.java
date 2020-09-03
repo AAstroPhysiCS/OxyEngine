@@ -1,19 +1,21 @@
 package OxyEngineEditor.UI.Panels;
 
+import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.PerspectiveCamera;
-import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngineEditor.Scene.WorldGrid;
 import imgui.ImGui;
 import imgui.ImVec2;
-import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
+import static OxyEngineEditor.UI.OxyEventSystem.keyEventDispatcher;
+import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE;
+
 public class ScenePanel extends Panel {
 
-    public static boolean focusedWindowDragging, focusedWindow;
+    public static boolean focusedWindowDragging, focusedWindow, hoveredWindow;
 
     public static final ImVec2 windowSize = new ImVec2();
     public static final ImVec2 windowPos = new ImVec2();
@@ -29,11 +31,13 @@ public class ScenePanel extends Panel {
         return INSTANCE;
     }
 
-    public static ScenePanel getInstance() { return INSTANCE; }
+    public static ScenePanel getInstance() {
+        return INSTANCE;
+    }
 
     private ScenePanel(SceneLayer sceneLayer, OxyShader shader) {
         this.sceneLayer = sceneLayer;
-        new WorldGrid(sceneLayer.getScene(), 25, shader);
+//        new WorldGrid(sceneLayer.getScene(), 10, shader);
     }
 
     @Override
@@ -43,10 +47,6 @@ public class ScenePanel extends Panel {
     @Override
     public void renderPanel() {
 
-        ImGui.pushStyleColor(ImGuiCol.ChildBg, bgC[0], bgC[1], bgC[2], bgC[3]);
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-        ImGui.pushStyleVar(ImGuiStyleVar.ChildBorderSize, 0);
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowMinSize, 50, 50);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0, 0);
 
         ImGui.begin("Scene", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoTitleBar);
@@ -56,8 +56,15 @@ public class ScenePanel extends Panel {
         ImGui.getMousePos(mousePos);
         ImGui.getCursorPos(offset);
 
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_DELETE] && entityContext != null) {
+            sceneLayer.getScene().removeEntity(entityContext);
+            sceneLayer.rebuild();
+            entityContext = null;
+        }
+
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
         focusedWindow = ImGui.isWindowFocused();
+        hoveredWindow = ImGui.isWindowHovered();
 
         ImVec2 availContentRegionSize = new ImVec2();
         ImGui.getContentRegionAvail(availContentRegionSize);
@@ -73,10 +80,6 @@ public class ScenePanel extends Panel {
             }
         }
 
-        ImGui.popStyleVar();
-        ImGui.popStyleColor();
-        ImGui.popStyleVar();
-        ImGui.popStyleVar();
         ImGui.popStyleVar();
         ImGui.end();
     }

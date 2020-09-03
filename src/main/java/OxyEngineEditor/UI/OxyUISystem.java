@@ -21,7 +21,7 @@ import java.io.File;
 import java.util.Objects;
 
 import static OxyEngine.System.OxySystem.gl_Version;
-import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.*;
+import static OxyEngineEditor.UI.OxyEventSystem.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class OxyUISystem {
@@ -42,40 +42,29 @@ public class OxyUISystem {
         init();
     }
 
-    public static record OxyEventSystem() {
-        public static GLFWEventDispatcher.MouseEvent mouseButtonDispatcher;
-        public static GLFWEventDispatcher.MouseCursorPosEvent mouseCursorPosDispatcher;
-        public static GLFWEventDispatcher.KeyEvent keyEventDispatcher;
-        public static GLFWEventDispatcher.KeyCharEvent keyCharDispatcher;
-        public static GLFWEventDispatcher.MouseScrollEvent mouseScrollDispatcher;
-
-        public static OxyEventDispatcher eventDispatcher;
-    }
-
     private void init() {
         ImGui.createContext();
-        ImGui.loadIniSettingsFromDisk(OxySystem.FileSystem.getResourceByPath("/ini/imgui.ini"));
 
         io = ImGui.getIO();
         ImGui.getStyle().setColors(OxyEngine.getLoadedTheme());
 
+        io.setIniFilename(OxySystem.FileSystem.getResourceByPath("/ini/imgui.ini"));
+        io.setWantSaveIniSettings(true);
         io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard);
         io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
-        io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+//        io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
         io.setConfigViewportsNoTaskBarIcon(true);
         setKeymap();
 
         mouseButtonDispatcher = (GLFWEventDispatcher.MouseEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseEvent, io);
         mouseCursorPosDispatcher = (GLFWEventDispatcher.MouseCursorPosEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseCursorPosEvent, io);
         keyEventDispatcher = (GLFWEventDispatcher.KeyEvent) GLFWEventDispatcher.getInstance(GLFWEventType.KeyEvent, io);
-        keyCharDispatcher = (GLFWEventDispatcher.KeyCharEvent) GLFWEventDispatcher.getInstance(GLFWEventType.KeyCharEvent, io);
         mouseScrollDispatcher = (GLFWEventDispatcher.MouseScrollEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseScrollEvent, io);
 
 
         final long winPtr = windowHandle.getPointer();
         glfwSetMouseButtonCallback(winPtr, mouseButtonDispatcher);
         glfwSetKeyCallback(winPtr, keyEventDispatcher);
-        glfwSetCharCallback(winPtr, keyCharDispatcher);
         glfwSetScrollCallback(winPtr, mouseScrollDispatcher);
         glfwSetCursorPosCallback(winPtr, mouseCursorPosDispatcher);
 
@@ -114,7 +103,7 @@ public class OxyUISystem {
 
         io.setDisplaySize(windowHandle.getWidth(), windowHandle.getHeight());
         io.setDisplayFramebufferScale((float) fbWidth[0] / windowHandle.getWidth(), (float) fbHeight[0] / windowHandle.getHeight());
-        io.setMousePos((float) OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos(), (float) OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos());
+        io.setMousePos((float) OxyEventSystem.mouseCursorPosDispatcher.getXPos(), (float) OxyEventSystem.mouseCursorPosDispatcher.getYPos());
         io.setDeltaTime(deltaTime);
 
         final int imguiCursor = ImGui.getMouseCursor();

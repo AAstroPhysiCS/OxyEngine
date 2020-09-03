@@ -4,7 +4,7 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngineEditor.EditorApplication;
+import OxyEngine.OxyApplication;
 import OxyEngineEditor.Components.PerspectiveCamera;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -37,7 +37,7 @@ public abstract class OxyRenderer {
         }
 
         public static String getStats() {
-            if (currentBoundedCamera == null) return "No Camera";
+            if (currentBoundedCamera == null) return "FPS: %s, No Camera".formatted(OxyApplication.FPS);
             String s = """
                     FPS: %s
                     Draw Calls: %s
@@ -59,7 +59,7 @@ public abstract class OxyRenderer {
                         Z: %s
                     Zoom: %s
                     """.formatted(
-                    EditorApplication.FPS,
+                    OxyApplication.FPS,
                     drawCalls,
                     totalShapeCount,
                     totalVertexCount,

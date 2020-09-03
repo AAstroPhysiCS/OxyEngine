@@ -3,9 +3,9 @@ package OxyEngine.Core.Camera.Controller;
 import OxyEngine.Tools.Ref;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
-import OxyEngineEditor.UI.OxyUISystem;
 import org.joml.Vector3f;
 
+import static OxyEngineEditor.UI.OxyEventSystem.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class PerspectiveCameraController extends OxyCameraController {
@@ -19,52 +19,67 @@ public class PerspectiveCameraController extends OxyCameraController {
     }
 
     private void rotate() {
-        float dx = (float) (OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos() - oldMouseX);
-        float dy = (float) (OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos() - oldMouseY);
+        float dx = (float) (mouseCursorPosDispatcher.getXPos() - oldMouseX);
+        float dy = (float) (mouseCursorPosDispatcher.getYPos() - oldMouseY);
 
         rotationRef.obj.x += (-dy * mouseSpeed) / 16;
         rotationRef.obj.y += (-dx * mouseSpeed) / 16;
     }
 
-    private void updateRotationFree() {
-        if (ScenePanel.focusedWindowDragging) rotate();
+    private void updateRotationFree(float ts) {
+        if (ScenePanel.focusedWindowDragging)
+            rotate();
 
-        oldMouseX = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos();
-        oldMouseY = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos();
+        updatePosition(ts);
+
+        oldMouseX = mouseCursorPosDispatcher.getXPos();
+        oldMouseY = mouseCursorPosDispatcher.getYPos();
     }
 
     private void updateRotationSwipe() {
-        if (OxyUISystem.OxyEventSystem.mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_MIDDLE] && (ScenePanel.focusedWindowDragging || SceneHierarchyPanel.focusedWindowDragging))
+        if ((ScenePanel.focusedWindowDragging || SceneHierarchyPanel.focusedWindowDragging)) {
             rotate();
+        }
 
-        oldMouseX = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getXPos();
-        oldMouseY = OxyUISystem.OxyEventSystem.mouseCursorPosDispatcher.getYPos();
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT] &&
+                mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_RIGHT] &&
+                ScenePanel.focusedWindow) {
+            float dx = (float) (mouseCursorPosDispatcher.getXPos() - oldMouseX);
+            float dy = (float) (mouseCursorPosDispatcher.getYPos() - oldMouseY);
+            float angle90 = rotationRef.obj.y;
+            positionRef.obj.x += Math.cos(angle90) * (-dx * mouseSpeed);
+            positionRef.obj.z += Math.sin(angle90) * (-dx * mouseSpeed);
+            positionRef.obj.y += (-dy * mouseSpeed);
+        }
+
+        oldMouseX = mouseCursorPosDispatcher.getXPos();
+        oldMouseY = mouseCursorPosDispatcher.getYPos();
     }
 
     private void updatePosition(float ts) {
         if (!ScenePanel.focusedWindow) return;
         float angle90 = (float) (rotationRef.obj.y + (Math.PI / 2));
         float angle = rotationRef.obj.y;
-        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_W]) {
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_W]) {
             positionRef.obj.x += Math.cos(angle90) * horizontalSpeed * ts;
             positionRef.obj.z += Math.sin(angle90) * horizontalSpeed * ts;
         }
-        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_S]) {
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_S]) {
             positionRef.obj.x -= Math.cos(angle90) * horizontalSpeed * ts;
             positionRef.obj.z -= Math.sin(angle90) * horizontalSpeed * ts;
         }
-        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_D]) {
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_D]) {
             positionRef.obj.x += Math.cos(angle) * horizontalSpeed * ts;
             positionRef.obj.z += Math.sin(angle) * horizontalSpeed * ts;
         }
-        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_A]) {
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_A]) {
             positionRef.obj.x -= Math.cos(angle) * horizontalSpeed * ts;
             positionRef.obj.z -= Math.sin(angle) * horizontalSpeed * ts;
         }
-        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_SPACE]) {
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_SPACE]) {
             positionRef.obj.y -= verticalSpeed * ts;
         }
-        if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT]) {
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT]) {
             positionRef.obj.y += verticalSpeed * ts;
         }
     }
@@ -72,7 +87,6 @@ public class PerspectiveCameraController extends OxyCameraController {
     @Override
     public void update(float ts, Mode mode) {
         if (mode == Mode.SWIPE) updateRotationSwipe();
-        else updateRotationFree();
-        updatePosition(ts);
+        else updateRotationFree(ts);
     }
 }

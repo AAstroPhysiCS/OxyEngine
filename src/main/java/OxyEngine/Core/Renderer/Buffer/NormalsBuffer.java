@@ -33,6 +33,11 @@ public class NormalsBuffer extends Buffer {
 
     @Override
     public void dispose() {
+        normals = null;
         glDeleteBuffers(bufferId);
+    }
+
+    public float[] getNormals() {
+        return normals;
     }
 }

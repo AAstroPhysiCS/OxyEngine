@@ -85,10 +85,8 @@ public final class VertexBuffer extends Buffer {
 
     @Override
     public void dispose() {
+        vertices = null;
+        dataToUpdate = null;
         glDeleteBuffers(bufferId);
-    }
-
-    public void clear() {
-        vertices = new float[0];
     }
 }

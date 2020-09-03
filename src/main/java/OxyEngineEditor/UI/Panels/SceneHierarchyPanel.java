@@ -13,10 +13,10 @@ import OxyEngineEditor.Scene.Model.ModelType;
 import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
 import imgui.ImGui;
-import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Vector3f;
+
+import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
 
 public class SceneHierarchyPanel extends Panel {
 
@@ -26,8 +26,6 @@ public class SceneHierarchyPanel extends Panel {
     private final OxyShader shader;
 
     public static boolean focusedWindow, focusedWindowDragging;
-
-    public static OxyEntity selectedContextEntity;
 
     public static SceneHierarchyPanel getInstance(SceneLayer scene, OxyShader shader) {
         if (INSTANCE == null) INSTANCE = new SceneHierarchyPanel(scene, shader);
@@ -49,28 +47,22 @@ public class SceneHierarchyPanel extends Panel {
         sceneLayer.getScene().each(entity -> {
             TagComponent tagComponent = entity.get(TagComponent.class);
             if (tagComponent != null) {
-                if (ImGui.treeNodeEx(String.valueOf(entityTagCounter), ImGuiTreeNodeFlags.OpenOnArrow | (selectedContextEntity == entity ? ImGuiTreeNodeFlags.Selected : 0), tagComponent.tag())) {
+                if (ImGui.treeNodeEx(String.valueOf(entityTagCounter), ImGuiTreeNodeFlags.OpenOnArrow | (entityContext == entity ? ImGuiTreeNodeFlags.Selected : 0), tagComponent.tag())) {
                     ImGui.treePop();
                 }
                 if (ImGui.isItemClicked()) {
-                    //quick trick lol
-                    if (selectedContextEntity != null)
-                        selectedContextEntity.get(SelectedComponent.class).selected = false;
-                    selectedContextEntity = entity;
-                    selectedContextEntity.get(SelectedComponent.class).selected = true;
+                    if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
+                    entityContext = entity;
+                    entityContext.get(SelectedComponent.class).selected = true;
                 }
                 entityTagCounter++;
             }
-        }, ModelMesh.class, TagComponent.class, SelectedComponent.class); //all entities that have x
+        }, ModelMesh.class); //all entities that have x
         entityTagCounter = 0;
     }
 
     @Override
     public void renderPanel() {
-        ImGui.pushStyleColor(ImGuiCol.WindowBg, bgC[0], bgC[1], bgC[2], bgC[3]);
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding | ImGuiStyleVar.WindowBorderSize, 0);
-
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, -1, 8);
 
         ImGui.begin("Scene Hierarchy");
         focusedWindow = ImGui.isWindowFocused();
@@ -79,15 +71,12 @@ public class SceneHierarchyPanel extends Panel {
         updateEntityPanel();
 
         if (ImGui.beginPopupContextWindow("item context menu")) {
-            if (ImGui.button("Create new entity"))
+            if (ImGui.button("Create Entity"))
                 addEntity(ModelType.Cube.getPath().getBytes(), shader);
             ImGui.endPopup();
         }
-        ImGui.popStyleVar();
 
         ImGui.end();
-        ImGui.popStyleColor();
-        ImGui.popStyleVar();
     }
 
     static int counter = 0;

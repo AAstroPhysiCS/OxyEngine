@@ -64,6 +64,7 @@ public class SceneLayer extends Layer {
         //Prep
         {
             List<OxyEntity> cachedConverted = new ArrayList<>(allModelEntities);
+            if(cachedConverted.size() == 0) return;
             ModelMesh mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMesh.class);
             mesh.initList();
         }
@@ -109,8 +110,6 @@ public class SceneLayer extends Layer {
         {
             for (EntityComponent c : cachedNativeMeshes) {
                 Mesh mesh = (Mesh) c;
-                RenderableComponent rC = mesh.renderableComponent;
-                if (rC.mode != RenderingMode.Normal) continue;
                 render(ts, mesh, mainCamera);
             }
             for (OxyEntity e : allModelEntities) {

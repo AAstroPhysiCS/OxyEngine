@@ -16,6 +16,7 @@ import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.UI.OxyEventSystem;
 import OxyEngineEditor.UI.OxyUISystem;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Vector3f;
@@ -92,13 +93,12 @@ public class EditorApplication extends OxyApplication {
         overlayPanelLayer.addPanel(StatsPanel.getInstance());
         overlayPanelLayer.addPanel(ToolbarPanel.getInstance());
         overlayPanelLayer.addPanel(SceneHierarchyPanel.getInstance(sceneLayer, oxyShader));
+        overlayPanelLayer.addPanel(PropertiesPanel.getInstance(sceneLayer));
         overlayPanelLayer.addPanel(ScenePanel.getInstance(sceneLayer, oxyShader));
-        overlayPanelLayer.addPanel(PropertiesPanel.getInstance());
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, overlayPanelLayer);
-        for (Layer l : layerStack.getLayerStack()) {
+        for (Layer l : layerStack.getLayerStack())
             l.build();
-        }
     }
 
     @Override
@@ -129,7 +129,7 @@ public class EditorApplication extends OxyApplication {
             int frames = 0;
 
             while (oxyEngine.getMainThread().isAlive() && !glfwWindowShouldClose(windowHandle.getPointer())) {
-                if (OxyUISystem.OxyEventSystem.keyEventDispatcher.getKeys()[GLFW.GLFW_KEY_ESCAPE]) break;
+                if (OxyEventSystem.keyEventDispatcher.getKeys()[GLFW.GLFW_KEY_ESCAPE]) break;
 
                 final float currentTime = (float) glfwGetTime();
                 final float deltaTime = (time > 0) ? (float) (currentTime - time) : 1f / 60f;

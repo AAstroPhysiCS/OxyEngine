@@ -12,6 +12,12 @@ public class TransformComponent implements EntityComponent {
 
     public Matrix4f transform;
 
+    public TransformComponent(TransformComponent t){
+        this.scale = new Vector3f(t.scale);
+        this.position = new Vector3f(t.position);
+        this.rotation = new Vector3f(t.rotation);
+    }
+
     public TransformComponent(Vector3f position, Vector3f rotation, Vector3f scale){
         this.scale = scale;
         this.position = position;

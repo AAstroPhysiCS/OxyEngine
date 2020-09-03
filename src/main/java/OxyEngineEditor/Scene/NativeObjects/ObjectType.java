@@ -1,7 +1,7 @@
 package OxyEngineEditor.Scene.NativeObjects;
 
 public enum ObjectType {
-    Grid(40, 6);
+    Grid(32, 6);
 
     private final int n_Vertices;
     private final int n_Indices;

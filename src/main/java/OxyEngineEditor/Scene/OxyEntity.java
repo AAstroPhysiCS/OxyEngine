@@ -12,7 +12,7 @@ import java.util.List;
 
 import static OxyEngine.System.Globals.Globals.toPrimitiveFloat;
 import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
-import static OxyEngineEditor.UI.OxyUISystem.OxyEventSystem.eventDispatcher;
+import static OxyEngineEditor.UI.OxyEventSystem.eventDispatcher;
 
 public abstract class OxyEntity {
 
@@ -26,7 +26,7 @@ public abstract class OxyEntity {
         this.scene = scene;
     }
 
-    protected abstract void initData();
+    protected abstract void initData(String path);
 
     public abstract void constructData();
 
