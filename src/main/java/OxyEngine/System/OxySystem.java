@@ -1,6 +1,9 @@
 package OxyEngine.System;
 
 import OxyEngineEditor.EntryPoint;
+import OxyEngineEditor.UI.Panels.PropertiesPanel;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.util.nfd.NativeFileDialog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -20,6 +23,7 @@ public interface OxySystem {
 
     Logger logger = Logger.getLogger(OxySystem.class.getName());
 
+    String BASE_PATH = System.getProperty("user.dir");
     String gl_Version = "#version 460";
 
     static void init() {
@@ -57,6 +61,17 @@ public interface OxySystem {
         static String getResourceByPath(String path){
             String fullPath = EntryPoint.class.getResource(path).getPath();
             return (String) fullPath.subSequence(1, fullPath.length());
+        }
+
+        static String openDialog(String filterList, String defaultPath){
+            String path = null;
+            PointerBuffer buffer = PointerBuffer.allocateDirect(16);
+            int result = NativeFileDialog.NFD_OpenDialog(filterList, defaultPath, buffer);
+            if (result == NativeFileDialog.NFD_OKAY) {
+                path = buffer.getStringASCII();
+            }
+            NativeFileDialog.nNFD_Free(buffer.get());
+            return path;
         }
     }
 }

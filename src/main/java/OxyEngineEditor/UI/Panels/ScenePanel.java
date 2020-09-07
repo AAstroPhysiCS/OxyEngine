@@ -58,7 +58,7 @@ public class ScenePanel extends Panel {
 
         if (keyEventDispatcher.getKeys()[GLFW_KEY_DELETE] && entityContext != null) {
             sceneLayer.getScene().removeEntity(entityContext);
-            sceneLayer.rebuild();
+            sceneLayer.updateAllModelEntities();
             entityContext = null;
         }
 

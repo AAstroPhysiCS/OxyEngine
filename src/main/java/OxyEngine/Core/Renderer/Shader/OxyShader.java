@@ -22,6 +22,8 @@ public class OxyShader implements OxyDisposable, EntityComponent {
     public static final int TEXTURE_SLOT = 2;
     public static final int COLOR = 3;
     public static final int NORMALS = 4;
+    public static final int BITANGENT = 5;
+    public static final int TANGENT = 6;
 
     private final Map<String, ? super Number> uniformLocations = new HashMap<>();
 
@@ -106,10 +108,6 @@ public class OxyShader implements OxyDisposable, EntityComponent {
         setUniformMatrix4fv(camera.getModelMatrix(), "m_Matrix", camera.isTranspose());
         setUniformMatrix4fv(camera.getViewMatrix(), "v_Matrix", camera.isTranspose());
         setUniformMatrix4fv(camera.getViewMatrixNoTranslation(), "v_Matrix_NoTransform", camera.isTranspose());
-    }
-
-    public Map<String, ? super Number> getUniformLocations() {
-        return uniformLocations;
     }
 
     public int getProgram() {

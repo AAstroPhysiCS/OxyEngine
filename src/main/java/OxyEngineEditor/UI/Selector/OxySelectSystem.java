@@ -28,7 +28,9 @@ public class OxySelectSystem {
 
     public static OxyEntity entityContext;
 
-    public OxySelectSystem(Scene scene, OxyGizmo3D gizmo) {
+    private OxySelectSystem() {}
+
+    public static void init(Scene scene, OxyGizmo3D gizmo){
         OxySelectSystem.gizmo = gizmo;
         OxySelectSystem.renderer = scene.getRenderer();
         OxySelectSystem.scene = scene;

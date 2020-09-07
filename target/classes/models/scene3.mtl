@@ -1,5 +1,5 @@
-# Blender MTL File: 'None'
-# Material Count: 5
+# Blender MTL File: 'untitled.blend'
+# Material Count: 6
 
 newmtl Material.001
 Ns 225.000000
@@ -51,3 +51,14 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
+
+newmtl None
+Ns 500.000001
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.734191 0.762922
+Ks 0.800000 0.800000 0.800000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\okang\\Desktop\\brickwall.jpg

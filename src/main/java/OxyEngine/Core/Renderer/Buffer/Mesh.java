@@ -19,6 +19,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     protected VertexBuffer vertexBuffer;
     protected TextureBuffer textureBuffer;
     protected NormalsBuffer normalsBuffer;
+    protected TangentBuffer tangentBuffer;
 
     protected OxyShader shader;
     protected String path;
@@ -45,6 +46,10 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
 
     public NormalsBuffer getNormalsBuffer() {
         return normalsBuffer;
+    }
+
+    public TangentBuffer getTangentBuffer() {
+        return tangentBuffer;
     }
 
     public String getPath() {
@@ -132,10 +137,8 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         entities.clear();
         vertexBuffer.dispose();
         indexBuffer.dispose();
-        if (textureBuffer != null)
-            textureBuffer.dispose();
-        if (normalsBuffer != null)
-            normalsBuffer.dispose();
+        if (textureBuffer != null) textureBuffer.dispose();
+        if (normalsBuffer != null) normalsBuffer.dispose();
         glDeleteVertexArrays(vao);
     }
 }

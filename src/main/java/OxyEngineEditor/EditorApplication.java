@@ -2,6 +2,8 @@ package OxyEngineEditor;
 
 import OxyEngine.Core.Layers.*;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Renderer.Light.Light;
+import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -11,6 +13,7 @@ import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
+import OxyEngineEditor.Components.EmittingComponent;
 import OxyEngineEditor.Components.PerspectiveCamera;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TransformComponent;
@@ -53,14 +56,14 @@ public class EditorApplication extends OxyApplication {
         PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
         cameraEntity.addComponent(camera);
 
-        /*OxyEntity pointLightEntity = scene.createNativeObjectEntity();
+        OxyEntity pointLightEntity = scene.createNativeObjectEntity();
         Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
         pointLightEntity.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
-                new Vector3f(0, -33, -1.8f),
+                new Vector3f(0, -12, 0),
                 null,
-                new Vector3f(2f, 2f, 2f),
+                new Vector3f(5f, 5f, 5f),
                 new Vector3f(10f, 10f, 10f),
-                new Vector3f(10f, 10f, 10f)));*/
+                new Vector3f(10f, 10f, 10f)));
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
@@ -72,7 +75,7 @@ public class EditorApplication extends OxyApplication {
                 new Vector3f(0f, 0f, 0f)));*/
 
 
-        List<OxyEntity> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene3.obj"), oxyShader);
+        List<OxyEntity> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene3.fbx"), oxyShader);
         for (OxyEntity obj : testObjects) {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0), 2f));
             obj.constructData();

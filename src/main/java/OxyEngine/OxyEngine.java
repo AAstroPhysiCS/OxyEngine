@@ -55,7 +55,7 @@ public class OxyEngine implements OxyDisposable {
         }
     }
 
-    public synchronized void start() {
+    public void start() {
         thread.start();
     }
 

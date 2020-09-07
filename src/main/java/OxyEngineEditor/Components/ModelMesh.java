@@ -14,14 +14,17 @@ public class ModelMesh extends Mesh {
 
     public static final BufferTemplate.Attributes attributesNormals = new BufferTemplate.Attributes(OxyShader.NORMALS, 3, GL_FLOAT, false, 0, 0);
 
+    public static final BufferTemplate.Attributes attributesTangents = new BufferTemplate.Attributes(OxyShader.TANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
+    public static final BufferTemplate.Attributes attributesBiTangents = new BufferTemplate.Attributes(OxyShader.BITANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
+
     public static final BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0);
 
-    private final float[] vertices, textureCoords, normals;
+    private final float[] vertices, textureCoords, normals, tangents, biTangents;
     private final int[] indices;
 
     private final String path;
 
-    private ModelMesh(String path, OxyShader shader, BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals) {
+    private ModelMesh(String path, OxyShader shader, BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
         this.path = path;
         this.shader = shader;
         this.vertices = vertices;
@@ -29,6 +32,8 @@ public class ModelMesh extends Mesh {
         this.textureCoords = textureCoords;
         this.normals = normals;
         this.mode = mode;
+        this.tangents = tangents;
+        this.biTangents = biTangents;
 
         vertexBuffer = new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                 .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
@@ -41,12 +46,25 @@ public class ModelMesh extends Mesh {
                 .setAttribPointer(attributesTXCoords));
 
         normalsBuffer = new NormalsBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-                .setAttribPointer(attributesNormals));
+                .setAttribPointer(attributesNormals, attributesTangents, attributesBiTangents));
+
+        tangentBuffer = new TangentBuffer(() -> new BufferTemplate.BufferTemplateImpl()
+        .setAttribPointer(attributesTangents, attributesBiTangents));
 
         vertexBuffer.setVertices(vertices);
         indexBuffer.setIndices(indices);
         textureBuffer.setTextureCoords(textureCoords);
         normalsBuffer.setNormals(normals);
+
+        float[] biAndTangents = new float[tangents.length + biTangents.length];
+        int tangentPtr = 0, biTangentPtr = 0;
+        for(int i = 0; i < biAndTangents.length;){
+            float tangentFloat = tangents[tangentPtr++];
+            float biTangentFloat = tangents[biTangentPtr++];
+            biAndTangents[i++] = tangentFloat;
+            biAndTangents[i++] = biTangentFloat;
+        }
+        tangentBuffer.setBiAndTangent(biAndTangents);
     }
 
     interface ModelMeshBuilder {
@@ -61,6 +79,10 @@ public class ModelMesh extends Mesh {
 
         ModelMeshBuilder setNormals(float[] normals);
 
+        ModelMeshBuilder setTangents(float[] tangents);
+
+        ModelMeshBuilder setBiTangents(float[] biTangents);
+
         ModelMeshBuilder setMode(int mode);
 
         ModelMeshBuilder setUsage(BufferTemplate.Usage usage);
@@ -73,7 +95,7 @@ public class ModelMesh extends Mesh {
     public static class ModelMeshBuilderImpl implements ModelMeshBuilder {
 
         private OxyShader shader;
-        private float[] vertices, textureCoords, normals;
+        private float[] vertices, textureCoords, normals, tangents, biTangents;
         private int[] indices;
         private int mode;
         private BufferTemplate.Usage usage;
@@ -110,6 +132,18 @@ public class ModelMesh extends Mesh {
         }
 
         @Override
+        public ModelMeshBuilderImpl setTangents(float[] tangents) {
+            this.tangents = tangents;
+            return this;
+        }
+
+        @Override
+        public ModelMeshBuilderImpl setBiTangents(float[] biTangents) {
+            this.biTangents = biTangents;
+            return this;
+        }
+
+        @Override
         public ModelMeshBuilderImpl setMode(int mode) {
             this.mode = mode;
             return this;
@@ -130,7 +164,7 @@ public class ModelMesh extends Mesh {
         @Override
         public ModelMesh create() {
             assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
-            return new ModelMesh(path, shader, usage, mode, vertices, indices, textureCoords, normals);
+            return new ModelMesh(path, shader, usage, mode, vertices, indices, textureCoords, normals, tangents, biTangents);
         }
     }
 
@@ -144,6 +178,14 @@ public class ModelMesh extends Mesh {
 
     public float[] getNormals() {
         return normals;
+    }
+
+    public float[] getTangents() {
+        return tangents;
+    }
+
+    public float[] getBiTangents() {
+        return biTangents;
     }
 
     public int[] getIndices() {

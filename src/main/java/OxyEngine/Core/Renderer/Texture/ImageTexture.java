@@ -24,6 +24,7 @@ public class ImageTexture extends OxyTexture.Texture {
         int[] height = new int[1];
         int[] channels = new int[1];
         ByteBuffer buffer = loadTextureFile(path, width, height, channels);
+        if(buffer == null) return;
         int alFormat = GL_RGBA;
         if (channels[0] == 3)
             alFormat = GL_RGB;

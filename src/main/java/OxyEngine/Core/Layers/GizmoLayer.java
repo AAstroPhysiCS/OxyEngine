@@ -8,12 +8,11 @@ import OxyEngineEditor.UI.Selector.OxySelectSystem;
 public class GizmoLayer extends Layer {
 
     private final OxyGizmo3D gizmo3D;
-    private final OxySelectSystem selectSystem;
 
     public GizmoLayer(Scene scene, WindowHandle windowHandle) {
         super(scene);
         gizmo3D = OxyGizmo3D.getInstance(windowHandle, scene);
-        selectSystem = new OxySelectSystem(scene, gizmo3D);
+        OxySelectSystem.init(scene, gizmo3D);
     }
 
     @Override

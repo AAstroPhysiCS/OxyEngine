@@ -15,26 +15,30 @@ import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
 
 public class ModelFactory implements EntityComponent {
 
-    private final List<Vector3f> verticesNonTransformed, normals;
+    private final List<Vector3f> verticesNonTransformed, normals, tangents, biTangents;
     private final List<int[]> faces;
     private final List<Vector2f> textureCoords;
 
     public ModelFactory(List<Vector3f> verticesNonTransformed, List<Vector2f> textureCoords, List<Vector3f> normals,
-                        List<int[]> faces) {
+                        List<int[]> faces, List<Vector3f> tangents, List<Vector3f> biTangents) {
         this.verticesNonTransformed = verticesNonTransformed;
         this.textureCoords = textureCoords;
+        this.biTangents = biTangents;
+        this.tangents = tangents;
         this.normals = normals;
         this.faces = faces;
     }
 
     public void constructData(OxyModel e) {
-        e.vertices = new float[verticesNonTransformed.size() * 4 * 8];
-        e.normals = new float[verticesNonTransformed.size() * 3 * 4];
-        e.tcs = new float[verticesNonTransformed.size() * 2 * 4];
+        e.vertices = new float[verticesNonTransformed.size() * 8];
+        e.normals = new float[verticesNonTransformed.size() * 3];
+        e.tcs = new float[verticesNonTransformed.size() * 2];
+        e.tangents = new float[tangents.size() * 3];
+        e.biTangents = new float[biTangents.size() * 3];
         List<Integer> indicesArr = new ArrayList<>();
 
         OxyMaterial material = e.get(OxyMaterial.class);
-        ImageTexture texture = material.texture;
+        ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
@@ -82,11 +86,24 @@ public class ModelFactory implements EntityComponent {
             e.tcs[tcsPtr++] = v.y;
         }
         e.indices = toPrimitiveInteger(indicesArr);
+
+        int tangentPtr = 0;
+        for(Vector3f v : tangents){
+            e.tangents[tangentPtr++] = v.x;
+            e.tangents[tangentPtr++] = v.y;
+            e.tangents[tangentPtr++] = v.z;
+        }
+        int biTangentPtr = 0;
+        for(Vector3f v : biTangents){
+            e.biTangents[biTangentPtr++] = v.x;
+            e.biTangents[biTangentPtr++] = v.y;
+            e.biTangents[biTangentPtr++] = v.z;
+        }
     }
 
     public void updateData(OxyModel e) {
         OxyMaterial material = e.get(OxyMaterial.class);
-        ImageTexture texture = material.texture;
+        ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
@@ -116,4 +133,7 @@ public class ModelFactory implements EntityComponent {
         }
     }
 
+    public List<Vector3f> getVerticesNonTransformed() {
+        return verticesNonTransformed;
+    }
 }

@@ -64,10 +64,14 @@ public class SceneLayer extends Layer {
         //Prep
         {
             List<OxyEntity> cachedConverted = new ArrayList<>(allModelEntities);
-            if(cachedConverted.size() == 0) return;
+            if (cachedConverted.size() == 0) return;
             ModelMesh mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMesh.class);
             mesh.initList();
         }
+    }
+
+    public void updateAllModelEntities() {
+        allModelEntities = scene.view(ModelMesh.class);
     }
 
     @Override
@@ -119,6 +123,12 @@ public class SceneLayer extends Layer {
                 OxyMaterial material = e.get(OxyMaterial.class);
                 SelectedComponent s = e.get(SelectedComponent.class);
                 material.push(modelMesh.getShader());
+//                modelMesh.getShader().enable();
+//                TransformComponent c = e.get(TransformComponent.class);
+//                modelMesh.getShader().setUniformMatrix4fv(new Matrix4f().rotateX(c.rotation.x).rotateY(c.rotation.y).rotateZ(c.rotation.z), "model", true);
+//                modelMesh.getShader().disable();
+                glEnable(GL_CULL_FACE);
+                glCullFace(GL_BACK);
                 if (s.selected) {
                     glEnable(GL_STENCIL_TEST);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -128,7 +138,7 @@ public class SceneLayer extends Layer {
 
                     render(ts, modelMesh, mainCamera);
                     outlineShader.enable();
-                    e.get(TransformComponent.class).scale.add(0.10f, 0.10f, 0.10f);
+                    e.get(TransformComponent.class).scale.mul(1.10f, 1.10f, 1.10f);
                     e.updateData();
 
                     glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -136,13 +146,14 @@ public class SceneLayer extends Layer {
 
                     render(ts, modelMesh, mainCamera, outlineShader); // draw with the outline shader
                     outlineShader.disable();
-                    e.get(TransformComponent.class).scale.sub(0.10f, 0.10f, 0.10f);
+                    e.get(TransformComponent.class).scale.div(1.10f, 1.10f, 1.10f);
                     e.updateData();
 
                     glDisable(GL_STENCIL_TEST);
                 } else {
                     render(ts, modelMesh, mainCamera);
                 }
+                glDisable(GL_CULL_FACE);
                 material.pop(modelMesh.getShader());
             }
         }

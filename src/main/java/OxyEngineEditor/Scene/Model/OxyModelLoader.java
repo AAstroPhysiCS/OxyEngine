@@ -3,7 +3,10 @@ package OxyEngineEditor.Scene.Model;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
@@ -21,6 +24,8 @@ public class OxyModelLoader {
         public final List<Vector3f> vertices = new ArrayList<>();
         public final List<Vector2f> textureCoords = new ArrayList<>();
         public final List<Vector3f> normals = new ArrayList<>();
+        public final List<Vector3f> tangents = new ArrayList<>();
+        public final List<Vector3f> biTangents = new ArrayList<>();
         public final List<int[]> faces = new ArrayList<>();
 
         public OxyMaterial material;
@@ -44,10 +49,11 @@ public class OxyModelLoader {
     }
 
     void processData() {
-        int flag = aiProcess_JoinIdenticalVertices
-                | aiProcess_Triangulate
+        int flag = aiProcess_Triangulate
                 | aiProcess_FixInfacingNormals
-                | aiProcess_OptimizeMeshes;
+                | aiProcess_OptimizeMeshes
+                | aiProcess_FlipUVs
+                | aiProcess_CalcTangentSpace;
 
         AIScene aiScene = aiImportFile(objPath, flag);
         PointerBuffer materials = Objects.requireNonNull(aiScene).mMaterials();
@@ -66,10 +72,10 @@ public class OxyModelLoader {
         }
 
         //transforming to 0,0,0
-        for(AssimpOxyMesh oxyMesh : this.meshes){
+        for (AssimpOxyMesh oxyMesh : this.meshes) {
             Matrix4f transform = new Matrix4f()
                     .translate(new Vector3f(oxyMesh.pos).negate());
-            for(int j = 0; j < oxyMesh.vertices.size(); j++){
+            for (int j = 0; j < oxyMesh.vertices.size(); j++) {
                 Vector3f vertices3f = oxyMesh.vertices.get(j);
                 Vector4f t4f = new Vector4f(vertices3f, 1.0f).mul(transform);
                 vertices3f.set(t4f.x, t4f.y, t4f.z);
@@ -106,6 +112,18 @@ public class OxyModelLoader {
             AIVector3D textCoord = textCoords.get();
             oxyMesh.textureCoords.add(new Vector2f(textCoord.x(), 1 - textCoord.y()));
         }
+
+        AIVector3D.Buffer tangent = mesh.mTangents();
+        while (Objects.requireNonNull(tangent).hasRemaining()) {
+            AIVector3D tangentC = tangent.get();
+            oxyMesh.tangents.add(new Vector3f(tangentC.x(), tangentC.y(), tangentC.z()));
+        }
+
+        AIVector3D.Buffer bitangent = mesh.mBitangents();
+        while (Objects.requireNonNull(bitangent).hasRemaining()) {
+            AIVector3D biTangentC = bitangent.get();
+            oxyMesh.biTangents.add(new Vector3f(biTangentC.x(), biTangentC.y(), biTangentC.z()));
+        }
     }
 
     private void addMaterial(AIMaterial aiMaterial, AssimpOxyMesh oxyMesh) {
@@ -113,10 +131,18 @@ public class OxyModelLoader {
         AIString path = AIString.calloc();
         aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
         String textPath = path.dataString();
-        ImageTexture texture = null;
+        ImageTexture albedoTexture = null;
+        if (!textPath.equals(""))
+            albedoTexture = OxyTexture.loadImage(textPath);
+
+        AIString pathHeight = AIString.calloc();
+        aiGetMaterialTexture(aiMaterial, aiTextureType_HEIGHT, 0, pathHeight, (IntBuffer) null, null, null, null, null, null);
+        textPath = pathHeight.dataString();
+        ImageTexture normalTexture = null;
         if (!textPath.equals("")) {
-            texture = OxyTexture.loadImage(textPath);
+            normalTexture = OxyTexture.loadImage(textPath);
         }
+
         Vector4f ambient = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, aiTextureType_NONE, 0, color);
         if (result == 0) {
@@ -134,7 +160,7 @@ public class OxyModelLoader {
         if (result == 0) {
             specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
-        oxyMesh.material = new OxyMaterial(texture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 1f);
+        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 1f);
     }
 
     public String getPath() {

@@ -77,7 +77,7 @@ public class PerspectiveCamera extends OxyCamera {
             if (entityContext != null) {
                 OxyGizmo3D.getInstance().scaleAll(entityContext);
             }
-            if(zoom >= 500) zoom = 500;
+            if (zoom >= 500) zoom = 500;
         }
 
         cameraController.update(ts, OxyCameraController.Mode.SWIPE);

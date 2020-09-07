@@ -62,16 +62,10 @@ public class Scene implements OxyDisposable {
                             assimpMesh.max
                     ),
                     new TransformComponent(new Vector3f(assimpMesh.pos)),
-                    new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
+                    new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                     new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                     new RenderableComponent(RenderingMode.Normal),
-                    new OxyMaterial(
-                            assimpMesh.material.texture,
-                            assimpMesh.material.ambientColor,
-                            assimpMesh.material.diffuseColor,
-                            assimpMesh.material.specularColor,
-                            assimpMesh.material.reflectance
-                    )
+                    assimpMesh.material
             );
             e.initData(path);
             models.add(e);
@@ -92,16 +86,10 @@ public class Scene implements OxyDisposable {
                         assimpMesh.max
                 ),
                 new TransformComponent(new Vector3f(assimpMesh.pos)),
-                new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces),
+                new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                 new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                 new RenderableComponent(RenderingMode.Normal),
-                new OxyMaterial(
-                        assimpMesh.material.texture,
-                        assimpMesh.material.ambientColor,
-                        assimpMesh.material.diffuseColor,
-                        assimpMesh.material.specularColor,
-                        assimpMesh.material.reflectance
-                )
+                assimpMesh.material
         );
         e.initData(path);
         return e;

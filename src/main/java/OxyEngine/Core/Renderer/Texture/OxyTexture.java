@@ -28,7 +28,9 @@ public class OxyTexture {
 
         protected ByteBuffer loadTextureFile(String path, int[] width, int[] height, int[] channels) {
             ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
-            assert buffer != null : oxyAssert("Texture could not be loaded!");
+            if(buffer == null){
+                oxyAssert("Texture could not be loaded! Gonna give some default color");
+            }
             return buffer;
         }
 

@@ -16,7 +16,7 @@ import static OxyEngineEditor.UI.OxyEventSystem.eventDispatcher;
 
 public abstract class OxyEntity {
 
-    public float[] vertices, tcs, normals;
+    public float[] vertices, tcs, normals, tangents, biTangents;
     public int[] indices;
 
     public Vector3f originPos;

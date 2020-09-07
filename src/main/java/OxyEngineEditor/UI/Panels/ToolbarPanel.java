@@ -5,8 +5,8 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.flag.ImGuiStyleVar;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.util.nfd.NativeFileDialog;
+
+import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 
 public class ToolbarPanel extends Panel {
 
@@ -36,22 +36,12 @@ public class ToolbarPanel extends Panel {
                     ImGui.endMenu();
                 }
                 if (ImGui.menuItem("Open a scene", "Ctrl+O")) {
-                    PointerBuffer buffer = PointerBuffer.allocateDirect(16);
-                    int result = NativeFileDialog.NFD_OpenDialog("osc\0", null, buffer);
-                    if (result == NativeFileDialog.NFD_OKAY) {
-                        System.out.println(buffer.getStringASCII());
-                    }
-                    NativeFileDialog.nNFD_Free(buffer.get());
+                    String openScene = openDialog("", null);
                 }
                 if (ImGui.menuItem("Save the scene", "Ctrl+S")) {
                 }
                 if (ImGui.menuItem("Save As...")) {
-                    PointerBuffer buffer = PointerBuffer.allocateDirect(16);
-                    int result = NativeFileDialog.NFD_SaveDialog("osc\0", null, buffer);
-                    if (result == NativeFileDialog.NFD_OKAY) {
-                        System.out.println(buffer.getStringASCII());
-                    }
-                    NativeFileDialog.nNFD_Free(buffer.get());
+                    String saveAs = openDialog("", null);
                 }
                 ImGui.endMenu();
             }

@@ -8,13 +8,11 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Components.ModelMesh;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
-import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Model.ModelType;
 import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
-import org.joml.Vector3f;
 
 import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
 
@@ -79,8 +77,6 @@ public class SceneHierarchyPanel extends Panel {
         ImGui.end();
     }
 
-    static int counter = 0;
-
     private void addEntity(byte[] data, OxyShader shader) {
         OxyEntity model = sceneLayer.getScene().createModelEntity(new String(data), shader);
         //TEMP
@@ -93,8 +89,8 @@ public class SceneHierarchyPanel extends Panel {
         model.get(OxyMaterial.class).diffuseColor = new OxyColor(PropertiesPanel.diffuseColor);
         model.get(OxyMaterial.class).ambientColor = new OxyColor(PropertiesPanel.ambientColor);
         model.get(OxyMaterial.class).specularColor = new OxyColor(PropertiesPanel.specularColor);
-        model.get(OxyMaterial.class).texture = texture;
-        model.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(-30, -10 * counter++, 0)));
+        model.get(OxyMaterial.class).albedoTexture = texture;
+        model.addComponent(new SelectedComponent(false));
         model.updateData();
         sceneLayer.rebuild();
     }
