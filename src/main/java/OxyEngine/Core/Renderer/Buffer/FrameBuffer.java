@@ -10,8 +10,7 @@ import static org.lwjgl.opengl.GL45.glCreateTextures;
 
 public class FrameBuffer extends Buffer {
 
-    private int colorAttachmentId, depthAttachment, renderBufferObject;
-    private final boolean primary = false;
+    private int colorAttachmentId, depthAttachment;
 
     private int width;
     private int height;

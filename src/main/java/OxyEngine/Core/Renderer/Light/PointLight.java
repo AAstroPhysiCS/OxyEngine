@@ -1,7 +1,6 @@
 package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import org.joml.Matrix4f;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 

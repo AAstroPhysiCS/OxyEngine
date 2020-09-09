@@ -31,10 +31,6 @@ public class ScenePanel extends Panel {
         return INSTANCE;
     }
 
-    public static ScenePanel getInstance() {
-        return INSTANCE;
-    }
-
     private ScenePanel(SceneLayer sceneLayer, OxyShader shader) {
         this.sceneLayer = sceneLayer;
 //        new WorldGrid(sceneLayer.getScene(), 10, shader);

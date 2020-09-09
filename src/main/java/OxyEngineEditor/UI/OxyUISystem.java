@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.Objects;
 
 import static OxyEngine.System.OxySystem.gl_Version;
+import static OxyEngineEditor.Scene.OxyEntity.entitySystemRunnable;
 import static OxyEngineEditor.UI.OxyEventSystem.*;
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -111,7 +112,8 @@ public class OxyUISystem {
         glfwSetInputMode(windowHandle.getPointer(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
-    public void dispatchEvents() {
+    public void dispatchNativeEvents() {
+        entitySystemRunnable.run();
         eventDispatcher.dispatch();
     }
 

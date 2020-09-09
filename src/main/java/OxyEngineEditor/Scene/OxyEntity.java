@@ -22,6 +22,9 @@ public abstract class OxyEntity {
     public Vector3f originPos;
     protected final Scene scene;
 
+    private static final List<OxyEntitySystem> entitySystems = new ArrayList<>();
+    public static final OxyEntitySystem.EntitySystemRunnable entitySystemRunnable = new OxyEntitySystem.EntitySystemRunnable(entitySystems);
+
     public OxyEntity(Scene scene) {
         this.scene = scene;
     }
@@ -102,6 +105,10 @@ public abstract class OxyEntity {
 
     public void addEventListener(OxyEventListener listener) {
         eventDispatcher.addListeners(this, listener);
+    }
+
+    public void addSystem(OxyEntitySystem system){
+        entitySystems.add(system);
     }
 
     public float[] getVertices() {

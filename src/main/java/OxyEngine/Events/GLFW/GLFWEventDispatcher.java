@@ -12,12 +12,6 @@ public interface GLFWEventDispatcher {
 
         private final boolean[] keys = new boolean[1000];
 
-        private final ImGuiIO io;
-
-        public KeyEvent(ImGuiIO io) {
-            this.io = io;
-        }
-
         @Override
         public void invoke(long window, int key, int scancode, int action, int mods) {
             keys[key] = action != GLFW.GLFW_RELEASE;
@@ -106,7 +100,7 @@ public interface GLFWEventDispatcher {
 
     static GLFWEventDispatcher getInstance(GLFWEventType type, ImGuiIO io) {
         return switch (type) {
-            case KeyEvent -> new KeyEvent(io);
+            case KeyEvent -> new KeyEvent();
             case MouseEvent -> new MouseEvent(io);
             case MouseCursorPosEvent -> new MouseCursorPosEvent();
             case MouseScrollEvent -> new MouseScrollEvent(io);

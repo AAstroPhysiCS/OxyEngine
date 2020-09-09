@@ -40,7 +40,4 @@ public class NormalsBuffer extends Buffer {
         normals = null;
         glDeleteBuffers(bufferId);
     }
-
-    public float[] getNormals() { return normals;
-    }
 }

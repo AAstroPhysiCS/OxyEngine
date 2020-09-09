@@ -160,7 +160,7 @@ public class OxyModelLoader {
         if (result == 0) {
             specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
-        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 1f);
+        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 32);
     }
 
     public String getPath() {

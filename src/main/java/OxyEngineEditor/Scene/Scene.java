@@ -43,8 +43,19 @@ public class Scene implements OxyDisposable {
         return e;
     }
 
+    public final OxyNativeObject createNativeObjectEntity(boolean withMesh) {
+        OxyNativeObject e = new OxyNativeObject(this);
+        registry.entityList.put(e, new LinkedHashSet<>(15));
+        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
+        return e;
+    }
+
     public final List<OxyEntity> createModelEntities(ModelType type, OxyShader shader) {
         return createModelEntities(type.getPath(), shader);
+    }
+
+    public final OxyEntity createModelEntity(ModelType type, OxyShader shader) {
+        return createModelEntity(type.getPath(), shader);
     }
 
     public final List<OxyEntity> createModelEntities(String path, OxyShader shader) {

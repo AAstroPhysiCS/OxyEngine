@@ -27,14 +27,6 @@ public abstract class OxyCameraController {
         this(new Ref<>(new Vector3f(0, 0, 0)), new Ref<>(new Vector3f(0, 0, 0)), mouseSpeed, horizontalSpeed, verticalSpeed);
     }
 
-    public void setRotation(Vector3f pos){
-        rotationRef.obj = pos;
-    }
-
-    public void setPosition(Vector3f pos){
-        rotationRef.obj = pos;
-    }
-
     public Vector3f getRotation() {
         return rotationRef.obj;
     }

@@ -13,11 +13,11 @@ import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Components.EmittingComponent;
-import OxyEngineEditor.Components.PerspectiveCamera;
-import OxyEngineEditor.Components.SelectedComponent;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Components.*;
+import OxyEngineEditor.Scene.Model.ModelType;
+import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.OxyEntitySystem;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.OxyEventSystem;
 import OxyEngineEditor.UI.OxyUISystem;
@@ -59,11 +59,33 @@ public class EditorApplication extends OxyApplication {
         OxyEntity pointLightEntity = scene.createNativeObjectEntity();
         Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
         pointLightEntity.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
-                new Vector3f(0, -12, 0),
+                new Vector3f(0, -2, 0),
                 null,
+                new Vector3f(0.1f, 0.1f, 0.1f),
                 new Vector3f(5f, 5f, 5f),
-                new Vector3f(10f, 10f, 10f),
-                new Vector3f(10f, 10f, 10f)));
+                new Vector3f(1f, 1f, 1f)));
+
+        OxyEntity m = scene.createModelEntity(ModelType.Sphere, oxyShader);
+        m.addComponent(new TransformComponent(new Vector3f(0, -10, 0), 1f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
+        m.constructData();
+
+        class Mover implements OxyEntitySystem {
+
+            private final Vector3f positionLight, positionEntity;
+
+            public Mover(Vector3f positionLight, Vector3f positionEntity) {
+                this.positionLight = positionLight;
+                this.positionEntity = positionEntity;
+            }
+
+            @Override
+            public void run() {
+                positionLight.set(positionEntity);
+            }
+        }
+
+        m.addSystem(new Mover(pointLightEntity.get(EmittingComponent.class).position(), m.get(TransformComponent.class).position));
+
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
@@ -73,7 +95,6 @@ public class EditorApplication extends OxyApplication {
                 new Vector3f(0.5f, 0.5f, 0.5f),
                 new Vector3f(5.0f, 5.0f, 5.0f),
                 new Vector3f(0f, 0f, 0f)));*/
-
 
         List<OxyEntity> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene3.fbx"), oxyShader);
         for (OxyEntity obj : testObjects) {

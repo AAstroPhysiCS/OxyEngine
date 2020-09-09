@@ -8,7 +8,6 @@ import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static org.lwjgl.opengl.GL11.GL_LINES;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class OxyModel extends OxyEntity {

@@ -76,7 +76,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
-        scene.getOxyUISystem().dispatchEvents();
+        scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
 
         for (OxyEntity e : cachedLightEntities) {
@@ -88,7 +88,8 @@ public class SceneLayer extends Layer {
             l.setSpecular(emittingComponent.specular());
             l.setPosition(emittingComponent.position());
             l.setDirection(emittingComponent.direction());
-            l.update(e.get(OxyShader.class));
+            OxyShader shader = e.get(OxyShader.class);
+            l.update(shader);
         }
     }
 
@@ -122,11 +123,11 @@ public class SceneLayer extends Layer {
                 ModelMesh modelMesh = e.get(ModelMesh.class);
                 OxyMaterial material = e.get(OxyMaterial.class);
                 SelectedComponent s = e.get(SelectedComponent.class);
+                modelMesh.getShader().enable();
+                TransformComponent c = e.get(TransformComponent.class);
+                modelMesh.getShader().setUniformMatrix4fv(c.transform, "model", false);
+                modelMesh.getShader().disable();
                 material.push(modelMesh.getShader());
-//                modelMesh.getShader().enable();
-//                TransformComponent c = e.get(TransformComponent.class);
-//                modelMesh.getShader().setUniformMatrix4fv(new Matrix4f().rotateX(c.rotation.x).rotateY(c.rotation.y).rotateZ(c.rotation.z), "model", true);
-//                modelMesh.getShader().disable();
                 glEnable(GL_CULL_FACE);
                 glCullFace(GL_BACK);
                 if (s.selected) {

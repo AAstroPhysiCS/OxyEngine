@@ -132,8 +132,4 @@ public class ModelFactory implements EntityComponent {
             } else vertPtr += 4;
         }
     }
-
-    public List<Vector3f> getVerticesNonTransformed() {
-        return verticesNonTransformed;
-    }
 }

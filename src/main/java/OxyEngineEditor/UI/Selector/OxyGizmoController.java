@@ -2,13 +2,11 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.OxyMouseListener;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
 
@@ -30,18 +28,14 @@ public class OxyGizmoController implements OxyMouseListener {
     static Vector2d oldMousePos = new Vector2d();
 
     static OxyGizmo3D gizmo;
-    static Scene scene;
-    static WindowHandle windowHandle;
 
     static boolean dragging;
 
     static boolean pressedXTranslation, pressedYTranslation, pressedZTranslation;
     static boolean pressedXScale, pressedYScale, pressedZScale, pressedScaleFactor;
 
-    OxyGizmoController(WindowHandle windowHandle, Scene scene, OxyGizmo3D gizmo) {
+    OxyGizmoController(OxyGizmo3D gizmo) {
         OxyGizmoController.gizmo = gizmo;
-        OxyGizmoController.scene = scene;
-        OxyGizmoController.windowHandle = windowHandle;
     }
 
     @Override

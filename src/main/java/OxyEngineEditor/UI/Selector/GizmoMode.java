@@ -102,7 +102,7 @@ enum GizmoMode {
                         m.get(TagComponent.class),
                         m.get(BoundingBoxComponent.class)
                 );
-                cM.addEventListener(new OxyGizmoController(windowHandle, scene, gizmo3D));
+                cM.addEventListener(new OxyGizmoController(gizmo3D));
                 cM.initData(path);
                 cM.constructData();
                 this.models.add(cM);

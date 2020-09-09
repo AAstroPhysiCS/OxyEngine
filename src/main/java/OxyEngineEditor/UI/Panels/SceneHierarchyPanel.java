@@ -2,14 +2,10 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Components.ModelMesh;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
 import OxyEngineEditor.Scene.Model.ModelType;
-import OxyEngineEditor.Scene.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -79,17 +75,6 @@ public class SceneHierarchyPanel extends Panel {
 
     private void addEntity(byte[] data, OxyShader shader) {
         OxyEntity model = sceneLayer.getScene().createModelEntity(new String(data), shader);
-        //TEMP
-        ImageTexture texture = null;
-        if (PropertiesPanel.lastTexturePath != null) {
-            texture = OxyTexture.loadImage(PropertiesPanel.lastTexturePath);
-            PropertiesPanel.lastTextureID = texture.getTextureId();
-        }
-
-        model.get(OxyMaterial.class).diffuseColor = new OxyColor(PropertiesPanel.diffuseColor);
-        model.get(OxyMaterial.class).ambientColor = new OxyColor(PropertiesPanel.ambientColor);
-        model.get(OxyMaterial.class).specularColor = new OxyColor(PropertiesPanel.specularColor);
-        model.get(OxyMaterial.class).albedoTexture = texture;
         model.addComponent(new SelectedComponent(false));
         model.updateData();
         sceneLayer.rebuild();

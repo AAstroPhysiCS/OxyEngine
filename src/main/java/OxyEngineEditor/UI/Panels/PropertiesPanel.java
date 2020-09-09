@@ -3,7 +3,6 @@ package OxyEngineEditor.UI.Panels;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
@@ -40,17 +39,10 @@ public class PropertiesPanel extends Panel {
         this.sceneLayer = sceneLayer;
     }
 
-    static String lastTexturePath = null;
-    static int lastTextureID = -1;
-    static final ImString inputTextPath = new ImString();
-    static final float[] diffuseColor = new float[]{0f, 0.0f, 0.0f, 0.0f};
-    static final float[] specularColor = new float[]{0f, 0.0f, 0.0f, 0.0f};
-    static final float[] ambientColor = new float[]{0f, 0.0f, 0.0f, 0.0f};
     static boolean init = false;
     public static boolean focusedWindow = false;
     private static final ImBoolean helpWindowBool = new ImBoolean();
-
-    static ImBoolean baseOpen = new ImBoolean(true);
+    public static final float[] normalMapStrength = new float[]{0f};
 
     ImString name = new ImString(0);
     ImString meshPath = new ImString(0);
@@ -163,6 +155,11 @@ public class PropertiesPanel extends Panel {
             ImGui.treePop();
         }
 
+        if (entityContext == null) {
+            ImGui.end();
+            return;
+        }
+
         if (ImGui.treeNodeEx("Base", ImGuiTreeNodeFlags.DefaultOpen)) {
             ImGui.alignTextToFramePadding();
             { // BASE COLOR
@@ -191,7 +188,7 @@ public class PropertiesPanel extends Panel {
                     entityContext.get(OxyMaterial.class).albedoTexture = OxyTexture.loadImage(path);
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
-                if(ImGui.button("Remove")){
+                if (ImGui.button("Remove A")) {
                     entityContext.get(OxyMaterial.class).albedoTexture = null;
                 }
 
@@ -201,17 +198,21 @@ public class PropertiesPanel extends Panel {
                 boolean nullN = entityContext.get(OxyMaterial.class).normalTexture == null;
                 if (ImGui.imageButton(nullN ? 0 : entityContext.get(OxyMaterial.class).normalTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
-                    if(path == null) return;
+                    if (path == null) return;
                     entityContext.get(OxyMaterial.class).normalTexture = OxyTexture.loadImage(path);
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
-                if(ImGui.button("Remove N")){
+                if (ImGui.button("Remove N")) {
                     entityContext.get(OxyMaterial.class).normalTexture = null;
                 }
             }
 
             ImGui.treePop();
         }
+        ImGui.alignTextToFramePadding();
+        ImGui.text("Normal map strength:");
+        ImGui.sameLine();
+        ImGui.sliderFloat("###hidelabel", normalMapStrength, 0, 100);
 
         final float windowWidth = ImGui.getWindowWidth();
         ImGui.spacing();

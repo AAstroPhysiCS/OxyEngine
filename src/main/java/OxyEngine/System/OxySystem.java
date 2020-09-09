@@ -1,7 +1,6 @@
 package OxyEngine.System;
 
 import OxyEngineEditor.EntryPoint;
-import OxyEngineEditor.UI.Panels.PropertiesPanel;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
 
