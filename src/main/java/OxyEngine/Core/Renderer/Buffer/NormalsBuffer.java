@@ -7,9 +7,6 @@ import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public class NormalsBuffer extends Buffer {
 
-    /*
-     Normals, bitangents and tangents
-     */
     private float[] normals = new float[0];
 
     private final BufferTemplate.BufferTemplateImpl implementation;

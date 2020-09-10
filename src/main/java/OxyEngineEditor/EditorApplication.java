@@ -86,7 +86,6 @@ public class EditorApplication extends OxyApplication {
 
         m.addSystem(new Mover(pointLightEntity.get(EmittingComponent.class).position(), m.get(TransformComponent.class).position));
 
-
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
         directionalLightEntity.addComponent(oxyShader, directionalLightComponent, new EmittingComponent(

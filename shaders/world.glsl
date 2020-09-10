@@ -111,7 +111,7 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
         specular *= attenuation;
         vec3 result = specular + diffuse + ambient;
 
-        color = vec4(result, 1.0f) * inVar.colorOut * texture(skyBoxTexture, R);
+        color = vec4(result, 1.0f) * inVar.colorOut;
     }
     else { //texture
         vec3 ambient = calcAmbient(texture(tex[index], inVar.texCoordsOut).rgb, p_Light.ambient);
@@ -123,7 +123,7 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
         specular *= attenuation;
         vec3 result = specular + diffuse + ambient;
 
-        color = vec4(result, 1.0f) * texture(skyBoxTexture, R);
+        color = vec4(result, 1.0f);
     }
 }
 
@@ -188,8 +188,8 @@ layout(location = 1) in vec2 tcs;
 layout(location = 2) in float textureSlot;
 layout(location = 3) in vec4 color;
 layout(location = 4) in vec4 normals;
-layout(location = 5) in vec4 tangent;
-layout(location = 6) in vec4 biTangent;
+layout(location = 5) in vec4 biTangent;
+layout(location = 6) in vec4 tangent;
 
 uniform mat4 v_Matrix;
 uniform mat4 model;
@@ -215,10 +215,10 @@ void main(){
     outVar.normalsOut = mat4(transpose(inverse(model))) * normals;
     outVar.lightModelNormal = normalize(model * vec4(normals.xyz, 0.0)).xyz;
 
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    mat4 normalMatrix = transpose(inverse(model));
     vec3 T = normalize(vec3(model * vec4(tangent.xyz, 0.0)));
+    vec3 B = normalize(vec3(model * vec4(biTangent.xyz, 0.0)));
     vec3 N = normalize(vec3(model * vec4(normals.xyz, 0.0)));
-    vec3 B = cross(N, T);
 
     mat3 TBN = transpose(mat3(T, B, N));
     outVar.TBN = TBN;

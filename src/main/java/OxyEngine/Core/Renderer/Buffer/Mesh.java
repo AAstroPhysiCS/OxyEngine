@@ -64,6 +64,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         indexBuffer.load();
 
         if (normalsBuffer != null) if (normalsBuffer.empty()) normalsBuffer.load();
+        if (tangentBuffer != null) if (tangentBuffer.empty()) tangentBuffer.load();
         if (textureBuffer != null) if (textureBuffer.empty()) textureBuffer.load();
 
         if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC) {
@@ -139,6 +140,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         indexBuffer.dispose();
         if (textureBuffer != null) textureBuffer.dispose();
         if (normalsBuffer != null) normalsBuffer.dispose();
+        if (tangentBuffer != null) tangentBuffer.dispose();
         glDeleteVertexArrays(vao);
     }
 }

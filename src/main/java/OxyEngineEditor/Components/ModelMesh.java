@@ -46,10 +46,10 @@ public class ModelMesh extends Mesh {
                 .setAttribPointer(attributesTXCoords));
 
         normalsBuffer = new NormalsBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-                .setAttribPointer(attributesNormals, attributesTangents, attributesBiTangents));
+                .setAttribPointer(attributesNormals));
 
         tangentBuffer = new TangentBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-        .setAttribPointer(attributesTangents, attributesBiTangents));
+                .setAttribPointer(attributesTangents, attributesBiTangents));
 
         vertexBuffer.setVertices(vertices);
         indexBuffer.setIndices(indices);
@@ -58,11 +58,13 @@ public class ModelMesh extends Mesh {
 
         float[] biAndTangents = new float[tangents.length + biTangents.length];
         int tangentPtr = 0, biTangentPtr = 0;
-        for(int i = 0; i < biAndTangents.length;){
-            float tangentFloat = tangents[tangentPtr++];
-            float biTangentFloat = tangents[biTangentPtr++];
-            biAndTangents[i++] = tangentFloat;
-            biAndTangents[i++] = biTangentFloat;
+        for (int i = 0; i < biAndTangents.length; ) {
+            biAndTangents[i++] = tangents[tangentPtr++];
+            biAndTangents[i++] = tangents[tangentPtr++];
+            biAndTangents[i++] = tangents[tangentPtr++];
+            biAndTangents[i++] = biTangents[biTangentPtr++];
+            biAndTangents[i++] = biTangents[biTangentPtr++];
+            biAndTangents[i++] = biTangents[biTangentPtr++];
         }
         tangentBuffer.setBiAndTangent(biAndTangents);
     }
