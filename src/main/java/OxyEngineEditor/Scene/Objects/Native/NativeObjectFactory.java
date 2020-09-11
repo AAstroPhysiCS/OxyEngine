@@ -1,9 +1,9 @@
-package OxyEngineEditor.Scene.NativeObjects;
+package OxyEngineEditor.Scene.Objects.Native;
 
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.NativeObjectMesh;
 import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Scene.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -11,9 +11,10 @@ public abstract class NativeObjectFactory implements EntityComponent {
 
     public ObjectType type;
     protected float[] vertexPos;
+    private int vertPtr = 0;
 
     //Texture does not work in native objects, only colors
-    public void constructData(OxyNativeObject e) {
+    public void constructData(OxyNativeObject e, int size) {
         OxyMaterial material = e.get(OxyMaterial.class);
         TransformComponent c = e.get(TransformComponent.class);
 
@@ -24,8 +25,7 @@ public abstract class NativeObjectFactory implements EntityComponent {
                 .rotateY(c.rotation.y)
                 .rotateZ(c.rotation.z);
 
-        e.vertices = new float[e.type.n_Vertices()];
-        int vertPtr = 0;
+        if (e.vertices == null) e.vertices = new float[e.type.n_Vertices() * size];
         for (int i = 0; i < vertexPos.length; ) {
             Vector4f transformed = new Vector4f(vertexPos[i++], vertexPos[i++], vertexPos[i++], 1.0f).mul(c.transform);
             e.vertices[vertPtr++] = transformed.x;

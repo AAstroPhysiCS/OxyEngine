@@ -5,7 +5,7 @@ import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Scene.Model.OxyModel;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
@@ -14,11 +14,11 @@ import OxyEngineEditor.UI.Selector.Tools.MouseSelector;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-import static OxyEngineEditor.UI.OxyEventSystem.keyEventDispatcher;
-import static OxyEngineEditor.UI.OxyEventSystem.mouseButtonDispatcher;
+import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
+import static OxyEngine.System.OxyEventSystem.mouseButtonDispatcher;
 import static org.lwjgl.glfw.GLFW.*;
 
-public class OxySelectSystem {
+public class OxySelectHandler {
 
     private static OxyGizmo3D gizmo;
     private static MouseSelector mSelector;
@@ -28,12 +28,12 @@ public class OxySelectSystem {
 
     public static OxyEntity entityContext;
 
-    private OxySelectSystem() {}
+    private OxySelectHandler() {}
 
     public static void init(Scene scene, OxyGizmo3D gizmo){
-        OxySelectSystem.gizmo = gizmo;
-        OxySelectSystem.renderer = scene.getRenderer();
-        OxySelectSystem.scene = scene;
+        OxySelectHandler.gizmo = gizmo;
+        OxySelectHandler.renderer = scene.getRenderer();
+        OxySelectHandler.scene = scene;
         mSelector = MouseSelector.getInstance();
     }
 

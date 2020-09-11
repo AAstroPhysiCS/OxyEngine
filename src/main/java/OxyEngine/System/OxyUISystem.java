@@ -1,28 +1,28 @@
-package OxyEngineEditor.UI;
+package OxyEngine.System;
 
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
 import OxyEngine.Events.OxyEventDispatcher;
 import OxyEngine.OxyEngine;
-import OxyEngine.System.OxySystem;
 import OxyEngineEditor.UI.Font.FontLoader;
-import OxyEngineEditor.UI.Font.OxyFontSystem;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImGuiStyle;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
-import imgui.flag.*;
+import imgui.flag.ImGuiCol;
+import imgui.flag.ImGuiConfigFlags;
+import imgui.flag.ImGuiKey;
+import imgui.flag.ImGuiMouseCursor;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.glfw.ImGuiImplGlfw;
 
 import java.io.File;
 import java.util.Objects;
 
+import static OxyEngine.System.OxyEventSystem.*;
 import static OxyEngine.System.OxySystem.gl_Version;
-import static OxyEngineEditor.Scene.OxyEntity.entitySystemRunnable;
-import static OxyEngineEditor.UI.OxyEventSystem.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class OxyUISystem {
@@ -113,11 +113,10 @@ public class OxyUISystem {
     }
 
     public void dispatchNativeEvents() {
-        entitySystemRunnable.run();
         eventDispatcher.dispatch();
     }
 
-    public void newFrameGLFW(){
+    public void newFrameGLFW() {
         imGuiGlfw.newFrame();
     }
 

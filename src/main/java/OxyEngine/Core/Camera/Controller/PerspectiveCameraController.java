@@ -5,7 +5,7 @@ import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Vector3f;
 
-import static OxyEngineEditor.UI.OxyEventSystem.*;
+import static OxyEngine.System.OxyEventSystem.*;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class PerspectiveCameraController extends OxyCameraController {

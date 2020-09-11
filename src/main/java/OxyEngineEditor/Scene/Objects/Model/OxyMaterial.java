@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene.Model;
+package OxyEngineEditor.Scene.Objects.Model;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
@@ -35,11 +35,11 @@ public class OxyMaterial implements EntityComponent {
     }
 
     public OxyMaterial(Vector4f diffuseColor) {
-        this(null, null, new OxyColor(new Vector4f(0.0f, 0.0f, 0.0f, 0.0f)), new OxyColor(diffuseColor), new OxyColor(new Vector4f(0.0f, 0.0f, 0.0f, 0.0f)), 1.0f);
+        this(null, null, new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), new OxyColor(diffuseColor), new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), 1.0f);
     }
 
     public OxyMaterial(float r, float g, float b, float a) {
-        this(null, null, new OxyColor(new Vector4f(0.0f, 0.0f, 0.0f, 0.0f)), new OxyColor(new Vector4f(r, g, b, a)), new OxyColor(new Vector4f(0.0f, 0.0f, 0.0f, 0.0f)), 1.0f);
+        this(null, null, new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), new OxyColor(new Vector4f(r, g, b, a)), new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), 1.0f);
     }
 
     public void push(OxyShader shader) {

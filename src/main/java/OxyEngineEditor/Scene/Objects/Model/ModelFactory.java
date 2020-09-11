@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene.Model;
+package OxyEngineEditor.Scene.Objects.Model;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngineEditor.Components.EntityComponent;

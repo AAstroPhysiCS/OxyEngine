@@ -14,13 +14,13 @@ import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.*;
-import OxyEngineEditor.Scene.Model.ModelType;
-import OxyEngineEditor.Scene.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.ModelType;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.OxyEntitySystem;
+import OxyEngine.System.OxyEntitySystem;
 import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.UI.OxyEventSystem;
-import OxyEngineEditor.UI.OxyUISystem;
+import OxyEngine.System.OxyEventSystem;
+import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -61,7 +61,7 @@ public class EditorApplication extends OxyApplication {
         pointLightEntity.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
                 new Vector3f(0, -2, 0),
                 null,
-                new Vector3f(0.1f, 0.1f, 0.1f),
+                new Vector3f(2f, 2f, 2f),
                 new Vector3f(5f, 5f, 5f),
                 new Vector3f(1f, 1f, 1f)));
 
@@ -69,22 +69,14 @@ public class EditorApplication extends OxyApplication {
         m.addComponent(new TransformComponent(new Vector3f(0, -10, 0), 1f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m.constructData();
 
-        class Mover implements OxyEntitySystem {
-
-            private final Vector3f positionLight, positionEntity;
-
-            public Mover(Vector3f positionLight, Vector3f positionEntity) {
-                this.positionLight = positionLight;
-                this.positionEntity = positionEntity;
-            }
-
+        record Mover(Vector3f positionLight, Vector3f positionEntity) implements OxyEntitySystem {
             @Override
             public void run() {
                 positionLight.set(positionEntity);
             }
         }
 
-        m.addSystem(new Mover(pointLightEntity.get(EmittingComponent.class).position(), m.get(TransformComponent.class).position));
+        m.addComponent(new Mover(pointLightEntity.get(EmittingComponent.class).position(), m.get(TransformComponent.class).position));
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();

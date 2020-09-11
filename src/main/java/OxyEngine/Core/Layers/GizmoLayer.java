@@ -3,7 +3,7 @@ package OxyEngine.Core.Layers;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Selector.OxyGizmo3D;
-import OxyEngineEditor.UI.Selector.OxySelectSystem;
+import OxyEngineEditor.UI.Selector.OxySelectHandler;
 
 public class GizmoLayer extends Layer {
 
@@ -12,7 +12,7 @@ public class GizmoLayer extends Layer {
     public GizmoLayer(Scene scene, WindowHandle windowHandle) {
         super(scene);
         gizmo3D = OxyGizmo3D.getInstance(windowHandle, scene);
-        OxySelectSystem.init(scene, gizmo3D);
+        OxySelectHandler.init(scene, gizmo3D);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class GizmoLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
-        OxySelectSystem.controlRenderableStates();
+        OxySelectHandler.controlRenderableStates();
     }
 
     @Override

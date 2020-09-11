@@ -7,7 +7,7 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
 import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Scene.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
 import imgui.ImGui;
 import imgui.flag.ImGuiColorEditFlags;
@@ -21,8 +21,8 @@ import java.util.List;
 
 import static OxyEngine.System.OxySystem.BASE_PATH;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
-import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
-import static OxyEngineEditor.UI.Selector.OxySelectSystem.gizmoEntityContextControl;
+import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Selector.OxySelectHandler.gizmoEntityContextControl;
 
 public class PropertiesPanel extends Panel {
 
@@ -58,6 +58,7 @@ public class PropertiesPanel extends Panel {
 
     @Override
     public void renderPanel() {
+        gizmoEntityContextControl(entityContext);
 
         if (entityContext != null) {
             name = new ImString(entityContext.get(TagComponent.class).tag(), 100);
@@ -110,8 +111,6 @@ public class PropertiesPanel extends Panel {
             t.rotation.set(rotationArr);
             t.scale.set(scaleArr);
             entityContext.updateData();
-
-            gizmoEntityContextControl(entityContext);
 
             ImGui.popItemWidth();
             ImGui.columns(1);

@@ -11,7 +11,7 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.*;
-import OxyEngineEditor.Scene.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
@@ -76,6 +76,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
+        scene.getEntitySystemRunner().run();
         scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
 

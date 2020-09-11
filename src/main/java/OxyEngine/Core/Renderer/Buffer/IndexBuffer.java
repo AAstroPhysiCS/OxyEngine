@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
+import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;

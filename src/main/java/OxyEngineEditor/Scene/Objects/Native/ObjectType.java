@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene.NativeObjects;
+package OxyEngineEditor.Scene.Objects.Native;
 
 public enum ObjectType {
     Grid(32, 6);

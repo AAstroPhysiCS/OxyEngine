@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene.Model;
+package OxyEngineEditor.Scene.Objects.Model;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.Mesh;

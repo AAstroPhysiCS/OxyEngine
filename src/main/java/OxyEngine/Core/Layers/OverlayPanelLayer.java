@@ -3,7 +3,7 @@ package OxyEngine.Core.Layers;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.UI.Font.OxyFontSystem;
+import OxyEngine.System.OxyFontSystem;
 import OxyEngineEditor.UI.Panels.*;
 import imgui.ImGui;
 import imgui.ImGuiViewport;

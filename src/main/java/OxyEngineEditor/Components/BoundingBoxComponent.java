@@ -1,6 +1,6 @@
 package OxyEngineEditor.Components;
 
-import OxyEngineEditor.Scene.Model.OxyModelLoader;
+import OxyEngineEditor.Scene.Objects.Model.OxyModelLoader;
 import org.joml.Vector3f;
 
 import java.util.Arrays;

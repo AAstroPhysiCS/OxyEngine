@@ -6,13 +6,19 @@ import org.joml.Vector3f;
 
 public class TransformComponent implements EntityComponent {
 
-    public final Vector3f position;
-    public final Vector3f rotation;
-    public final Vector3f scale;
+    public Vector3f position;
+    public Vector3f rotation;
+    public Vector3f scale;
 
     public Matrix4f transform;
 
     public TransformComponent(TransformComponent t){
+        this.scale = new Vector3f(t.scale);
+        this.position = new Vector3f(t.position);
+        this.rotation = new Vector3f(t.rotation);
+    }
+
+    public void set(TransformComponent t){
         this.scale = new Vector3f(t.scale);
         this.position = new Vector3f(t.position);
         this.rotation = new Vector3f(t.rotation);
@@ -60,5 +66,14 @@ public class TransformComponent implements EntityComponent {
 
     public TransformComponent(){
         this(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
+    }
+
+    @Override
+    public String toString(){
+        return """
+               X: %s, Y: %s, Z: %s
+               Rotation X: %s, Rotation Y: %s, Rotation Z: %s
+               Scale X: %s, Scale Y: %s, Scale Z: %s
+               """.formatted(position.x, position.y, position.z, rotation.x, rotation.y, rotation.z, scale.x, scale.y, scale.z);
     }
 }

@@ -1,4 +1,4 @@
-package OxyEngineEditor.UI;
+package OxyEngine.System;
 
 import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.OxyEventDispatcher;

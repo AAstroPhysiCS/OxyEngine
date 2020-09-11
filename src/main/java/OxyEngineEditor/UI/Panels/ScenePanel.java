@@ -4,13 +4,14 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.PerspectiveCamera;
+import OxyEngineEditor.Scene.WorldGrid;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
-import static OxyEngineEditor.UI.OxyEventSystem.keyEventDispatcher;
-import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
+import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
+import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE;
 
 public class ScenePanel extends Panel {
@@ -33,7 +34,7 @@ public class ScenePanel extends Panel {
 
     private ScenePanel(SceneLayer sceneLayer, OxyShader shader) {
         this.sceneLayer = sceneLayer;
-//        new WorldGrid(sceneLayer.getScene(), 10, shader);
+        new WorldGrid(sceneLayer.getScene(), 10, shader);
     }
 
     @Override

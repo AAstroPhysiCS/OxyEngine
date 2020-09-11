@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene.Model;
+package OxyEngineEditor.Scene.Objects.Model;
 
 import OxyEngine.System.OxySystem;
 

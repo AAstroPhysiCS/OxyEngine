@@ -111,7 +111,7 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
         specular *= attenuation;
         vec3 result = specular + diffuse + ambient;
 
-        color = vec4(result, 1.0f) * inVar.colorOut;
+        color = vec4(result, 1.0f) * inVar.colorOut * texture(skyBoxTexture, R);
     }
     else { //texture
         vec3 ambient = calcAmbient(texture(tex[index], inVar.texCoordsOut).rgb, p_Light.ambient);
@@ -123,7 +123,7 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
         specular *= attenuation;
         vec3 result = specular + diffuse + ambient;
 
-        color = vec4(result, 1.0f);
+        color = vec4(result, 1.0f) * texture(skyBoxTexture, R);
     }
 }
 

@@ -4,7 +4,7 @@ import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
+import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 

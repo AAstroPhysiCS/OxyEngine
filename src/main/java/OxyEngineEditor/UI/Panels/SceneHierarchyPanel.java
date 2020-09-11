@@ -5,12 +5,12 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.ModelMesh;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
-import OxyEngineEditor.Scene.Model.ModelType;
+import OxyEngineEditor.Scene.Objects.Model.ModelType;
 import OxyEngineEditor.Scene.OxyEntity;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 
-import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
+import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
 public class SceneHierarchyPanel extends Panel {
 

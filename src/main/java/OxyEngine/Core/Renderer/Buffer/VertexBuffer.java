@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
+import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL20.*;

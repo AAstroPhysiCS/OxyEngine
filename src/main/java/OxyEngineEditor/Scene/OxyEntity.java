@@ -4,7 +4,7 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Scene.NativeObjects.ObjectType;
+import OxyEngineEditor.Scene.Objects.Native.ObjectType;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static OxyEngine.System.Globals.Globals.toPrimitiveFloat;
 import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
-import static OxyEngineEditor.UI.OxyEventSystem.eventDispatcher;
+import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 
 public abstract class OxyEntity {
 
@@ -21,9 +21,6 @@ public abstract class OxyEntity {
 
     public Vector3f originPos;
     protected final Scene scene;
-
-    private static final List<OxyEntitySystem> entitySystems = new ArrayList<>();
-    public static final OxyEntitySystem.EntitySystemRunnable entitySystemRunnable = new OxyEntitySystem.EntitySystemRunnable(entitySystems);
 
     public OxyEntity(Scene scene) {
         this.scene = scene;
@@ -105,10 +102,6 @@ public abstract class OxyEntity {
 
     public void addEventListener(OxyEventListener listener) {
         eventDispatcher.addListeners(this, listener);
-    }
-
-    public void addSystem(OxyEntitySystem system){
-        entitySystems.add(system);
     }
 
     public float[] getVertices() {

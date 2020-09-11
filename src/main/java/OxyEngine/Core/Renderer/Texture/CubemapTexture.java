@@ -4,7 +4,7 @@ import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.NativeObjectMesh;
-import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
+import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 
 import java.io.File;

@@ -4,15 +4,15 @@ import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Events.OxyMouseListener;
 import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Scene.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Model.OxyModel;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
 
-import static OxyEngineEditor.UI.OxyEventSystem.keyEventDispatcher;
-import static OxyEngineEditor.UI.OxyEventSystem.mouseCursorPosDispatcher;
-import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
+import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
+import static OxyEngine.System.OxyEventSystem.mouseCursorPosDispatcher;
+import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 
 public class OxyGizmoController implements OxyMouseListener {

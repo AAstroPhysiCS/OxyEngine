@@ -7,9 +7,12 @@ import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Components.*;
-import OxyEngineEditor.Scene.Model.*;
-import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
-import OxyEngineEditor.UI.OxyUISystem;
+import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
+import OxyEngineEditor.Scene.Objects.Model.ModelType;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngineEditor.Scene.Objects.Model.OxyModelLoader;
+import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.System.OxyUISystem;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -25,6 +28,7 @@ public class Scene implements OxyDisposable {
     private final Registry registry = new Registry();
 
     private final OxyRenderer3D renderer;
+    private final OxyEntitySystemRunner entitySystemRunner;
     private OxyUISystem oxyUISystem;
 
     private final FrameBuffer frameBuffer;
@@ -34,17 +38,15 @@ public class Scene implements OxyDisposable {
         this.renderer = renderer;
         this.frameBuffer = frameBuffer;
         this.sceneName = sceneName;
+        entitySystemRunner = new OxyEntitySystemRunner(this);
     }
 
     public final OxyNativeObject createNativeObjectEntity() {
-        OxyNativeObject e = new OxyNativeObject(this);
-        registry.entityList.put(e, new LinkedHashSet<>(15));
-        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
-        return e;
+        return createNativeObjectEntity(1);
     }
 
-    public final OxyNativeObject createNativeObjectEntity(boolean withMesh) {
-        OxyNativeObject e = new OxyNativeObject(this);
+    public final OxyNativeObject createNativeObjectEntity(int size) {
+        OxyNativeObject e = new OxyNativeObject(this, size);
         registry.entityList.put(e, new LinkedHashSet<>(15));
         e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
         return e;
@@ -227,6 +229,10 @@ public class Scene implements OxyDisposable {
 
     public String getSceneName() {
         return sceneName;
+    }
+
+    public OxyEntitySystemRunner getEntitySystemRunner() {
+        return entitySystemRunner;
     }
 
     @Override

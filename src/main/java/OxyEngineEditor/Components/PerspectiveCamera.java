@@ -12,7 +12,7 @@ import imgui.ImGuiIO;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import static OxyEngineEditor.UI.Selector.OxySelectSystem.entityContext;
+import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
 public class PerspectiveCamera extends OxyCamera {
 

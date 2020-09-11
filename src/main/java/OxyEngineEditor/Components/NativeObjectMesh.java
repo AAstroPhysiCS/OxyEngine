@@ -5,13 +5,11 @@ import OxyEngine.Core.Renderer.Buffer.IndexBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Scene.NativeObjects.OxyNativeObject;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class NativeObjectMesh extends Mesh {
-
 
     public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 8 * Float.BYTES, 0);
     public static final BufferTemplate.Attributes attributesTXSlot = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 8 * Float.BYTES, 3 * Float.BYTES);
@@ -81,20 +79,5 @@ public class NativeObjectMesh extends Mesh {
                             .setAttribPointer(verticesPointers)),
                     new IndexBuffer());
         }
-    }
-
-    public void addToBuffer(OxyNativeObject oxyEntity) {
-        entities.add(oxyEntity);
-        vertexBuffer.addToBuffer(oxyEntity);
-        indexBuffer.addToBuffer(oxyEntity);
-
-        load();
-    }
-
-    public void addToBuffer(float[] vertices, int[] indices) {
-        vertexBuffer.addToBuffer(vertices);
-        indexBuffer.addToBuffer(indices);
-
-        load();
     }
 }
