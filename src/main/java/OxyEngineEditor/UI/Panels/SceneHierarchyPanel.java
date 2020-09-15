@@ -66,7 +66,7 @@ public class SceneHierarchyPanel extends Panel {
 
         if (ImGui.beginPopupContextWindow("item context menu")) {
             if (ImGui.button("Create Entity"))
-                addEntity(ModelType.Cube.getPath().getBytes(), shader);
+                addEntity(ModelType.Sphere.getPath().getBytes(), shader);
             ImGui.endPopup();
         }
 

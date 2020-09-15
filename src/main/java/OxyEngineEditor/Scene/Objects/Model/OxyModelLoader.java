@@ -127,22 +127,51 @@ public class OxyModelLoader {
     }
 
     private void addMaterial(AIMaterial aiMaterial, AssimpOxyMesh oxyMesh) {
-        AIColor4D color = AIColor4D.create();
         AIString path = AIString.calloc();
         aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
         String textPath = path.dataString();
         ImageTexture albedoTexture = null;
         if (!textPath.equals(""))
             albedoTexture = OxyTexture.loadImage(textPath);
+        path.clear();
 
         AIString pathHeight = AIString.calloc();
         aiGetMaterialTexture(aiMaterial, aiTextureType_HEIGHT, 0, pathHeight, (IntBuffer) null, null, null, null, null, null);
-        textPath = pathHeight.dataString();
+        String textPathHeight = pathHeight.dataString();
         ImageTexture normalTexture = null;
-        if (!textPath.equals("")) {
-            normalTexture = OxyTexture.loadImage(textPath);
+        if (!textPathHeight.equals("")) {
+            normalTexture = OxyTexture.loadImage(textPathHeight);
         }
+        pathHeight.clear();
 
+        AIString pathRoughness = AIString.calloc();
+        aiGetMaterialTexture(aiMaterial, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, 0, pathRoughness, (IntBuffer) null, null, null, null, null, null);
+        String textPathRoughness = pathRoughness.dataString();
+        ImageTexture roughnessTexture = null;
+        if (!textPathRoughness.equals("")) {
+            roughnessTexture = OxyTexture.loadImage(textPathRoughness);
+        }
+        pathRoughness.clear();
+
+        AIString pathMetallic = AIString.calloc();
+        aiGetMaterialTexture(aiMaterial, aiTextureType_UNKNOWN, 0, pathMetallic, (IntBuffer) null, null, null, null, null, null);
+        String textPathMetallic = pathMetallic.dataString();
+        ImageTexture metallicTexture = null;
+        if (!textPathMetallic.equals("")) {
+            metallicTexture = OxyTexture.loadImage(textPathMetallic);
+        }
+        pathMetallic.clear();
+
+        AIString pathAO = AIString.calloc();
+        aiGetMaterialTexture(aiMaterial, aiTextureType_LIGHTMAP, 0, pathAO, (IntBuffer) null, null, null, null, null, null);
+        String textPathAO = pathAO.dataString();
+        ImageTexture aoTexture = null;
+        if (!textPathAO.equals("")) {
+            aoTexture = OxyTexture.loadImage(textPathAO);
+        }
+        pathAO.clear();
+
+        AIColor4D color = AIColor4D.create();
         Vector4f ambient = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, aiTextureType_NONE, 0, color);
         if (result == 0) {
@@ -160,7 +189,8 @@ public class OxyModelLoader {
         if (result == 0) {
             specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
-        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 32);
+
+        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 32);
     }
 
     public String getPath() {

@@ -2,8 +2,8 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
-import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Components.*;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
 import org.joml.Vector3f;
 
@@ -24,6 +24,23 @@ public abstract class OxyEntity {
 
     public OxyEntity(Scene scene) {
         this.scene = scene;
+    }
+
+    public OxyEntity(OxyModel other){
+        this(other.scene);
+        this.tangents = other.tangents.clone();
+        this.biTangents = other.biTangents.clone();
+        this.originPos = new Vector3f(other.originPos);
+        this.normals = other.normals.clone();
+        this.vertices = other.vertices.clone();
+        this.tcs = other.tcs.clone();
+        this.indices = other.indices.clone();
+    }
+
+    public abstract OxyEntity copyMe();
+
+    protected void addToScene(){
+        scene.put(this);
     }
 
     protected abstract void initData(String path);

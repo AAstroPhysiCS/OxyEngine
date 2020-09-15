@@ -3,7 +3,6 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
@@ -24,10 +23,10 @@ enum GizmoMode {
 
     GizmoComponent gizmoComponent;
 
-    void init(WindowHandle windowHandle, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
+    void init(Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
         switch (this) {
-            case Translation -> gizmoComponent = new Translation(windowHandle, scene, shader, gizmo3D);
-            case Scale -> gizmoComponent = new Scaling(windowHandle, scene, shader, gizmo3D);
+            case Translation -> gizmoComponent = new Translation(scene, shader, gizmo3D);
+            case Scale -> gizmoComponent = new Scaling(scene, shader, gizmo3D);
         }
     }
 
@@ -84,8 +83,8 @@ enum GizmoMode {
             }
         }
 
-        public GizmoComponent(String path, WindowHandle windowHandle, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
-            List<OxyEntity> models = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath(path), shader);
+        public GizmoComponent(String path, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
+            List<OxyModel> models = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath(path), shader);
             for (OxyEntity m : models) {
                 ComponentModel cM = new ComponentModel(scene);
                 cM.vertices = m.vertices;
@@ -157,8 +156,8 @@ enum GizmoMode {
 
     static class Translation extends GizmoComponent {
 
-        Translation(WindowHandle windowHandle, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
-            super("/models/native/oxygizmo.obj", windowHandle, scene, shader, gizmo3D);
+        Translation(Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
+            super("/models/native/oxygizmo.obj", scene, shader, gizmo3D);
         }
 
         @Override
@@ -183,8 +182,8 @@ enum GizmoMode {
 
     static class Scaling extends GizmoComponent {
 
-        Scaling(WindowHandle windowHandle, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
-            super("/models/native/oxygizmoScale2.obj", windowHandle, scene, shader, gizmo3D);
+        Scaling(Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
+            super("/models/native/oxygizmoScale2.obj", scene, shader, gizmo3D);
         }
 
         @Override

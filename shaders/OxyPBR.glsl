@@ -54,6 +54,12 @@ uniform int normalMapSlot = -1;
 uniform float normalMapStrength;
 vec3 normalMap;
 vec3 tangentLightPos, tangentViewPos, tangentVertexPos;
+//GAMMA
+uniform float gamma;
+//PBR
+uniform int metallicSlot;
+uniform int roughnessSlot;
+uniform int aoSlot;
 
 vec3 calcAmbient(vec3 ambient, vec3 lightAmbient){
     return lightAmbient * ambient;
@@ -71,7 +77,7 @@ vec3 calcSpecular(vec3 lightDir, vec3 viewDir, vec3 specular, vec3 lightSpecular
     return lightSpecular * (spec * specular);
 }
 
-uniform float gamma;
+vec3 calcPBR(vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic);
 
 void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
 
@@ -103,6 +109,7 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
     int index = int(round(inVar.textureSlotOut));
     float distance = length(p_Light.position - inVar.vertexPos);
     float attenuation = 1.0 / (p_Light.constant + p_Light.linear * distance + p_Light.quadratic * (distance));
+
     if (index == 0){ //color
         vec3 ambient = calcAmbient(material.ambient, p_Light.ambient);
         vec3 diffuse = calcDiffuse(lightDir, material.diffuse, p_Light.diffuse, norm);
@@ -117,17 +124,26 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
         color = vec4(result, 1.0f) * inVar.colorOut * texture(skyBoxTexture, R);
     }
     else { //texture
-        vec3 ambient = calcAmbient(texture(tex[index], inVar.texCoordsOut).rgb, p_Light.ambient);
-        vec3 diffuse = calcDiffuse(lightDir, texture(tex[index], inVar.texCoordsOut).rgb, p_Light.diffuse, norm);
-        vec3 specular = calcSpecular(lightDir, viewDir, texture(tex[index], inVar.texCoordsOut).rgb, p_Light.specular, norm);
+        //vec3 ambient = calcAmbient(material.ambient, p_Light.ambient);
+        //vec3 specular = calcSpecular(lightDir, viewDir, material.specular, p_Light.specular, norm);
 
-        ambient *= attenuation;
-        diffuse *= attenuation;
-        specular *= attenuation;
-        vec3 result = specular + diffuse + ambient;
+        vec3 diffuse = pow(texture(tex[index], inVar.texCoordsOut).rgb, vec3(2.2));
+        float metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
+        float roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
+        float aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
+
+        vec3 F0 = vec3(0.04);
+        F0 = mix(F0, diffuse, metallicMap);
+        vec3 Lo = calcPBR(lightPos, p_Light.diffuse, norm, viewDir, vertexPos, F0, diffuse, roughnessMap, metallicMap);
+
+        vec3 ambient = vec3(0.03) * diffuse * aoMap;
+        vec3 result = ambient + Lo;
+        result = result / (result + vec3(1.0));
+        //diffuse *= attenuation;
+        //specular *= attenuation;
         result = pow(result, vec3(1f / gamma));
 
-        color = vec4(result, 1.0f) * texture(skyBoxTexture, R);
+        color = vec4(result, 1.0f);
     }
 }
 
@@ -163,6 +179,86 @@ void calcDirectionalLightImpl(DirectionalLight d_Light, vec3 I, vec3 R){
 
         color = vec4(result, 1.0f) * texture(skyBoxTexture, R);
     }
+}
+
+#define PI 3.14159265358979323
+
+float DistributionGGX(vec3 N, vec3 H, float roughness)
+{
+    float a = roughness*roughness;
+    float a2 = a*a;
+    float NdotH = max(dot(N, H), 0.0);
+    float NdotH2 = NdotH*NdotH;
+
+    float nom   = a2;
+    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    denom = PI * denom * denom;
+
+    return nom / max(denom, 0.001); // prevent divide by zero for roughness=0.0 and NdotH=1.0
+}
+
+float GeometrySchlickGGX(float NdotV, float roughness)
+{
+    float r = (roughness + 1.0);
+    float k = (r*r) / 8.0;
+
+    float nom   = NdotV;
+    float denom = NdotV * (1.0 - k) + k;
+
+    return nom / denom;
+}
+
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+{
+    float NdotV = max(dot(N, V), 0.0);
+    float NdotL = max(dot(N, L), 0.0);
+    float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+    float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+    return ggx1 * ggx2;
+}
+
+vec3 fresnelSchlick(float cosTheta, vec3 F0)
+{
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+vec3 calcPBR(vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic){
+     vec3 Lo = vec3(0.0);
+     //calculate per-light radiance
+     vec3 L = normalize(pointLightPos - vertexPos);
+     vec3 H = normalize(V + L);
+     float distance = length(pointLightPos - vertexPos);
+     float attenuation = 1.0 / (p_Light.constant + p_Light.linear * distance + p_Light.quadratic * (distance));
+     //float attenuation = 1.0 / (distance * distance);
+     vec3 radiance = pointLightDiffuseColor * attenuation;
+
+     // Cook-Torrance BRDF
+     float NDF = DistributionGGX(N, H, roughness);
+     float G   = GeometrySmith(N, V, L, roughness);
+     vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
+
+     vec3 nominator    = NDF * G * F;
+     float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
+     vec3 specular = nominator / denominator;
+
+     // kS is equal to Fresnel
+     vec3 kS = F;
+     // for energy conservation, the diffuse and specular light can't
+     // be above 1.0 (unless the surface emits light); to preserve this
+     // relationship the diffuse component (kD) should equal 1.0 - kS.
+     vec3 kD = vec3(1.0) - kS;
+     // multiply kD by the inverse metalness such that only non-metals
+     // have diffuse lighting, or a linear blend if partly metal (pure metals
+     // have no diffuse light).
+     kD *= 1.0 - metallic;
+
+     // scale light by NdotL
+     float NdotL = max(dot(N, L), 0.0);
+
+     // add to outgoing radiance Lo
+     Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+     return Lo;
 }
 
 void main(){

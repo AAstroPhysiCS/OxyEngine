@@ -6,13 +6,13 @@ import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
 import OxyEngineEditor.Scene.Objects.Model.ModelType;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Model.OxyModelLoader;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
-import OxyEngine.System.OxyUISystem;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -41,32 +41,36 @@ public class Scene implements OxyDisposable {
         entitySystemRunner = new OxyEntitySystemRunner(this);
     }
 
+    final void put(OxyEntity e){
+        registry.entityList.put(e, new LinkedHashSet<>(15));
+    }
+
     public final OxyNativeObject createNativeObjectEntity() {
         return createNativeObjectEntity(1);
     }
 
     public final OxyNativeObject createNativeObjectEntity(int size) {
         OxyNativeObject e = new OxyNativeObject(this, size);
-        registry.entityList.put(e, new LinkedHashSet<>(15));
+        put(e);
         e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
         return e;
     }
 
-    public final List<OxyEntity> createModelEntities(ModelType type, OxyShader shader) {
+    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
         return createModelEntities(type.getPath(), shader);
     }
 
-    public final OxyEntity createModelEntity(ModelType type, OxyShader shader) {
+    public final OxyModel createModelEntity(ModelType type, OxyShader shader) {
         return createModelEntity(type.getPath(), shader);
     }
 
-    public final List<OxyEntity> createModelEntities(String path, OxyShader shader) {
-        List<OxyEntity> models = new ArrayList<>();
+    public final List<OxyModel> createModelEntities(String path, OxyShader shader) {
+        List<OxyModel> models = new ArrayList<>();
         OxyModelLoader loader = new OxyModelLoader(path);
 
         for (OxyModelLoader.AssimpOxyMesh assimpMesh : loader.meshes) {
             OxyModel e = new OxyModel(this);
-            registry.entityList.put(e, new LinkedHashSet<>(15));
+            put(e);
             e.originPos = new Vector3f(assimpMesh.pos);
             e.addComponent(
                     shader,
@@ -86,11 +90,11 @@ public class Scene implements OxyDisposable {
         return models;
     }
 
-    public final OxyEntity createModelEntity(String path, OxyShader shader) {
+    public final OxyModel createModelEntity(String path, OxyShader shader) {
         OxyModelLoader loader = new OxyModelLoader(path);
         OxyModelLoader.AssimpOxyMesh assimpMesh = loader.meshes.get(0);
         OxyModel e = new OxyModel(this);
-        registry.entityList.put(e, new LinkedHashSet<>(15));
+        put(e);
         e.originPos = new Vector3f(assimpMesh.pos);
         e.addComponent(
                 shader,

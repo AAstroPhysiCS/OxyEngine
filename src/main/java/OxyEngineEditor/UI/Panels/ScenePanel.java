@@ -4,6 +4,7 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.PerspectiveCamera;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.WorldGrid;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -12,7 +13,7 @@ import imgui.flag.ImGuiWindowFlags;
 
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class ScenePanel extends Panel {
 
@@ -22,6 +23,8 @@ public class ScenePanel extends Panel {
     public static final ImVec2 windowPos = new ImVec2();
     public static final ImVec2 mousePos = new ImVec2();
     public static final ImVec2 offset = new ImVec2(); //Window position relative to the window... means that it subtracts the tab
+
+    private static boolean cPressed = false;
 
     private static ScenePanel INSTANCE = null;
 
@@ -34,7 +37,7 @@ public class ScenePanel extends Panel {
 
     private ScenePanel(SceneLayer sceneLayer, OxyShader shader) {
         this.sceneLayer = sceneLayer;
-        new WorldGrid(sceneLayer.getScene(), 10, shader);
+        new WorldGrid(sceneLayer.getScene(), 25, shader);
     }
 
     @Override
@@ -58,6 +61,13 @@ public class ScenePanel extends Panel {
             sceneLayer.updateAllModelEntities();
             entityContext = null;
         }
+
+        if(keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && keyEventDispatcher.getKeys()[GLFW_KEY_C] && entityContext instanceof OxyModel m && !cPressed){
+            m.copyMe();
+            sceneLayer.updateAllModelEntities();
+            cPressed = true;
+        }
+        if(!keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && !keyEventDispatcher.getKeys()[GLFW_KEY_C]) cPressed = false;
 
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
         focusedWindow = ImGui.isWindowFocused();

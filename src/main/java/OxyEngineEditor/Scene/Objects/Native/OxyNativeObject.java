@@ -1,7 +1,9 @@
 package OxyEngineEditor.Scene.Objects.Native;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngineEditor.Components.NativeObjectMesh;
+import OxyEngineEditor.Components.RenderableComponent;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
@@ -22,6 +24,14 @@ public class OxyNativeObject extends OxyEntity {
         TransformComponent tOld = get(TransformComponent.class);
         tOld.set(t);
         initData(null);
+    }
+
+    @Override
+    public OxyEntity copyMe() {
+        OxyNativeObject e = new OxyNativeObject(scene, size);
+        e.addToScene();
+        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
+        return e;
     }
 
     @Override

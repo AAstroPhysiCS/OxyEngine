@@ -1,7 +1,6 @@
 package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Window.WindowHandle;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
@@ -11,8 +10,8 @@ public class OxyGizmo3D {
 
     private static OxyGizmo3D INSTANCE = null;
 
-    public static OxyGizmo3D getInstance(WindowHandle windowHandle, Scene scene) {
-        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(windowHandle, scene);
+    public static OxyGizmo3D getInstance(Scene scene) {
+        if (INSTANCE == null) INSTANCE = new OxyGizmo3D(scene);
         return INSTANCE;
     }
 
@@ -22,10 +21,10 @@ public class OxyGizmo3D {
 
     GizmoMode mode;
 
-    private OxyGizmo3D(WindowHandle windowHandle, Scene scene) {
+    private OxyGizmo3D(Scene scene) {
         OxyShader shader = new OxyShader("shaders/gizmo.glsl");
-        GizmoMode.Translation.init(windowHandle, scene, shader, this);
-        GizmoMode.Scale.init(windowHandle, scene, shader, this);
+        GizmoMode.Translation.init(scene, shader, this);
+        GizmoMode.Scale.init(scene, shader, this);
 
         mode = GizmoMode.None; // default
     }

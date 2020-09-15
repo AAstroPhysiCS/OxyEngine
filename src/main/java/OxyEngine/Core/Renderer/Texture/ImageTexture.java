@@ -8,6 +8,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 
 public class ImageTexture extends OxyTexture.Texture {
 
@@ -19,15 +20,21 @@ public class ImageTexture extends OxyTexture.Texture {
         this.path = path;
 
         assert slot != 0 : oxyAssert("Slot can not be 0");
+        assert slot <= 32 : oxyAssert("32 Texture Slots exceeded!");
 
         int[] width = new int[1];
         int[] height = new int[1];
         int[] channels = new int[1];
+        stbi_set_flip_vertically_on_load(false);
         ByteBuffer buffer = loadTextureFile(path, width, height, channels);
-        if(buffer == null) return;
+        if (buffer == null || !buffer.hasRemaining()) return;
+
         int alFormat = GL_RGBA;
-        if (channels[0] == 3)
+        if(channels[0] == 1){
+            alFormat = GL_RED;
+        } else if(channels[0] == 3){
             alFormat = GL_RGB;
+        }
 
         textureId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureId);

@@ -2,10 +2,12 @@ package OxyEngineEditor.Scene.Objects.Model;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Components.ModelMesh;
+import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import org.joml.Vector3f;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -16,6 +18,39 @@ public class OxyModel extends OxyEntity {
 
     public OxyModel(Scene scene) {
         super(scene);
+    }
+
+    public OxyModel(OxyModel other) {
+        super(other.scene);
+        this.tangents = other.tangents.clone();
+        this.biTangents = other.biTangents.clone();
+        this.originPos = new Vector3f(other.originPos);
+        this.normals = other.normals.clone();
+        this.vertices = other.vertices.clone();
+        this.tcs = other.tcs.clone();
+        this.indices = other.indices.clone();
+    }
+
+    @Override
+    public OxyEntity copyMe() {
+        OxyModel e = new OxyModel(this);
+        e.addToScene();
+        var boundingBox = get(BoundingBoxComponent.class);
+        e.addComponent(
+                get(ModelFactory.class),
+                get(OxyShader.class),
+                new BoundingBoxComponent(
+                        boundingBox.min(),
+                        boundingBox.max()
+                ),
+                new TransformComponent(get(TransformComponent.class)),
+                new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),
+                new RenderableComponent(RenderingMode.Normal),
+                new OxyMaterial(get(OxyMaterial.class)),
+                new SelectedComponent(false)
+        );
+        e.initData(get(Mesh.class).getPath());
+        return e;
     }
 
     @Override

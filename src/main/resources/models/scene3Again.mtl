@@ -1,0 +1,78 @@
+# Blender MTL File: 'untitled.blend'
+# Material Count: 7
+
+newmtl Cube_Material
+Ns 900.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.734191 0.762922
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\okang\\Desktop\\brickwall.jpg
+
+newmtl Material
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.729496 0.729496
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd C:\\Users\\okang\\Desktop\\rustediron1-alt2-bl\\rustediron1-alt2-bl\\rustediron2_basecolor.png
+map_Ns C:\\Users\\okang\\Desktop\\rustediron1-alt2-bl\\rustediron1-alt2-bl\\rustediron2_roughness.png
+refl C:\\Users\\okang\\Desktop\\rustediron1-alt2-bl\\rustediron1-alt2-bl\\rustediron2_metallic.png
+
+newmtl Material.001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd D:\\programming\\Java\\OxyEngine\\src\\main\\resources\\images\\worldmap.jpg
+
+newmtl Material.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.871367 0.064803 0.074214
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.004
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.013639 0.800000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.006
+Ns 575.999996
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.611916 0.496897
+Ks 0.800000 0.800000 0.800000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl Material.007
+Ns 900.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.058456 0.059017 0.060720
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\okang\\Desktop\\brickwall.jpg

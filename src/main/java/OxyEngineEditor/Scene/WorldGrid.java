@@ -10,8 +10,6 @@ import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import java.util.Arrays;
-
 import static OxyEngineEditor.Components.NativeObjectMesh.*;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
@@ -33,7 +31,7 @@ public class WorldGrid {
     }
 
     private void add(int size) {
-        OxyNativeObject mainObj = scene.createNativeObjectEntity(20 * 20);
+        OxyNativeObject mainObj = scene.createNativeObjectEntity(size * size * 4);
         mainObj.addComponent(worldGridMesh, new GridFactory(), new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 0.2f)));
         for (int x = -size; x < size; x++) {
             for (int z = -size; z < size; z++) {

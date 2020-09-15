@@ -12,15 +12,16 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
+import OxyEngine.System.OxyEntitySystem;
+import OxyEngine.System.OxyEventSystem;
 import OxyEngine.System.OxySystem;
+import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.ModelType;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngine.System.OxyEntitySystem;
 import OxyEngineEditor.Scene.Scene;
-import OxyEngine.System.OxyEventSystem;
-import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -35,12 +36,9 @@ import static org.lwjgl.opengl.GL11.glGetError;
 
 public class EditorApplication extends OxyApplication {
 
-    private final WindowHandle windowHandle;
-
     public EditorApplication() {
         windowHandle = new WindowHandle("OxyEngine - Editor", 1366, 768, WindowHandle.WindowMode.WINDOWEDFULLSCREEN);
         oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, OxyRendererType.Oxy3D);
-        layerStack = new LayerStack();
         oxyEngine.start();
     }
 
@@ -48,7 +46,7 @@ public class EditorApplication extends OxyApplication {
     public void init() {
         oxyEngine.init();
 
-        OxyShader oxyShader = new OxyShader("shaders/world.glsl");
+        OxyShader oxyShader = new OxyShader("shaders/OxyPBR.glsl");
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
         scene = new Scene("Test Scene 1", oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
@@ -56,27 +54,22 @@ public class EditorApplication extends OxyApplication {
         PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
         cameraEntity.addComponent(camera);
 
-        OxyEntity pointLightEntity = scene.createNativeObjectEntity();
+        OxyModel m = scene.createModelEntity(ModelType.Sphere, oxyShader);
         Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
-        pointLightEntity.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
+        m.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
                 new Vector3f(0, -2, 0),
                 null,
                 new Vector3f(2f, 2f, 2f),
                 new Vector3f(5f, 5f, 5f),
                 new Vector3f(1f, 1f, 1f)));
-
-        OxyEntity m = scene.createModelEntity(ModelType.Sphere, oxyShader);
         m.addComponent(new TransformComponent(new Vector3f(0, -10, 0), 1f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m.constructData();
 
-        record Mover(Vector3f positionLight, Vector3f positionEntity) implements OxyEntitySystem {
-            @Override
-            public void run() {
-                positionLight.set(positionEntity);
-            }
-        }
-
-        m.addComponent(new Mover(pointLightEntity.get(EmittingComponent.class).position(), m.get(TransformComponent.class).position));
+        //ONLY ONCE
+        m.addComponent((OxyEntitySystem) () -> {
+            m.get(EmittingComponent.class).position().set(m.get(TransformComponent.class).position);
+            m.get(EmittingComponent.class).diffuse().set(m.get(OxyMaterial.class).diffuseColor.getNumbers()[0] * 5, m.get(OxyMaterial.class).diffuseColor.getNumbers()[1] * 5, m.get(OxyMaterial.class).diffuseColor.getNumbers()[2] * 5);
+        });
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
@@ -87,8 +80,8 @@ public class EditorApplication extends OxyApplication {
                 new Vector3f(5.0f, 5.0f, 5.0f),
                 new Vector3f(0f, 0f, 0f)));*/
 
-        List<OxyEntity> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene3.fbx"), oxyShader);
-        for (OxyEntity obj : testObjects) {
+        List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene3Again.obj"), oxyShader);
+        for (OxyModel obj : testObjects) {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0), 2f));
             obj.constructData();
         }
@@ -102,7 +95,7 @@ public class EditorApplication extends OxyApplication {
         //order matters!
         scene.setUISystem(new OxyUISystem(windowHandle));
         SceneLayer sceneLayer = new SceneLayer(scene);
-        GizmoLayer gizmoLayer = new GizmoLayer(scene, windowHandle);
+        GizmoLayer gizmoLayer = new GizmoLayer(scene);
         OverlayPanelLayer overlayPanelLayer = new OverlayPanelLayer(windowHandle, scene);
 
         overlayPanelLayer.addPanel(StatsPanel.getInstance());

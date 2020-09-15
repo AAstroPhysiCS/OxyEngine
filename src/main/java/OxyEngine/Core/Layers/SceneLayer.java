@@ -61,6 +61,7 @@ public class SceneLayer extends Layer {
     @Override
     public void rebuild() {
         allModelEntities = scene.view(ModelMesh.class);
+
         //Prep
         {
             List<OxyEntity> cachedConverted = new ArrayList<>(allModelEntities);
@@ -72,6 +73,7 @@ public class SceneLayer extends Layer {
 
     public void updateAllModelEntities() {
         allModelEntities = scene.view(ModelMesh.class);
+        cachedLightEntities = scene.view(Light.class);
     }
 
     @Override
@@ -124,11 +126,13 @@ public class SceneLayer extends Layer {
                 ModelMesh modelMesh = e.get(ModelMesh.class);
                 OxyMaterial material = e.get(OxyMaterial.class);
                 SelectedComponent s = e.get(SelectedComponent.class);
-                modelMesh.getShader().enable();
                 TransformComponent c = e.get(TransformComponent.class);
+                modelMesh.getShader().enable();
+                if(cachedLightEntities.size() == 0) modelMesh.getShader().setUniform1f("currentLightIndex", -1f);
                 modelMesh.getShader().setUniformMatrix4fv(c.transform, "model", false);
                 modelMesh.getShader().disable();
                 material.push(modelMesh.getShader());
+
                 glEnable(GL_CULL_FACE);
                 glCullFace(GL_BACK);
                 if (s.selected) {

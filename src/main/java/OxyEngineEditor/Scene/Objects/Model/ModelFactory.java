@@ -15,7 +15,10 @@ import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
 
 public class ModelFactory implements EntityComponent {
 
-    private final List<Vector3f> verticesNonTransformed, normals, tangents, biTangents;
+    private final List<Vector3f> verticesNonTransformed;
+    private final List<Vector3f> normals;
+    private final List<Vector3f> tangents;
+    private final List<Vector3f> biTangents;
     private final List<int[]> faces;
     private final List<Vector2f> textureCoords;
 

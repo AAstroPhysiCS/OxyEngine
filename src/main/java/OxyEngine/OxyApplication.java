@@ -1,14 +1,20 @@
 package OxyEngine;
 
 import OxyEngine.Core.Layers.LayerStack;
+import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Scene.Scene;
 
 public abstract class OxyApplication implements OxyDisposable {
 
-    protected LayerStack layerStack; // every app should have a layer stack
+    protected final LayerStack layerStack; // every app should have a layer stack
     protected Scene scene;
     protected OxyEngine oxyEngine;
+    protected WindowHandle windowHandle;
+
+    public OxyApplication(){
+        layerStack = new LayerStack();
+    }
 
     public static int FPS = 0;
 
