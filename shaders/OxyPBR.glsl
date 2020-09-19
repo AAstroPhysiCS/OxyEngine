@@ -60,6 +60,7 @@ uniform float gamma;
 uniform int metallicSlot;
 uniform int roughnessSlot;
 uniform int aoSlot;
+uniform int heightSlot;
 
 vec3 calcAmbient(vec3 ambient, vec3 lightAmbient){
     return lightAmbient * ambient;
@@ -77,6 +78,14 @@ vec3 calcSpecular(vec3 lightDir, vec3 viewDir, vec3 specular, vec3 lightSpecular
     return lightSpecular * (spec * specular);
 }
 
+uniform float heightScale;
+//DOES NOT WORK!!!!
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
+{
+    float height =  texture(tex[heightSlot], texCoords).r;
+    return texCoords - viewDir.xy * (height * heightScale);
+}
+
 vec3 calcPBR(vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic);
 
 void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
@@ -84,6 +93,7 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
     vec3 vertexPos = inVar.vertexPos;
     vec3 lightPos = p_Light.position;
     vec3 cameraPosVec3 = cameraPos;
+    vec2 texCoordsOut = inVar.texCoordsOut;
 
     if(normalMapSlot != 0){
         vertexPos = inVar.TBN * inVar.vertexPos;
@@ -94,10 +104,17 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
     vec3 lightDir = normalize(lightPos - vertexPos);
     vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
 
+    //PARALLAX MAPPING
+    if(heightSlot != 0){
+        //texCoordsOut = ParallaxMapping(inVar.texCoordsOut, viewDir);
+        //if(texCoordsOut.x > 1.0 || texCoordsOut.y > 1.0 || texCoordsOut.x < 0.0 || texCoordsOut.y < 0.0)
+        //    discard;
+    }
+
     vec3 norm;
     //NORMAL MAP
     if(normalMapSlot != 0){
-        vec3 normalMap = texture(tex[normalMapSlot], inVar.texCoordsOut).rgb;
+        vec3 normalMap = texture(tex[normalMapSlot], texCoordsOut).rgb;
         normalMap = normalMap * 2.0 - 1.0;
         normalMap.xy *= normalMapStrength;
         normalMap = normalize(normalMap);
@@ -121,13 +138,13 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
         vec3 result = specular + diffuse + ambient;
         result = pow(result, vec3(1f / gamma));
 
-        color = vec4(result, 1.0f) * inVar.colorOut * texture(skyBoxTexture, R);
+        color = vec4(result, 1.0f) * inVar.colorOut;
     }
     else { //texture
         //vec3 ambient = calcAmbient(material.ambient, p_Light.ambient);
         //vec3 specular = calcSpecular(lightDir, viewDir, material.specular, p_Light.specular, norm);
 
-        vec3 diffuse = pow(texture(tex[index], inVar.texCoordsOut).rgb, vec3(2.2));
+        vec3 diffuse = pow(texture(tex[index], texCoordsOut).rgb, vec3(2.2));
         float metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
         float roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
         float aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
@@ -169,7 +186,7 @@ void calcDirectionalLightImpl(DirectionalLight d_Light, vec3 I, vec3 R){
         specular = calcSpecular(lightDir,viewDir, material.specular, d_Light.specular, norm);
         result = specular + diffuse + ambient;
 
-        color = vec4(result, 1.0f) * inVar.colorOut * texture(skyBoxTexture, R);
+        color = vec4(result, 1.0f) * inVar.colorOut;
     }
     else {
         ambient = calcAmbient(texture(tex[index], inVar.texCoordsOut).rgb, d_Light.ambient);
@@ -177,7 +194,7 @@ void calcDirectionalLightImpl(DirectionalLight d_Light, vec3 I, vec3 R){
         specular = calcSpecular(lightDir, viewDir, texture(tex[index], inVar.texCoordsOut).rgb, d_Light.specular, norm);
         result = specular + diffuse + ambient;
 
-        color = vec4(result, 1.0f) * texture(skyBoxTexture, R);
+        color = vec4(result, 1.0f);
     }
 }
 

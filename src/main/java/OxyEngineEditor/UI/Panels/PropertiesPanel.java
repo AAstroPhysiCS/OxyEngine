@@ -42,8 +42,9 @@ public class PropertiesPanel extends Panel {
     static boolean init = false;
     public static boolean focusedWindow = false;
     private static final ImBoolean helpWindowBool = new ImBoolean();
-    public static final float[] normalMapStrength = new float[]{0f};
+    public static final float[] normalMapStrength = new float[]{1f};
     public static final float[] gammaStrength = new float[]{2f};
+    public static final float[] heightScale = new float[]{0.1f};
 
     ImString name = new ImString(0);
     ImString meshPath = new ImString(0);
@@ -248,6 +249,20 @@ public class PropertiesPanel extends Panel {
                 if (ImGui.button("Remove AO")) {
                     entityContext.get(OxyMaterial.class).aoTexture = null;
                 }
+
+                ImGui.alignTextToFramePadding();
+                ImGui.text("Height Map: ");
+                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 130);
+                boolean nullHeight = entityContext.get(OxyMaterial.class).heightTexture == null;
+                if (ImGui.imageButton(nullHeight ? -6 : entityContext.get(OxyMaterial.class).heightTexture.getTextureId(), 80, 60)) {
+                    String path = openDialog("", null);
+                    if (path != null)
+                        entityContext.get(OxyMaterial.class).heightTexture = OxyTexture.loadImage(path);
+                }
+                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
+                if (ImGui.button("Remove H")) {
+                    entityContext.get(OxyMaterial.class).heightTexture = null;
+                }
             }
 
             ImGui.treePop();
@@ -255,12 +270,17 @@ public class PropertiesPanel extends Panel {
         ImGui.alignTextToFramePadding();
         ImGui.text("Normal map strength:");
         ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel", normalMapStrength, 0, 100);
+        ImGui.sliderFloat("###hidelabel n", normalMapStrength, 0, 100);
 
         ImGui.alignTextToFramePadding();
         ImGui.text("Gamma strength:");
         ImGui.sameLine();
         ImGui.sliderFloat("###hidelabel g", gammaStrength, 0, 100);
+
+        ImGui.alignTextToFramePadding();
+        ImGui.text("Height scale:");
+        ImGui.sameLine();
+        ImGui.sliderFloat("###hidelabel h", heightScale, 0, 10);
 
         final float windowWidth = ImGui.getWindowWidth();
         ImGui.spacing();
@@ -269,74 +289,6 @@ public class PropertiesPanel extends Panel {
         ImGui.pushItemWidth(-1);
         ImGui.button("Add Component", 300, 30);
         ImGui.popItemWidth();
-        /*ImGui.spacing();
-        if (ImGui.checkbox("Albedo", albedoRadio)) {
-            if (ImGui.colorButton("alb", albedo,
-                    ImGuiColorEditFlags.AlphaBar |
-                            ImGuiColorEditFlags.AlphaPreview |
-                            ImGuiColorEditFlags.NoBorder,
-                    70, 70
-            ) && entityContext != null) {
-                String path = openDialog("", null);
-                entityContext.get(OxyMaterial.class).albedoTexture = OxyTexture.loadImage(path);
-            }
-            ImGui.sameLine();
-            if(albedoRadio.get() && entityContext != null) {
-//                ImGui.sameLine();
-                ImGui.colorEdit4("alb", albedo,
-                        ImGuiColorEditFlags.NoSidePreview |
-                                ImGuiColorEditFlags.NoSmallPreview |
-                                ImGuiColorEditFlags.DisplayRGB |
-                                ImGuiColorEditFlags.NoLabel
-                );
-                entityContext.get(OxyMaterial.class).diffuseColor.setColorRGBA(albedo);
-            }
-        }
-        if (ImGui.collapsingHeader("Normals", ImGuiTreeNodeFlags.DefaultOpen)) {
-            ImGui.colorButton("norm", normals,
-                    ImGuiColorEditFlags.AlphaBar |
-                            ImGuiColorEditFlags.AlphaPreview |
-                            ImGuiColorEditFlags.NoBorder,
-                    70, 70
-            );
-            ImGui.sameLine();
-            ImGui.colorEdit4("norm", normals,
-                    ImGuiColorEditFlags.NoSidePreview |
-                            ImGuiColorEditFlags.NoSmallPreview |
-                            ImGuiColorEditFlags.DisplayRGB |
-                            ImGuiColorEditFlags.NoLabel
-            );
-        }
-        if (ImGui.collapsingHeader("Metalness", ImGuiTreeNodeFlags.DefaultOpen)) {
-            ImGui.colorButton("mness", metalness,
-                    ImGuiColorEditFlags.AlphaBar |
-                            ImGuiColorEditFlags.AlphaPreview |
-                            ImGuiColorEditFlags.NoBorder,
-                    70, 70
-            );
-            ImGui.sameLine();
-            ImGui.colorEdit4("mness", metalness,
-                    ImGuiColorEditFlags.NoSidePreview |
-                            ImGuiColorEditFlags.NoSmallPreview |
-                            ImGuiColorEditFlags.DisplayRGB |
-                            ImGuiColorEditFlags.NoLabel
-            );
-        }
-        if (ImGui.collapsingHeader("Roughness", ImGuiTreeNodeFlags.DefaultOpen)) {
-            ImGui.colorButton("rness", roughness,
-                    ImGuiColorEditFlags.AlphaBar |
-                            ImGuiColorEditFlags.AlphaPreview |
-                            ImGuiColorEditFlags.NoBorder,
-                    70, 70
-            );
-            ImGui.sameLine();
-            ImGui.colorEdit4("rness", roughness,
-                    ImGuiColorEditFlags.NoSidePreview |
-                            ImGuiColorEditFlags.NoSmallPreview |
-                            ImGuiColorEditFlags.DisplayRGB |
-                            ImGuiColorEditFlags.NoLabel
-            );
-        }*/
 
         ImGui.checkbox("Demo", helpWindowBool);
         if (helpWindowBool.get()) ImGui.showDemoWindow();

@@ -23,8 +23,13 @@ public class OxyTexture {
     static abstract class Texture implements OxyDisposable {
 
         protected int textureId;
-        protected int textureSlot;
-        protected String path;
+        protected final int textureSlot;
+        protected final String path;
+
+        public Texture(int slot, String path){
+            this.path = path;
+            this.textureSlot = slot;
+        }
 
         protected ByteBuffer loadTextureFile(String path, int[] width, int[] height, int[] channels) {
             ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
@@ -76,6 +81,10 @@ public class OxyTexture {
 
     public static CubemapTexture loadCubemap(String path, Scene scene) {
         return new CubemapTexture(++slotCounter, path, scene);
+    }
+
+    public static HDRTexture loadHDRTexture(String path, Scene scene){
+        return new HDRTexture(++slotCounter, path, scene);
     }
 
     public static Texture loadImageCached(int slot) {

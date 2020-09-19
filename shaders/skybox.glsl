@@ -7,7 +7,11 @@ in vec3 tcsOut;
 uniform samplerCube skyBoxTexture;
 
 void main(){
-    color = texture(skyBoxTexture, tcsOut);
+    vec3 textureRGB = texture(skyBoxTexture, tcsOut).rgb;
+    textureRGB = textureRGB / (textureRGB + vec3(1.0));
+    textureRGB = pow(textureRGB, vec3(1.0/2.2));
+
+    color = vec4(textureRGB, 1.0);
 }
 
 //#type vertex
@@ -21,5 +25,5 @@ uniform mat4 v_Matrix_NoTransform;
 
 void main(){
     tcsOut = pos;
-    gl_Position = vec4(pos * 1000, 1.0f) * v_Matrix_NoTransform;
+    gl_Position = (vec4(pos, 1.0f) * v_Matrix_NoTransform).xyww;
 }

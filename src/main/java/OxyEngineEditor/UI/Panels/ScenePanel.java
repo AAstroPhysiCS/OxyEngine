@@ -62,12 +62,14 @@ public class ScenePanel extends Panel {
             entityContext = null;
         }
 
-        if(keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && keyEventDispatcher.getKeys()[GLFW_KEY_C] && entityContext instanceof OxyModel m && !cPressed){
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && keyEventDispatcher.getKeys()[GLFW_KEY_C] &&
+                entityContext instanceof OxyModel m && !cPressed && focusedWindow) {
             m.copyMe();
             sceneLayer.updateAllModelEntities();
             cPressed = true;
         }
-        if(!keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && !keyEventDispatcher.getKeys()[GLFW_KEY_C]) cPressed = false;
+        if (!keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && !keyEventDispatcher.getKeys()[GLFW_KEY_C])
+            cPressed = false;
 
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
         focusedWindow = ImGui.isWindowFocused();

@@ -35,13 +35,11 @@ public class SceneHierarchyPanel extends Panel {
     public void preload() {
     }
 
-    int entityTagCounter = 0;
-
     public void updateEntityPanel() {
         sceneLayer.getScene().each(entity -> {
             TagComponent tagComponent = entity.get(TagComponent.class);
             if (tagComponent != null) {
-                if (ImGui.treeNodeEx(String.valueOf(entityTagCounter), ImGuiTreeNodeFlags.OpenOnArrow | (entityContext == entity ? ImGuiTreeNodeFlags.Selected : 0), tagComponent.tag())) {
+                if (ImGui.treeNodeEx(String.valueOf(entity.hashCode()), ImGuiTreeNodeFlags.OpenOnArrow | (entityContext == entity ? ImGuiTreeNodeFlags.Selected : 0), tagComponent.tag())) {
                     ImGui.treePop();
                 }
                 if (ImGui.isItemClicked()) {
@@ -49,10 +47,8 @@ public class SceneHierarchyPanel extends Panel {
                     entityContext = entity;
                     entityContext.get(SelectedComponent.class).selected = true;
                 }
-                entityTagCounter++;
             }
         }, ModelMesh.class); //all entities that have x
-        entityTagCounter = 0;
     }
 
     @Override

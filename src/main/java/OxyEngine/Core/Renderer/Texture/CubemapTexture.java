@@ -73,8 +73,7 @@ public class CubemapTexture extends OxyTexture.Texture {
     private static final List<String> totalFiles = new ArrayList<>();
 
     CubemapTexture(int slot, String path, Scene scene) {
-        this.textureSlot = slot;
-        this.path = path;
+        super(slot, path);
         this.scene = scene;
 
         assert slot != 0 : oxyAssert("Slot can not be 0");
@@ -115,8 +114,6 @@ public class CubemapTexture extends OxyTexture.Texture {
         allTextures.add(this);
     }
 
-    private OxyNativeObject cube;
-
     public void init(Set<EntityComponent> allOtherShaders) {
 
         for (EntityComponent s : allOtherShaders) {
@@ -142,7 +139,7 @@ public class CubemapTexture extends OxyTexture.Texture {
                     .setVerticesBufferAttributes(attributesVert)
                     .create();
 
-            cube = scene.createNativeObjectEntity();
+            OxyNativeObject cube = scene.createNativeObjectEntity();
             cube.vertices = skyboxVertices;
             int[] indices = new int[skyboxVertices.length];
             for (int i = 0; i < skyboxVertices.length; i++) {
@@ -152,9 +149,5 @@ public class CubemapTexture extends OxyTexture.Texture {
             cube.addComponent(mesh, shader);
             mesh.initList();
         }
-    }
-
-    public OxyNativeObject getCube() {
-        return cube;
     }
 }

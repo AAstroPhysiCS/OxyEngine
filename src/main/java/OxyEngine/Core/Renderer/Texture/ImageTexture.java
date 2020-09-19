@@ -13,11 +13,11 @@ import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 public class ImageTexture extends OxyTexture.Texture {
 
     private final float[] tcs;
+    private int alFormat = -1;
 
     ImageTexture(int slot, String path, float[] tcs) {
-        this.textureSlot = slot;
+        super(slot, path);
         this.tcs = tcs;
-        this.path = path;
 
         assert slot != 0 : oxyAssert("Slot can not be 0");
         assert slot <= 32 : oxyAssert("32 Texture Slots exceeded!");
@@ -29,12 +29,14 @@ public class ImageTexture extends OxyTexture.Texture {
         ByteBuffer buffer = loadTextureFile(path, width, height, channels);
         if (buffer == null || !buffer.hasRemaining()) return;
 
-        int alFormat = GL_RGBA;
-        if(channels[0] == 1){
+        if(channels[0] == 1)
             alFormat = GL_RED;
-        } else if(channels[0] == 3){
+        else if(channels[0] == 3)
             alFormat = GL_RGB;
-        }
+        else if(channels[0] == 4)
+            alFormat = GL_RGBA;
+
+        assert alFormat != -1 : oxyAssert("Format not supported!");
 
         textureId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureId);
@@ -56,5 +58,9 @@ public class ImageTexture extends OxyTexture.Texture {
 
     public float[] getTextureCoords() {
         return tcs;
+    }
+
+    public int getFormat() {
+        return alFormat;
     }
 }

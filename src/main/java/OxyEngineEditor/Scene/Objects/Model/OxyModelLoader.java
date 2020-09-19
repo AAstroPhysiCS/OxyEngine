@@ -135,14 +135,14 @@ public class OxyModelLoader {
             albedoTexture = OxyTexture.loadImage(textPath);
         path.clear();
 
-        AIString pathHeight = AIString.calloc();
-        aiGetMaterialTexture(aiMaterial, aiTextureType_HEIGHT, 0, pathHeight, (IntBuffer) null, null, null, null, null, null);
-        String textPathHeight = pathHeight.dataString();
+        AIString pathNormals = AIString.calloc();
+        aiGetMaterialTexture(aiMaterial, aiTextureType_HEIGHT, 0, pathNormals, (IntBuffer) null, null, null, null, null, null);
+        String textPathNormals = pathNormals.dataString();
         ImageTexture normalTexture = null;
-        if (!textPathHeight.equals("")) {
-            normalTexture = OxyTexture.loadImage(textPathHeight);
+        if (!textPathNormals.equals("")) {
+            normalTexture = OxyTexture.loadImage(textPathNormals);
         }
-        pathHeight.clear();
+        pathNormals.clear();
 
         AIString pathRoughness = AIString.calloc();
         aiGetMaterialTexture(aiMaterial, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, 0, pathRoughness, (IntBuffer) null, null, null, null, null, null);
@@ -171,6 +171,15 @@ public class OxyModelLoader {
         }
         pathAO.clear();
 
+        AIString pathHeight = AIString.calloc();
+        aiGetMaterialTexture(aiMaterial, aiTextureType_NORMALS, 0, pathHeight, (IntBuffer) null, null, null, null, null, null);
+        String textPathHeight = pathHeight.dataString();
+        ImageTexture heightTexture = null;
+        if (!textPathAO.equals("")) {
+            heightTexture = OxyTexture.loadImage(textPathHeight);
+        }
+        pathHeight.clear();
+
         AIColor4D color = AIColor4D.create();
         Vector4f ambient = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, aiTextureType_NONE, 0, color);
@@ -190,7 +199,7 @@ public class OxyModelLoader {
             specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
 
-        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 32);
+        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 32);
     }
 
     public String getPath() {

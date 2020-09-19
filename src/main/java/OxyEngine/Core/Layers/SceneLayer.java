@@ -6,7 +6,7 @@ import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Texture.CubemapTexture;
+import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxySystem;
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
 public class SceneLayer extends Layer {
 
@@ -32,14 +33,16 @@ public class SceneLayer extends Layer {
     }
 
     static final OxyShader outlineShader = new OxyShader("D:\\programming\\Java\\OxyEngine\\shaders\\outline.glsl");
+    public static HDRTexture hdrTexture;
 
     @Override
     public void build() {
+        hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/images/venice_sunrise_4k.hdr"), scene);
 
-        Set<EntityComponent> cachedShaders = scene.distinct(OxyShader.class);
+//        Set<EntityComponent> cachedShaders = scene.distinct(OxyShader.class);
         //skyboxtexture
-        CubemapTexture cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), scene);
-        cubemapTexture.init(cachedShaders);
+//        CubemapTexture cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), scene);
+//        cubemapTexture.init(cachedShaders);
 
         cachedNativeMeshes = scene.distinct(NativeObjectMesh.class);
         cachedCameraComponents = scene.distinct(OxyCamera.class);
@@ -96,8 +99,17 @@ public class SceneLayer extends Layer {
         }
     }
 
+    static boolean initHdrTexture = false;
+    public static final OxyShader cubemapShader = new OxyShader("shaders/skybox.glsl");
+
     @Override
     public void render(float ts, float deltaTime) {
+        if (!initHdrTexture && OxyRenderer.currentBoundedCamera != null) {
+            hdrTexture.captureFaces(ts);
+            cachedNativeMeshes = scene.distinct(NativeObjectMesh.class);
+            initHdrTexture = true;
+        }
+
         scene.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();
 
@@ -108,6 +120,7 @@ public class SceneLayer extends Layer {
                 if (camera instanceof PerspectiveCamera p) {
                     if (p.isPrimary()) {
                         mainCamera = p;
+                        OxyRenderer.currentBoundedCamera = mainCamera;
                         break;
                     }
                 }
@@ -116,9 +129,20 @@ public class SceneLayer extends Layer {
 
         //Rendering
         {
+
+            glDepthFunc(GL_LEQUAL);
             for (EntityComponent c : cachedNativeMeshes) {
                 Mesh mesh = (Mesh) c;
-                render(ts, mesh, mainCamera);
+                if(mesh.equals(hdrTexture.getMesh())){
+                    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+                    cubemapShader.enable();
+                    cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
+                    cubemapShader.disable();
+                    render(ts, mesh, mainCamera, cubemapShader);
+                    glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+                } else {
+                    render(ts, mesh, mainCamera);
+                }
             }
             for (OxyEntity e : allModelEntities) {
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
@@ -128,8 +152,8 @@ public class SceneLayer extends Layer {
                 SelectedComponent s = e.get(SelectedComponent.class);
                 TransformComponent c = e.get(TransformComponent.class);
                 modelMesh.getShader().enable();
-                if(cachedLightEntities.size() == 0) modelMesh.getShader().setUniform1f("currentLightIndex", -1f);
-                modelMesh.getShader().setUniformMatrix4fv(c.transform, "model", false);
+                if (cachedLightEntities.size() == 0) modelMesh.getShader().setUniform1f("currentLightIndex", -1f);
+                modelMesh.getShader().setUniformMatrix4fv("model", c.transform, false);
                 modelMesh.getShader().disable();
                 material.push(modelMesh.getShader());
 

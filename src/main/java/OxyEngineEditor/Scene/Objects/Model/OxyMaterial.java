@@ -10,19 +10,20 @@ import org.joml.Vector4f;
 
 public class OxyMaterial implements EntityComponent {
 
-    public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture;
+    public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture;
     public final OxyColor ambientColor;
     public final OxyColor diffuseColor;
     public final OxyColor specularColor;
     public final float reflectance;
 
     public OxyMaterial(ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
-                       OxyColor ambientColor, OxyColor diffuseColor, OxyColor specularColor, float reflectance) {
+                       ImageTexture heightTexture, OxyColor ambientColor, OxyColor diffuseColor, OxyColor specularColor, float reflectance) {
         this.albedoTexture = albedoTexture;
         this.roughnessTexture = roughnessTexture;
         this.metallicTexture = metallicTexture;
         this.aoTexture = aoTexture;
         this.normalTexture = normalTexture;
+        this.heightTexture = heightTexture;
         this.ambientColor = ambientColor;
         this.diffuseColor = diffuseColor;
         this.specularColor = specularColor;
@@ -30,28 +31,29 @@ public class OxyMaterial implements EntityComponent {
     }
 
     public OxyMaterial(OxyColor ambientColor, OxyColor diffuseColor, OxyColor specularColor) {
-        this(null, null, null, null, null, ambientColor, diffuseColor, specularColor, 1.0f);
+        this(null, null, null, null, null, null, ambientColor, diffuseColor, specularColor, 1.0f);
     }
 
     public OxyMaterial(Vector4f ambientColor, Vector4f diffuseColor, Vector4f specularColor) {
-        this(null, null, null, null, null, new OxyColor(ambientColor), new OxyColor(diffuseColor), new OxyColor(specularColor), 1.0f);
+        this(null, null, null, null, null, null, new OxyColor(ambientColor), new OxyColor(diffuseColor), new OxyColor(specularColor), 1.0f);
     }
 
     public OxyMaterial(Vector4f diffuseColor) {
-        this(null, null, null, null, null, new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), new OxyColor(diffuseColor), new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), 1.0f);
+        this(null, null, null, null, null, null, new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), new OxyColor(diffuseColor), new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), 1.0f);
     }
 
     public OxyMaterial(float r, float g, float b, float a) {
-        this(null, null, null, null, null, new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), new OxyColor(new Vector4f(r, g, b, a)), new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), 1.0f);
+        this(null, null, null, null, null, null, new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), new OxyColor(new Vector4f(r, g, b, a)), new OxyColor(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)), 1.0f);
     }
 
-    public OxyMaterial(OxyMaterial other){
+    public OxyMaterial(OxyMaterial other) {
         this.roughnessTexture = other.roughnessTexture;
         this.aoTexture = other.aoTexture;
         this.normalTexture = other.normalTexture;
         this.reflectance = other.reflectance;
         this.albedoTexture = other.albedoTexture;
         this.metallicTexture = other.metallicTexture;
+        this.heightTexture = other.heightTexture;
         this.diffuseColor = new OxyColor(other.diffuseColor.getNumbers().clone());
         this.ambientColor = new OxyColor(other.ambientColor.getNumbers().clone());
         this.specularColor = new OxyColor(other.specularColor.getNumbers().clone());
@@ -79,6 +81,12 @@ public class OxyMaterial implements EntityComponent {
             shader.setUniform1i("roughnessSlot", roughnessTexture.getTextureSlot());
         } else {
             shader.setUniform1i("roughnessSlot", 0);
+        }
+        if (heightTexture != null) {
+            shader.setUniform1i("heightSlot", heightTexture.getTextureSlot());
+            shader.setUniform1f("heightScale", PropertiesPanel.heightScale[0]);
+        } else {
+            shader.setUniform1i("heightSlot", 0);
         }
         shader.setUniform1f("gamma", PropertiesPanel.gammaStrength[0]);
         shader.setUniformVec3("material.ambient", new Vector3f(ambientColor.getNumbers()[0], ambientColor.getNumbers()[1], ambientColor.getNumbers()[2]));

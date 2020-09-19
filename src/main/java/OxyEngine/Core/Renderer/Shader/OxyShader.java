@@ -87,7 +87,7 @@ public class OxyShader implements OxyDisposable, EntityComponent {
         glUniform3f(location, vec.x, vec.y, vec.z);
     }
 
-    public void setUniformMatrix4fv(Matrix4f m, String name, boolean transpose){
+    public void setUniformMatrix4fv(String name, Matrix4f m, boolean transpose) {
         m.get(buffer);
         if (!uniformLocations.containsKey(name)) {
             uniformLocations.put(name, glGetUniformLocation(program, name));
@@ -95,7 +95,7 @@ public class OxyShader implements OxyDisposable, EntityComponent {
         glUniformMatrix4fv((Integer) uniformLocations.get(name), transpose, buffer);
     }
 
-    public void setUniformMatrix3fv(Matrix3f m, String name, boolean transpose){
+    public void setUniformMatrix3fv(String name, Matrix3f m, boolean transpose) {
         m.get(buffer);
         if (!uniformLocations.containsKey(name)) {
             uniformLocations.put(name, glGetUniformLocation(program, name));
@@ -104,10 +104,10 @@ public class OxyShader implements OxyDisposable, EntityComponent {
     }
 
     public void setCamera(OxyCamera camera) {
-        setUniformMatrix4fv(camera.getProjectionMatrix(), "pr_Matrix", camera.isTranspose());
-        setUniformMatrix4fv(camera.getModelMatrix(), "m_Matrix", camera.isTranspose());
-        setUniformMatrix4fv(camera.getViewMatrix(), "v_Matrix", camera.isTranspose());
-        setUniformMatrix4fv(camera.getViewMatrixNoTranslation(), "v_Matrix_NoTransform", camera.isTranspose());
+        setUniformMatrix4fv("pr_Matrix", camera.getProjectionMatrix(), camera.isTranspose());
+        setUniformMatrix4fv("m_Matrix", camera.getModelMatrix(), camera.isTranspose());
+        setUniformMatrix4fv("v_Matrix", camera.getViewMatrix(), camera.isTranspose());
+        setUniformMatrix4fv("v_Matrix_NoTransform", camera.getViewMatrixNoTranslation(), camera.isTranspose());
     }
 
     public int getProgram() {
