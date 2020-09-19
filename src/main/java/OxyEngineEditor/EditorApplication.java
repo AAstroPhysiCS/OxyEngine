@@ -51,7 +51,7 @@ public class EditorApplication extends OxyApplication {
         scene = new Scene("Test Scene 1", oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
         OxyEntity cameraEntity = scene.createNativeObjectEntity();
-        PerspectiveCamera camera = new PerspectiveCamera(true, 70, (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
+        PerspectiveCamera camera = new PerspectiveCamera(true, (float) Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
         cameraEntity.addComponent(camera);
 
         OxyModel m = scene.createModelEntity(ModelType.Sphere, oxyShader);

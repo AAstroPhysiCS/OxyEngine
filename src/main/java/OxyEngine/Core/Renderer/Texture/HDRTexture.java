@@ -67,8 +67,7 @@ public class HDRTexture extends OxyTexture.Texture {
 
     private final Matrix4f[] captureViews;
     private final Matrix4f captureProjection;
-    private final int captureFBO, captureRBO, hdrTexture;
-    private final int[] width, height;
+    private final int captureFBO, hdrTexture;
 
     public HDRTexture(int slot, String path, Scene scene) {
         super(slot, path);
@@ -76,8 +75,8 @@ public class HDRTexture extends OxyTexture.Texture {
         assert slot != 0 : oxyAssert("Slot can not be 0");
 
         stbi_set_flip_vertically_on_load(false);
-        width = new int[1];
-        height = new int[1];
+        int[] width = new int[1];
+        int[] height = new int[1];
         int[] nrComponents = new int[1];
         FloatBuffer data = stbi_loadf(path, width, height, nrComponents, 0);
         assert data != null : oxyAssert("HDR Texture failed!");
@@ -108,7 +107,7 @@ public class HDRTexture extends OxyTexture.Texture {
         allTextures.add(this);
 
         captureFBO = glGenFramebuffers();
-        captureRBO = glGenRenderbuffers();
+        int captureRBO = glGenRenderbuffers();
 
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
@@ -116,14 +115,32 @@ public class HDRTexture extends OxyTexture.Texture {
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
         assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
 
-        captureProjection = new Matrix4f().perspective(70.0f, 1.0f, 1.0f, 10.0f);
+        captureProjection = new Matrix4f().perspective((float) Math.toRadians(90), 1.0f, 0.478f, 10.0f);
         captureViews = new Matrix4f[]{
-                new Matrix4f().lookAt(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, .0f, -1.0f, 0.0f),
-                new Matrix4f().lookAt(0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
-                new Matrix4f().lookAt(0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f),
-                new Matrix4f().lookAt(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f),
-                new Matrix4f().lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f),
-                new Matrix4f().lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f),
+                new Matrix4f()
+                        .rotateX((float) Math.toRadians(180))
+                        .scale(1.0f, -1.0f, 1.0f)
+                        .lookAt(0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
+                new Matrix4f()
+                        .rotateX((float) Math.toRadians(180))
+                        .scale(1.0f, -1.0f, 1.0f)
+                        .lookAt(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
+                new Matrix4f()
+                        .rotateY((float) Math.toRadians(180))
+                        .scale(1.0f, -1.0f, 1.0f)
+                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+                new Matrix4f()
+                        .rotateY((float) Math.toRadians(180))
+                        .scale(1.0f, -1.0f, 1.0f)
+                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f),
+                new Matrix4f()
+                        .rotateX((float) Math.toRadians(180))
+                        .scale(1.0f, -1.0f, 1.0f)
+                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f),
+                new Matrix4f()
+                        .rotateX((float) Math.toRadians(180))
+                        .scale(1.0f, -1.0f, 1.0f)
+                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f),
         };
     }
 
@@ -163,7 +180,6 @@ public class HDRTexture extends OxyTexture.Texture {
             shader.enable();
             shader.setUniformMatrix4fv("view", captureViews[i], true);
             shader.disable();
-
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                     GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
             OpenGLRendererAPI.clearBuffer();

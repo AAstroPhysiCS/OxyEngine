@@ -37,7 +37,7 @@ public class ScenePanel extends Panel {
 
     private ScenePanel(SceneLayer sceneLayer, OxyShader shader) {
         this.sceneLayer = sceneLayer;
-        new WorldGrid(sceneLayer.getScene(), 25, shader);
+        new WorldGrid(sceneLayer.getScene(), 10, shader);
     }
 
     @Override

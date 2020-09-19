@@ -37,7 +37,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void build() {
-        hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/images/venice_sunrise_4k.hdr"), scene);
+        hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/pink_sunrise_4k.hdr"), scene);
 
 //        Set<EntityComponent> cachedShaders = scene.distinct(OxyShader.class);
         //skyboxtexture
