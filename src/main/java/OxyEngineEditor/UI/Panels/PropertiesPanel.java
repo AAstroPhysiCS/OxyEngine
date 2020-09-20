@@ -135,7 +135,7 @@ public class PropertiesPanel extends Panel {
             ImGui.popItemWidth();
             ImGui.sameLine();
             if (ImGui.button("...")) {
-                String path = openDialog("obj", null);
+                String path = openDialog("", null);
                 if (path != null) {
                     if (entityContext != null) {
                         List<OxyModel> eList = sceneLayer.getScene().createModelEntities(path, entityContext.get(OxyShader.class));

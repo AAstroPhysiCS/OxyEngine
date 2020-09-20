@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 import static org.lwjgl.opengl.GL45.glDeleteBuffers;
@@ -33,9 +34,8 @@ public class OxyTexture {
 
         protected ByteBuffer loadTextureFile(String path, int[] width, int[] height, int[] channels) {
             ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
-            if(buffer == null){
-                oxyAssert("Texture could not be loaded! Gonna give some default color");
-            }
+            if(buffer == null)
+                logger.warning("Texture: " + path + " could not be loaded! Gonna give some default color");
             return buffer;
         }
 
@@ -84,7 +84,10 @@ public class OxyTexture {
     }
 
     public static HDRTexture loadHDRTexture(String path, Scene scene){
-        return new HDRTexture(++slotCounter, path, scene);
+        HDRTexture hdrTexture = new HDRTexture(++slotCounter, path, scene);
+        HDRTexture.IrradianceTexture irradianceTexture = new HDRTexture.IrradianceTexture(++slotCounter, path, hdrTexture);
+        HDRTexture.setIrradianceTexture(irradianceTexture);
+        return hdrTexture;
     }
 
     public static Texture loadImageCached(int slot) {

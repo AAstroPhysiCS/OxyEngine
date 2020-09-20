@@ -12,6 +12,7 @@
       <w>glfw</w>
       <w>glsl</w>
       <w>imgui</w>
+      <w>irradiance</w>
       <w>jcenter</w>
       <w>lwjgl</w>
       <w>macos</w>

@@ -32,17 +32,12 @@ public class SceneLayer extends Layer {
         super(scene);
     }
 
-    static final OxyShader outlineShader = new OxyShader("D:\\programming\\Java\\OxyEngine\\shaders\\outline.glsl");
-    public static HDRTexture hdrTexture;
+    static final OxyShader outlineShader = new OxyShader("D:\\programming\\Java\\OxyEngine\\shaders\\OxyOutline.glsl");
+    static HDRTexture hdrTexture;
 
     @Override
     public void build() {
         hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/pink_sunrise_4k.hdr"), scene);
-
-//        Set<EntityComponent> cachedShaders = scene.distinct(OxyShader.class);
-        //skyboxtexture
-//        CubemapTexture cubemapTexture = OxyTexture.loadCubemap(OxySystem.FileSystem.getResourceByPath("/images/skybox/skyboxNature1"), scene);
-//        cubemapTexture.init(cachedShaders);
 
         cachedNativeMeshes = scene.distinct(NativeObjectMesh.class);
         cachedCameraComponents = scene.distinct(OxyCamera.class);
@@ -100,7 +95,7 @@ public class SceneLayer extends Layer {
     }
 
     static boolean initHdrTexture = false;
-    public static final OxyShader cubemapShader = new OxyShader("shaders/skybox.glsl");
+    public static final OxyShader cubemapShader = new OxyShader("shaders/OxySkybox.glsl");
 
     @Override
     public void render(float ts, float deltaTime) {
@@ -154,6 +149,7 @@ public class SceneLayer extends Layer {
                 modelMesh.getShader().enable();
                 if (cachedLightEntities.size() == 0) modelMesh.getShader().setUniform1f("currentLightIndex", -1f);
                 modelMesh.getShader().setUniformMatrix4fv("model", c.transform, false);
+                modelMesh.getShader().setUniform1i("irradianceMap", hdrTexture.getIrradianceSlot());
                 modelMesh.getShader().disable();
                 material.push(modelMesh.getShader());
 

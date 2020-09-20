@@ -19,6 +19,9 @@ uniform sampler2D tex[32];
 uniform samplerCube skyBoxTexture;
 uniform vec3 cameraPos;
 
+//irradiance
+uniform samplerCube irradianceMap;
+
 struct Material{
     vec3 ambient;
     vec3 diffuse;
@@ -84,84 +87,6 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
 {
     float height =  texture(tex[heightSlot], texCoords).r;
     return texCoords - viewDir.xy * (height * heightScale);
-}
-
-vec3 calcPBR(vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic);
-
-void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
-
-    vec3 vertexPos = inVar.vertexPos;
-    vec3 lightPos = p_Light.position;
-    vec3 cameraPosVec3 = cameraPos;
-    vec2 texCoordsOut = inVar.texCoordsOut;
-
-    if(normalMapSlot != 0){
-        vertexPos = inVar.TBN * inVar.vertexPos;
-        lightPos = inVar.TBN * p_Light.position;
-        cameraPosVec3 = inVar.TBN * cameraPos;
-    }
-
-    vec3 lightDir = normalize(lightPos - vertexPos);
-    vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
-
-    //PARALLAX MAPPING
-    if(heightSlot != 0){
-        //texCoordsOut = ParallaxMapping(inVar.texCoordsOut, viewDir);
-        //if(texCoordsOut.x > 1.0 || texCoordsOut.y > 1.0 || texCoordsOut.x < 0.0 || texCoordsOut.y < 0.0)
-        //    discard;
-    }
-
-    vec3 norm;
-    //NORMAL MAP
-    if(normalMapSlot != 0){
-        vec3 normalMap = texture(tex[normalMapSlot], texCoordsOut).rgb;
-        normalMap = normalMap * 2.0 - 1.0;
-        normalMap.xy *= normalMapStrength;
-        normalMap = normalize(normalMap);
-        norm = normalMap;
-    } else {
-        norm = vec3(normalize(inVar.lightModelNormal));
-    }
-
-    int index = int(round(inVar.textureSlotOut));
-    float distance = length(p_Light.position - inVar.vertexPos);
-    float attenuation = 1.0 / (p_Light.constant + p_Light.linear * distance + p_Light.quadratic * (distance));
-
-    if (index == 0){ //color
-        vec3 ambient = calcAmbient(material.ambient, p_Light.ambient);
-        vec3 diffuse = calcDiffuse(lightDir, material.diffuse, p_Light.diffuse, norm);
-        vec3 specular = calcSpecular(lightDir, viewDir, material.specular, p_Light.specular, norm);
-
-        ambient *= attenuation;
-        diffuse *= attenuation;
-        specular *= attenuation;
-        vec3 result = specular + diffuse + ambient;
-        result = pow(result, vec3(1f / gamma));
-
-        color = vec4(result, 1.0f) * inVar.colorOut;
-    }
-    else { //texture
-        //vec3 ambient = calcAmbient(material.ambient, p_Light.ambient);
-        //vec3 specular = calcSpecular(lightDir, viewDir, material.specular, p_Light.specular, norm);
-
-        vec3 diffuse = pow(texture(tex[index], texCoordsOut).rgb, vec3(2.2));
-        float metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
-        float roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
-        float aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
-
-        vec3 F0 = vec3(0.04);
-        F0 = mix(F0, diffuse, metallicMap);
-        vec3 Lo = calcPBR(lightPos, p_Light.diffuse, norm, viewDir, vertexPos, F0, diffuse, roughnessMap, metallicMap);
-
-        vec3 ambient = vec3(0.03) * diffuse * aoMap;
-        vec3 result = ambient + Lo;
-        result = result / (result + vec3(1.0));
-        //diffuse *= attenuation;
-        //specular *= attenuation;
-        result = pow(result, vec3(1f / gamma));
-
-        color = vec4(result, 1.0f);
-    }
 }
 
 void calcDirectionalLightImpl(DirectionalLight d_Light, vec3 I, vec3 R){
@@ -240,6 +165,11 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
 vec3 calcPBR(vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic){
      vec3 Lo = vec3(0.0);
      //calculate per-light radiance
@@ -276,6 +206,85 @@ vec3 calcPBR(vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, ve
      // add to outgoing radiance Lo
      Lo += (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
      return Lo;
+}
+
+void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
+
+    vec3 vertexPos = inVar.vertexPos;
+    vec3 lightPos = p_Light.position;
+    vec3 cameraPosVec3 = cameraPos;
+    vec2 texCoordsOut = inVar.texCoordsOut;
+
+    if(normalMapSlot != 0){
+        vertexPos = inVar.TBN * inVar.vertexPos;
+        lightPos = inVar.TBN * p_Light.position;
+        cameraPosVec3 = inVar.TBN * cameraPos;
+    }
+
+    vec3 lightDir = normalize(lightPos - vertexPos);
+    vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
+
+    //PARALLAX MAPPING
+    if(heightSlot != 0){
+        //texCoordsOut = ParallaxMapping(inVar.texCoordsOut, viewDir);
+        //if(texCoordsOut.x > 1.0 || texCoordsOut.y > 1.0 || texCoordsOut.x < 0.0 || texCoordsOut.y < 0.0)
+        //    discard;
+    }
+
+    vec3 norm;
+    //NORMAL MAP
+    if(normalMapSlot != 0){
+        vec3 normalMap = texture(tex[normalMapSlot], texCoordsOut).rgb;
+        normalMap = normalMap * 2.0 - 1.0;
+        normalMap.xy *= normalMapStrength;
+        normalMap = normalize(normalMap);
+        norm = normalMap;
+    } else {
+        norm = vec3(normalize(inVar.lightModelNormal));
+    }
+
+    int index = int(round(inVar.textureSlotOut));
+    float distance = length(p_Light.position - inVar.vertexPos);
+    float attenuation = 1.0 / (p_Light.constant + p_Light.linear * distance + p_Light.quadratic * (distance));
+
+    if (index == 0){ //color
+        vec3 ambient = calcAmbient(material.ambient, p_Light.ambient);
+        vec3 diffuse = calcDiffuse(lightDir, material.diffuse, p_Light.diffuse, norm);
+        vec3 specular = calcSpecular(lightDir, viewDir, material.specular, p_Light.specular, norm);
+
+        ambient *= attenuation;
+        diffuse *= attenuation;
+        specular *= attenuation;
+        vec3 result = specular + diffuse + ambient;
+        result = result / (result + vec3(1.0));
+        result = pow(result, vec3(1f / gamma));
+
+        color = vec4(result, 1.0f) * inVar.colorOut;
+    }
+    else { //texture
+        vec3 albedo = pow(texture(tex[index], texCoordsOut).rgb, vec3(2.2));
+        float metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
+        float roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
+        float aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
+
+        vec3 F0 = vec3(0.04);
+        F0 = mix(F0, albedo, metallicMap);
+        vec3 Lo = calcPBR(lightPos, p_Light.diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap);
+        //vec3 ambient = vec3(0.03) * albedo * aoMap;
+
+        vec3 kS = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
+        vec3 kD = 1.0 - kS;
+        kD *= 1.0 - metallicMap;
+        vec3 irradiance = texture(irradianceMap, norm).rgb;
+        vec3 diffuseMap = irradiance * albedo;
+        vec3 ambient = (kD * diffuseMap) * aoMap;
+
+        vec3 result = ambient + Lo;
+        result = result / (result + vec3(1.0));
+        result = pow(result, vec3(1f / gamma));
+
+        color = vec4(result, 1.0f);
+    }
 }
 
 void main(){

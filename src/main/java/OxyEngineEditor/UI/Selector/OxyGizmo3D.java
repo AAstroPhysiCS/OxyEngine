@@ -22,7 +22,7 @@ public class OxyGizmo3D {
     GizmoMode mode;
 
     private OxyGizmo3D(Scene scene) {
-        OxyShader shader = new OxyShader("shaders/gizmo.glsl");
+        OxyShader shader = new OxyShader("shaders/OxyGizmo.glsl");
         GizmoMode.Translation.init(scene, shader, this);
         GizmoMode.Scale.init(scene, shader, this);
 

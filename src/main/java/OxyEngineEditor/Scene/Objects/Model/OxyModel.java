@@ -36,6 +36,7 @@ public class OxyModel extends OxyEntity {
         OxyModel e = new OxyModel(this);
         e.addToScene();
         var boundingBox = get(BoundingBoxComponent.class);
+        var transform = get(TransformComponent.class);
         e.addComponent(
                 get(ModelFactory.class),
                 get(OxyShader.class),
@@ -43,7 +44,7 @@ public class OxyModel extends OxyEntity {
                         boundingBox.min(),
                         boundingBox.max()
                 ),
-                new TransformComponent(get(TransformComponent.class)),
+                new TransformComponent(new TransformComponent(new Vector3f(0, 0, 0), transform.rotation, transform.scale)),
                 new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),
                 new RenderableComponent(RenderingMode.Normal),
                 new OxyMaterial(get(OxyMaterial.class)),

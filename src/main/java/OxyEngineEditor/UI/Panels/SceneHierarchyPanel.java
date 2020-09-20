@@ -58,13 +58,13 @@ public class SceneHierarchyPanel extends Panel {
         focusedWindow = ImGui.isWindowFocused();
         focusedWindowDragging = focusedWindow && ImGui.isMouseDragging(2);
 
-        updateEntityPanel();
-
-        if (ImGui.beginPopupContextWindow("item context menu")) {
+        if (ImGui.beginPopupContextWindow("Entity menu")) {
             if (ImGui.button("Create Entity"))
                 addEntity(ModelType.Sphere.getPath().getBytes(), shader);
             ImGui.endPopup();
         }
+
+        updateEntityPanel();
 
         ImGui.end();
     }

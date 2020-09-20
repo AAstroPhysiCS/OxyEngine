@@ -125,7 +125,7 @@ public class CubemapTexture extends OxyTexture.Texture {
 
         if (shader == null) {
 
-            shader = new OxyShader("shaders/skybox.glsl");
+            shader = new OxyShader("shaders/OxySkybox.glsl");
             shader.enable();
             shader.setUniform1i("skyBoxTexture", textureSlot);
             shader.disable();
