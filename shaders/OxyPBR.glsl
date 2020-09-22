@@ -64,6 +64,7 @@ uniform int metallicSlot;
 uniform int roughnessSlot;
 uniform int aoSlot;
 uniform int heightSlot;
+//PBR FILTERING
 
 vec3 calcAmbient(vec3 ambient, vec3 lightAmbient){
     return lightAmbient * ambient;

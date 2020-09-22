@@ -14,6 +14,7 @@ import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.UI.Panels.PropertiesPanel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,7 +132,8 @@ public class SceneLayer extends Layer {
                 if(mesh.equals(hdrTexture.getMesh())){
                     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
                     cubemapShader.enable();
-                    cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
+                    cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
+                    cubemapShader.setUniform1f("mipLevel", PropertiesPanel.mipLevelStrength[0]);
                     cubemapShader.disable();
                     render(ts, mesh, mainCamera, cubemapShader);
                     glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -150,6 +152,7 @@ public class SceneLayer extends Layer {
                 if (cachedLightEntities.size() == 0) modelMesh.getShader().setUniform1f("currentLightIndex", -1f);
                 modelMesh.getShader().setUniformMatrix4fv("model", c.transform, false);
                 modelMesh.getShader().setUniform1i("irradianceMap", hdrTexture.getIrradianceSlot());
+                modelMesh.getShader().setUniform1i("prefilterMap", hdrTexture.getPrefilterSlot());
                 modelMesh.getShader().disable();
                 material.push(modelMesh.getShader());
 

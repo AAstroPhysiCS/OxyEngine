@@ -45,6 +45,7 @@ public class PropertiesPanel extends Panel {
     public static final float[] normalMapStrength = new float[]{1f};
     public static final float[] gammaStrength = new float[]{2f};
     public static final float[] heightScale = new float[]{0.1f};
+    public static final float[] mipLevelStrength = new float[]{1.0f};
 
     ImString name = new ImString(0);
     ImString meshPath = new ImString(0);
@@ -276,6 +277,11 @@ public class PropertiesPanel extends Panel {
         ImGui.text("Gamma strength:");
         ImGui.sameLine();
         ImGui.sliderFloat("###hidelabel g", gammaStrength, 0, 100);
+
+        ImGui.alignTextToFramePadding();
+        ImGui.text("Environment LOD:");
+        ImGui.sameLine();
+        ImGui.sliderFloat("###hidelabel lod", mipLevelStrength, 0, 4);
 
         ImGui.alignTextToFramePadding();
         ImGui.text("Height scale:");

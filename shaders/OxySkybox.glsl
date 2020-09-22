@@ -5,9 +5,10 @@ layout(location = 0) out vec4 color;
 
 in vec3 tcsOut;
 uniform samplerCube skyBoxTexture;
+uniform float mipLevel;
 
 void main(){
-    vec3 textureRGB = texture(skyBoxTexture, tcsOut).rgb;
+    vec3 textureRGB = textureLod(skyBoxTexture, tcsOut, mipLevel).rgb;
     textureRGB = textureRGB / (textureRGB + vec3(1.0));
     textureRGB = pow(textureRGB, vec3(1.0/2.2));
 

@@ -3,6 +3,7 @@
     <words>
       <w>assimp</w>
       <w>attrib</w>
+      <w>bdrf</w>
       <w>bitangent</w>
       <w>coords</w>
       <w>cubemap</w>
@@ -16,6 +17,7 @@
       <w>jcenter</w>
       <w>lwjgl</w>
       <w>macos</w>
+      <w>prefilter</w>
       <w>renderable</w>
       <w>renderlist</w>
       <w>shaders</w>

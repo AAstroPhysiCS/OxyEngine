@@ -10,6 +10,7 @@ import OxyEngineEditor.Scene.Scene;
 import org.joml.Matrix4f;
 
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 
 import static OxyEngine.Core.Renderer.Texture.OxyTexture.allTextures;
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -70,6 +71,8 @@ public class HDRTexture extends OxyTexture.Texture {
     private final int captureFBO, captureRBO, hdrTexture;
 
     private static IrradianceTexture irradianceTexture;
+    private static PrefilterTexture prefilterTexture;
+    private static BDRF bdrf;
 
     public HDRTexture(int slot, String path, Scene scene) {
         super(slot, path);
@@ -189,14 +192,41 @@ public class HDRTexture extends OxyTexture.Texture {
         glBindTexture(GL_TEXTURE_2D, 0);
         assert irradianceTexture != null : oxyAssert("Irradiance Texture is null!");
         irradianceTexture.captureFaces(ts);
+        prefilterTexture.captureFaces(ts);
+//        bdrf.captureFaces(ts);
     }
 
     public static void setIrradianceTexture(IrradianceTexture irradianceTexture) {
         HDRTexture.irradianceTexture = irradianceTexture;
     }
 
-    public int getIrradianceSlot(){
+    public static void setPrefilterTexture(PrefilterTexture prefilterTexture) {
+        HDRTexture.prefilterTexture = prefilterTexture;
+    }
+
+    public static void setBdrf(BDRF bdrf) { HDRTexture.bdrf = bdrf; }
+
+    public int getIrradianceSlot() {
         return irradianceTexture.getTextureSlot();
+    }
+
+    public int getPrefilterSlot() {
+        return prefilterTexture.getTextureSlot();
+    }
+
+    public int getBDRFSlot() {
+        return bdrf.getTextureSlot();
+    }
+
+    static class BDRF extends OxyTexture.Texture {
+
+        public BDRF(int slot, String path) {
+            super(slot, path);
+        }
+
+        public void captureFaces(float ts) {
+            OxyShader shader = new OxyShader("shaders/OxyBDRF.glsl");
+        }
     }
 
     static class IrradianceTexture extends OxyTexture.Texture {
@@ -250,7 +280,65 @@ public class HDRTexture extends OxyTexture.Texture {
         }
     }
 
-    public NativeObjectMesh getMesh() {
-        return mesh;
+    static class PrefilterTexture extends OxyTexture.Texture {
+
+        private final HDRTexture mainTexture;
+
+        public PrefilterTexture(int slot, String path, HDRTexture mainTexture) {
+            super(slot, path);
+            this.mainTexture = mainTexture;
+        }
+
+        public void captureFaces(float ts) {
+            OxyShader shader = new OxyShader("shaders/OxyPrefiltering.glsl");
+
+            textureId = glGenTextures();
+            glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+            for (int i = 0; i < 6; i++) {
+                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 128, 128, 0,
+                        GL_RGB, GL_FLOAT, (FloatBuffer) null);
+            }
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+            allTextures.add(this);
+
+            shader.enable();
+            shader.setUniform1i("skyBoxTexture", 0);
+            shader.setUniformMatrix4fv("projection", mainTexture.captureProjection, true);
+            shader.disable();
+
+            glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, mainTexture.textureId);
+            int maxMipLevels = 5;
+            for(int mip = 0; mip < maxMipLevels; mip++) {
+                int mipWidth = (int) (128 * Math.pow(0.5f, mip));
+                int mipHeight = (int) (128 * Math.pow(0.5f, mip));
+                glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
+                glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
+                glViewport(0, 0, mipWidth, mipHeight);
+                float roughness = (float)mip / (float)(maxMipLevels - 1);
+                shader.enable();
+                shader.setUniform1f("roughness", roughness);
+                shader.disable();
+                for (int i = 0; i < 6; i++) {
+                    shader.enable();
+                    shader.setUniformMatrix4fv("view", mainTexture.captureViews[i], true);
+                    shader.disable();
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);
+                    OpenGLRendererAPI.clearBuffer();
+                    mainTexture.scene.getRenderer().render(ts, mainTexture.mesh, OxyRenderer.currentBoundedCamera, shader);
+                }
+            }
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
     }
+
+    public NativeObjectMesh getMesh() { return mesh; }
 }

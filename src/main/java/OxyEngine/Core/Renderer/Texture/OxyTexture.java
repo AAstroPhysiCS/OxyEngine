@@ -86,7 +86,9 @@ public class OxyTexture {
     public static HDRTexture loadHDRTexture(String path, Scene scene){
         HDRTexture hdrTexture = new HDRTexture(++slotCounter, path, scene);
         HDRTexture.IrradianceTexture irradianceTexture = new HDRTexture.IrradianceTexture(++slotCounter, path, hdrTexture);
+        HDRTexture.PrefilterTexture prefilterTexture = new HDRTexture.PrefilterTexture(++slotCounter, path, hdrTexture);
         HDRTexture.setIrradianceTexture(irradianceTexture);
+        HDRTexture.setPrefilterTexture(prefilterTexture);
         return hdrTexture;
     }
 
