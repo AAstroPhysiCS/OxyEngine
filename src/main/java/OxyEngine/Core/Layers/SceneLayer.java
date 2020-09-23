@@ -25,8 +25,8 @@ import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
 public class SceneLayer extends Layer {
 
-    private Set<OxyEntity> cachedLightEntities;
-    private Set<EntityComponent> cachedNativeMeshes, cachedCameraComponents;
+    private Set<OxyEntity> cachedLightEntities, cachedNativeMeshes;
+    private Set<EntityComponent> cachedCameraComponents;
     private Set<OxyEntity> allModelEntities;
 
     public SceneLayer(Scene scene) {
@@ -40,7 +40,7 @@ public class SceneLayer extends Layer {
     public void build() {
         hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/pink_sunrise_4k.hdr"), scene);
 
-        cachedNativeMeshes = scene.distinct(NativeObjectMesh.class);
+        cachedNativeMeshes = scene.view(NativeObjectMesh.class);
         cachedCameraComponents = scene.distinct(OxyCamera.class);
 
         cachedLightEntities = scene.view(Light.class);
@@ -48,8 +48,8 @@ public class SceneLayer extends Layer {
 
         //Prep
         {
-            for (EntityComponent e : cachedNativeMeshes) {
-                ((Mesh) e).initList();
+            for (OxyEntity e : cachedNativeMeshes) {
+                e.get(NativeObjectMesh.class).initList();
             }
             for (OxyEntity e : allModelEntities) {
                 e.get(ModelMesh.class).initList();
@@ -102,7 +102,7 @@ public class SceneLayer extends Layer {
     public void render(float ts, float deltaTime) {
         if (!initHdrTexture && OxyRenderer.currentBoundedCamera != null) {
             hdrTexture.captureFaces(ts);
-            cachedNativeMeshes = scene.distinct(NativeObjectMesh.class);
+            cachedNativeMeshes = scene.view(NativeObjectMesh.class);
             initHdrTexture = true;
         }
 
@@ -127,12 +127,16 @@ public class SceneLayer extends Layer {
         {
 
             glDepthFunc(GL_LEQUAL);
-            for (EntityComponent c : cachedNativeMeshes) {
-                Mesh mesh = (Mesh) c;
+            for (OxyEntity e : cachedNativeMeshes) {
+                Mesh mesh = e.get(Mesh.class);
+                if (e.has(OxyMaterial.class)) {
+                    OxyMaterial m = e.get(OxyMaterial.class);
+                    m.push(mesh.getShader());
+                }
                 if(mesh.equals(hdrTexture.getMesh())){
                     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
                     cubemapShader.enable();
-                    cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
+                    cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
                     cubemapShader.setUniform1f("mipLevel", PropertiesPanel.mipLevelStrength[0]);
                     cubemapShader.disable();
                     render(ts, mesh, mainCamera, cubemapShader);
@@ -153,6 +157,7 @@ public class SceneLayer extends Layer {
                 modelMesh.getShader().setUniformMatrix4fv("model", c.transform, false);
                 modelMesh.getShader().setUniform1i("irradianceMap", hdrTexture.getIrradianceSlot());
                 modelMesh.getShader().setUniform1i("prefilterMap", hdrTexture.getPrefilterSlot());
+                modelMesh.getShader().setUniform1i("brdfLUT", hdrTexture.getBDRFSlot());
                 modelMesh.getShader().disable();
                 material.push(modelMesh.getShader());
 
@@ -183,7 +188,6 @@ public class SceneLayer extends Layer {
                     render(ts, modelMesh, mainCamera);
                 }
                 glDisable(GL_CULL_FACE);
-                material.pop(modelMesh.getShader());
             }
         }
         scene.getFrameBuffer().unbind();

@@ -61,10 +61,15 @@ vec3 tangentLightPos, tangentViewPos, tangentVertexPos;
 uniform float gamma;
 //PBR
 uniform int metallicSlot;
+uniform float metallicFloat;
 uniform int roughnessSlot;
+uniform float roughnessFloat;
 uniform int aoSlot;
+uniform float aoFloat;
 uniform int heightSlot;
 //PBR FILTERING
+uniform samplerCube prefilterMap;
+uniform sampler2D brdfLUT;
 
 vec3 calcAmbient(vec3 ambient, vec3 lightAmbient){
     return lightAmbient * ambient;
@@ -90,7 +95,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
     return texCoords - viewDir.xy * (height * heightScale);
 }
 
-void calcDirectionalLightImpl(DirectionalLight d_Light, vec3 I, vec3 R){
+void calcDirectionalLightImpl(DirectionalLight d_Light){
     vec3 lightDir = normalize(-d_Light.direction);
     vec3 viewDir = normalize(cameraPos - vec3(inVar.vertexPos));
     int index = int(round(inVar.textureSlotOut));
@@ -209,7 +214,7 @@ vec3 calcPBR(vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, ve
      return Lo;
 }
 
-void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
+void calcPointLightImpl(PointLight p_Light){
 
     vec3 vertexPos = inVar.vertexPos;
     vec3 lightPos = p_Light.position;
@@ -248,63 +253,51 @@ void calcPointLightImpl(PointLight p_Light, vec3 I, vec3 R){
     float distance = length(p_Light.position - inVar.vertexPos);
     float attenuation = 1.0 / (p_Light.constant + p_Light.linear * distance + p_Light.quadratic * (distance));
 
+    vec3 R = reflect(-viewDir, norm);
+    const float MAX_REFLECTION_LOD = 5.0;
+
+    vec3 albedo;
+    float metallicMap, roughnessMap, aoMap;
     if (index == 0){ //color
-        vec3 ambient = calcAmbient(material.ambient, p_Light.ambient);
-        vec3 diffuse = calcDiffuse(lightDir, material.diffuse, p_Light.diffuse, norm);
-        vec3 specular = calcSpecular(lightDir, viewDir, material.specular, p_Light.specular, norm);
-
-        ambient *= attenuation;
-        diffuse *= attenuation;
-        specular *= attenuation;
-        vec3 result = specular + diffuse + ambient;
-        result = result / (result + vec3(1.0));
-        result = pow(result, vec3(1f / gamma));
-
-        color = vec4(result, 1.0f) * inVar.colorOut;
+        albedo = pow(vec3(material.diffuse), vec3(2.2));
+        metallicMap = metallicFloat;
+        roughnessMap = roughnessFloat;
+        aoMap = aoFloat;
     }
     else { //texture
-        vec3 albedo = pow(texture(tex[index], texCoordsOut).rgb, vec3(2.2));
-        float metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
-        float roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
-        float aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
-
-        vec3 F0 = vec3(0.04);
-        F0 = mix(F0, albedo, metallicMap);
-        vec3 Lo = calcPBR(lightPos, p_Light.diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap);
-        //vec3 ambient = vec3(0.03) * albedo * aoMap;
-
-        vec3 kS = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
-        vec3 kD = 1.0 - kS;
-        kD *= 1.0 - metallicMap;
-        vec3 irradiance = texture(irradianceMap, norm).rgb;
-        vec3 diffuseMap = irradiance * albedo;
-        vec3 ambient = (kD * diffuseMap) * aoMap;
-
-        vec3 result = ambient + Lo;
-        result = result / (result + vec3(1.0));
-        result = pow(result, vec3(1f / gamma));
-
-        color = vec4(result, 1.0f);
+        albedo = pow(texture(tex[index], texCoordsOut).rgb, vec3(2.2));
+        metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
+        roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
+        aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
     }
+
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, metallicMap);
+    vec3 Lo = calcPBR(lightPos, p_Light.diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap);
+
+    vec3 kS = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallicMap;
+    vec3 irradiance = texture(irradianceMap, norm).rgb;
+    vec3 diffuseMap = irradiance * albedo;
+
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughnessMap * MAX_REFLECTION_LOD).rgb;
+    vec2 envBRDF  = texture(brdfLUT, vec2(max(dot(norm, viewDir), 0.0), roughnessMap)).rg;
+    vec3 specular = prefilteredColor * (kS * envBRDF.x + envBRDF.y);
+    vec3 ambient = (kD * diffuseMap + specular) * aoMap;
+
+    vec3 result = ambient + Lo;
+    result = result / (result + vec3(1.0));
+    result = pow(result, vec3(1f / gamma));
+
+    color = vec4(result, 1.0f);
 }
 
 void main(){
-    vec3 I = normalize(vec3(inVar.vertexPos) - cameraPos);
-    vec3 R = reflect(I, normalize(vec3(inVar.normalsOut)));
-
-    //NORMAL MAPPING
     if (currentLightIndex == 0){
-        calcPointLightImpl(p_Light, I, R);
+        calcPointLightImpl(p_Light);
     } else if (currentLightIndex == 1){
-        calcDirectionalLightImpl(d_Light, I, R);
-    } else {
-        int index = int(round(inVar.textureSlotOut));
-        if (index == 0){
-            color = inVar.colorOut * texture(skyBoxTexture, R);
-        }
-        else {
-            color = texture(tex[index], inVar.texCoordsOut) * texture(skyBoxTexture, R);
-        }
+        calcDirectionalLightImpl(d_Light);
     }
 }
 

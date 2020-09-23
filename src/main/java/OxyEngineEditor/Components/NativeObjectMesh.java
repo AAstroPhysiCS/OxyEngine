@@ -11,9 +11,8 @@ import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class NativeObjectMesh extends Mesh {
 
-    public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 8 * Float.BYTES, 0);
-    public static final BufferTemplate.Attributes attributesTXSlot = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 8 * Float.BYTES, 3 * Float.BYTES);
-    public static final BufferTemplate.Attributes attributesColors = new BufferTemplate.Attributes(OxyShader.COLOR, 4, GL_FLOAT, false, 8 * Float.BYTES, 4 * Float.BYTES);
+    public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0);
+    public static final BufferTemplate.Attributes attributesTXSlot = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
 
     public int indicesX, indicesY, indicesZ;
 

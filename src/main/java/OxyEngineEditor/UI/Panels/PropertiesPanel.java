@@ -50,10 +50,9 @@ public class PropertiesPanel extends Panel {
     ImString name = new ImString(0);
     ImString meshPath = new ImString(0);
     float[] albedo = {0, 0, 0, 0};
-    float[] normals = {0, 0, 0, 0};
-    float[] metalness = {0, 0, 0, 0};
-    float[] roughness = {0, 0, 0, 0};
-
+    public static final float[] metalness = {0};
+    public static final float[] roughness = {1};
+    public static final float[] aoStrength = {1};
     @Override
     public void preload() {
 
@@ -66,11 +65,7 @@ public class PropertiesPanel extends Panel {
         if (entityContext != null) {
             name = new ImString(entityContext.get(TagComponent.class).tag(), 100);
             meshPath = new ImString(new File(BASE_PATH).toURI().relativize(new File(entityContext.get(Mesh.class).getPath()).toURI()).getPath());
-            OxyMaterial material = entityContext.get(OxyMaterial.class);
-            albedo = material.diffuseColor.getNumbers();
-            normals = material.specularColor.getNumbers();
-            metalness = material.ambientColor.getNumbers();
-            roughness = material.diffuseColor.getNumbers();
+            albedo = entityContext.get(OxyMaterial.class).diffuseColor.getNumbers();
         }
 
         ImGui.begin("Properties");
@@ -268,6 +263,22 @@ public class PropertiesPanel extends Panel {
 
             ImGui.treePop();
         }
+
+        ImGui.alignTextToFramePadding();
+        ImGui.text("Metallic Strength:");
+        ImGui.sameLine();
+        ImGui.sliderFloat("###hidelabel metallic", metalness, 0, 1);
+
+        ImGui.alignTextToFramePadding();
+        ImGui.text("Roughness strength:");
+        ImGui.sameLine();
+        ImGui.sliderFloat("###hidelabel roughness", roughness, 0, 1);
+
+        ImGui.alignTextToFramePadding();
+        ImGui.text("AO strength:");
+        ImGui.sameLine();
+        ImGui.sliderFloat("###hidelabel ao", aoStrength, 0, 1);
+
         ImGui.alignTextToFramePadding();
         ImGui.text("Normal map strength:");
         ImGui.sameLine();

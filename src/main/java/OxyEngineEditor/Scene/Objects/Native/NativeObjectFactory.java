@@ -15,7 +15,6 @@ public abstract class NativeObjectFactory implements EntityComponent {
 
     //Texture does not work in native objects, only colors
     public void constructData(OxyNativeObject e, int size) {
-        OxyMaterial material = e.get(OxyMaterial.class);
         TransformComponent c = e.get(TransformComponent.class);
 
         c.transform = new Matrix4f()
@@ -32,12 +31,6 @@ public abstract class NativeObjectFactory implements EntityComponent {
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = 0;
-            if (material.diffuseColor != null) {
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[0];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[1];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[2];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[3];
-            } else vertPtr += 4;
         }
     }
 

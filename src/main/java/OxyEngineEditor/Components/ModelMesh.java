@@ -8,9 +8,8 @@ import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class ModelMesh extends Mesh {
 
-    public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 8 * Float.BYTES, 0);
-    public static final BufferTemplate.Attributes attributesTXSlots = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 8 * Float.BYTES, 3 * Float.BYTES);
-    public static final BufferTemplate.Attributes attributesColor = new BufferTemplate.Attributes(OxyShader.COLOR, 4, GL_FLOAT, false, 8 * Float.BYTES, 4 * Float.BYTES);
+    public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0);
+    public static final BufferTemplate.Attributes attributesTXSlots = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
 
     public static final BufferTemplate.Attributes attributesNormals = new BufferTemplate.Attributes(OxyShader.NORMALS, 3, GL_FLOAT, false, 0, 0);
 
@@ -38,7 +37,7 @@ public class ModelMesh extends Mesh {
         vertexBuffer = new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
                 .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
                 .setUsage(usage)
-                .setAttribPointer(attributesVert, attributesTXSlots, attributesColor));
+                .setAttribPointer(attributesVert, attributesTXSlots));
 
         indexBuffer = new IndexBuffer();
 

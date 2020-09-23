@@ -33,7 +33,7 @@ public class ModelFactory implements EntityComponent {
     }
 
     public void constructData(OxyModel e) {
-        e.vertices = new float[verticesNonTransformed.size() * 8];
+        e.vertices = new float[verticesNonTransformed.size() * 4];
         e.normals = new float[verticesNonTransformed.size() * 3];
         e.tcs = new float[verticesNonTransformed.size() * 2];
         e.tangents = new float[tangents.size() * 3];
@@ -62,12 +62,6 @@ public class ModelFactory implements EntityComponent {
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
-            if (material.diffuseColor != null) {
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[0];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[1];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[2];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[3];
-            } else vertPtr += 4;
         }
 
         int nPtr = 0;
@@ -127,12 +121,6 @@ public class ModelFactory implements EntityComponent {
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
-            if (material.diffuseColor != null) {
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[0];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[1];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[2];
-                e.vertices[vertPtr++] = material.diffuseColor.getNumbers()[3];
-            } else vertPtr += 4;
         }
     }
 }

@@ -147,7 +147,6 @@ enum GizmoMode {
                 OxyMaterial material = e.get(OxyMaterial.class);
                 material.push(modelMesh.getShader());
                 scene.getRenderer().render(ts, modelMesh, OxyRenderer.currentBoundedCamera);
-                material.pop(modelMesh.getShader());
             }
         }
 

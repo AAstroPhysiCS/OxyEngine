@@ -87,8 +87,10 @@ public class OxyTexture {
         HDRTexture hdrTexture = new HDRTexture(++slotCounter, path, scene);
         HDRTexture.IrradianceTexture irradianceTexture = new HDRTexture.IrradianceTexture(++slotCounter, path, hdrTexture);
         HDRTexture.PrefilterTexture prefilterTexture = new HDRTexture.PrefilterTexture(++slotCounter, path, hdrTexture);
+        HDRTexture.BDRF bdrfTexture = new HDRTexture.BDRF(++slotCounter, path, hdrTexture);
         HDRTexture.setIrradianceTexture(irradianceTexture);
         HDRTexture.setPrefilterTexture(prefilterTexture);
+        HDRTexture.setBdrf(bdrfTexture);
         return hdrTexture;
     }
 

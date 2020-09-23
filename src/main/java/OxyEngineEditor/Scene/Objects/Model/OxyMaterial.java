@@ -61,6 +61,11 @@ public class OxyMaterial implements EntityComponent {
 
     public void push(OxyShader shader) {
         shader.enable();
+        if(diffuseColor != null){
+            shader.setUniformVec3("material.diffuse", new Vector3f(diffuseColor.getNumbers()[0], diffuseColor.getNumbers()[1], diffuseColor.getNumbers()[2]));
+            shader.setUniformVec3("colorOut", new Vector3f(diffuseColor.getNumbers()[0], diffuseColor.getNumbers()[1], diffuseColor.getNumbers()[2]));
+            shader.setUniformVec4("colorOut4f", new Vector4f(diffuseColor.getNumbers()[0], diffuseColor.getNumbers()[1], diffuseColor.getNumbers()[2], diffuseColor.getNumbers()[3]));
+        }
         if (normalTexture != null) {
             shader.setUniform1i("normalMapSlot", normalTexture.getTextureSlot());
             shader.setUniform1f("normalMapStrength", PropertiesPanel.normalMapStrength[0]);
@@ -71,15 +76,18 @@ public class OxyMaterial implements EntityComponent {
             shader.setUniform1i("metallicSlot", metallicTexture.getTextureSlot());
         } else {
             shader.setUniform1i("metallicSlot", 0);
+            shader.setUniform1f("metallicFloat", PropertiesPanel.metalness[0]);
         }
         if (aoTexture != null) {
             shader.setUniform1i("aoSlot", aoTexture.getTextureSlot());
         } else {
+            shader.setUniform1f("aoFloat", PropertiesPanel.aoStrength[0]);
             shader.setUniform1i("aoSlot", 0);
         }
         if (roughnessTexture != null) {
             shader.setUniform1i("roughnessSlot", roughnessTexture.getTextureSlot());
         } else {
+            shader.setUniform1f("roughnessFloat", PropertiesPanel.roughness[0]);
             shader.setUniform1i("roughnessSlot", 0);
         }
         if (heightTexture != null) {
@@ -89,19 +97,6 @@ public class OxyMaterial implements EntityComponent {
             shader.setUniform1i("heightSlot", 0);
         }
         shader.setUniform1f("gamma", PropertiesPanel.gammaStrength[0]);
-        shader.setUniformVec3("material.ambient", new Vector3f(ambientColor.getNumbers()[0], ambientColor.getNumbers()[1], ambientColor.getNumbers()[2]));
-        shader.setUniformVec3("material.specular", new Vector3f(specularColor.getNumbers()[0], specularColor.getNumbers()[1], specularColor.getNumbers()[2]));
-        shader.setUniformVec3("material.diffuse", new Vector3f(diffuseColor.getNumbers()[0], diffuseColor.getNumbers()[1], diffuseColor.getNumbers()[2]));
-        shader.setUniform1f("material.reflectance", reflectance);
-        shader.disable();
-    }
-
-    public void pop(OxyShader shader) {
-        shader.enable();
-        shader.setUniformVec3("material.ambient", new Vector3f(0, 0, 0));
-        shader.setUniformVec3("material.specular", new Vector3f(0, 0, 0));
-        shader.setUniformVec3("material.diffuse", new Vector3f(0, 0, 0));
-        shader.setUniform1f("material.reflectance", 0);
         shader.disable();
     }
 }

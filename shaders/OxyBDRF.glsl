@@ -110,7 +110,7 @@ vec2 IntegrateBRDF(float NdotV, float roughness)
 }
 
 void main(){
-    color = IntegrateBDRF(tcsOut.x, tcsOut.y);
+    color = IntegrateBRDF(tcsOut.x, tcsOut.y);
 }
 
 //#type vertex

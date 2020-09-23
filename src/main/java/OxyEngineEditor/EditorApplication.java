@@ -62,7 +62,7 @@ public class EditorApplication extends OxyApplication {
                 new Vector3f(2f, 2f, 2f),
                 new Vector3f(5f, 5f, 5f),
                 new Vector3f(1f, 1f, 1f)));
-        m.addComponent(new TransformComponent(new Vector3f(0, -10, 0), 1f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
+        m.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m.constructData();
 
         //ONLY ONCE
@@ -80,10 +80,18 @@ public class EditorApplication extends OxyApplication {
                 new Vector3f(5.0f, 5.0f, 5.0f),
                 new Vector3f(0f, 0f, 0f)));*/
 
-        List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/scene3Again.obj"), oxyShader);
+        List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/mainTestScene.obj"), oxyShader);
         for (OxyModel obj : testObjects) {
-            obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0), 2f));
+            obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0)));
             obj.constructData();
+        }
+
+        for(int i = 0; i < 7; i++){
+            for(int j = 0; j < 7; j++){
+                OxyModel model = scene.createModelEntity(ModelType.Sphere, oxyShader);
+                model.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f((i * 5), (j * 5) - 50, 0), new Vector3f(1.517f, 0, 0)));
+                model.constructData();
+            }
         }
 
         int[] samplers = new int[32];
@@ -102,7 +110,7 @@ public class EditorApplication extends OxyApplication {
         overlayPanelLayer.addPanel(ToolbarPanel.getInstance());
         overlayPanelLayer.addPanel(SceneHierarchyPanel.getInstance(sceneLayer, oxyShader));
         overlayPanelLayer.addPanel(PropertiesPanel.getInstance(sceneLayer));
-        overlayPanelLayer.addPanel(ScenePanel.getInstance(sceneLayer, oxyShader));
+        overlayPanelLayer.addPanel(ScenePanel.getInstance(sceneLayer));
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, overlayPanelLayer);
         for (Layer l : layerStack.getLayerStack())

@@ -18,13 +18,14 @@ public class WorldGrid {
     private final Scene scene;
     private final NativeObjectMesh worldGridMesh;
 
-    public WorldGrid(Scene scene, int size, OxyShader shader) {
+    public WorldGrid(Scene scene, int size) {
         this.scene = scene;
+        OxyShader shader = new OxyShader("shaders/OxyGrid.glsl");
         worldGridMesh = new NativeMeshBuilderImpl()
                 .setShader(shader)
                 .setMode(GL_LINES)
                 .setUsage(BufferTemplate.Usage.STATIC)
-                .setVerticesBufferAttributes(attributesVert, attributesTXSlot, attributesColors)
+                .setVerticesBufferAttributes(attributesVert, attributesTXSlot)
                 .create();
         add(size);
         worldGridMesh.initList();

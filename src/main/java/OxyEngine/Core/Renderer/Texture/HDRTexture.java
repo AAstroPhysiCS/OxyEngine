@@ -10,7 +10,6 @@ import OxyEngineEditor.Scene.Scene;
 import org.joml.Matrix4f;
 
 import java.nio.FloatBuffer;
-import java.util.Arrays;
 
 import static OxyEngine.Core.Renderer.Texture.OxyTexture.allTextures;
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -193,7 +192,7 @@ public class HDRTexture extends OxyTexture.Texture {
         assert irradianceTexture != null : oxyAssert("Irradiance Texture is null!");
         irradianceTexture.captureFaces(ts);
         prefilterTexture.captureFaces(ts);
-//        bdrf.captureFaces(ts);
+        bdrf.captureFaces(ts);
     }
 
     public static void setIrradianceTexture(IrradianceTexture irradianceTexture) {
@@ -204,7 +203,9 @@ public class HDRTexture extends OxyTexture.Texture {
         HDRTexture.prefilterTexture = prefilterTexture;
     }
 
-    public static void setBdrf(BDRF bdrf) { HDRTexture.bdrf = bdrf; }
+    public static void setBdrf(BDRF bdrf) {
+        HDRTexture.bdrf = bdrf;
+    }
 
     public int getIrradianceSlot() {
         return irradianceTexture.getTextureSlot();
@@ -220,12 +221,36 @@ public class HDRTexture extends OxyTexture.Texture {
 
     static class BDRF extends OxyTexture.Texture {
 
-        public BDRF(int slot, String path) {
+        private final HDRTexture mainTexture;
+
+        public BDRF(int slot, String path, HDRTexture mainTexture) {
             super(slot, path);
+            this.mainTexture = mainTexture;
         }
 
         public void captureFaces(float ts) {
             OxyShader shader = new OxyShader("shaders/OxyBDRF.glsl");
+            textureId = glGenTextures();
+            glBindTexture(GL_TEXTURE_2D, textureId);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0,
+                    GL_RG, GL_FLOAT, (FloatBuffer) null);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glBindTexture(GL_TEXTURE_2D, 0);
+            allTextures.add(this);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
+            glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
+            shader.enable();
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
+            glViewport(0, 0, 512, 512);
+            shader.disable();
+            OpenGLRendererAPI.clearBuffer();
+            mainTexture.scene.getRenderer().render(ts, mainTexture.mesh, OxyRenderer.currentBoundedCamera, shader);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
     }
 
@@ -316,13 +341,13 @@ public class HDRTexture extends OxyTexture.Texture {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_CUBE_MAP, mainTexture.textureId);
             int maxMipLevels = 5;
-            for(int mip = 0; mip < maxMipLevels; mip++) {
+            for (int mip = 0; mip < maxMipLevels; mip++) {
                 int mipWidth = (int) (128 * Math.pow(0.5f, mip));
                 int mipHeight = (int) (128 * Math.pow(0.5f, mip));
                 glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
                 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
                 glViewport(0, 0, mipWidth, mipHeight);
-                float roughness = (float)mip / (float)(maxMipLevels - 1);
+                float roughness = (float) mip / (float) (maxMipLevels - 1);
                 shader.enable();
                 shader.setUniform1f("roughness", roughness);
                 shader.disable();
@@ -340,5 +365,7 @@ public class HDRTexture extends OxyTexture.Texture {
         }
     }
 
-    public NativeObjectMesh getMesh() { return mesh; }
+    public NativeObjectMesh getMesh() {
+        return mesh;
+    }
 }

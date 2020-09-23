@@ -2,7 +2,6 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.PerspectiveCamera;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.WorldGrid;
@@ -30,14 +29,14 @@ public class ScenePanel extends Panel {
 
     private final SceneLayer sceneLayer;
 
-    public static ScenePanel getInstance(SceneLayer sceneLayer, OxyShader shader) {
-        if (INSTANCE == null) INSTANCE = new ScenePanel(sceneLayer, shader);
+    public static ScenePanel getInstance(SceneLayer sceneLayer) {
+        if (INSTANCE == null) INSTANCE = new ScenePanel(sceneLayer);
         return INSTANCE;
     }
 
-    private ScenePanel(SceneLayer sceneLayer, OxyShader shader) {
+    private ScenePanel(SceneLayer sceneLayer) {
         this.sceneLayer = sceneLayer;
-        new WorldGrid(sceneLayer.getScene(), 10, shader);
+        new WorldGrid(sceneLayer.getScene(), 10);
     }
 
     @Override

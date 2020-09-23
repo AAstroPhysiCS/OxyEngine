@@ -20,7 +20,6 @@ public class OxyShader implements OxyDisposable, EntityComponent {
     public static final int VERTICES = 0;
     public static final int TEXTURE_COORDS = 1;
     public static final int TEXTURE_SLOT = 2;
-    public static final int COLOR = 3;
     public static final int NORMALS = 4;
     public static final int BITANGENT = 5;
     public static final int TANGENT = 6;
