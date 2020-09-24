@@ -181,25 +181,13 @@ public class OxyModelLoader {
         pathHeight.clear();
 
         AIColor4D color = AIColor4D.create();
-        Vector4f ambient = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-        int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_AMBIENT, aiTextureType_NONE, 0, color);
-        if (result == 0) {
-            ambient = new Vector4f(color.r(), color.g(), color.b(), color.a());
-        }
-
         Vector4f diffuse = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-        result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, aiTextureType_NONE, 0, color);
+        int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, aiTextureType_NONE, 0, color);
         if (result == 0) {
             diffuse = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
 
-        Vector4f specular = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-        result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_SPECULAR, aiTextureType_NONE, 0, color);
-        if (result == 0) {
-            specular = new Vector4f(color.r(), color.g(), color.b(), color.a());
-        }
-
-        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture, new OxyColor(ambient), new OxyColor(diffuse), new OxyColor(specular), 32);
+        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture, new OxyColor(diffuse));
     }
 
     public String getPath() {

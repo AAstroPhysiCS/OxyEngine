@@ -3,7 +3,6 @@ package OxyEngineEditor.Scene.Objects.Native;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.NativeObjectMesh;
 import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 

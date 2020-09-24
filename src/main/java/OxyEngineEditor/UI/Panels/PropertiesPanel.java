@@ -42,17 +42,13 @@ public class PropertiesPanel extends Panel {
     static boolean init = false;
     public static boolean focusedWindow = false;
     private static final ImBoolean helpWindowBool = new ImBoolean();
-    public static final float[] normalMapStrength = new float[]{1f};
     public static final float[] gammaStrength = new float[]{2f};
-    public static final float[] heightScale = new float[]{0.1f};
     public static final float[] mipLevelStrength = new float[]{1.0f};
 
     ImString name = new ImString(0);
     ImString meshPath = new ImString(0);
     float[] albedo = {0, 0, 0, 0};
-    public static final float[] metalness = {0};
-    public static final float[] roughness = {1};
-    public static final float[] aoStrength = {1};
+
     @Override
     public void preload() {
 
@@ -65,7 +61,7 @@ public class PropertiesPanel extends Panel {
         if (entityContext != null) {
             name = new ImString(entityContext.get(TagComponent.class).tag(), 100);
             meshPath = new ImString(new File(BASE_PATH).toURI().relativize(new File(entityContext.get(Mesh.class).getPath()).toURI()).getPath());
-            albedo = entityContext.get(OxyMaterial.class).diffuseColor.getNumbers();
+            albedo = entityContext.get(OxyMaterial.class).albedoColor.getNumbers();
         }
 
         ImGui.begin("Properties");
@@ -170,7 +166,7 @@ public class PropertiesPanel extends Panel {
                                 ImGuiColorEditFlags.DisplayRGB |
                                 ImGuiColorEditFlags.NoLabel
                 ) && entityContext != null) {
-                    entityContext.get(OxyMaterial.class).diffuseColor.setColorRGBA(albedo);
+                    entityContext.get(OxyMaterial.class).albedoColor.setColorRGBA(albedo);
                 }
             }
 
@@ -264,25 +260,27 @@ public class PropertiesPanel extends Panel {
             ImGui.treePop();
         }
 
+        OxyMaterial m = entityContext.get(OxyMaterial.class);
+
         ImGui.alignTextToFramePadding();
         ImGui.text("Metallic Strength:");
         ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel metallic", metalness, 0, 1);
+        ImGui.sliderFloat("###hidelabel metallic", m.metalness, 0, 1);
 
         ImGui.alignTextToFramePadding();
         ImGui.text("Roughness strength:");
         ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel roughness", roughness, 0, 1);
+        ImGui.sliderFloat("###hidelabel roughness", m.roughness, 0, 1);
 
         ImGui.alignTextToFramePadding();
         ImGui.text("AO strength:");
         ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel ao", aoStrength, 0, 1);
+        ImGui.sliderFloat("###hidelabel ao", m.aoStrength, 0, 1);
 
         ImGui.alignTextToFramePadding();
         ImGui.text("Normal map strength:");
         ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel n", normalMapStrength, 0, 100);
+        ImGui.sliderFloat("###hidelabel n", m.normalStrength, 0, 100);
 
         ImGui.alignTextToFramePadding();
         ImGui.text("Gamma strength:");
@@ -297,7 +295,7 @@ public class PropertiesPanel extends Panel {
         ImGui.alignTextToFramePadding();
         ImGui.text("Height scale:");
         ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel h", heightScale, 0, 10);
+        ImGui.sliderFloat("###hidelabel h", m.heightScale, 0, 10);
 
         final float windowWidth = ImGui.getWindowWidth();
         ImGui.spacing();

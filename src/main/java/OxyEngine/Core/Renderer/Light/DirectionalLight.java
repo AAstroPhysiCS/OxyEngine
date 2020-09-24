@@ -11,7 +11,7 @@ public class DirectionalLight extends Light {
     }
 
     @Override
-    public void update(OxyShader shader) {
+    public void update(OxyShader shader, int i) {
         assert direction != null : oxyAssert("Directional Lights should have a direction");
         shader.enable();
         shader.setUniform1f("currentLightIndex", 1);

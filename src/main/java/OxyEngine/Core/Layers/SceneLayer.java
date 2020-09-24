@@ -38,7 +38,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void build() {
-        hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/pink_sunrise_4k.hdr"), scene);
+        hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/Newport_Loft_Ref.hdr"), scene);
 
         cachedNativeMeshes = scene.view(NativeObjectMesh.class);
         cachedCameraComponents = scene.distinct(OxyCamera.class);
@@ -81,6 +81,7 @@ public class SceneLayer extends Layer {
         scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
 
+        int i = 0;
         for (OxyEntity e : cachedLightEntities) {
             if (!e.has(EmittingComponent.class)) continue;
             Light l = e.get(Light.class);
@@ -91,7 +92,8 @@ public class SceneLayer extends Layer {
             l.setPosition(emittingComponent.position());
             l.setDirection(emittingComponent.direction());
             OxyShader shader = e.get(OxyShader.class);
-            l.update(shader);
+            l.update(shader, i);
+            i++;
         }
     }
 

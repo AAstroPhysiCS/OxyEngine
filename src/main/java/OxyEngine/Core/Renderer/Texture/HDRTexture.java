@@ -122,28 +122,18 @@ public class HDRTexture extends OxyTexture.Texture {
         captureProjection = new Matrix4f().perspective((float) Math.toRadians(90), 1.0f, 0.478f, 10.0f);
         captureViews = new Matrix4f[]{
                 new Matrix4f()
-                        .rotateX((float) Math.toRadians(180))
-                        .scale(1.0f, -1.0f, 1.0f)
                         .lookAt(0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
                 new Matrix4f()
-                        .rotateX((float) Math.toRadians(180))
-                        .scale(1.0f, -1.0f, 1.0f)
                         .lookAt(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
                 new Matrix4f()
                         .rotateY((float) Math.toRadians(180))
-                        .scale(1.0f, -1.0f, 1.0f)
-                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f),
-                new Matrix4f()
-                        .rotateY((float) Math.toRadians(180))
-                        .scale(1.0f, -1.0f, 1.0f)
                         .lookAt(0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f),
                 new Matrix4f()
-                        .rotateX((float) Math.toRadians(180))
-                        .scale(1.0f, -1.0f, 1.0f)
+                        .rotateY((float) Math.toRadians(180))
+                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+                new Matrix4f()
                         .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f),
                 new Matrix4f()
-                        .rotateX((float) Math.toRadians(180))
-                        .scale(1.0f, -1.0f, 1.0f)
                         .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f),
         };
     }

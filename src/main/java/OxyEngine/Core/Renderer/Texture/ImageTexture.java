@@ -25,7 +25,7 @@ public class ImageTexture extends OxyTexture.Texture {
         int[] width = new int[1];
         int[] height = new int[1];
         int[] channels = new int[1];
-        stbi_set_flip_vertically_on_load(false);
+        stbi_set_flip_vertically_on_load(true);
         ByteBuffer buffer = loadTextureFile(path, width, height, channels);
         if (buffer == null || !buffer.hasRemaining()) return;
 

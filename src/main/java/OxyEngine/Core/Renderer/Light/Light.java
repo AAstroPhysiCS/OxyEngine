@@ -25,5 +25,5 @@ public abstract class Light implements EntityComponent {
         this.specular = specular;
     }
 
-    public abstract void update(OxyShader shader);
+    public abstract void update(OxyShader shader, int i);
 }

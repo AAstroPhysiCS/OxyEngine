@@ -15,17 +15,17 @@ public class PointLight extends Light {
     }
 
     @Override
-    public void update(OxyShader shader) {
+    public void update(OxyShader shader, int i) {
         assert direction == null : oxyAssert("Point Lights should not have a direction");
         shader.enable();
         shader.setUniform1f("currentLightIndex", 0);
-        shader.setUniformVec3("p_Light.position", position);
-        shader.setUniformVec3("p_Light.ambient", ambient);
-        shader.setUniformVec3("p_Light.specular", specular);
-        shader.setUniformVec3("p_Light.diffuse", diffuse);
-        shader.setUniform1f("p_Light.constant", constant);
-        shader.setUniform1f("p_Light.linear", linear);
-        shader.setUniform1f("p_Light.quadratic", quadratic);
+        shader.setUniformVec3("p_Light["+i+"].position", position);
+        shader.setUniformVec3("p_Light["+i+"].ambient", ambient);
+        shader.setUniformVec3("p_Light["+i+"].specular", specular);
+        shader.setUniformVec3("p_Light["+i+"].diffuse", diffuse);
+        shader.setUniform1f("p_Light["+i+"].constant", constant);
+        shader.setUniform1f("p_Light["+i+"].linear", linear);
+        shader.setUniform1f("p_Light["+i+"].quadratic", quadratic);
         shader.disable();
     }
 }

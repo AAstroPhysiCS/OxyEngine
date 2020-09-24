@@ -62,18 +62,18 @@ public class OxyGizmoController implements OxyMouseListener {
     @Override
     public void mouseHovered(OxyEntity hoveredEntity) {
         if (hoveredEntity == null && hoveredGameObject != null) {
-            OxyColor hoveredColor = hoveredGameObject.get(OxyMaterial.class).diffuseColor;
+            OxyColor hoveredColor = hoveredGameObject.get(OxyMaterial.class).albedoColor;
             hoveredColor.setColorRGBA(standardColor.getNumbers());
             hoveredGameObject.updateData();
         }
         if (hoveredEntity instanceof OxyModel) {
             if (!init) {
-                OxyColor color = hoveredEntity.get(OxyMaterial.class).diffuseColor;
+                OxyColor color = hoveredEntity.get(OxyMaterial.class).albedoColor;
                 standardColor = (OxyColor) color.clone();
                 init = true;
             }
             hoveredGameObject = hoveredEntity;
-            OxyColor hoveredColor = hoveredGameObject.get(OxyMaterial.class).diffuseColor;
+            OxyColor hoveredColor = hoveredGameObject.get(OxyMaterial.class).albedoColor;
             hoveredColor.setColorRGBA(new float[]{1.0f, 1.0f, 0.0f, 1.0f});
             hoveredGameObject.updateData();
         }

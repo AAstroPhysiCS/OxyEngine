@@ -48,7 +48,7 @@ struct DirectionalLight{
 };
 
 uniform Material material;
-uniform PointLight p_Light;
+uniform PointLight p_Light[2];
 uniform DirectionalLight d_Light;
 uniform float currentLightIndex = -1;
 
@@ -176,8 +176,8 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec3 calcPBR(vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic){
-     vec3 Lo = vec3(0.0);
+vec3 Lo = vec3(0.0);
+vec3 calcPBR(PointLight p_Light, vec3 pointLightPos, vec3 pointLightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic){
      //calculate per-light radiance
      vec3 L = normalize(pointLightPos - vertexPos);
      vec3 H = normalize(V + L);
@@ -249,23 +249,20 @@ void calcPointLightImpl(PointLight p_Light){
         norm = vec3(normalize(inVar.lightModelNormal));
     }
 
-    int index = int(round(inVar.textureSlotOut));
-    float distance = length(p_Light.position - inVar.vertexPos);
-    float attenuation = 1.0 / (p_Light.constant + p_Light.linear * distance + p_Light.quadratic * (distance));
-
     vec3 R = reflect(-viewDir, norm);
     const float MAX_REFLECTION_LOD = 5.0;
 
     vec3 albedo;
     float metallicMap, roughnessMap, aoMap;
-    if (index == 0){ //color
+
+    if (int(round(inVar.textureSlotOut)) == 0){ //color
         albedo = pow(vec3(material.diffuse), vec3(2.2));
         metallicMap = metallicFloat;
         roughnessMap = roughnessFloat;
         aoMap = aoFloat;
     }
     else { //texture
-        albedo = pow(texture(tex[index], texCoordsOut).rgb, vec3(2.2));
+        albedo = pow(texture(tex[int(round(inVar.textureSlotOut))], texCoordsOut).rgb, vec3(2.2));
         metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
         roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
         aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
@@ -273,7 +270,7 @@ void calcPointLightImpl(PointLight p_Light){
 
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallicMap);
-    vec3 Lo = calcPBR(lightPos, p_Light.diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap);
+    vec3 Lo = calcPBR(p_Light, lightPos, p_Light.diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap);
 
     vec3 kS = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
     vec3 kD = 1.0 - kS;
@@ -295,7 +292,9 @@ void calcPointLightImpl(PointLight p_Light){
 
 void main(){
     if (currentLightIndex == 0){
-        calcPointLightImpl(p_Light);
+        for(int i = 0; i < p_Light.length; i++){
+            calcPointLightImpl(p_Light[i]);
+        }
     } else if (currentLightIndex == 1){
         calcDirectionalLightImpl(d_Light);
     }

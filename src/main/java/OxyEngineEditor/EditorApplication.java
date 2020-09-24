@@ -23,7 +23,9 @@ import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Panels.*;
+import org.joml.Math;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -51,7 +53,7 @@ public class EditorApplication extends OxyApplication {
         scene = new Scene("Test Scene 1", oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
         OxyEntity cameraEntity = scene.createNativeObjectEntity();
-        PerspectiveCamera camera = new PerspectiveCamera(true, (float) Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
+        PerspectiveCamera camera = new PerspectiveCamera(true, Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
         cameraEntity.addComponent(camera);
 
         OxyModel m = scene.createModelEntity(ModelType.Sphere, oxyShader);
@@ -65,10 +67,23 @@ public class EditorApplication extends OxyApplication {
         m.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m.constructData();
 
+        OxyModel m2 = scene.createModelEntity(ModelType.Sphere, oxyShader);
+        Light pointLightComponent2 = new PointLight(1.0f, 0.027f, 0.0028f);
+        m2.addComponent(oxyShader, pointLightComponent2, new EmittingComponent(
+                new Vector3f(0, -3, 0),
+                null,
+                new Vector3f(2f, 2f, 2f),
+                new Vector3f(5f, 5f, 5f),
+                new Vector3f(1f, 1f, 1f)));
+        m2.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
+        m2.constructData();
+
         //ONLY ONCE
         m.addComponent((OxyEntitySystem) () -> {
             m.get(EmittingComponent.class).position().set(m.get(TransformComponent.class).position);
-            m.get(EmittingComponent.class).diffuse().set(m.get(OxyMaterial.class).diffuseColor.getNumbers()[0] * 5, m.get(OxyMaterial.class).diffuseColor.getNumbers()[1] * 5, m.get(OxyMaterial.class).diffuseColor.getNumbers()[2] * 5);
+            m.get(EmittingComponent.class).diffuse().set(m.get(OxyMaterial.class).albedoColor.getNumbers()[0] * 5, m.get(OxyMaterial.class).albedoColor.getNumbers()[1] * 5, m.get(OxyMaterial.class).albedoColor.getNumbers()[2] * 5);
+            m2.get(EmittingComponent.class).position().set(m2.get(TransformComponent.class).position);
+            m2.get(EmittingComponent.class).diffuse().set(m2.get(OxyMaterial.class).albedoColor.getNumbers()[0] * 5, m2.get(OxyMaterial.class).albedoColor.getNumbers()[1] * 5, m2.get(OxyMaterial.class).albedoColor.getNumbers()[2] * 5);
         });
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
@@ -87,9 +102,12 @@ public class EditorApplication extends OxyApplication {
         }
 
         for(int i = 0; i < 7; i++){
+            float metallic = i / 7f;
             for(int j = 0; j < 7; j++){
+                float roughness = Math.clamp(j / 7f, 0.05f, 1.0f);
                 OxyModel model = scene.createModelEntity(ModelType.Sphere, oxyShader);
-                model.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f((i * 5), (j * 5) - 50, 0), new Vector3f(1.517f, 0, 0)));
+                model.addComponent(new OxyMaterial(new Vector4f(1.0f, 0.0f, 0.0f, 0.5f), metallic, roughness, 1.0f));
+                model.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f((i * 4), (j * 4) - 30, 0), new Vector3f(1.517f, 0, 0), 2f));
                 model.constructData();
             }
         }

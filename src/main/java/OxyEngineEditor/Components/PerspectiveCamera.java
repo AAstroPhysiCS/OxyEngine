@@ -19,7 +19,7 @@ public class PerspectiveCamera extends OxyCamera {
     protected final float fovY, zNear, zFar;
     protected float aspect;
 
-    public static int zoom = 90;
+    public static float zoom = 90;
     public final boolean primary;
 
     public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
@@ -73,7 +73,7 @@ public class PerspectiveCamera extends OxyCamera {
     public void finalizeCamera(float ts) {
         ImGuiIO io = ImGui.getIO();
         if (ScenePanel.focusedWindow || SceneHierarchyPanel.focusedWindow) {
-            zoom += io.getMouseWheel();
+            zoom += io.getMouseWheel() * ts * 32f;
             if (entityContext != null) {
                 OxyGizmo3D.getInstance().scaleAll(entityContext);
             }
