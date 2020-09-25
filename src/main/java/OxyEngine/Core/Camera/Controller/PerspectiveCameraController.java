@@ -1,6 +1,5 @@
 package OxyEngine.Core.Camera.Controller;
 
-import OxyEngine.Tools.Ref;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Vector3f;
@@ -10,11 +9,11 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class PerspectiveCameraController extends OxyCameraController {
 
-    public PerspectiveCameraController(Ref<Vector3f> translationRef, Ref<Vector3f> rotationRef, float mouseSpeed, float horizontalSpeed, float verticalSpeed) {
+    public PerspectiveCameraController(Vector3f translationRef, Vector3f rotationRef, float mouseSpeed, float horizontalSpeed, float verticalSpeed) {
         super(translationRef, rotationRef, mouseSpeed, horizontalSpeed, verticalSpeed);
     }
 
-    public PerspectiveCameraController(Ref<Vector3f> translationRef, Ref<Vector3f> rotationRef) {
+    public PerspectiveCameraController(Vector3f translationRef, Vector3f rotationRef) {
         super(translationRef, rotationRef, 0.05f, 7f, 7f);
     }
 
@@ -22,8 +21,8 @@ public class PerspectiveCameraController extends OxyCameraController {
         float dx = (float) (mouseCursorPosDispatcher.getXPos() - oldMouseX);
         float dy = (float) (mouseCursorPosDispatcher.getYPos() - oldMouseY);
 
-        rotationRef.obj.x += (-dy * mouseSpeed) / 16;
-        rotationRef.obj.y += (-dx * mouseSpeed) / 16;
+        rotationRef.x += (-dy * mouseSpeed) / 16;
+        rotationRef.y += (-dx * mouseSpeed) / 16;
     }
 
     private void updateRotationFree(float ts) {
@@ -43,13 +42,13 @@ public class PerspectiveCameraController extends OxyCameraController {
 
         if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT] &&
                 mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_RIGHT] &&
-                ScenePanel.focusedWindow) {
+                ScenePanel.hoveredWindow) {
             float dx = (float) (mouseCursorPosDispatcher.getXPos() - oldMouseX);
             float dy = (float) (mouseCursorPosDispatcher.getYPos() - oldMouseY);
-            float angle90 = rotationRef.obj.y;
-            positionRef.obj.x += Math.cos(angle90) * (-dx * mouseSpeed);
-            positionRef.obj.z += Math.sin(angle90) * (-dx * mouseSpeed);
-            positionRef.obj.y += (-dy * mouseSpeed);
+            float angle90 = rotationRef.y;
+            positionRef.x += Math.cos(angle90) * (-dx * mouseSpeed);
+            positionRef.z += Math.sin(angle90) * (-dx * mouseSpeed);
+            positionRef.y += (-dy * mouseSpeed);
         }
 
         oldMouseX = mouseCursorPosDispatcher.getXPos();
@@ -57,30 +56,30 @@ public class PerspectiveCameraController extends OxyCameraController {
     }
 
     private void updatePosition(float ts) {
-        if (!ScenePanel.focusedWindow) return;
-        float angle90 = (float) (rotationRef.obj.y + (Math.PI / 2));
-        float angle = rotationRef.obj.y;
+        if (!ScenePanel.hoveredWindow) return;
+        float angle90 = (float) (rotationRef.y + (Math.PI / 2));
+        float angle = rotationRef.y;
         if (keyEventDispatcher.getKeys()[GLFW_KEY_W]) {
-            positionRef.obj.x += Math.cos(angle90) * horizontalSpeed * ts;
-            positionRef.obj.z += Math.sin(angle90) * horizontalSpeed * ts;
+            positionRef.x += Math.cos(angle90) * horizontalSpeed * ts;
+            positionRef.z += Math.sin(angle90) * horizontalSpeed * ts;
         }
         if (keyEventDispatcher.getKeys()[GLFW_KEY_S]) {
-            positionRef.obj.x -= Math.cos(angle90) * horizontalSpeed * ts;
-            positionRef.obj.z -= Math.sin(angle90) * horizontalSpeed * ts;
+            positionRef.x -= Math.cos(angle90) * horizontalSpeed * ts;
+            positionRef.z -= Math.sin(angle90) * horizontalSpeed * ts;
         }
         if (keyEventDispatcher.getKeys()[GLFW_KEY_D]) {
-            positionRef.obj.x += Math.cos(angle) * horizontalSpeed * ts;
-            positionRef.obj.z += Math.sin(angle) * horizontalSpeed * ts;
+            positionRef.x += Math.cos(angle) * horizontalSpeed * ts;
+            positionRef.z += Math.sin(angle) * horizontalSpeed * ts;
         }
         if (keyEventDispatcher.getKeys()[GLFW_KEY_A]) {
-            positionRef.obj.x -= Math.cos(angle) * horizontalSpeed * ts;
-            positionRef.obj.z -= Math.sin(angle) * horizontalSpeed * ts;
+            positionRef.x -= Math.cos(angle) * horizontalSpeed * ts;
+            positionRef.z -= Math.sin(angle) * horizontalSpeed * ts;
         }
         if (keyEventDispatcher.getKeys()[GLFW_KEY_SPACE]) {
-            positionRef.obj.y -= verticalSpeed * ts;
+            positionRef.y -= verticalSpeed * ts;
         }
         if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT]) {
-            positionRef.obj.y += verticalSpeed * ts;
+            positionRef.y += verticalSpeed * ts;
         }
     }
 

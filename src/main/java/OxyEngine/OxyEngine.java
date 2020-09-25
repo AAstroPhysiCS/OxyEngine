@@ -21,7 +21,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class OxyEngine implements OxyDisposable {
 
     private final WindowHandle windowHandle;
-    private final Antialiasing antialiasing;
+    private static Antialiasing antialiasing;
     private final boolean vSync;
 
     private final Thread thread;
@@ -33,7 +33,7 @@ public class OxyEngine implements OxyDisposable {
     public OxyEngine(Supplier<Runnable> supplier, WindowHandle windowHandle, Antialiasing antialiasing, boolean vSync, OxyRendererType type) {
         thread = new Thread(supplier.get(), "OxyEngine - 1");
         this.windowHandle = windowHandle;
-        this.antialiasing = antialiasing;
+        OxyEngine.antialiasing = antialiasing;
         this.vSync = vSync;
 
         if (type == OxyRendererType.Oxy3D)
@@ -85,6 +85,10 @@ public class OxyEngine implements OxyDisposable {
 
         glfwTerminate();
         Objects.requireNonNull(glfwSetErrorCallback(null)).free();
+    }
+
+    public static Antialiasing getAntialiasing() {
+        return antialiasing;
     }
 
     public OxyRenderer getRenderer() {

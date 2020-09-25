@@ -44,6 +44,7 @@ public class PropertiesPanel extends Panel {
     private static final ImBoolean helpWindowBool = new ImBoolean();
     public static final float[] gammaStrength = new float[]{2f};
     public static final float[] mipLevelStrength = new float[]{1.0f};
+    public static final float[] exposure = new float[]{1.0f};
 
     ImString name = new ImString(0);
     ImString meshPath = new ImString(0);
@@ -296,6 +297,11 @@ public class PropertiesPanel extends Panel {
         ImGui.text("Height scale:");
         ImGui.sameLine();
         ImGui.sliderFloat("###hidelabel h", m.heightScale, 0, 10);
+
+        ImGui.alignTextToFramePadding();
+        ImGui.text("Exposure: ");
+        ImGui.sameLine();
+        ImGui.sliderFloat("###hidelabel exposure", exposure, 0, 10);
 
         final float windowWidth = ImGui.getWindowWidth();
         ImGui.spacing();

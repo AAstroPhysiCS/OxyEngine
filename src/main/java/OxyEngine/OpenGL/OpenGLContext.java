@@ -20,7 +20,6 @@ public class OpenGLContext {
         glfwShowWindow(windowHandle.getPointer());
 
         createCapabilities();
-        glEnable(GL_MULTISAMPLE);
         glEnable(GL_DEPTH_TEST);
         logger.info("Renderer: " + glGetString(GL_RENDERER));
         logger.info("OpenGL version: " + glGetString(GL_VERSION));

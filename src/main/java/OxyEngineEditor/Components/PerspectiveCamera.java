@@ -3,8 +3,6 @@ package OxyEngineEditor.Components;
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
 import OxyEngine.Core.Camera.Controller.PerspectiveCameraController;
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Tools.Ref;
-import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.Selector.OxyGizmo3D;
 import imgui.ImGui;
@@ -34,15 +32,11 @@ public class PerspectiveCamera extends OxyCamera {
         this.zNear = zNear;
         this.zFar = zFar;
 
-        cameraController = new PerspectiveCameraController(new Ref<>(translation), new Ref<>(rotation));
+        cameraController = new PerspectiveCameraController(translation, rotation);
     }
 
     public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose, Vector3f center, Vector3f rotation) {
         this(primary, fovY, aspect, zNear, zFar, center, rotation, transpose);
-    }
-
-    public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, Ref<Vector3f> translation, Ref<Vector3f> rotation, boolean transpose) {
-        this(primary, fovY, aspect, zNear, zFar, translation.obj, rotation.obj, transpose);
     }
 
     @Override
@@ -69,15 +63,21 @@ public class PerspectiveCamera extends OxyCamera {
         viewMatrixNoTranslation.rotateY(cameraController.getRotation().y);
     }
 
+    static final float zoomSpeed = 0.25f;
+
     @Override
     public void finalizeCamera(float ts) {
         ImGuiIO io = ImGui.getIO();
-        if (ScenePanel.focusedWindow || SceneHierarchyPanel.focusedWindow) {
-            zoom += io.getMouseWheel() * ts * 32f;
-            if (entityContext != null) {
-                OxyGizmo3D.getInstance().scaleAll(entityContext);
+        if (ScenePanel.hoveredWindow) {
+            if (io.getMouseWheel() > 0) {
+                zoom += zoomSpeed;
+            } else if (io.getMouseWheel() < 0) {
+                zoom += -zoomSpeed;
             }
+            if (entityContext != null)
+                OxyGizmo3D.getInstance().scaleAll(entityContext);
             if (zoom >= 500) zoom = 500;
+            if (zoom <= -500) zoom = -500;
         }
 
         cameraController.update(ts, OxyCameraController.Mode.SWIPE);

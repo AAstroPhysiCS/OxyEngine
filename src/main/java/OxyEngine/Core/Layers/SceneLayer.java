@@ -38,7 +38,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void build() {
-        hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/Newport_Loft_Ref.hdr"), scene);
+        hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/fireplace_4k.hdr"), scene);
 
         cachedNativeMeshes = scene.view(NativeObjectMesh.class);
         cachedCameraComponents = scene.distinct(OxyCamera.class);
@@ -77,6 +77,8 @@ public class SceneLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
+        scene.getFrameBuffer().blit();
+
         scene.getEntitySystemRunner().run();
         scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
@@ -140,6 +142,7 @@ public class SceneLayer extends Layer {
                     cubemapShader.enable();
                     cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
                     cubemapShader.setUniform1f("mipLevel", PropertiesPanel.mipLevelStrength[0]);
+                    cubemapShader.setUniform1f("exposure", PropertiesPanel.exposure[0]);
                     cubemapShader.disable();
                     render(ts, mesh, mainCamera, cubemapShader);
                     glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);

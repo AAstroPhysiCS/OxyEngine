@@ -79,7 +79,7 @@ public class ScenePanel extends Panel {
 
         FrameBuffer frameBuffer = sceneLayer.getScene().getFrameBuffer();
         if (frameBuffer != null) {
-            ImGui.image(frameBuffer.getColorAttachment(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
+            ImGui.image(frameBuffer.getColorAttachmentTexture(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
 
             if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {
                 frameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
