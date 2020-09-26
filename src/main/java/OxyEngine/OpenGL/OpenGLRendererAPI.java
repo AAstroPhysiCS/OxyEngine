@@ -2,7 +2,7 @@ package OxyEngine.OpenGL;
 
 import OxyEngine.Core.Window.WindowHandle;
 
-import static OxyEngine.System.Globals.Globals.normalizeColor;
+import static OxyEngine.Tools.Globals.normalizeColor;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 

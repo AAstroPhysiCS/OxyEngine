@@ -28,7 +28,6 @@ public class Scene implements OxyDisposable {
     private final Registry registry = new Registry();
 
     private final OxyRenderer3D renderer;
-    private final OxyEntitySystemRunner entitySystemRunner;
     private OxyUISystem oxyUISystem;
 
     private final FrameBuffer frameBuffer;
@@ -38,10 +37,9 @@ public class Scene implements OxyDisposable {
         this.renderer = renderer;
         this.frameBuffer = frameBuffer;
         this.sceneName = sceneName;
-        entitySystemRunner = new OxyEntitySystemRunner(this);
     }
 
-    final void put(OxyEntity e){
+    final void put(OxyEntity e) {
         registry.entityList.put(e, new LinkedHashSet<>(15));
     }
 
@@ -233,10 +231,6 @@ public class Scene implements OxyDisposable {
 
     public String getSceneName() {
         return sceneName;
-    }
-
-    public OxyEntitySystemRunner getEntitySystemRunner() {
-        return entitySystemRunner;
     }
 
     @Override

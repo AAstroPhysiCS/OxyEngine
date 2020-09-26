@@ -4,7 +4,7 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngineEditor.Components.PerspectiveCamera;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
-import OxyEngineEditor.Scene.WorldGrid;
+import OxyEngineEditor.Scene.Objects.WorldGrid;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiStyleVar;

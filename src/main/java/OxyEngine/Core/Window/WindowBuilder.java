@@ -15,9 +15,11 @@ public interface WindowBuilder {
 
         public long createWindowedFullscreenOpenGLWindow(String title) {
             GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-            assert vidMode != null;
-            glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
-            return glfwCreateWindow(vidMode.width(), vidMode.height(), title, 0, 0);
+            if(vidMode != null) {
+                glfwWindowHint(GLFW_MAXIMIZED, GL_TRUE);
+                return glfwCreateWindow(vidMode.width(), vidMode.height(), title, 0, 0);
+            }
+            return 0;
         }
 
         public long createFullscreenOpenGLWindow(String title) {

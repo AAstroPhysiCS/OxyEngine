@@ -60,12 +60,11 @@ public class OxyEngine implements OxyDisposable {
     }
 
     public void init() {
-        assert glfwInit() : oxyAssert("Can't init GLFW");
+        if(!glfwInit()) oxyAssert("Can't init GLFW");
         logger.info("GLFW init successful");
 
         WindowBuilder builder = new WindowBuilder.WindowFactory();
         WindowHint windowHint = builder.createHints()
-                .antiAliasing(antialiasing)
                 .resizable(GLFW_TRUE)
                 .doubleBuffered(GLFW_TRUE);
         windowHint.create();

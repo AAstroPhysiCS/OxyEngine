@@ -10,8 +10,8 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.System.Globals.Globals.toPrimitiveFloat;
-import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
+import static OxyEngine.Tools.Globals.toPrimitiveFloat;
+import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 
 public abstract class OxyEntity {

@@ -4,11 +4,14 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngineEditor.Components.ScriptingComponent;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.OxyScriptItem;
 import imgui.ImGui;
 import imgui.flag.ImGuiColorEditFlags;
 import imgui.flag.ImGuiInputTextFlags;
@@ -18,6 +21,7 @@ import imgui.type.ImString;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import static OxyEngine.System.OxySystem.BASE_PATH;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
@@ -171,7 +175,7 @@ public class PropertiesPanel extends Panel {
                 }
             }
 
-            { // ALBEDO
+            {
                 ImGui.spacing();
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Albedo: (Base Texture): ");
@@ -257,8 +261,22 @@ public class PropertiesPanel extends Panel {
                     entityContext.get(OxyMaterial.class).heightTexture = null;
                 }
             }
-
             ImGui.treePop();
+        }
+
+        { // Scripting
+            Set<OxyEntity> set = sceneLayer.getScene().view(ScriptingComponent.class);
+            for (OxyEntity e : set) {
+                OxyScriptItem item = e.get(ScriptingComponent.class).getScriptItem();
+                for (var f : item.getFieldsAsObject()) {
+                    if (f.obj() instanceof Float m) {
+                        ImGui.alignTextToFramePadding();
+                        ImGui.text(f.name());
+                        ImGui.sameLine();
+                        ImGui.sliderFloat("##hideLabel item1" + f.hashCode(), new float[]{m}, 0, 1000);
+                    }
+                }
+            }
         }
 
         OxyMaterial m = entityContext.get(OxyMaterial.class);

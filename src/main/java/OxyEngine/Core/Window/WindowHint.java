@@ -1,7 +1,5 @@
 package OxyEngine.Core.Window;
 
-import OxyEngine.OxyEngine;
-
 import static org.lwjgl.glfw.GLFW.*;
 
 public class WindowHint {
@@ -10,10 +8,6 @@ public class WindowHint {
 
     public WindowHint resizable(int resizable) {
         this.resizable = resizable;
-        return this;
-    }
-
-    public WindowHint antiAliasing(OxyEngine.Antialiasing antialiasing) {
         return this;
     }
 

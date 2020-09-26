@@ -79,7 +79,6 @@ public class SceneLayer extends Layer {
     public void update(float ts, float deltaTime) {
         scene.getFrameBuffer().blit();
 
-        scene.getEntitySystemRunner().run();
         scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
 

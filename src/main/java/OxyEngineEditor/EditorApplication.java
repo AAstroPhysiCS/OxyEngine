@@ -1,6 +1,9 @@
 package OxyEngineEditor;
 
-import OxyEngine.Core.Layers.*;
+import OxyEngine.Core.Layers.GizmoLayer;
+import OxyEngine.Core.Layers.Layer;
+import OxyEngine.Core.Layers.OverlayPanelLayer;
+import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
@@ -12,7 +15,6 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.System.OxyEntitySystem;
 import OxyEngine.System.OxyEventSystem;
 import OxyEngine.System.OxySystem;
 import OxyEngine.System.OxyUISystem;
@@ -25,7 +27,6 @@ import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Math;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -78,13 +79,7 @@ public class EditorApplication extends OxyApplication {
         m2.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m2.constructData();
 
-        //ONLY ONCE
-        m.addComponent((OxyEntitySystem) () -> {
-            m.get(EmittingComponent.class).position().set(m.get(TransformComponent.class).position);
-            m.get(EmittingComponent.class).diffuse().set(m.get(OxyMaterial.class).albedoColor.getNumbers()[0] * 5, m.get(OxyMaterial.class).albedoColor.getNumbers()[1] * 5, m.get(OxyMaterial.class).albedoColor.getNumbers()[2] * 5);
-            m2.get(EmittingComponent.class).position().set(m2.get(TransformComponent.class).position);
-            m2.get(EmittingComponent.class).diffuse().set(m2.get(OxyMaterial.class).albedoColor.getNumbers()[0] * 5, m2.get(OxyMaterial.class).albedoColor.getNumbers()[1] * 5, m2.get(OxyMaterial.class).albedoColor.getNumbers()[2] * 5);
-        });
+        m2.addComponent(new ScriptingComponent("src/main/java/test/TestScript.java"));
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
@@ -92,24 +87,13 @@ public class EditorApplication extends OxyApplication {
                 null,
                 new Vector3f(152, -9.8f, -0.14f),
                 new Vector3f(0.5f, 0.5f, 0.5f),
-                new Vector3f(5.0f, 5.0f, 5.0f),
+                new Vector3f(5.0f, 5.0f, 5.0f),d
                 new Vector3f(0f, 0f, 0f)));*/
 
         List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/mainTestScene.obj"), oxyShader);
         for (OxyModel obj : testObjects) {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0)));
             obj.constructData();
-        }
-
-        for(int i = 0; i < 7; i++){
-            float metallic = i / 7f;
-            for(int j = 0; j < 7; j++){
-                float roughness = Math.clamp(j / 7f, 0.05f, 1.0f);
-                OxyModel model = scene.createModelEntity(ModelType.Sphere, oxyShader);
-                model.addComponent(new OxyMaterial(new Vector4f(1.0f, 0.0f, 0.0f, 0.5f), metallic, roughness, 1.0f));
-                model.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f((i * 4), (j * 4) - 30, 0), new Vector3f(1.517f, 0, 0), 2f));
-                model.constructData();
-            }
         }
 
         int[] samplers = new int[32];

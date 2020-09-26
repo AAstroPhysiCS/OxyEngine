@@ -3,7 +3,7 @@ package OxyEngineEditor.UI.Panels;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import imgui.ImGui;
 
-import static OxyEngine.System.Globals.Globals.normalizeColor;
+import static OxyEngine.Tools.Globals.normalizeColor;
 
 public class StatsPanel extends Panel {
 

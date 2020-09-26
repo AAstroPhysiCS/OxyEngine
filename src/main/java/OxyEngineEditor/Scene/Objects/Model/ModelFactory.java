@@ -11,7 +11,7 @@ import org.joml.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.System.Globals.Globals.toPrimitiveInteger;
+import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 
 public class ModelFactory implements EntityComponent {
 

@@ -4,7 +4,7 @@ import org.joml.Vector4f;
 
 import java.awt.*;
 
-import static OxyEngine.System.Globals.Globals.normalizeColor;
+import static OxyEngine.Tools.Globals.normalizeColor;
 
 public class OxyColor implements Cloneable {
 
