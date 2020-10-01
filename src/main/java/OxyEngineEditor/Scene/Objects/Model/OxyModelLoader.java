@@ -187,6 +187,18 @@ public class OxyModelLoader {
             diffuse = new Vector4f(color.r(), color.g(), color.b(), color.a());
         }
 
+        float[] metallic = new float[1];
+        result = aiGetMaterialFloatArray(aiMaterial, AI_MATKEY_REFLECTIVITY, aiTextureType_NONE, 0, metallic, new int[]{1});
+        if (result == 0) {
+//            System.out.println(Arrays.toString(metallic));
+        }
+
+        float[] roughness = new float[1];
+        result = aiGetMaterialFloatArray(aiMaterial, AI_MATKEY_SHININESS_STRENGTH, aiTextureType_NONE, 0, roughness, new int[]{1});
+        if (result == 0) {
+//            System.out.println(Arrays.toString(roughness));
+        }
+
         oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture, new OxyColor(diffuse));
     }
 

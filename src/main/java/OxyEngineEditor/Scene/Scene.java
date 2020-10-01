@@ -166,12 +166,12 @@ public class Scene implements OxyDisposable {
     }
 
     @SafeVarargs
-    public final Set<EntityComponent> distinct(Class<? extends EntityComponent>... destClasses) {
+    public final <V extends EntityComponent> Set<V> distinct(Class<? super V>... destClasses) {
         return registry.distinct(destClasses);
     }
 
     @SafeVarargs
-    public final <U extends EntityComponent> Set<EntityComponent> distinct(RegistryPredicate<Boolean, U> predicate, Class<U> type,
+    public final <U extends EntityComponent> Set<U> distinct(RegistryPredicate<Boolean, U> predicate, Class<U> type,
                                                                            Class<? extends EntityComponent>... destClasses) {
         return registry.distinct(predicate, type, destClasses);
     }

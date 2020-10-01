@@ -4,7 +4,6 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.UI.Panels.PropertiesPanel;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -28,7 +27,11 @@ public class OxyMaterial implements EntityComponent {
         this.normalTexture = normalTexture;
         this.heightTexture = heightTexture;
         this.albedoColor = albedoColor;
-        metalness = new float[]{0.0f}; roughness = new float[]{1.0f}; aoStrength = new float[]{1.0f}; normalStrength = new float[]{1.0f}; heightScale = new float[]{1.0f};
+        metalness = new float[]{0.0f};
+        roughness = new float[]{1.0f};
+        aoStrength = new float[]{1.0f};
+        normalStrength = new float[]{1.0f};
+        heightScale = new float[]{1.0f};
     }
 
     public OxyMaterial(Vector4f albedoColor) {
@@ -39,7 +42,7 @@ public class OxyMaterial implements EntityComponent {
         this(null, null, null, null, null, null, new OxyColor(new Vector4f(r, g, b, a)));
     }
 
-    public OxyMaterial(Vector4f albedoColor, float metalness, float roughness, float aoStrength){
+    public OxyMaterial(Vector4f albedoColor, float metalness, float roughness, float aoStrength) {
         this(null, null, null, null, null, null, new OxyColor(albedoColor));
         this.metalness = new float[]{metalness};
         this.roughness = new float[]{roughness};
@@ -63,7 +66,7 @@ public class OxyMaterial implements EntityComponent {
 
     public void push(OxyShader shader) {
         shader.enable();
-        if(albedoColor != null){
+        if (albedoColor != null) {
             shader.setUniformVec3("material.diffuse", new Vector3f(albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]));
             shader.setUniformVec3("colorOut", new Vector3f(albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]));
             shader.setUniformVec4("colorOut4f", new Vector4f(albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2], albedoColor.getNumbers()[3]));
@@ -98,7 +101,6 @@ public class OxyMaterial implements EntityComponent {
         } else {
             shader.setUniform1i("heightSlot", 0);
         }
-        shader.setUniform1f("gamma", PropertiesPanel.gammaStrength[0]);
         shader.disable();
     }
 }

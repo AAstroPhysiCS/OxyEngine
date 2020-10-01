@@ -9,8 +9,8 @@ import java.util.List;
 
 import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
-import static org.lwjgl.opengl.GL45.glDeleteBuffers;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class OxyTexture {
@@ -27,21 +27,22 @@ public class OxyTexture {
         protected final int textureSlot;
         protected final String path;
 
-        public Texture(int slot, String path){
+        public Texture(int slot, String path) {
             this.path = path;
             this.textureSlot = slot;
         }
 
         protected ByteBuffer loadTextureFile(String path, int[] width, int[] height, int[] channels) {
             ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
-            if(buffer == null)
+            if (buffer == null)
                 logger.warning("Texture: " + path + " could not be loaded! Gonna give some default color");
             return buffer;
         }
 
         @Override
         public void dispose() {
-            glDeleteBuffers(textureId);
+            glDeleteTextures(textureId);
+            allTextures.remove(this);
         }
 
         public boolean empty() {
@@ -83,14 +84,14 @@ public class OxyTexture {
         return new CubemapTexture(++slotCounter, path, scene);
     }
 
-    public static HDRTexture loadHDRTexture(String path, Scene scene){
+    public static HDRTexture loadHDRTexture(String path, Scene scene) {
         HDRTexture hdrTexture = new HDRTexture(++slotCounter, path, scene);
         HDRTexture.IrradianceTexture irradianceTexture = new HDRTexture.IrradianceTexture(++slotCounter, path, hdrTexture);
         HDRTexture.PrefilterTexture prefilterTexture = new HDRTexture.PrefilterTexture(++slotCounter, path, hdrTexture);
         HDRTexture.BDRF bdrfTexture = new HDRTexture.BDRF(++slotCounter, path, hdrTexture);
-        HDRTexture.setIrradianceTexture(irradianceTexture);
-        HDRTexture.setPrefilterTexture(prefilterTexture);
-        HDRTexture.setBdrf(bdrfTexture);
+        hdrTexture.setIrradianceTexture(irradianceTexture);
+        hdrTexture.setPrefilterTexture(prefilterTexture);
+        hdrTexture.setBdrf(bdrfTexture);
         return hdrTexture;
     }
 

@@ -19,9 +19,6 @@ uniform sampler2D tex[32];
 uniform samplerCube skyBoxTexture;
 uniform vec3 cameraPos;
 
-//irradiance
-uniform samplerCube irradianceMap;
-
 struct Material{
     vec3 ambient;
     vec3 diffuse;
@@ -70,22 +67,8 @@ uniform int heightSlot;
 //PBR FILTERING
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
-
-vec3 calcAmbient(vec3 ambient, vec3 lightAmbient){
-    return lightAmbient * ambient;
-}
-
-vec3 calcDiffuse(vec3 lightDir, vec3 diffuse, vec3 lightDiffuse, vec3 norm){
-    float diff = max(dot(lightDir, norm), 0.0);
-    return lightDiffuse * (diff * diffuse);
-}
-
-vec3 calcSpecular(vec3 lightDir, vec3 viewDir, vec3 specular, vec3 lightSpecular, vec3 norm){
-    vec3 reflectDir = reflect(-lightDir, norm);
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(norm, halfwayDir), 0.0), material.reflectance);
-    return lightSpecular * (spec * specular);
-}
+//irradiance
+uniform samplerCube irradianceMap;
 
 uniform float heightScale;
 //DOES NOT WORK!!!!
@@ -112,20 +95,8 @@ void calcDirectionalLightImpl(DirectionalLight d_Light){
 
     vec3 result, ambient, diffuse, specular;
     if (index == 0){
-        ambient = calcAmbient(material.ambient, d_Light.ambient);
-        diffuse = calcDiffuse(lightDir, material.diffuse, d_Light.diffuse, norm);
-        specular = calcSpecular(lightDir,viewDir, material.specular, d_Light.specular, norm);
-        result = specular + diffuse + ambient;
-
-        color = vec4(result, 1.0f) * inVar.colorOut;
     }
     else {
-        ambient = calcAmbient(texture(tex[index], inVar.texCoordsOut).rgb, d_Light.ambient);
-        diffuse = calcDiffuse(lightDir, texture(tex[index], inVar.texCoordsOut).rgb, d_Light.diffuse, norm);
-        specular = calcSpecular(lightDir, viewDir, texture(tex[index], inVar.texCoordsOut).rgb, d_Light.specular, norm);
-        result = specular + diffuse + ambient;
-
-        color = vec4(result, 1.0f);
     }
 }
 
@@ -250,7 +221,7 @@ void calcPointLightImpl(PointLight p_Light){
     }
 
     vec3 R = reflect(-viewDir, norm);
-    const float MAX_REFLECTION_LOD = 5.0;
+    const float MAX_REFLECTION_LOD = 4.0;
 
     vec3 albedo;
     float metallicMap, roughnessMap, aoMap;

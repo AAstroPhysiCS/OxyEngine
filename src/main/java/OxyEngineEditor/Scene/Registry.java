@@ -103,16 +103,16 @@ public class Registry {
     }
 
     @SafeVarargs
-    public final Set<EntityComponent> distinct(Class<? extends EntityComponent>... destClasses) {
-        Set<EntityComponent> allDistinctComponents = new LinkedHashSet<>();
+    public final <V extends EntityComponent> Set<V> distinct(Class<? super V>... classes) {
+        Set<V> allDistinctComponents = new LinkedHashSet<>();
         for (var value : entityList.values()) {
             int counter = 0;
             for (EntityComponent c : value) {
-                for (var destClass : destClasses) {
+                for (var destClass : classes) {
                     if (c.getClass() == destClass || destClass.isInstance(c)) {
                         counter++;
-                        if (counter == destClasses.length) {
-                            allDistinctComponents.add(c);
+                        if (counter == classes.length) {
+                            allDistinctComponents.add((V) c);
                         }
                     }
                 }
@@ -122,8 +122,8 @@ public class Registry {
     }
 
     @SafeVarargs
-    public final <U extends EntityComponent> Set<EntityComponent> distinct(RegistryPredicate<Boolean, U> predicate, Class<U> type, Class<? extends EntityComponent>... destClasses) {
-        Set<EntityComponent> allDistinctComponents = new LinkedHashSet<>();
+    public final <U extends EntityComponent> Set<U> distinct(RegistryPredicate<Boolean, U> predicate, Class<U> type, Class<? extends EntityComponent>... destClasses) {
+        Set<U> allDistinctComponents = new LinkedHashSet<>();
         for (var entrySet : entityList.entrySet()) {
             var value = entrySet.getValue();
             var entity = entrySet.getKey();
@@ -133,7 +133,7 @@ public class Registry {
                     if (c.getClass() == destClass || destClass.isInstance(c)) {
                         counter++;
                         if (counter == destClasses.length && predicate.test(entity.get(type))) {
-                            allDistinctComponents.add(c);
+                            allDistinctComponents.add((U) c);
                         }
                     }
                 }

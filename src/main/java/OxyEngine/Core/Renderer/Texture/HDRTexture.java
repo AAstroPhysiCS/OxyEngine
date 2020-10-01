@@ -63,17 +63,19 @@ public class HDRTexture extends OxyTexture.Texture {
     };
 
     private final Scene scene;
-    private NativeObjectMesh mesh;
+    private static NativeObjectMesh mesh;
 
     private final Matrix4f[] captureViews;
     private final Matrix4f captureProjection;
-    private final int captureFBO, captureRBO, hdrTexture;
+    private final int hdrTexture;
+    private final int captureFBO;
+    private final int captureRBO;
 
-    private static IrradianceTexture irradianceTexture;
-    private static PrefilterTexture prefilterTexture;
-    private static BDRF bdrf;
+    private IrradianceTexture irradianceTexture;
+    private PrefilterTexture prefilterTexture;
+    private BDRF bdrf;
 
-    public HDRTexture(int slot, String path, Scene scene) {
+    HDRTexture(int slot, String path, Scene scene) {
         super(slot, path);
         this.scene = scene;
         assert slot != 0 : oxyAssert("Slot can not be 0");
@@ -96,7 +98,10 @@ public class HDRTexture extends OxyTexture.Texture {
         stbi_image_free(data);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        textureId = glGenTextures();
+        if (textureId == 0) {
+            textureId = glGenTextures();
+            allTextures.add(this);
+        }
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
         for (int i = 0; i < 6; i++) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F,
@@ -108,13 +113,12 @@ public class HDRTexture extends OxyTexture.Texture {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-        allTextures.add(this);
 
         captureFBO = glGenFramebuffers();
         captureRBO = glGenRenderbuffers();
-
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 3840, 3840);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
         assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
@@ -138,8 +142,9 @@ public class HDRTexture extends OxyTexture.Texture {
         };
     }
 
+    private static final OxyShader shader = new OxyShader("shaders/OxyHDR.glsl");
+
     public void captureFaces(float ts) {
-        OxyShader shader = new OxyShader("shaders/OxyHDR.glsl");
         shader.enable();
         shader.setUniform1i("hdrTexture", 0);
         shader.setUniformMatrix4fv("projection", captureProjection, true);
@@ -147,22 +152,23 @@ public class HDRTexture extends OxyTexture.Texture {
 
         BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0);
 
-        mesh = new NativeObjectMesh.NativeMeshBuilderImpl()
-                .setShader(shader)
-                .setMode(GL_TRIANGLES)
-                .setUsage(BufferTemplate.Usage.STATIC)
-                .setVerticesBufferAttributes(attributesVert)
-                .create();
-
-        OxyNativeObject cube = scene.createNativeObjectEntity();
-        cube.vertices = skyboxVertices;
-        int[] indices = new int[skyboxVertices.length];
-        for (int i = 0; i < skyboxVertices.length; i++) {
-            indices[i] = i;
+        if (mesh == null) {
+            mesh = new NativeObjectMesh.NativeMeshBuilderImpl()
+                    .setShader(shader)
+                    .setMode(GL_TRIANGLES)
+                    .setUsage(BufferTemplate.Usage.STATIC)
+                    .setVerticesBufferAttributes(attributesVert)
+                    .create();
+            OxyNativeObject cube = scene.createNativeObjectEntity();
+            cube.vertices = skyboxVertices;
+            int[] indices = new int[skyboxVertices.length];
+            for (int i = 0; i < skyboxVertices.length; i++) {
+                indices[i] = i;
+            }
+            cube.indices = indices;
+            cube.addComponent(mesh, shader);
+            mesh.initList();
         }
-        cube.indices = indices;
-        cube.addComponent(mesh, shader);
-        mesh.initList();
 
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         glActiveTexture(GL_TEXTURE0);
@@ -179,22 +185,38 @@ public class HDRTexture extends OxyTexture.Texture {
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
-        assert irradianceTexture != null : oxyAssert("Irradiance Texture is null!");
+        if (irradianceTexture == null || prefilterTexture == null || bdrf == null) {
+            oxyAssert("HDR Texture Algorithms are null!");
+            return;
+        }
         irradianceTexture.captureFaces(ts);
         prefilterTexture.captureFaces(ts);
         bdrf.captureFaces(ts);
     }
 
-    public static void setIrradianceTexture(IrradianceTexture irradianceTexture) {
-        HDRTexture.irradianceTexture = irradianceTexture;
+    @Override
+    public void dispose() {
+        super.dispose();
+        glDeleteTextures(irradianceTexture.textureId);
+        glDeleteTextures(prefilterTexture.textureId);
+        glDeleteTextures(bdrf.textureId);
+        glDeleteFramebuffers(captureFBO);
+        glDeleteRenderbuffers(captureRBO);
+        allTextures.remove(bdrf);
+        allTextures.remove(prefilterTexture);
+        allTextures.remove(irradianceTexture);
     }
 
-    public static void setPrefilterTexture(PrefilterTexture prefilterTexture) {
-        HDRTexture.prefilterTexture = prefilterTexture;
+    public void setIrradianceTexture(IrradianceTexture irradianceTexture) {
+        this.irradianceTexture = irradianceTexture;
     }
 
-    public static void setBdrf(BDRF bdrf) {
-        HDRTexture.bdrf = bdrf;
+    public void setPrefilterTexture(PrefilterTexture prefilterTexture) {
+        this.prefilterTexture = prefilterTexture;
+    }
+
+    public void setBdrf(BDRF bdrf) {
+        this.bdrf = bdrf;
     }
 
     public int getIrradianceSlot() {
@@ -213,13 +235,14 @@ public class HDRTexture extends OxyTexture.Texture {
 
         private final HDRTexture mainTexture;
 
-        public BDRF(int slot, String path, HDRTexture mainTexture) {
+        BDRF(int slot, String path, HDRTexture mainTexture) {
             super(slot, path);
             this.mainTexture = mainTexture;
         }
 
+        final static OxyShader shader = new OxyShader("shaders/OxyBDRF.glsl");
+
         public void captureFaces(float ts) {
-            OxyShader shader = new OxyShader("shaders/OxyBDRF.glsl");
             textureId = glGenTextures();
             glBindTexture(GL_TEXTURE_2D, textureId);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0,
@@ -239,7 +262,7 @@ public class HDRTexture extends OxyTexture.Texture {
             glViewport(0, 0, 512, 512);
             shader.disable();
             OpenGLRendererAPI.clearBuffer();
-            mainTexture.scene.getRenderer().render(ts, mainTexture.mesh, OxyRenderer.currentBoundedCamera, shader);
+            mainTexture.scene.getRenderer().render(ts, mesh, OxyRenderer.currentBoundedCamera, shader);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
     }
@@ -248,14 +271,14 @@ public class HDRTexture extends OxyTexture.Texture {
 
         private final HDRTexture mainTexture;
 
-        public IrradianceTexture(int slot, String path, HDRTexture mainTexture) {
+        IrradianceTexture(int slot, String path, HDRTexture mainTexture) {
             super(slot, path);
             this.mainTexture = mainTexture;
         }
 
-        void captureFaces(float ts) {
-            OxyShader shader = new OxyShader("shaders/OxyIBL.glsl");
+        final static OxyShader shader = new OxyShader("shaders/OxyIBL.glsl");
 
+        void captureFaces(float ts) {
             textureId = glGenTextures();
             glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
             for (int i = 0; i < 6; i++) {
@@ -289,7 +312,7 @@ public class HDRTexture extends OxyTexture.Texture {
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
                 OpenGLRendererAPI.clearBuffer();
-                mainTexture.scene.getRenderer().render(ts, mainTexture.mesh, OxyRenderer.currentBoundedCamera, shader);
+                mainTexture.scene.getRenderer().render(ts, mesh, OxyRenderer.currentBoundedCamera, shader);
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
@@ -299,13 +322,14 @@ public class HDRTexture extends OxyTexture.Texture {
 
         private final HDRTexture mainTexture;
 
-        public PrefilterTexture(int slot, String path, HDRTexture mainTexture) {
+        PrefilterTexture(int slot, String path, HDRTexture mainTexture) {
             super(slot, path);
             this.mainTexture = mainTexture;
         }
 
+        final static OxyShader shader = new OxyShader("shaders/OxyPrefiltering.glsl");
+
         public void captureFaces(float ts) {
-            OxyShader shader = new OxyShader("shaders/OxyPrefiltering.glsl");
 
             textureId = glGenTextures();
             glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
@@ -348,7 +372,7 @@ public class HDRTexture extends OxyTexture.Texture {
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);
                     OpenGLRendererAPI.clearBuffer();
-                    mainTexture.scene.getRenderer().render(ts, mainTexture.mesh, OxyRenderer.currentBoundedCamera, shader);
+                    mainTexture.scene.getRenderer().render(ts, mesh, OxyRenderer.currentBoundedCamera, shader);
                 }
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);

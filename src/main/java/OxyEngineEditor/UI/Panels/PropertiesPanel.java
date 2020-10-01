@@ -4,14 +4,10 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngineEditor.Components.ScriptingComponent;
-import OxyEngineEditor.Components.SelectedComponent;
-import OxyEngineEditor.Components.TagComponent;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Scripting.OxyScriptItem;
+import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.OxyScriptItem;
 import imgui.ImGui;
 import imgui.flag.ImGuiColorEditFlags;
 import imgui.flag.ImGuiInputTextFlags;
@@ -46,9 +42,6 @@ public class PropertiesPanel extends Panel {
     static boolean init = false;
     public static boolean focusedWindow = false;
     private static final ImBoolean helpWindowBool = new ImBoolean();
-    public static final float[] gammaStrength = new float[]{2f};
-    public static final float[] mipLevelStrength = new float[]{1.0f};
-    public static final float[] exposure = new float[]{1.0f};
 
     ImString name = new ImString(0);
     ImString meshPath = new ImString(0);
@@ -183,11 +176,14 @@ public class PropertiesPanel extends Panel {
                 boolean nullT = entityContext.get(OxyMaterial.class).albedoTexture == null;
                 if (ImGui.imageButton(nullT ? -1 : entityContext.get(OxyMaterial.class).albedoTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
-                    if (path != null)
+                    if (path != null) {
+                        if (!nullT) entityContext.get(OxyMaterial.class).albedoTexture.dispose();
                         entityContext.get(OxyMaterial.class).albedoTexture = OxyTexture.loadImage(path);
+                    }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
                 if (ImGui.button("Remove A")) {
+                    entityContext.get(OxyMaterial.class).albedoTexture.dispose();
                     entityContext.get(OxyMaterial.class).albedoTexture = null;
                 }
 
@@ -197,11 +193,14 @@ public class PropertiesPanel extends Panel {
                 boolean nullN = entityContext.get(OxyMaterial.class).normalTexture == null;
                 if (ImGui.imageButton(nullN ? -2 : entityContext.get(OxyMaterial.class).normalTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
-                    if (path != null)
+                    if (path != null) {
+                        if (!nullN) entityContext.get(OxyMaterial.class).normalTexture.dispose();
                         entityContext.get(OxyMaterial.class).normalTexture = OxyTexture.loadImage(path);
+                    }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
                 if (ImGui.button("Remove N")) {
+                    entityContext.get(OxyMaterial.class).normalTexture.dispose();
                     entityContext.get(OxyMaterial.class).normalTexture = null;
                 }
 
@@ -211,11 +210,14 @@ public class PropertiesPanel extends Panel {
                 boolean nullR = entityContext.get(OxyMaterial.class).roughnessTexture == null;
                 if (ImGui.imageButton(nullR ? -3 : entityContext.get(OxyMaterial.class).roughnessTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
-                    if (path != null)
+                    if (path != null) {
+                        if (!nullR) entityContext.get(OxyMaterial.class).roughnessTexture.dispose();
                         entityContext.get(OxyMaterial.class).roughnessTexture = OxyTexture.loadImage(path);
+                    }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
                 if (ImGui.button("Remove R")) {
+                    entityContext.get(OxyMaterial.class).roughnessTexture.dispose();
                     entityContext.get(OxyMaterial.class).roughnessTexture = null;
                 }
 
@@ -225,11 +227,14 @@ public class PropertiesPanel extends Panel {
                 boolean nullM = entityContext.get(OxyMaterial.class).metallicTexture == null;
                 if (ImGui.imageButton(nullM ? -4 : entityContext.get(OxyMaterial.class).metallicTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
-                    if (path != null)
+                    if (path != null) {
+                        if (!nullM) entityContext.get(OxyMaterial.class).metallicTexture.dispose();
                         entityContext.get(OxyMaterial.class).metallicTexture = OxyTexture.loadImage(path);
+                    }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
                 if (ImGui.button("Remove M")) {
+                    entityContext.get(OxyMaterial.class).metallicTexture.dispose();
                     entityContext.get(OxyMaterial.class).metallicTexture = null;
                 }
 
@@ -239,11 +244,14 @@ public class PropertiesPanel extends Panel {
                 boolean nullAO = entityContext.get(OxyMaterial.class).aoTexture == null;
                 if (ImGui.imageButton(nullAO ? -5 : entityContext.get(OxyMaterial.class).aoTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
-                    if (path != null)
+                    if (path != null) {
+                        if (!nullAO) entityContext.get(OxyMaterial.class).aoTexture.dispose();
                         entityContext.get(OxyMaterial.class).aoTexture = OxyTexture.loadImage(path);
+                    }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
                 if (ImGui.button("Remove AO")) {
+                    entityContext.get(OxyMaterial.class).aoTexture.dispose();
                     entityContext.get(OxyMaterial.class).aoTexture = null;
                 }
 
@@ -253,11 +261,14 @@ public class PropertiesPanel extends Panel {
                 boolean nullHeight = entityContext.get(OxyMaterial.class).heightTexture == null;
                 if (ImGui.imageButton(nullHeight ? -6 : entityContext.get(OxyMaterial.class).heightTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
-                    if (path != null)
+                    if (path != null) {
+                        if (!nullHeight) entityContext.get(OxyMaterial.class).heightTexture.dispose();
                         entityContext.get(OxyMaterial.class).heightTexture = OxyTexture.loadImage(path);
+                    }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
                 if (ImGui.button("Remove H")) {
+                    entityContext.get(OxyMaterial.class).heightTexture.dispose();
                     entityContext.get(OxyMaterial.class).heightTexture = null;
                 }
             }
@@ -265,13 +276,13 @@ public class PropertiesPanel extends Panel {
         }
 
         { // Scripting
-            Set<OxyEntity> set = sceneLayer.getScene().view(ScriptingComponent.class);
-            for (OxyEntity e : set) {
-                OxyScriptItem item = e.get(ScriptingComponent.class).getScriptItem();
+            Set<ScriptingComponent> set = sceneLayer.cachedScriptComponents;
+            for (EntityComponent e : set) {
+                OxyScriptItem item = ((ScriptingComponent) e).getScriptItem();
                 for (var f : item.getFieldsAsObject()) {
-                    if (f.obj() instanceof Float m) {
+                    if (f.getObject() instanceof Float m) {
                         ImGui.alignTextToFramePadding();
-                        ImGui.text(f.name());
+                        ImGui.text(f.getName());
                         ImGui.sameLine();
                         ImGui.sliderFloat("##hideLabel item1" + f.hashCode(), new float[]{m}, 0, 1000);
                     }
@@ -300,26 +311,6 @@ public class PropertiesPanel extends Panel {
         ImGui.text("Normal map strength:");
         ImGui.sameLine();
         ImGui.sliderFloat("###hidelabel n", m.normalStrength, 0, 100);
-
-        ImGui.alignTextToFramePadding();
-        ImGui.text("Gamma strength:");
-        ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel g", gammaStrength, 0, 100);
-
-        ImGui.alignTextToFramePadding();
-        ImGui.text("Environment LOD:");
-        ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel lod", mipLevelStrength, 0, 4);
-
-        ImGui.alignTextToFramePadding();
-        ImGui.text("Height scale:");
-        ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel h", m.heightScale, 0, 10);
-
-        ImGui.alignTextToFramePadding();
-        ImGui.text("Exposure: ");
-        ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel exposure", exposure, 0, 10);
 
         final float windowWidth = ImGui.getWindowWidth();
         ImGui.spacing();

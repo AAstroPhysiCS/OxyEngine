@@ -1,8 +1,8 @@
 package OxyEngineEditor.Components;
 
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Scene.OxyScriptItem;
-import OxyEngineEditor.Scene.ScriptableEntity;
+import OxyEngine.Scripting.OxyScriptItem;
+import OxyEngine.Scripting.ScriptableEntity;
 
 import java.io.File;
 

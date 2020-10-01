@@ -71,9 +71,8 @@ public class OverlayPanelLayer extends Layer {
         int id = ImGui.getID("MyDockSpace");
         ImGui.dockSpace(id, 0, 0, ImGuiDockNodeFlags.PassthruCentralNode);
         ImGui.end();
-        for (Panel panel : panelList) {
+        for (Panel panel : panelList)
             panel.renderPanel();
-        }
         ImGui.popFont();
         ImGui.popStyleVar();
 
