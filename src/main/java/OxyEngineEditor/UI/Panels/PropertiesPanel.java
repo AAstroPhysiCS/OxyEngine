@@ -13,9 +13,11 @@ import imgui.flag.ImGuiColorEditFlags;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImBoolean;
+import imgui.type.ImInt;
 import imgui.type.ImString;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +37,8 @@ public class PropertiesPanel extends Panel {
 
     private final SceneLayer sceneLayer;
 
+    private static final List<PropertyTree> propertyTree = new ArrayList<>();
+
     public PropertiesPanel(SceneLayer sceneLayer) {
         this.sceneLayer = sceneLayer;
     }
@@ -46,6 +50,11 @@ public class PropertiesPanel extends Panel {
     ImString name = new ImString(0);
     ImString meshPath = new ImString(0);
     float[] albedo = {0, 0, 0, 0};
+
+    final String[] componentNames = UIEditable.allUIEditableNames();
+    final String[] componentFullName = UIEditable.allUIEditableFullNames();
+
+    protected static final ImInt defaultValue = new ImInt(-1);
 
     @Override
     public void preload() {
@@ -317,7 +326,37 @@ public class PropertiesPanel extends Panel {
         ImGui.spacing();
         ImGui.setCursorPosX(windowWidth / 2 - 150);
         ImGui.pushItemWidth(-1);
-        ImGui.button("Add Component", 300, 30);
+        if (ImGui.button("Add Component", 300, 30)) {
+            propertyTree.add(new PropertyTree() {
+                @Override
+                public void designTree() {
+                    ImGui.text("Type: ");
+                    ImGui.sameLine();
+                    ImGui.combo("###hidelabel " + hashCode(), defaultValue, componentNames, componentNames.length);
+                    if (defaultValue.get() != -1) {
+                        try {
+                            @SuppressWarnings("unchecked")
+                            EntityComponent destClass = entityContext.get((Class<? extends EntityComponent>) Class.forName(componentFullName[defaultValue.get()]));
+                            node = (PropertyNode) destClass.getClass().getField("node").get(destClass);
+                        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    if (node != null) {
+                        name = componentNames[defaultValue.get()];
+                        node.designNode();
+                    }
+                }
+            });
+        }
+        for (PropertyTree tree : propertyTree) {
+
+            if (tree.name == null) tree.name = "Node " + tree.hashCode();
+            if (ImGui.treeNodeEx(tree.name, ImGuiTreeNodeFlags.DefaultOpen)) {
+                tree.designTree();
+                ImGui.treePop();
+            }
+        }
         ImGui.popItemWidth();
 
         ImGui.checkbox("Demo", helpWindowBool);

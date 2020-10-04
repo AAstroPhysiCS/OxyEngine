@@ -4,10 +4,13 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngineEditor.Components.EntityComponent;
+import OxyEngineEditor.Components.UIEditable;
+import OxyEngineEditor.UI.Panels.PropertyNode;
+import imgui.ImGui;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-public class OxyMaterial implements EntityComponent {
+public class OxyMaterial implements EntityComponent, UIEditable {
 
     public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture;
     public final OxyColor albedoColor;
@@ -17,6 +20,8 @@ public class OxyMaterial implements EntityComponent {
     public float[] aoStrength;
     public final float[] normalStrength;
     public final float[] heightScale;
+
+    public PropertyNode node = () -> ImGui.text("THIS IS OXY MATERIAL COMPONENT");
 
     public OxyMaterial(ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
                        ImageTexture heightTexture, OxyColor albedoColor) {

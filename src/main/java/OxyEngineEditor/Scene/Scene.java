@@ -5,6 +5,7 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Scripting.OxyScriptItem;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Components.*;
@@ -148,6 +149,7 @@ public class Scene implements OxyDisposable {
     public <T extends EntityComponent> T get(OxyEntity entity, Class<T> destClass) {
         return registry.get(entity, destClass);
     }
+
     /*
      * gets all the entities associated with these classes
      */
@@ -172,7 +174,7 @@ public class Scene implements OxyDisposable {
 
     @SafeVarargs
     public final <U extends EntityComponent> Set<U> distinct(RegistryPredicate<Boolean, U> predicate, Class<U> type,
-                                                                           Class<? extends EntityComponent>... destClasses) {
+                                                             Class<? extends EntityComponent>... destClasses) {
         return registry.distinct(predicate, type, destClasses);
     }
 
@@ -235,6 +237,7 @@ public class Scene implements OxyDisposable {
 
     @Override
     public void dispose() {
+        OxyScriptItem.suspendAll();
         oxyUISystem.dispose();
     }
 }

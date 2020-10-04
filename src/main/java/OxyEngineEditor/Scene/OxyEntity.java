@@ -58,6 +58,11 @@ public abstract class OxyEntity {
             if (c instanceof TransformComponent t) { //if someone decides to add a seperate TransformComponent, then validate it
                 t.validate(this);
             }
+            if(c instanceof ScriptingComponent s){
+                s.setScene(scene);
+                s.setEntity(this);
+                s.finalizeComponent();
+            }
         }
     }
 

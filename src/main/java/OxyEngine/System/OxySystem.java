@@ -3,11 +3,13 @@ package OxyEngine.System;
 import OxyEngineEditor.EntryPoint;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
+import org.reflections.Reflections;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
@@ -25,6 +27,8 @@ public interface OxySystem {
     String BASE_PATH = System.getProperty("user.dir");
     String gl_Version = "#version 460";
 
+    Reflections reflections = new Reflections("OxyEngine");
+
     static void init() {
         for (Handler handlers : logger.getHandlers())
             logger.removeHandler(handlers);
@@ -35,9 +39,13 @@ public interface OxySystem {
         logger.addHandler(handler);
     }
 
-    static String oxyAssert(String msg){
+    static String oxyAssert(String msg) {
         logger.severe(msg);
         return msg;
+    }
+
+    static <T> Set<Class<? extends T>> getSubClasses(Class<T> type) {
+        return reflections.getSubTypesOf(type);
     }
 
     interface FileSystem {
@@ -57,12 +65,12 @@ public interface OxySystem {
             return builder.toString();
         }
 
-        static String getResourceByPath(String path){
+        static String getResourceByPath(String path) {
             String fullPath = EntryPoint.class.getResource(path).getPath();
             return (String) fullPath.subSequence(1, fullPath.length());
         }
 
-        static String openDialog(String filterList, String defaultPath){
+        static String openDialog(String filterList, String defaultPath) {
             String path = null;
             PointerBuffer buffer = PointerBuffer.allocateDirect(16);
             int result = NativeFileDialog.NFD_OpenDialog(filterList, defaultPath, buffer);

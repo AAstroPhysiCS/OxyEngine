@@ -1,7 +1,7 @@
 package OxyEngineEditor.Components;
 
 /*
- A tagging interface
+ * A tagging interface
  */
 public interface EntityComponent {
 }

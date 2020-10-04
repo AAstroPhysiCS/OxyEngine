@@ -67,6 +67,7 @@ public class EditorApplication extends OxyApplication {
                 new Vector3f(1f, 1f, 1f)));
         m.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m.constructData();
+        m.addComponent(new ScriptingComponent("src/main/java/nScripts/LightPositionScript.java"));
 
         OxyModel m2 = scene.createModelEntity(ModelType.Sphere, oxyShader);
         Light pointLightComponent2 = new PointLight(1.0f, 0.027f, 0.0028f);
@@ -79,7 +80,7 @@ public class EditorApplication extends OxyApplication {
         m2.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m2.constructData();
 
-        m2.addComponent(new ScriptingComponent("src/main/java/test/TestScript.java"));
+        m2.addComponent(new ScriptingComponent("src/main/java/nScripts/LightPositionScript.java"));
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
@@ -87,7 +88,7 @@ public class EditorApplication extends OxyApplication {
                 null,
                 new Vector3f(152, -9.8f, -0.14f),
                 new Vector3f(0.5f, 0.5f, 0.5f),
-                new Vector3f(5.0f, 5.0f, 5.0f),d
+                new Vector3f(5.0f, 5.0f, 5.0f),
                 new Vector3f(0f, 0f, 0f)));*/
 
         List<OxyModel> testObjects = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath("/models/mainTestScene.obj"), oxyShader);
@@ -95,6 +96,7 @@ public class EditorApplication extends OxyApplication {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0)));
             obj.constructData();
         }
+        testObjects.get(3).addComponent(new ScriptingComponent("src/main/java/nScripts/ColorIteratorScript.java"));
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;

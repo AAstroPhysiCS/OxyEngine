@@ -94,11 +94,6 @@ public class SceneLayer extends Layer {
         scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
 
-        for (EntityComponent e : cachedScriptComponents) {
-            OxyScriptItem item = ((ScriptingComponent) e).getScriptItem();
-            item.invokeMethod("onUpdate", ts);
-        }
-
         int i = 0;
         for (OxyEntity e : cachedLightEntities) {
             if (!e.has(EmittingComponent.class)) continue;
@@ -125,6 +120,11 @@ public class SceneLayer extends Layer {
             hdrTexture.captureFaces(ts);
             cachedNativeMeshes = scene.view(NativeObjectMesh.class);
             initHdrTexture = true;
+        }
+
+        for (EntityComponent e : cachedScriptComponents) {
+            OxyScriptItem item = ((ScriptingComponent) e).getScriptItem();
+            item.invokeMethod("onUpdate", ts);
         }
 
         scene.getFrameBuffer().bind();

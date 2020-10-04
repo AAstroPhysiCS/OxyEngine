@@ -2,10 +2,7 @@ package OxyEngineEditor.Scene;
 
 import OxyEngineEditor.Components.EntityComponent;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /*
  * Entity Component System (ECS)
