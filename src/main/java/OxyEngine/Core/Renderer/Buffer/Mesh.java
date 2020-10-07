@@ -143,4 +143,5 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         if (tangentBuffer != null) tangentBuffer.dispose();
         glDeleteVertexArrays(vao);
     }
+
 }

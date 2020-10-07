@@ -116,6 +116,7 @@ public class EditorApplication extends OxyApplication {
         overlayPanelLayer.addPanel(PropertiesPanel.getInstance(sceneLayer));
         overlayPanelLayer.addPanel(ScenePanel.getInstance(sceneLayer));
         overlayPanelLayer.addPanel(EnvironmentPanel.getInstance(sceneLayer));
+        overlayPanelLayer.addPanel(ProjectPanel.getInstance());
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, overlayPanelLayer);
         for (Layer l : layerStack.getLayerStack())

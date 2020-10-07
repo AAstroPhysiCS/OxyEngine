@@ -1,20 +1,16 @@
 package OxyEngineEditor.Components;
 
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.UI.Panels.PropertyNode;
-import imgui.ImGui;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class TransformComponent implements EntityComponent, UIEditable {
+public class TransformComponent implements EntityComponent {
 
     public Vector3f position;
     public Vector3f rotation;
     public Vector3f scale;
 
     public Matrix4f transform;
-
-    public PropertyNode node = () -> ImGui.text("THIS IS TRANSFORM COMPONENT");
 
     public TransformComponent(TransformComponent t) {
         this.scale = new Vector3f(t.scale);

@@ -5,6 +5,7 @@ import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
+import OxyEngineEditor.UI.Panels.PropertyEntry;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 
 public abstract class OxyEntity {
+
+    private final List<PropertyEntry> nodes = new ArrayList<>();
 
     public float[] vertices, tcs, normals, tangents, biTangents;
     public int[] indices;
@@ -136,6 +139,10 @@ public abstract class OxyEntity {
 
     public float[] getTcs() {
         return tcs;
+    }
+
+    public List<PropertyEntry> getPropertyEntries() {
+        return nodes;
     }
 
     public Object clone() {
