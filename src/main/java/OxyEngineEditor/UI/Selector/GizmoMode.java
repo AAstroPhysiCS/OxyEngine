@@ -128,8 +128,8 @@ enum GizmoMode {
         }
 
         private void scale(OxyModel model, OxyEntity e) {
-            if (model.get(SelectedComponent.class).fixedValue && zoom >= 100) {
-                model.get(TransformComponent.class).scale.set(zoom * 0.03f);
+            if (model.get(SelectedComponent.class).fixedValue) {
+                model.get(TransformComponent.class).scale.set(zoom * 0.06f);
                 update(model, e);
             } else {
                 if (zoom < 150 && model.get(TransformComponent.class).scale.x != 3) { //does not matter if x or y or z

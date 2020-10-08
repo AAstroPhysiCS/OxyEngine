@@ -1,4 +1,4 @@
-package nScripts;
+package OxyEngine.Scripting.NativeScripts;
 
 import OxyEngine.Scripting.ScriptableEntity;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;

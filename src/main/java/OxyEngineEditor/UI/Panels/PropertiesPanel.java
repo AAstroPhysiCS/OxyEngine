@@ -128,7 +128,7 @@ public class PropertiesPanel extends Panel {
 
                 meshPath = new ImString(entityContext.get(Mesh.class).getPath());
 
-                ImGui.radioButton("Cast Shadows", false);
+                ImGui.checkbox("Cast Shadows", false);
 
                 if (!initPanel) ImGui.setNextItemOpen(true);
                 ImGui.columns(2, "myColumns");

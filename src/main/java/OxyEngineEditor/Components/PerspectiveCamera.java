@@ -17,7 +17,7 @@ public class PerspectiveCamera extends OxyCamera {
     protected final float fovY, zNear, zFar;
     protected float aspect;
 
-    public static float zoom = 90;
+    public static float zoom = 800 * 0.06f;
     public final boolean primary;
 
     public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {

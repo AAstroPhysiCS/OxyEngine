@@ -36,9 +36,11 @@ public class EnvironmentPanel extends Panel {
 
         if (ImGui.button("Load environment map")) {
             String path = openDialog("hdr", null);
-            if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
-            SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, sceneLayer.getScene());
-            SceneLayer.hdrTexture.captureFaces(0);
+            if (path != null) {
+                if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
+                SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, sceneLayer.getScene());
+                SceneLayer.hdrTexture.captureFaces(0);
+            }
         }
 
         ImGui.alignTextToFramePadding();

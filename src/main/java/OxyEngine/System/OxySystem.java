@@ -5,14 +5,13 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
 import org.reflections.Reflections;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public interface OxySystem {
 
@@ -46,6 +45,13 @@ public interface OxySystem {
 
     static <T> Set<Class<? extends T>> getSubClasses(Class<T> type) {
         return reflections.getSubTypesOf(type);
+    }
+
+    static File[] getCurrentProjectFiles(boolean hideHiddenFiles){
+        File[] f = new File(BASE_PATH).listFiles();
+        if(f == null) return null;
+        if(hideHiddenFiles) return Arrays.stream(f).filter(file -> !file.isHidden()).collect(Collectors.toList()).toArray(new File[0]);
+        return f;
     }
 
     interface FileSystem {
