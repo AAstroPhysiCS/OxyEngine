@@ -1,10 +1,12 @@
 package OxyEngineEditor.UI.Panels;
 
+import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxySystem;
 import imgui.ImGui;
 import imgui.ImGuiStyle;
 import imgui.ImVec2;
-import imgui.flag.ImGuiColorEditFlags;
+import imgui.flag.ImGuiCol;
 
 import java.io.File;
 
@@ -19,13 +21,19 @@ public class ProjectPanel extends Panel {
 
     private static File[] allCurrentProjectFiles = OxySystem.getCurrentProjectFiles(true);
 
+    private static ImageTexture fileAsset;
+    private static ImageTexture dirAsset;
+
+    private static boolean init = false;
+
     private ProjectPanel() {
 
     }
 
     @Override
     public void preload() {
-
+        fileAsset = OxyTexture.loadImage("src/main/resources/assets/fileAsset.png");
+        dirAsset = OxyTexture.loadImage("src/main/resources/assets/dirAsset.png");
     }
 
     @Override
@@ -33,20 +41,25 @@ public class ProjectPanel extends Panel {
         ImGui.begin("Project");
 
         if (ImGui.button("Create")) {
-
         }
         ImGui.sameLine(ImGui.getWindowWidth() - 100);
         if (ImGui.button("Reload")) {
             allCurrentProjectFiles = OxySystem.getCurrentProjectFiles(true);
         }
+        ImGui.separator();
+        ImGui.spacing();
 
         ImGui.columns(2, "ProjectPanelCol");
+        if (!init) {
+            ImGui.setColumnOffset(0, (-ImGui.getWindowWidth() / 2f) + 400f);
+            init = true;
+        }
         // 0 is automatic, i guess
-        ImGui.beginChild("FilePanel", 0, 0, true);
+        ImGui.beginChild("FilePanel", 0, 0, false);
         allFileListing(allCurrentProjectFiles);
         ImGui.endChild();
         ImGui.nextColumn();
-        ImGui.beginChild("InsideFilePanel", 0, 0, true);
+        ImGui.beginChild("InsideFilePanel", 0, 0, false);
         previewFiles();
         ImGui.endChild();
         ImGui.columns(1);
@@ -75,11 +88,13 @@ public class ProjectPanel extends Panel {
     private static final ImVec2 pos = new ImVec2(), regionMax = new ImVec2();
 
     private void previewFiles() {
+
         if (lastPath == null) return;
         ImGui.getWindowPos(pos);
         ImGui.getWindowContentRegionMax(regionMax);
         float windowVisible = pos.x + regionMax.x;
-
+        ImVec2 cursorPos = new ImVec2();
+        ImGui.getCursorPos(cursorPos);
         File f = new File(lastPath);
         ImGuiStyle style = ImGui.getStyle();
         if (f.isDirectory()) {
@@ -88,19 +103,32 @@ public class ProjectPanel extends Panel {
             for (int i = 0; i < underFiles.length; i++) {
                 File fUnderFiles = underFiles[i];
                 ImGui.pushID(i);
-                if (fUnderFiles.isDirectory()) {
-                    ImGui.colorButton("preview" + fUnderFiles.hashCode(), new float[]{1.0f, 0.0f, 0.0f, 0.0f}, ImGuiColorEditFlags.None, imageButtonWidth, 50f);
-//                    ImGui.sameLine();
-//                    ImGui.text(fUnderFiles.getName());
-                } else {
-                    ImGui.colorButton("preview" + fUnderFiles.hashCode(), new float[]{1.0f, 1.0f, 1.0f, 1.0f}, ImGuiColorEditFlags.None, imageButtonWidth, 50f);
-//                    ImGui.sameLine();
-//                    ImGui.text(fUnderFiles.getName().split("\\.")[0]);
-                }
+                ImGui.pushStyleColor(ImGuiCol.Button, 1.0f, 1.0f, 1.0f, 0.0f);
+                ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.1f);
+                ImGui.pushStyleColor(ImGuiCol.ButtonActive, 1.0f, 1.0f, 1.0f, 0.3f);
+                if (fUnderFiles.isDirectory())
+                    ImGui.imageButton(dirAsset.getTextureId(), imageButtonWidth, 75f, 0, 1, 1, 0, 2);
+                else ImGui.imageButton(fileAsset.getTextureId(), imageButtonWidth, 75f, 0, 1, 1, 0, 2);
+                ImGui.popStyleColor(3);
                 float lastButton = ImGui.getItemRectMaxX();
                 float nextButton = lastButton + style.getItemSpacingX() + imageButtonWidth;
-                if (i + 1 < underFiles.length && nextButton < windowVisible) ImGui.sameLine();
+                if (i + 1 < underFiles.length && nextButton < windowVisible) {
+                    ImGui.sameLine();
+                } else {
+                    ImGui.dummy(0, 28);
+                }
                 ImGui.popID();
+            }
+            int yOff = 0, xOff = 0;
+            for (File fUnderFiles : underFiles) {
+                float lastButton = ImGui.getItemRectMaxX();
+                float nextButton = lastButton + style.getItemSpacingX() + imageButtonWidth + 15;
+                if (nextButton > windowVisible) {
+                    yOff++;
+                    xOff = 1;
+                } else xOff++;
+                ImGui.setCursorPos((imageButtonWidth * (xOff - 1)) + (imageButtonWidth * (xOff - 1) / 5.7f), (yOff * 115) + 85f);
+                ImGui.text(fUnderFiles.getName().length() >= 8 ? fUnderFiles.getName().substring(0, 8) + "..." : fUnderFiles.getName());
             }
         }
     }

@@ -2,6 +2,7 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Renderer.OxyRenderer;
 import imgui.ImGui;
+import imgui.flag.ImGuiWindowFlags;
 
 import static OxyEngine.Tools.Globals.normalizeColor;
 
@@ -20,9 +21,9 @@ public class StatsPanel extends Panel {
 
     @Override
     public void renderPanel() {
-        ImGui.begin("Stats");
+        ImGui.begin("Stats", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDocking);
 
-        ImGui.textColored(normalizeColor(144), normalizeColor(103), normalizeColor(121), 1.0f, OxyRenderer.Stats.getStats());
+        ImGui.textColored(normalizeColor(200), normalizeColor(200), normalizeColor(200), 1.0f, OxyRenderer.Stats.getStats());
         ImGui.spacing();
 
         ImGui.end();
