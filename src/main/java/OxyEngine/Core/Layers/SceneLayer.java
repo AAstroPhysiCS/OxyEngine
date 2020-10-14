@@ -35,7 +35,7 @@ public class SceneLayer extends Layer {
         super(scene);
     }
 
-    static final OxyShader outlineShader = new OxyShader("D:\\programming\\Java\\OxyEngine\\shaders\\OxyOutline.glsl");
+    static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
     public static HDRTexture hdrTexture;
 
     @Override

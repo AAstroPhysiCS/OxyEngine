@@ -19,24 +19,7 @@ public class OxyScriptItem {
         this.methods = allMethods;
     }
 
-    public static final class ScriptEntry {
-
-        private final String name;
-        private final Object e;
-
-        private ScriptEntry(String name, Object e) {
-            this.name = name;
-            this.e = e;
-        }
-
-        public Object getObject() {
-            return e;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
+    public static final record ScriptEntry(String name, Object e) {}
 
     public ScriptEntry[] getFieldsAsObject() {
         ScriptEntry[] objects = new ScriptEntry[fields.length];

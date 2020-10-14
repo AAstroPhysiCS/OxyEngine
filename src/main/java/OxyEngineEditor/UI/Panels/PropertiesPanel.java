@@ -113,9 +113,9 @@ public class PropertiesPanel extends Panel {
             for (EntityComponent e : set) {
                 OxyScriptItem item = ((ScriptingComponent) e).getScriptItem();
                 for (var f : item.getFieldsAsObject()) {
-                    if (f.getObject() instanceof Float m) {
+                    if (f.e() instanceof Float m) {
                         ImGui.alignTextToFramePadding();
-                        ImGui.text(f.getName());
+                        ImGui.text(f.name());
                         ImGui.sameLine();
                         ImGui.sliderFloat("##hideLabel item1" + f.hashCode(), new float[]{m}, 0, 1000);
                     }

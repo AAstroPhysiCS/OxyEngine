@@ -63,18 +63,25 @@ public class ProjectPanel extends Panel {
         previewFiles();
         ImGui.endChild();
         ImGui.columns(1);
-
         ImGui.end();
     }
 
-    private static String lastPath;
+    private static File lastDir;
+    private static String nameOfPreviewFile;
 
     private void allFileListing(File[] files) {
+        if (files == null) return;
         for (File f : files) {
             File[] underFiles = f.listFiles();
             if (underFiles != null) {
-                if (ImGui.treeNode(f.getName())) {
-                    lastPath = f.getPath();
+                if(nameOfPreviewFile != null) {
+                    if (nameOfPreviewFile.equals(f.getName())) {
+                        ImGui.setNextItemOpen(true);
+                        nameOfPreviewFile = null;
+                    }
+                }
+                if (ImGui.treeNodeEx(f.getName())) {
+                    lastDir = f;
                     allFileListing(underFiles);
                     ImGui.treePop();
                 }
@@ -85,17 +92,15 @@ public class ProjectPanel extends Panel {
     }
 
     private static final float imageButtonWidth = 75f;
-    private static final ImVec2 pos = new ImVec2(), regionMax = new ImVec2();
+    private static final ImVec2 pos = new ImVec2(), regionMax = new ImVec2(), cursorPos = new ImVec2();
 
     private void previewFiles() {
-
-        if (lastPath == null) return;
+        if (lastDir == null) return;
         ImGui.getWindowPos(pos);
         ImGui.getWindowContentRegionMax(regionMax);
         float windowVisible = pos.x + regionMax.x;
-        ImVec2 cursorPos = new ImVec2();
         ImGui.getCursorPos(cursorPos);
-        File f = new File(lastPath);
+        File f = lastDir;
         ImGuiStyle style = ImGui.getStyle();
         if (f.isDirectory()) {
             File[] underFiles = f.listFiles();
@@ -106,17 +111,19 @@ public class ProjectPanel extends Panel {
                 ImGui.pushStyleColor(ImGuiCol.Button, 1.0f, 1.0f, 1.0f, 0.0f);
                 ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.1f);
                 ImGui.pushStyleColor(ImGuiCol.ButtonActive, 1.0f, 1.0f, 1.0f, 0.3f);
-                if (fUnderFiles.isDirectory())
-                    ImGui.imageButton(dirAsset.getTextureId(), imageButtonWidth, 75f, 0, 1, 1, 0, 2);
-                else ImGui.imageButton(fileAsset.getTextureId(), imageButtonWidth, 75f, 0, 1, 1, 0, 2);
+                if (fUnderFiles.isDirectory()) {
+                    if (ImGui.imageButton(dirAsset.getTextureId(), imageButtonWidth, 75f, 0, 1, 1, 0, 2)) {
+                        nameOfPreviewFile = fUnderFiles.getName();
+                    }
+                } else {
+                    if (ImGui.imageButton(fileAsset.getTextureId(), imageButtonWidth, 75f, 0, 1, 1, 0, 2)) {
+                    }
+                }
                 ImGui.popStyleColor(3);
                 float lastButton = ImGui.getItemRectMaxX();
                 float nextButton = lastButton + style.getItemSpacingX() + imageButtonWidth;
-                if (i + 1 < underFiles.length && nextButton < windowVisible) {
-                    ImGui.sameLine();
-                } else {
-                    ImGui.dummy(0, 28);
-                }
+                if (i + 1 < underFiles.length && nextButton < windowVisible) ImGui.sameLine();
+                else ImGui.dummy(0, 28);
                 ImGui.popID();
             }
             int yOff = 0, xOff = 0;
