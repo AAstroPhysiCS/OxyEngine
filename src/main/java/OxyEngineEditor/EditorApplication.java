@@ -24,6 +24,7 @@ import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.Scene.SceneSerializer;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Math;
 import org.joml.Vector3f;
@@ -121,6 +122,7 @@ public class EditorApplication extends OxyApplication {
         layerStack.pushLayer(sceneLayer, gizmoLayer, overlayPanelLayer);
         for (Layer l : layerStack.getLayerStack())
             l.build();
+        SceneSerializer.serializeScene(scene);
     }
 
     @Override

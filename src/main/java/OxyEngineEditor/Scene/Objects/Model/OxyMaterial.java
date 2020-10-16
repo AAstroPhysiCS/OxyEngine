@@ -116,7 +116,7 @@ public class OxyMaterial implements EntityComponent, UIEditable {
 
     public final PropertyEntry node = () -> {
 
-        if(entityContext == null) return;
+        if (entityContext == null) return;
 
         albedo = entityContext.get(OxyMaterial.class).albedoColor.getNumbers();
 

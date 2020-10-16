@@ -24,7 +24,13 @@ import java.util.stream.Stream;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-public class Scene implements OxyDisposable {
+@OxySerializable(getInfo = """
+        Scene Name: %s
+        Registry {
+        \tObject count: %s
+        \t\t**objpl**}"""
+)
+public final class Scene implements OxyDisposable {
 
     private final Registry registry = new Registry();
 

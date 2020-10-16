@@ -64,6 +64,7 @@ public class ProjectPanel extends Panel {
         ImGui.endChild();
         ImGui.columns(1);
         ImGui.end();
+        lastDir = null;
     }
 
     private static File lastDir;
