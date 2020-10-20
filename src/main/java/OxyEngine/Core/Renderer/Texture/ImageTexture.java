@@ -3,6 +3,7 @@ package OxyEngine.Core.Renderer.Texture;
 import java.nio.ByteBuffer;
 
 import static OxyEngine.Core.Renderer.Texture.OxyTexture.allTextures;
+import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
@@ -18,6 +19,8 @@ public class ImageTexture extends OxyTexture.Texture {
     ImageTexture(int slot, String path, float[] tcs) {
         super(slot, path);
         this.tcs = tcs;
+
+        if(path.equals("null")) return;
 
         assert slot != 0 : oxyAssert("Slot can not be 0");
         assert slot <= 32 : oxyAssert("32 Texture Slots exceeded!");

@@ -1,121 +1,147 @@
 Scene Name: Test Scene 1
+Environment {
+	Environment Map: D:/programming/Java/OxyEngine/target/classes/hdr/birchwood_4k.hdr
+	Environment Gamma Strength: 2.0
+	Environment LOD: 1.0
+	Environment Exposure: 1.0
+}
 Registry {
-	Object count: 9
-	Object 1 {
-       	Name: No tag given
-       	Pos: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-       	Color: No color given
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
-       	Mesh: No mesh given
-   }
-   Object 2 {
+	Object count: 10
+	OxyNativeObject 1 {
+       	Name: null
+       	Position: false
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Scale: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Color: ( 1.000E+0  1.000E+0  1.000E+0)
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: null
+    }
+	OxyModel 2 {
        	Name: Light Cube
-       	Pos: ( 0.000E+0 -1.000E+1  0.000E+0)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Grouped: false
+       	Position: ( 0.000E+0 -1.000E+1  0.000E+0)
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
        	Scale: ( 5.000E-1  5.000E-1  5.000E-1)
        	Color: [1.0, 1.0, 1.0, 1.0]
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
-   }
-   Object 3 {
+    }
+	OxyModel 3 {
        	Name: Light Cube 2
-       	Pos: ( 0.000E+0 -1.000E+1  0.000E+0)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Grouped: false
+       	Position: ( 0.000E+0 -1.000E+1  0.000E+0)
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
        	Scale: ( 5.000E-1  5.000E-1  5.000E-1)
        	Color: [1.0, 1.0, 1.0, 1.0]
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
-   }
-   Object 4 {
+    }
+	OxyModel 4 {
        	Name: Cube
-       	Pos: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Grouped: true
+       	Position: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
        	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
        	Color: [0.8, 0.502477, 0.354984, 1.0]
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-   }
-   Object 5 {
+    }
+	OxyModel 5 {
        	Name: Cube.001
-       	Pos: ( 0.000E+0 -3.000E+0  6.470E+0)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Grouped: true
+       	Position: ( 0.000E+0 -3.000E+0  6.470E+0)
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
        	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
        	Color: [0.167063, 0.8, 0.047106, 1.0]
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-   }
-   Object 6 {
+    }
+	OxyModel 6 {
        	Name: Sphere
-       	Pos: ( 0.000E+0 -3.000E+0  0.000E+0)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Grouped: true
+       	Position: ( 0.000E+0 -3.000E+0  0.000E+0)
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
        	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
        	Color: [0.8, 0.086863, 0.093309, 1.0]
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-   }
-   Object 7 {
+    }
+	OxyModel 7 {
        	Name: Cone
-       	Pos: ( 0.000E+0 -3.139E+0 -6.000E+0)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Grouped: true
+       	Position: ( 0.000E+0 -3.139E+0 -6.000E+0)
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
        	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-       	Color: [0.04545, 0.239631, 0.8, 1.0]
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
+       	Color: [0.32999995, 1.0, 1.0, 1.0]
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-   }
-   Object 8 {
+    }
+	OxyModel 8 {
        	Name: Cube.002
-       	Pos: ( 1.110E+1 -4.322E+0 -9.662E-2)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Grouped: true
+       	Position: ( 1.110E+1 -4.322E+0 -9.662E-2)
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
        	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
        	Color: [0.0, 0.0, 0.0, 1.0]
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-   }
-   Object 9 {
-       	Name: No tag given
-       	Pos: ( 9.000E+0  0.000E+0  9.000E+0)
-       	Rot: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 2.000E+1  2.000E+1  2.000E+1)
-       	Color: [1.0, 1.0, 1.0, 0.2]
-       	Albedo Texture: No albedo texture given
-       	Normal Map Texture: No normal texture given
-       	Roughness Map Texture: No roughness texture given
-       	AO Map Texture: No ao texture given
-       	Metallic Map Texture: No metallic texture given
-       	Mesh: No mesh given
-   }
+    }
+	OxyNativeObject 9 {
+       	Name: null
+       	Position: false
+       	Rotation: ( 9.000E+0  0.000E+0  9.000E+0)
+       	Scale: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Color: ( 2.000E+1  2.000E+1  2.000E+1)
+       	Albedo Texture: [1.0, 1.0, 1.0, 0.2]
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: null
+    }
+	OxyNativeObject 10 {
+       	Name: null
+       	Position: false
+       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Scale: ( 0.000E+0  0.000E+0  0.000E+0)
+       	Color: ( 1.000E+0  1.000E+0  1.000E+0)
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: null
+    }
 }

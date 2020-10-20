@@ -5,7 +5,6 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Scripting.OxyScriptItem;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Components.*;
@@ -24,11 +23,17 @@ import java.util.stream.Stream;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-@OxySerializable(getInfo = """
+@OxySerializable(info = """
         Scene Name: %s
+        Environment {
+        \tEnvironment Map: %s
+        \tEnvironment Gamma Strength: %s
+        \tEnvironment LOD: %s
+        \tEnvironment Exposure: %s
+        }
         Registry {
         \tObject count: %s
-        \t\t**objpl**}"""
+        """
 )
 public final class Scene implements OxyDisposable {
 
@@ -87,6 +92,7 @@ public final class Scene implements OxyDisposable {
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                     new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                     new RenderableComponent(RenderingMode.Normal),
+                    new EntitySerializationInfo(true),
                     assimpMesh.material
             );
             e.initData(path);
@@ -111,6 +117,7 @@ public final class Scene implements OxyDisposable {
                 new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                 new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                 new RenderableComponent(RenderingMode.Normal),
+                new EntitySerializationInfo(false),
                 assimpMesh.material
         );
         e.initData(path);
@@ -243,7 +250,6 @@ public final class Scene implements OxyDisposable {
 
     @Override
     public void dispose() {
-        OxyScriptItem.suspendAll();
-        oxyUISystem.dispose();
+        registry.entityList.keySet().removeIf(e -> e instanceof OxyModel);
     }
 }

@@ -6,12 +6,28 @@ import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.OxySerializable;
 import OxyEngineEditor.Scene.Scene;
 import org.joml.Vector3f;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-
+@OxySerializable(info = """
+        \t\tOxyModel %s {
+               \tName: %s
+               \tGrouped: %s
+               \tPosition: %s
+               \tRotation: %s
+               \tScale: %s
+               \tColor: %s
+               \tAlbedo Texture: %s
+               \tNormal Map Texture: %s
+               \tRoughness Map Texture: %s
+               \tAO Map Texture: %s
+               \tMetallic Map Texture: %s
+               \tMesh: %s
+            }"""
+)
 public class OxyModel extends OxyEntity {
 
     private ModelFactory factory;

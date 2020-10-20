@@ -15,6 +15,7 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
+import OxyEngine.Scripting.OxyScriptItem;
 import OxyEngine.System.OxyEventSystem;
 import OxyEngine.System.OxySystem;
 import OxyEngine.System.OxyUISystem;
@@ -46,11 +47,13 @@ public class EditorApplication extends OxyApplication {
         oxyEngine.start();
     }
 
+    OxyShader oxyShader;
+
     @Override
     public void init() {
         oxyEngine.init();
 
-        OxyShader oxyShader = new OxyShader("shaders/OxyPBR.glsl");
+        oxyShader = new OxyShader("shaders/OxyPBR.glsl");
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
         scene = new Scene("Test Scene 1", oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
@@ -112,7 +115,7 @@ public class EditorApplication extends OxyApplication {
         OverlayPanelLayer overlayPanelLayer = new OverlayPanelLayer(windowHandle, scene);
 
         overlayPanelLayer.addPanel(StatsPanel.getInstance());
-        overlayPanelLayer.addPanel(ToolbarPanel.getInstance());
+        overlayPanelLayer.addPanel(ToolbarPanel.getInstance(sceneLayer, gizmoLayer, overlayPanelLayer, oxyShader));
         overlayPanelLayer.addPanel(SceneHierarchyPanel.getInstance(sceneLayer, oxyShader));
         overlayPanelLayer.addPanel(PropertiesPanel.getInstance(sceneLayer));
         overlayPanelLayer.addPanel(ScenePanel.getInstance(sceneLayer));
@@ -122,7 +125,6 @@ public class EditorApplication extends OxyApplication {
         layerStack.pushLayer(sceneLayer, gizmoLayer, overlayPanelLayer);
         for (Layer l : layerStack.getLayerStack())
             l.build();
-        SceneSerializer.serializeScene(scene);
     }
 
     @Override
@@ -180,6 +182,8 @@ public class EditorApplication extends OxyApplication {
     @Override
     public void dispose() {
         oxyEngine.dispose();
+        OxyScriptItem.suspendAll();
+        scene.getOxyUISystem().dispose();
         scene.dispose();
     }
 }

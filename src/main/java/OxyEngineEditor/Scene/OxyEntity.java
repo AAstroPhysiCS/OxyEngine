@@ -2,7 +2,9 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
-import OxyEngineEditor.Components.*;
+import OxyEngineEditor.Components.EntityComponent;
+import OxyEngineEditor.Components.ScriptingComponent;
+import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
 import OxyEngineEditor.UI.Panels.PropertyEntry;
@@ -11,9 +13,9 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
+import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 import static OxyEngine.Tools.Globals.toPrimitiveFloat;
 import static OxyEngine.Tools.Globals.toPrimitiveInteger;
-import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 
 public abstract class OxyEntity {
 
@@ -29,7 +31,7 @@ public abstract class OxyEntity {
         this.scene = scene;
     }
 
-    public OxyEntity(OxyModel other){
+    public OxyEntity(OxyModel other) {
         this(other.scene);
         this.tangents = other.tangents.clone();
         this.biTangents = other.biTangents.clone();
@@ -42,7 +44,7 @@ public abstract class OxyEntity {
 
     public abstract OxyEntity copyMe();
 
-    protected void addToScene(){
+    protected void addToScene() {
         scene.put(this);
     }
 
@@ -61,7 +63,7 @@ public abstract class OxyEntity {
             if (c instanceof TransformComponent t) { //if someone decides to add a seperate TransformComponent, then validate it
                 t.validate(this);
             }
-            if(c instanceof ScriptingComponent s){
+            if (c instanceof ScriptingComponent s) {
                 s.setScene(scene);
                 s.setEntity(this);
                 s.finalizeComponent();

@@ -8,9 +8,9 @@ import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 
 public class EnvironmentPanel extends Panel {
 
-    public static final float[] gammaStrength = new float[]{2f};
-    public static final float[] mipLevelStrength = new float[]{1.0f};
-    public static final float[] exposure = new float[]{1.0f};
+    public static float[] gammaStrength = new float[]{2f};
+    public static float[] mipLevelStrength = new float[]{1.0f};
+    public static float[] exposure = new float[]{1.0f};
 
     private static EnvironmentPanel INSTANCE = null;
 

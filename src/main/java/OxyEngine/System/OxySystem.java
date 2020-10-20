@@ -86,5 +86,16 @@ public interface OxySystem {
             NativeFileDialog.nNFD_Free(buffer.get());
             return path;
         }
+
+        static String saveDialog(String filterList, String defaultPath){
+            String path = null;
+            PointerBuffer buffer = PointerBuffer.allocateDirect(16);
+            int result = NativeFileDialog.NFD_SaveDialog(filterList, defaultPath, buffer);
+            if (result == NativeFileDialog.NFD_OKAY) {
+                path = buffer.getStringASCII();
+            }
+            NativeFileDialog.nNFD_Free(buffer.get());
+            return path;
+        }
     }
 }

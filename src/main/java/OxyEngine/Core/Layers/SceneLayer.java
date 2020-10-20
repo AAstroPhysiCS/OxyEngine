@@ -40,19 +40,20 @@ public class SceneLayer extends Layer {
 
     @Override
     public void build() {
-        hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/birchwood_4k.hdr"), scene);
+        if(hdrTexture == null) hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/birchwood_4k.hdr"), scene);
 
-        cachedNativeMeshes = scene.view(NativeObjectMesh.class);
-        cachedCameraComponents = scene.distinct(OxyCamera.class);
-
-        cachedLightEntities = scene.view(Light.class);
-        allModelEntities = scene.view(ModelMesh.class);
-
-        //Prep
-        {
+        if(cachedNativeMeshes == null){
+            cachedNativeMeshes = scene.view(NativeObjectMesh.class);
             for (OxyEntity e : cachedNativeMeshes) {
                 e.get(NativeObjectMesh.class).initList();
             }
+        }
+
+        cachedCameraComponents = scene.distinct(OxyCamera.class);
+        cachedLightEntities = scene.view(Light.class);
+        allModelEntities = scene.view(ModelMesh.class);
+        //Prep
+        {
             for (OxyEntity e : allModelEntities) {
                 e.get(ModelMesh.class).initList();
             }
@@ -90,7 +91,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
-
+        if(scene == null) return;
         scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
 
@@ -115,6 +116,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void render(float ts, float deltaTime) {
+        if(scene == null) return;
         scene.getFrameBuffer().blit();
         if (!initHdrTexture && OxyRenderer.currentBoundedCamera != null) {
             hdrTexture.captureFaces(ts);
@@ -228,5 +230,12 @@ public class SceneLayer extends Layer {
     private void render(float ts, Mesh mesh) {
         scene.getRenderer().render(ts, mesh);
         OxyRenderer.Stats.totalShapeCount = scene.getShapeCount();
+    }
+
+    public void clear(){
+        cachedLightEntities.clear();
+        cachedScriptComponents.clear();
+        cachedCameraComponents.clear();
+        allModelEntities.clear();
     }
 }

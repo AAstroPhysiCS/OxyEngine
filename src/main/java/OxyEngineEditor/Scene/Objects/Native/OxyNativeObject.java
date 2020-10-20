@@ -6,10 +6,26 @@ import OxyEngineEditor.Components.NativeObjectMesh;
 import OxyEngineEditor.Components.RenderableComponent;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.OxySerializable;
 import OxyEngineEditor.Scene.Scene;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
+@OxySerializable(info = """
+        \t\tOxyNativeObject %s {
+               \tName: %s
+               \tPosition: %s
+               \tRotation: %s
+               \tScale: %s
+               \tColor: %s
+               \tAlbedo Texture: %s
+               \tNormal Map Texture: %s
+               \tRoughness Map Texture: %s
+               \tAO Map Texture: %s
+               \tMetallic Map Texture: %s
+               \tMesh: %s
+            }"""
+)
 public class OxyNativeObject extends OxyEntity {
 
     public ObjectType type;
