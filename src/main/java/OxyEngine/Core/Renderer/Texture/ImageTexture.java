@@ -3,7 +3,6 @@ package OxyEngine.Core.Renderer.Texture;
 import java.nio.ByteBuffer;
 
 import static OxyEngine.Core.Renderer.Texture.OxyTexture.allTextures;
-import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
@@ -11,7 +10,7 @@ import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 
-public class ImageTexture extends OxyTexture.Texture {
+public class ImageTexture extends OxyTexture.AbstractTexture {
 
     private final float[] tcs;
     private int alFormat = -1;
@@ -22,6 +21,7 @@ public class ImageTexture extends OxyTexture.Texture {
 
         if(path.equals("null")) return;
 
+        assert slot != -1 : oxyAssert("No empty texture slot!");
         assert slot != 0 : oxyAssert("Slot can not be 0");
         assert slot <= 32 : oxyAssert("32 Texture Slots exceeded!");
 

@@ -18,6 +18,7 @@ import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -91,6 +92,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
+//        System.out.println(Arrays.stream(OxyTexture.slotCounter).filter(value -> value == 1).count());
         if(scene == null) return;
         scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
@@ -169,6 +171,7 @@ public class SceneLayer extends Layer {
                 }
             }
             for (OxyEntity e : allModelEntities) {
+                if(!e.has(SelectedComponent.class)) return;
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
                 ModelMesh modelMesh = e.get(ModelMesh.class);

@@ -21,7 +21,7 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
 
-public class CubemapTexture extends OxyTexture.Texture {
+public class CubemapTexture extends OxyTexture.AbstractTexture {
 
     private static final float[] skyboxVertices = {
             -1, 1, -1,

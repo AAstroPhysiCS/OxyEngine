@@ -4,6 +4,7 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.UIEditable;
 import OxyEngineEditor.UI.Panels.PropertyEntry;
@@ -15,7 +16,7 @@ import org.joml.Vector4f;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
-public class OxyMaterial implements EntityComponent, UIEditable {
+public class OxyMaterial implements EntityComponent, UIEditable, OxyDisposable {
 
     public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture;
     public final OxyColor albedoColor;
@@ -260,6 +261,16 @@ public class OxyMaterial implements EntityComponent, UIEditable {
             }
         }
     };
+
+    @Override
+    public void dispose() {
+        if (albedoTexture != null) albedoTexture.dispose();
+        if (aoTexture != null) aoTexture.dispose();
+        if (normalTexture != null) normalTexture.dispose();
+        if (metallicTexture != null) metallicTexture.dispose();
+        if (roughnessTexture != null) roughnessTexture.dispose();
+        if (heightTexture != null) heightTexture.dispose();
+    }
 
     @Override
     public PropertyEntry node() {

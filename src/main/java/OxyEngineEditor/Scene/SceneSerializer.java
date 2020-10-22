@@ -120,14 +120,17 @@ public final class SceneSerializer {
 
     private static final class SceneReader implements AutoCloseable {
 
-        private final String loadedS;
+        private String loadedS;
+
+        private Scene oldScene;
 
         public SceneReader(String path) {
-            loadedS = OxySystem.FileSystem.load(path);
+            if(path != null) loadedS = OxySystem.FileSystem.load(path);
         }
 
         @SuppressWarnings("DuplicateExpressions")
         public Scene readScene(SceneLayer layer, OxyShader shader) {
+            if(loadedS == null) return layer.getScene();
             String[] splitted = loadedS.split("\n");
             boolean objFound = false;
             String sceneName = null;
@@ -151,12 +154,12 @@ public final class SceneSerializer {
                 }
                 if (obj != null) objects.add(obj);
             }
-            Scene oldScene = layer.getScene();
+            oldScene = layer.getScene();
             layer.clear();
-            oldScene.dispose();
             Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer());
             scene.setUISystem(oldScene.getOxyUISystem());
-            List<String> meshes = new ArrayList<>();
+            Map<String, List<List<EntityComponent>>> listOfEntries = new HashMap<>(objects.size());
+            oldScene.dispose();
             for (var obj : objects) {
                 for (var entrySet : obj.map.entrySet()) {
                     var key = entrySet.getKey();
@@ -218,33 +221,49 @@ public final class SceneSerializer {
                                 case "Mesh" -> mesh = sValue;
                             }
                         }
-                        if (grouped.equals("true") && !meshes.contains(mesh)) {
-                            List<OxyModel> mList = scene.createModelEntities(mesh, shader);
-                            meshes.add(mesh);
-                            for (OxyModel m : mList) {
-                                m.addComponent(new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
-                                                OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
-                                        new SelectedComponent(false), OxyRenderer.currentBoundedCamera
-                                );
-                                m.constructData();
-                            }
+                        if (grouped.equals("true") && !listOfEntries.containsKey(mesh)) {
+                            listOfEntries.put(mesh, new ArrayList<>());
+                        }
+                        if (grouped.equals("true")) {
+                            listOfEntries.get(mesh).add(List.of(new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
+                                            OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
+                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(false)));
                         } else {
                             OxyModel m = scene.createModelEntity(mesh, shader);
                             m.addComponent(new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
                                             OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
-                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera
+                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(false)
                             );
                             m.constructData();
                         }
                     }
                 }
             }
-            meshes.clear();
+
+            List<OxyModel> m = null;
+            List<String> meshValue = new ArrayList<>();
+            for (var entrySet : listOfEntries.entrySet()) {
+                String mesh = entrySet.getKey();
+                if(!meshValue.contains(mesh)){
+                    m = scene.createModelEntities(mesh, shader);
+                    meshValue.add(mesh);
+                }
+                List<List<EntityComponent>> components = entrySet.getValue();
+                if(m != null) {
+                    for (int i = 0; i < m.size(); i++) {
+                        m.get(i).addComponent(components.get(i).toArray(EntityComponent[]::new));
+                        m.get(i).constructData();
+                    }
+                }
+                m = null;
+            }
             return scene;
         }
 
+        //I don't have to do this... but just to be sure
         @Override
         public void close() {
+            oldScene = null;
         }
     }
 }

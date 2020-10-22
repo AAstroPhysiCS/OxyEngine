@@ -5,20 +5,16 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Components.*;
-import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
-import OxyEngineEditor.Scene.Objects.Model.ModelType;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
-import OxyEngineEditor.Scene.Objects.Model.OxyModelLoader;
+import OxyEngineEditor.Scene.Objects.Model.*;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -125,6 +121,7 @@ public final class Scene implements OxyDisposable {
     }
 
     public final void removeEntity(OxyEntity e) {
+        e.get(OxyMaterial.class).dispose();
         e.get(Mesh.class).dispose();
         var value = registry.entityList.remove(e);
         assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");
@@ -250,6 +247,14 @@ public final class Scene implements OxyDisposable {
 
     @Override
     public void dispose() {
-        registry.entityList.keySet().removeIf(e -> e instanceof OxyModel);
+        Iterator<OxyEntity> it = registry.entityList.keySet().iterator();
+        while(it.hasNext()){
+            OxyEntity e = it.next();
+            if(e instanceof OxyModel) {
+                e.get(Mesh.class).dispose();
+                e.get(OxyMaterial.class).dispose();
+                it.remove();
+            }
+        }
     }
 }

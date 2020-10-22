@@ -16,7 +16,7 @@ import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.stb.STBImage.*;
 
-public class HDRTexture extends OxyTexture.Texture {
+public class HDRTexture extends OxyTexture.AbstractTexture {
 
     private static final float[] skyboxVertices = {
             -1, 1, -1,
@@ -98,10 +98,8 @@ public class HDRTexture extends OxyTexture.Texture {
         stbi_image_free(data);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        if (textureId == 0) {
-            textureId = glGenTextures();
-            allTextures.add(this);
-        }
+        textureId = glGenTextures();
+        allTextures.add(this);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
         for (int i = 0; i < 6; i++) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F,
@@ -196,15 +194,12 @@ public class HDRTexture extends OxyTexture.Texture {
 
     @Override
     public void dispose() {
-        super.dispose();
-        glDeleteTextures(irradianceTexture.textureId);
-        glDeleteTextures(prefilterTexture.textureId);
-        glDeleteTextures(bdrf.textureId);
+        bdrf.dispose();
+        prefilterTexture.dispose();
+        irradianceTexture.dispose();
         glDeleteFramebuffers(captureFBO);
         glDeleteRenderbuffers(captureRBO);
-        allTextures.remove(bdrf);
-        allTextures.remove(prefilterTexture);
-        allTextures.remove(irradianceTexture);
+        super.dispose();
     }
 
     public void setIrradianceTexture(IrradianceTexture irradianceTexture) {
@@ -231,13 +226,14 @@ public class HDRTexture extends OxyTexture.Texture {
         return bdrf.getTextureSlot();
     }
 
-    static class BDRF extends OxyTexture.Texture {
+    static class BDRF extends OxyTexture.AbstractTexture {
 
         private final HDRTexture mainTexture;
 
         BDRF(int slot, String path, HDRTexture mainTexture) {
             super(slot, path);
             this.mainTexture = mainTexture;
+            allTextures.add(this);
         }
 
         final static OxyShader shader = new OxyShader("shaders/OxyBDRF.glsl");
@@ -252,7 +248,6 @@ public class HDRTexture extends OxyTexture.Texture {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glBindTexture(GL_TEXTURE_2D, 0);
-            allTextures.add(this);
 
             glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
             glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
@@ -267,13 +262,14 @@ public class HDRTexture extends OxyTexture.Texture {
         }
     }
 
-    static class IrradianceTexture extends OxyTexture.Texture {
+    static class IrradianceTexture extends OxyTexture.AbstractTexture {
 
         private final HDRTexture mainTexture;
 
         IrradianceTexture(int slot, String path, HDRTexture mainTexture) {
             super(slot, path);
             this.mainTexture = mainTexture;
+            allTextures.add(this);
         }
 
         final static OxyShader shader = new OxyShader("shaders/OxyIBL.glsl");
@@ -291,7 +287,6 @@ public class HDRTexture extends OxyTexture.Texture {
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-            allTextures.add(this);
 
             glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
             glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
@@ -318,13 +313,14 @@ public class HDRTexture extends OxyTexture.Texture {
         }
     }
 
-    static class PrefilterTexture extends OxyTexture.Texture {
+    static class PrefilterTexture extends OxyTexture.AbstractTexture {
 
         private final HDRTexture mainTexture;
 
         PrefilterTexture(int slot, String path, HDRTexture mainTexture) {
             super(slot, path);
             this.mainTexture = mainTexture;
+            allTextures.add(this);
         }
 
         final static OxyShader shader = new OxyShader("shaders/OxyPrefiltering.glsl");
@@ -344,7 +340,6 @@ public class HDRTexture extends OxyTexture.Texture {
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
             glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-            allTextures.add(this);
 
             shader.enable();
             shader.setUniform1i("skyBoxTexture", 0);
