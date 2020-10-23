@@ -14,9 +14,10 @@ import static OxyEngine.System.OxySystem.oxyAssert;
 @OxySerializable(info = """
         \t\tOxyNativeObject %s {
                \tName: %s
-               \tPosition: %s
-               \tRotation: %s
-               \tScale: %s
+               \tGrouped: %s
+               \tPosition: X %s, Y %s, Z %s
+               \tRotation: X %s, Y %s, Z %s
+               \tScale: X %s, Y %s, Z %s
                \tColor: %s
                \tAlbedo Texture: %s
                \tNormal Map Texture: %s

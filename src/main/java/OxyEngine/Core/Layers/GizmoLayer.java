@@ -11,12 +11,11 @@ public class GizmoLayer extends Layer {
     public GizmoLayer(Scene scene) {
         super(scene);
         gizmo3D = OxyGizmo3D.getInstance(scene);
-        OxySelectHandler.init(scene, gizmo3D);
     }
 
     @Override
     public void build() {
-
+        OxySelectHandler.init(scene, gizmo3D);
     }
 
     @Override

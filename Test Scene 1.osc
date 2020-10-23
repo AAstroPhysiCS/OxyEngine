@@ -1,31 +1,38 @@
 Scene Name: Test Scene 1
 Environment {
-	Environment Map: D:/programming/Java/OxyEngine/target/classes/hdr/birchwood_4k.hdr
+	Environment Map: D:\programming\Java\OxyEngine\src\main\resources\hdr\pink_sunrise_4k.hdr
 	Environment Gamma Strength: 2.0
 	Environment LOD: 1.0
 	Environment Exposure: 1.0
 }
 Registry {
-	Object count: 10
-	OxyNativeObject 1 {
-       	Name: null
-       	Position: false
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Color: ( 1.000E+0  1.000E+0  1.000E+0)
+	Object count: 9
+	OxyModel 1 {
+       	Name: Light Cube
+       	Grouped: false
+       	Emitting: true
+       	Position: X 0.0, Y -1.7152953, Z -5.043754
+       	Bounds Min: X 1.0, Y 1.0, Z 1.0
+       	Bounds Max: X 1.0, Y 1.0, Z 1.0
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 0.5, Y 0.5, Z 0.5
+       	Color: [1.0, 1.0, 1.0, 1.0]
        	Albedo Texture: null
        	Normal Map Texture: null
        	Roughness Map Texture: null
        	AO Map Texture: null
        	Metallic Map Texture: null
-       	Mesh: null
+       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
     }
 	OxyModel 2 {
-       	Name: Light Cube
+       	Name: Light Cube 2
        	Grouped: false
-       	Position: ( 0.000E+0 -1.000E+1  0.000E+0)
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 5.000E-1  5.000E-1  5.000E-1)
+       	Emitting: true
+       	Position: X 0.0, Y -2.74994, Z -0.008752439
+       	Bounds Min: X 1.0, Y 1.0, Z 1.0
+       	Bounds Max: X 1.0, Y 1.0, Z 1.0
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 0.5, Y 0.5, Z 0.5
        	Color: [1.0, 1.0, 1.0, 1.0]
        	Albedo Texture: null
        	Normal Map Texture: null
@@ -35,25 +42,48 @@ Registry {
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
     }
 	OxyModel 3 {
-       	Name: Light Cube 2
+       	Name: Plane.010
        	Grouped: false
-       	Position: ( 0.000E+0 -1.000E+1  0.000E+0)
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 5.000E-1  5.000E-1  5.000E-1)
-       	Color: [1.0, 1.0, 1.0, 1.0]
-       	Albedo Texture: null
+       	Emitting: false
+       	Position: X 45.802, Y -11.69123, Z -2.0861626E-7
+       	Bounds Min: X 4.817081, Y 3.0327969, Z 0.6683631
+       	Bounds Max: X 4.817081, Y 3.0327969, Z 0.6683631
+       	Rotation: X 3.1, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
+       	Color: [0.8, 0.8, 0.8, 1.0]
+       	Albedo Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_BaseColor.png
+       	Normal Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Normal.png
+       	Roughness Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Roughness.png
+       	AO Map Texture: C:\Users\okang\Desktop\rustediron1-alt2-bl\rustediron1-alt2-bl\ao.png
+       	Metallic Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Metallic.png
+       	Mesh: C:\Users\okang\Desktop\colt-m1911\source\colt low polyfbx.fbx
+    }
+	OxyModel 4 {
+       	Name: Cerberus00_Fixed
+       	Grouped: false
+       	Emitting: false
+       	Position: X 46.255, Y 0.2658, Z 177.523
+       	Bounds Min: X 16.25672, Y 78.05304, Z 32.99376
+       	Bounds Max: X 16.25672, Y 78.05304, Z 32.99376
+       	Rotation: X 1.6, Y 0.0, Z 0.0
+       	Scale: X 0.15, Y 0.15, Z 0.15
+       	Color: [0.5882353, 0.5882353, 0.5882353, 1.0]
+       	Albedo Texture: Textures\Cerberus_A.tga
        	Normal Map Texture: null
        	Roughness Map Texture: null
        	AO Map Texture: null
        	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
+       	Mesh: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Cerberus_LP.FBX
     }
-	OxyModel 4 {
+	OxyModel 5 {
        	Name: Cube
        	Grouped: true
-       	Position: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+       	Emitting: false
+       	Position: X 0.0, Y 0.0, Z 0.0
+       	Bounds Min: X 10.918967, Y 0.329088, Z 11.644152
+       	Bounds Max: X 10.918967, Y 0.329088, Z 11.644152
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
        	Color: [0.8, 0.502477, 0.354984, 1.0]
        	Albedo Texture: null
        	Normal Map Texture: null
@@ -62,12 +92,15 @@ Registry {
        	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
     }
-	OxyModel 5 {
+	OxyModel 6 {
        	Name: Cube.001
        	Grouped: true
-       	Position: ( 0.000E+0 -3.000E+0  6.470E+0)
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+       	Emitting: false
+       	Position: X 0.0, Y -3.0, Z 6.4697437
+       	Bounds Min: X 2.0, Y 2.0, Z 1.9999995
+       	Bounds Max: X 2.0, Y 2.0, Z 2.0
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
        	Color: [0.167063, 0.8, 0.047106, 1.0]
        	Albedo Texture: null
        	Normal Map Texture: null
@@ -76,12 +109,15 @@ Registry {
        	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
     }
-	OxyModel 6 {
+	OxyModel 7 {
        	Name: Sphere
        	Grouped: true
-       	Position: ( 0.000E+0 -3.000E+0  0.000E+0)
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+       	Emitting: false
+       	Position: X 0.0, Y -3.0, Z 0.0
+       	Bounds Min: X 2.0, Y 2.0, Z 2.0
+       	Bounds Max: X 2.0, Y 2.0, Z 2.0
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
        	Color: [0.8, 0.086863, 0.093309, 1.0]
        	Albedo Texture: null
        	Normal Map Texture: null
@@ -90,13 +126,16 @@ Registry {
        	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
     }
-	OxyModel 7 {
+	OxyModel 8 {
        	Name: Cone
        	Grouped: true
-       	Position: ( 0.000E+0 -3.139E+0 -6.000E+0)
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-       	Color: [0.5399998, 1.0, 1.0, 1.0]
+       	Emitting: false
+       	Position: X 0.0, Y -3.1387882, Z -6.0
+       	Bounds Min: X 2.0, Y 2.0, Z 2.0
+       	Bounds Max: X 2.0, Y 2.0000002, Z 2.0
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
+       	Color: [0.34999993, 1.0, 1.0, 1.0]
        	Albedo Texture: null
        	Normal Map Texture: null
        	Roughness Map Texture: null
@@ -104,12 +143,15 @@ Registry {
        	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
     }
-	OxyModel 8 {
+	OxyModel 9 {
        	Name: Cube.002
        	Grouped: true
-       	Position: ( 1.110E+1 -4.322E+0 -9.662E-2)
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+       	Emitting: false
+       	Position: X 11.095259, Y -4.321733, Z -0.096618176
+       	Bounds Min: X 0.32448006, Y 3.9361959, Z 11.781788
+       	Bounds Max: X 0.32448006, Y 3.936196, Z 11.781788
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
        	Color: [0.0, 0.0, 0.0, 1.0]
        	Albedo Texture: null
        	Normal Map Texture: null
@@ -117,31 +159,5 @@ Registry {
        	AO Map Texture: null
        	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-    }
-	OxyNativeObject 9 {
-       	Name: null
-       	Position: false
-       	Rotation: ( 9.000E+0  0.000E+0  9.000E+0)
-       	Scale: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Color: ( 2.000E+1  2.000E+1  2.000E+1)
-       	Albedo Texture: [1.0, 1.0, 1.0, 0.2]
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: null
-    }
-	OxyNativeObject 10 {
-       	Name: null
-       	Position: false
-       	Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Scale: ( 0.000E+0  0.000E+0  0.000E+0)
-       	Color: ( 1.000E+0  1.000E+0  1.000E+0)
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: null
     }
 }

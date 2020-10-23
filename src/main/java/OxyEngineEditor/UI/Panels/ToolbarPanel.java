@@ -60,6 +60,7 @@ public class ToolbarPanel extends Panel {
                     String openScene = openDialog(extensionName, null);
                     Scene newScene = SceneSerializer.deserializeScene(openScene, sceneLayer, shader);
                     gizmoLayer.setScene(newScene);
+                    gizmoLayer.build();
                     opL.setScene(newScene);
                     sceneLayer.build();
                 }

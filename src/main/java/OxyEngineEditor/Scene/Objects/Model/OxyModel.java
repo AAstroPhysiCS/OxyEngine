@@ -16,9 +16,12 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
         \t\tOxyModel %s {
                \tName: %s
                \tGrouped: %s
-               \tPosition: %s
-               \tRotation: %s
-               \tScale: %s
+               \tEmitting: %s
+               \tPosition: X %s, Y %s, Z %s
+               \tBounds Min: X %s, Y %s, Z %s
+               \tBounds Max: X %s, Y %s, Z %s
+               \tRotation: X %s, Y %s, Z %s
+               \tScale: X %s, Y %s, Z %s
                \tColor: %s
                \tAlbedo Texture: %s
                \tNormal Map Texture: %s

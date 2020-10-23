@@ -145,9 +145,11 @@ public class PropertiesPanel extends Panel {
                     if (path != null) {
                         if (entityContext != null) {
                             List<OxyModel> eList = sceneLayer.getScene().createModelEntities(path, entityContext.get(OxyShader.class));
+                            boolean isGrouped = true;
+                            if(eList.size() <= 1) isGrouped = false;
                             for (OxyModel e : eList) {
                                 TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
-                                e.addComponent(t, new SelectedComponent(true, false));
+                                e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped));
                                 e.constructData();
                             }
                             sceneLayer.getScene().removeEntity(entityContext);

@@ -18,6 +18,8 @@
       <w>jcenter</w>
       <w>lwjgl</w>
       <w>macos</w>
+      <w>maximov</w>
+      <w>polyfbx</w>
       <w>prefilter</w>
       <w>renderable</w>
       <w>renderlist</w>

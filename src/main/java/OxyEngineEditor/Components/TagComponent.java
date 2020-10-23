@@ -9,4 +9,9 @@ public class TagComponent implements EntityComponent {
     public String tag() {
         return tag;
     }
+
+    @Override
+    public String toString(){
+        return "TagComponent: " + tag;
+    }
 }

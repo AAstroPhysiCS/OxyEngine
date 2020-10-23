@@ -19,9 +19,7 @@ public class ImageTexture extends OxyTexture.AbstractTexture {
         super(slot, path);
         this.tcs = tcs;
 
-        if(path.equals("null")) return;
-
-        assert slot != -1 : oxyAssert("No empty texture slot!");
+        assert slot != -10 : oxyAssert("No empty texture slot!");
         assert slot != 0 : oxyAssert("Slot can not be 0");
         assert slot <= 32 : oxyAssert("32 Texture Slots exceeded!");
 

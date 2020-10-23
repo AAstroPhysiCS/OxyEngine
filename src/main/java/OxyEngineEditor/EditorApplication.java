@@ -25,7 +25,6 @@ import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.Scene.SceneSerializer;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Math;
 import org.joml.Vector3f;

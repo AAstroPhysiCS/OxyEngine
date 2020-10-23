@@ -72,7 +72,7 @@ public class SceneHierarchyPanel extends Panel {
     private void addEntity(byte[] data, OxyShader shader) {
         OxyEntity model = sceneLayer.getScene().createModelEntity(new String(data), shader);
         model.addComponent(new SelectedComponent(false));
-        model.updateData();
+        model.constructData();
         sceneLayer.rebuild();
     }
 }
