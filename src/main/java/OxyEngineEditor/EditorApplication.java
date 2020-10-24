@@ -62,7 +62,7 @@ public class EditorApplication extends OxyApplication {
 
         OxyModel m = scene.createModelEntity(ModelType.Sphere, oxyShader);
         Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
-        m.addComponent(oxyShader, pointLightComponent, new EmittingComponent(
+        m.addComponent(pointLightComponent, new EmittingComponent(
                 new Vector3f(0, -2, 0),
                 null,
                 new Vector3f(2f, 2f, 2f),
@@ -74,7 +74,7 @@ public class EditorApplication extends OxyApplication {
 
         OxyModel m2 = scene.createModelEntity(ModelType.Sphere, oxyShader);
         Light pointLightComponent2 = new PointLight(1.0f, 0.027f, 0.0028f);
-        m2.addComponent(oxyShader, pointLightComponent2, new EmittingComponent(
+        m2.addComponent(pointLightComponent2, new EmittingComponent(
                 new Vector3f(0, -3, 0),
                 null,
                 new Vector3f(2f, 2f, 2f),

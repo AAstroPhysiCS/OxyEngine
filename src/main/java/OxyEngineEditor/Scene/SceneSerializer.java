@@ -107,9 +107,11 @@ public final class SceneSerializer {
 
                 OxySerializable objInfo = e.getClass().getAnnotation(OxySerializable.class);
                 if (objInfo != null) {
-                    String formatObjTemplate = objInfo.info().formatted(ptr++, tag, grouped, emitting, transform.position.x, transform.position.y, transform.position.z,
+                    String formatObjTemplate = objInfo.info().formatted(ptr++, tag, grouped, emitting,
+                            transform.position.x, transform.position.y, transform.position.z,
+                            transform.rotation.x, transform.rotation.y, transform.rotation.z,
+                            transform.scale.x, transform.scale.y, transform.scale.z,
                             minBound.x, minBound.y, minBound.z, maxBound.x, maxBound.y, maxBound.z,
-                            transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.scale.x, transform.scale.y, transform.scale.z,
                             albedoColor, albedoTexture, normalTexture, roughnessTexture, aoTexture, metallicTexture, mesh).trim();
                     info.append("\t").append(formatObjTemplate).append("\n");
                 }
@@ -167,10 +169,10 @@ public final class SceneSerializer {
                 if (obj != null) objects.add(obj);
             }
             oldScene = layer.getScene();
-            layer.clear();
             Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer());
             scene.setUISystem(oldScene.getOxyUISystem());
             OxySelectHandler.entityContext = null;
+            layer.clear();
             oldScene.dispose();
             Map<String, List<List<EntityComponent>>> listOfEntries = new HashMap<>(objects.size());
             for (var obj : objects) {
@@ -184,11 +186,7 @@ public final class SceneSerializer {
                             String tag = split[0].trim();
                             String sValue = split[1].trim();
                             switch (tag) {
-                                case "Environment Map" -> {
-                                    if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
-                                    SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(sValue, layer.getScene());
-                                    SceneLayer.hdrTexture.captureFaces(0);
-                                }
+                                case "Environment Map" -> layer.loadHDRTextureToScene(sValue);
                                 case "Environment Gamma Strength" -> EnvironmentPanel.gammaStrength = new float[]{Float.parseFloat(sValue)};
                                 case "Environment LOD" -> EnvironmentPanel.mipLevelStrength = new float[]{Float.parseFloat(sValue)};
                                 case "Environment Exposure" -> EnvironmentPanel.exposure = new float[]{Float.parseFloat(sValue)};
@@ -207,56 +205,11 @@ public final class SceneSerializer {
                             switch (tag) {
                                 case "Name" -> name = sValue;
                                 case "Grouped" -> grouped = sValue;
-                                case "Position" -> {
-                                    String[] splittedVector = sValue.split(", ");
-                                    String[] valuesPos = new String[3];
-                                    int ptr = 0;
-                                    for (String s : splittedVector) {
-                                        String[] valuesVector = s.split(" ");
-                                        valuesPos[ptr++] = valuesVector[1];
-                                    }
-                                    pos = new Vector3f(Float.parseFloat(valuesPos[0]), Float.parseFloat(valuesPos[1]), Float.parseFloat(valuesPos[2]));
-                                }
-                                case "Bounds Min" -> {
-                                    String[] splittedVector = sValue.split(", ");
-                                    String[] valuesPos = new String[3];
-                                    int ptr = 0;
-                                    for (String s : splittedVector) {
-                                        String[] valuesVector = s.split(" ");
-                                        valuesPos[ptr++] = valuesVector[1];
-                                    }
-                                    min = new Vector3f(Float.parseFloat(valuesPos[0]), Float.parseFloat(valuesPos[1]), Float.parseFloat(valuesPos[2]));
-                                }
-                                case "Bounds Max" -> {
-                                    String[] splittedVector = sValue.split(", ");
-                                    String[] valuesPos = new String[3];
-                                    int ptr = 0;
-                                    for (String s : splittedVector) {
-                                        String[] valuesVector = s.split(" ");
-                                        valuesPos[ptr++] = valuesVector[1];
-                                    }
-                                    max = new Vector3f(Float.parseFloat(valuesPos[0]), Float.parseFloat(valuesPos[1]), Float.parseFloat(valuesPos[2]));
-                                }
-                                case "Rotation" -> {
-                                    String[] splittedVector = sValue.split(", ");
-                                    String[] valuesRot = new String[3];
-                                    int ptr = 0;
-                                    for (String s : splittedVector) {
-                                        String[] valuesVector = s.split(" ");
-                                        valuesRot[ptr++] = valuesVector[1];
-                                    }
-                                    rot = new Vector3f(Float.parseFloat(valuesRot[0]), Float.parseFloat(valuesRot[1]), Float.parseFloat(valuesRot[2]));
-                                }
-                                case "Scale" -> {
-                                    String[] splittedVector = sValue.split(", ");
-                                    String[] valuesScale = new String[3];
-                                    int ptr = 0;
-                                    for (String s : splittedVector) {
-                                        String[] valuesVector = s.split(" ");
-                                        valuesScale[ptr++] = valuesVector[1];
-                                    }
-                                    scale = new Vector3f(Float.parseFloat(valuesScale[0]), Float.parseFloat(valuesScale[1]), Float.parseFloat(valuesScale[2]));
-                                }
+                                case "Position" -> pos = getVector3fFromString(sValue);
+                                case "Bounds Min" -> min = getVector3fFromString(sValue);
+                                case "Bounds Max" -> max = getVector3fFromString(sValue);
+                                case "Rotation" -> rot = getVector3fFromString(sValue);
+                                case "Scale" -> scale = getVector3fFromString(sValue);
                                 case "Emitting" -> emitting = Boolean.parseBoolean(sValue);
                                 case "Color" -> {
                                     CharSequence sequenceForArrays = sValue.subSequence(sValue.indexOf("[") + 1, sValue.indexOf("]"));
@@ -277,23 +230,24 @@ public final class SceneSerializer {
                         if (grouped.equals("true")) {
                             listOfEntries.get(mesh).add(List.of(new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
                                             OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
-                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(true), new BoundingBoxComponent(min, max))
+                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(true, true), new BoundingBoxComponent(min, max))
                             );
                         } else {
                             OxyModel m = scene.createModelEntity(mesh, shader);
-                            m.originPos = new Vector3f();
+                            m.originPos = new Vector3f(0, 0, 0);
                             m.addComponent(new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
                                             OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
-                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(false), new BoundingBoxComponent(min, max)
+                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(min, max)
                             );
-                            if(emitting){
+                            if (emitting) {
                                 Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
-                                m.addComponent(shader, pointLightComponent, new EmittingComponent(
+                                m.addComponent(pointLightComponent, new EmittingComponent(
                                         new Vector3f(pos),
                                         null,
                                         new Vector3f(2f, 2f, 2f),
                                         new Vector3f(5f, 5f, 5f),
                                         new Vector3f(1f, 1f, 1f)));
+                                m.addComponent(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java"));
                             }
                             m.constructData();
                         }
@@ -322,10 +276,22 @@ public final class SceneSerializer {
             return scene;
         }
 
+        private static Vector3f getVector3fFromString(String sValue){
+            String[] splittedVector = sValue.split(", ");
+            String[] valuesPos = new String[3];
+            int ptr = 0;
+            for (String s : splittedVector) {
+                String[] valuesVector = s.split(" ");
+                valuesPos[ptr++] = valuesVector[1];
+            }
+            return new Vector3f(Float.parseFloat(valuesPos[0]), Float.parseFloat(valuesPos[1]), Float.parseFloat(valuesPos[2]));
+        }
+
         //I don't have to do this... but just to be sure
         @Override
         public void close() {
             oldScene = null;
+            System.gc();
         }
     }
 }

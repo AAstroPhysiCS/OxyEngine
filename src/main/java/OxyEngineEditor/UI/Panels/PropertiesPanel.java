@@ -149,7 +149,7 @@ public class PropertiesPanel extends Panel {
                             if(eList.size() <= 1) isGrouped = false;
                             for (OxyModel e : eList) {
                                 TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
-                                e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped));
+                                e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped, false));
                                 e.constructData();
                             }
                             sceneLayer.getScene().removeEntity(entityContext);

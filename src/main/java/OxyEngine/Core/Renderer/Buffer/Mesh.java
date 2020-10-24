@@ -32,26 +32,6 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         return indexBuffer.empty() && vertexBuffer.empty();
     }
 
-    public IndexBuffer getIndexBuffer() {
-        return indexBuffer;
-    }
-
-    public VertexBuffer getVertexBuffer() {
-        return vertexBuffer;
-    }
-
-    public TextureBuffer getTextureBuffer() {
-        return textureBuffer;
-    }
-
-    public NormalsBuffer getNormalsBuffer() {
-        return normalsBuffer;
-    }
-
-    public TangentBuffer getTangentBuffer() {
-        return tangentBuffer;
-    }
-
     public String getPath() {
         return path;
     }

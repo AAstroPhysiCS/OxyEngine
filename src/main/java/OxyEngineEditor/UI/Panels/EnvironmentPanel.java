@@ -1,7 +1,6 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import imgui.ImGui;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
@@ -36,11 +35,7 @@ public class EnvironmentPanel extends Panel {
 
         if (ImGui.button("Load environment map")) {
             String path = openDialog("hdr", null);
-            if (path != null) {
-                if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
-                SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, sceneLayer.getScene());
-                SceneLayer.hdrTexture.captureFaces(0);
-            }
+            if (path != null) sceneLayer.loadHDRTextureToScene(path);
         }
 
         ImGui.alignTextToFramePadding();

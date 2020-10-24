@@ -40,9 +40,10 @@ public class SceneLayer extends Layer {
 
     @Override
     public void build() {
-        if(hdrTexture == null) hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/birchwood_4k.hdr"), scene);
+        if (hdrTexture == null)
+            hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/birchwood_4k.hdr"), scene);
 
-        if(cachedNativeMeshes == null){
+        if (cachedNativeMeshes == null) {
             cachedNativeMeshes = scene.view(NativeObjectMesh.class);
             for (OxyEntity e : cachedNativeMeshes) {
                 e.get(NativeObjectMesh.class).initList();
@@ -68,6 +69,7 @@ public class SceneLayer extends Layer {
     @Override
     public void rebuild() {
         allModelEntities = scene.view(ModelMesh.class);
+//        cachedNativeMeshes = scene.view(NativeObjectMesh.class);
 
         //Prep
         {
@@ -90,7 +92,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void update(float ts, float deltaTime) {
-        if(scene == null) return;
+        if (scene == null) return;
         scene.getOxyUISystem().dispatchNativeEvents();
         scene.getOxyUISystem().updateImGuiContext(deltaTime);
 
@@ -115,7 +117,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void render(float ts, float deltaTime) {
-        if(scene == null) return;
+        if (scene == null) return;
         scene.getFrameBuffer().blit();
         if (!initHdrTexture && OxyRenderer.currentBoundedCamera != null) {
             hdrTexture.captureFaces(ts);
@@ -168,7 +170,7 @@ public class SceneLayer extends Layer {
                 }
             }
             for (OxyEntity e : allModelEntities) {
-                if(!e.has(SelectedComponent.class)) return;
+                if (!e.has(SelectedComponent.class)) return;
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
                 ModelMesh modelMesh = e.get(ModelMesh.class);
@@ -217,6 +219,12 @@ public class SceneLayer extends Layer {
         scene.getFrameBuffer().unbind();
     }
 
+    public void loadHDRTextureToScene(String path) {
+        if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
+        SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, scene);
+        SceneLayer.hdrTexture.captureFaces(0);
+    }
+
     private void render(float ts, Mesh mesh, OxyCamera camera) {
         scene.getRenderer().render(ts, mesh, camera);
         OxyRenderer.Stats.totalShapeCount = scene.getShapeCount();
@@ -232,7 +240,7 @@ public class SceneLayer extends Layer {
         OxyRenderer.Stats.totalShapeCount = scene.getShapeCount();
     }
 
-    public void clear(){
+    public void clear() {
         cachedLightEntities.clear();
         cachedScriptComponents.clear();
         cachedCameraComponents.clear();

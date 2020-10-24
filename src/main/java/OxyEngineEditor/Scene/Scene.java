@@ -56,19 +56,27 @@ public final class Scene implements OxyDisposable {
     public final OxyNativeObject createNativeObjectEntity(int size) {
         OxyNativeObject e = new OxyNativeObject(this, size);
         put(e);
-        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal), new EntitySerializationInfo(false));
+        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal), new EntitySerializationInfo(false, false));
         return e;
     }
 
+    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader, boolean importedFromFile) {
+        return createModelEntities(type.getPath(), shader, importedFromFile);
+    }
+
+    public final OxyModel createModelEntity(ModelType type, OxyShader shader, boolean importedFromFile) {
+        return createModelEntity(type.getPath(), shader, importedFromFile);
+    }
+
     public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
-        return createModelEntities(type.getPath(), shader);
+        return createModelEntities(type.getPath(), shader, false);
     }
 
     public final OxyModel createModelEntity(ModelType type, OxyShader shader) {
-        return createModelEntity(type.getPath(), shader);
+        return createModelEntity(type.getPath(), shader, false);
     }
 
-    public final List<OxyModel> createModelEntities(String path, OxyShader shader) {
+    public final List<OxyModel> createModelEntities(String path, OxyShader shader, boolean importedFromFile) {
         List<OxyModel> models = new ArrayList<>();
         OxyModelLoader loader = new OxyModelLoader(path);
 
@@ -86,7 +94,7 @@ public final class Scene implements OxyDisposable {
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                     new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                     new RenderableComponent(RenderingMode.Normal),
-                    new EntitySerializationInfo(true),
+                    new EntitySerializationInfo(true, importedFromFile),
                     assimpMesh.material
             );
             e.initData(path);
@@ -95,7 +103,11 @@ public final class Scene implements OxyDisposable {
         return models;
     }
 
-    public final OxyModel createModelEntity(String path, OxyShader shader) {
+    public final List<OxyModel> createModelEntities(String path, OxyShader shader) {
+        return createModelEntities(path, shader, false);
+    }
+
+    public final OxyModel createModelEntity(String path, OxyShader shader, boolean importedFromFile) {
         OxyModelLoader loader = new OxyModelLoader(path);
         OxyModelLoader.AssimpOxyMesh assimpMesh = loader.meshes.get(0);
         OxyModel e = new OxyModel(this);
@@ -111,11 +123,15 @@ public final class Scene implements OxyDisposable {
                 new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                 new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                 new RenderableComponent(RenderingMode.Normal),
-                new EntitySerializationInfo(false),
+                new EntitySerializationInfo(false, importedFromFile),
                 assimpMesh.material
         );
         e.initData(path);
         return e;
+    }
+
+    public final OxyModel createModelEntity(String path, OxyShader shader) {
+        return createModelEntity(path, shader, false);
     }
 
     public final void removeEntity(OxyEntity e) {
@@ -254,5 +270,6 @@ public final class Scene implements OxyDisposable {
                 it.remove();
             }
         }
+//        assert registry.entityList.keySet().size() == 0 : oxyAssert("Scene dispose failed");
     }
 }

@@ -3,6 +3,7 @@ package OxyEngineEditor.Scene;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Components.EntityComponent;
+import OxyEngineEditor.Components.EntitySerializationInfo;
 import OxyEngineEditor.Components.ScriptingComponent;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
@@ -60,7 +61,9 @@ public abstract class OxyEntity {
             if (c instanceof Mesh m) {
                 m.addToList(this);
             }
-            if (c instanceof TransformComponent t) { //if someone decides to add a seperate TransformComponent, then validate it
+            //if someone decides to add a seperate TransformComponent, then validate it
+            //if the entity was imported from a oxy scene file, then do not validate it, because it has been already validated.
+            if (c instanceof TransformComponent t && !get(EntitySerializationInfo.class).imported()) {
                 t.validate(this);
             }
             if (c instanceof ScriptingComponent s) {

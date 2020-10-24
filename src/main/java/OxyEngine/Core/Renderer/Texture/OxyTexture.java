@@ -18,6 +18,7 @@ public class OxyTexture {
 
     static final List<AbstractTexture> allTextures = new ArrayList<>();
     public static final int[] slotCounter = new int[32];
+
     static {
         Arrays.fill(slotCounter, 0);
     }
@@ -47,7 +48,7 @@ public class OxyTexture {
         public void dispose() {
             glDeleteTextures(textureId);
             allTextures.remove(this);
-            if(textureSlot != -1) slotCounter[textureSlot - 1] = 0;
+            if (textureSlot != -1) slotCounter[textureSlot - 1] = 0;
         }
 
         public boolean empty() {
@@ -73,26 +74,14 @@ public class OxyTexture {
     }
 
     public static ImageTexture loadImage(String path) {
-        if(path == null){
-            logger.warning("Path is null");
-            return null;
-        }
-        if(path.equals("null")){
-            logger.warning("Path is null");
-            return null;
-        }
+        if (path == null) return null;
+        if (path.equals("null")) return null;
         return new ImageTexture(getLatestSlot(), path, null);
     }
 
     public static ImageTexture loadImage(String path, float[] tcs) {
-        if(path == null){
-            logger.warning("Path is null");
-            return null;
-        }
-        if(path.equals("null")){
-            logger.warning("Path is null");
-            return null;
-        }
+        if (path == null) return null;
+        if (path.equals("null")) return null;
         return new ImageTexture(getLatestSlot(), path, tcs);
     }
 
@@ -102,14 +91,8 @@ public class OxyTexture {
     }
 
     public static CubemapTexture loadCubemap(String path, Scene scene) {
-        if(path == null){
-            logger.warning("Path is null");
-            return null;
-        }
-        if(path.equals("null")){
-            logger.warning("Path is null");
-            return null;
-        }
+        if (path == null) return null;
+        if (path.equals("null")) return null;
         return new CubemapTexture(getLatestSlot(), path, scene);
     }
 
@@ -141,9 +124,9 @@ public class OxyTexture {
         for (int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
     }
 
-    private static int getLatestSlot(){
-        for(int i = 0; i < slotCounter.length - 1; i++){
-            if(slotCounter[i] == 0){
+    private static int getLatestSlot() {
+        for (int i = 0; i < slotCounter.length - 1; i++) {
+            if (slotCounter[i] == 0) {
                 slotCounter[i] = 1;
                 return i + 1;
             }

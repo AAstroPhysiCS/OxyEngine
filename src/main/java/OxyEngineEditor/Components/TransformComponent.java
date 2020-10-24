@@ -1,6 +1,7 @@
 package OxyEngineEditor.Components;
 
 import OxyEngineEditor.Scene.OxyEntity;
+import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -32,6 +33,19 @@ public class TransformComponent implements EntityComponent {
 
     public TransformComponent(Vector3f position, Vector3f rotation, float scale) {
         this(position, rotation, new Vector3f(scale, scale, scale));
+    }
+
+    @Deprecated
+    public TransformComponent(Matrix4f t){
+        this.transform = t;
+        this.position = new Vector3f();
+        this.rotation = new Vector3f();
+        this.scale = new Vector3f();
+        AxisAngle4f rot = new AxisAngle4f();
+        t.getTranslation(position);
+        t.getRotation(rot);
+        t.getScale(scale);
+        rot.transform(rotation);
     }
 
     public void validate(OxyEntity entity) {
