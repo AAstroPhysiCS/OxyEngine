@@ -70,7 +70,7 @@ public class EditorApplication extends OxyApplication {
                 new Vector3f(1f, 1f, 1f)));
         m.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m.constructData();
-        m.addComponent(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java"));
+        m.addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java"));
 
         OxyModel m2 = scene.createModelEntity(ModelType.Sphere, oxyShader);
         Light pointLightComponent2 = new PointLight(1.0f, 0.027f, 0.0028f);
@@ -83,7 +83,7 @@ public class EditorApplication extends OxyApplication {
         m2.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m2.constructData();
 
-        m2.addComponent(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java"));
+        m2.addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java"));
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
@@ -99,7 +99,8 @@ public class EditorApplication extends OxyApplication {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0)));
             obj.constructData();
         }
-        testObjects.get(3).addComponent(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/ColorIteratorScript.java"));
+        testObjects.get(3).addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/ColorIteratorScript.java"));
+        testObjects.get(3).addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/PositionIteratorScript.java"));
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;

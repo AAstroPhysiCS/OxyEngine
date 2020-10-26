@@ -13,12 +13,17 @@ import static OxyEngine.System.OxySystem.oxyAssert;
 
 @OxySerializable(info = """
         \t\tOxyNativeObject %s {
+               \tID: %s
                \tName: %s
                \tGrouped: %s
+               \tEmitting: %s
                \tPosition: X %s, Y %s, Z %s
                \tRotation: X %s, Y %s, Z %s
                \tScale: X %s, Y %s, Z %s
+               \tBounds Min: X %s, Y %s, Z %s
+               \tBounds Max: X %s, Y %s, Z %s
                \tColor: %s
+               \tScripts: [%s]
                \tAlbedo Texture: %s
                \tNormal Map Texture: %s
                \tRoughness Map Texture: %s

@@ -69,7 +69,7 @@ public class ToolbarPanel extends Panel {
                 }
                 if (ImGui.menuItem("Save As...")) {
                     String saveAs = saveDialog(extensionName, null);
-                    SceneSerializer.serializeScene(sceneLayer, saveAs + fileExtension);
+                    if(saveAs != null) SceneSerializer.serializeScene(sceneLayer, saveAs + fileExtension);
                 }
                 ImGui.endMenu();
             }

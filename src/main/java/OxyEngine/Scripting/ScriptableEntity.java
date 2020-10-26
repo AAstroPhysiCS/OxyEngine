@@ -9,7 +9,7 @@ public abstract class ScriptableEntity {
     private final Scene scene;
     private final OxyEntity entity;
 
-    protected ScriptableEntity(Scene scene, OxyEntity entity) {
+    public ScriptableEntity(Scene scene, OxyEntity entity) {
         this.scene = scene;
         this.entity = entity;
     }
@@ -22,7 +22,11 @@ public abstract class ScriptableEntity {
         return scene.has(entity, destClass);
     }
 
-    protected abstract void onCreate();
+    protected void updateData() {
+        entity.updateData();
+    }
 
-    protected abstract void onUpdate(float ts);
+    public abstract void onCreate();
+
+    public abstract void onUpdate(float ts);
 }

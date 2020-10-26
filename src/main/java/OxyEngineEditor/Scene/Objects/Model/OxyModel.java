@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 @OxySerializable(info = """
         \t\tOxyModel %s {
+               \tID: %s
                \tName: %s
                \tGrouped: %s
                \tEmitting: %s
@@ -24,6 +25,7 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
                \tBounds Min: X %s, Y %s, Z %s
                \tBounds Max: X %s, Y %s, Z %s
                \tColor: %s
+               \tScripts: [%s]
                \tAlbedo Texture: %s
                \tNormal Map Texture: %s
                \tRoughness Map Texture: %s

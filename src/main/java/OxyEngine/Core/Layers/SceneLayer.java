@@ -13,6 +13,7 @@ import OxyEngine.Scripting.OxyScriptItem;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
@@ -29,7 +30,6 @@ public class SceneLayer extends Layer {
     private Set<OxyEntity> cachedLightEntities, cachedNativeMeshes;
     private Set<OxyCamera> cachedCameraComponents;
     private Set<OxyEntity> allModelEntities;
-    public Set<ScriptingComponent> cachedScriptComponents;
 
     public SceneLayer(Scene scene) {
         super(scene);
@@ -57,11 +57,10 @@ public class SceneLayer extends Layer {
         {
             for (OxyEntity e : allModelEntities) {
                 e.get(ModelMesh.class).initList();
-            }
-            cachedScriptComponents = scene.distinct(ScriptingComponent.class);
-            for (EntityComponent e : cachedScriptComponents) {
-                OxyScriptItem item = ((ScriptingComponent) e).getScriptItem();
-                item.invokeMethod("onCreate");
+                for (ScriptingComponent c : e.getScripts()) {
+                    OxyScriptItem item = c.getScriptItem();
+                    item.invokeMethod("onCreate");
+                }
             }
         }
     }
@@ -77,10 +76,12 @@ public class SceneLayer extends Layer {
             if (cachedConverted.size() == 0) return;
             ModelMesh mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMesh.class);
             mesh.initList();
-            cachedScriptComponents = scene.distinct(ScriptingComponent.class);
-            for (EntityComponent e : cachedScriptComponents) {
-                OxyScriptItem item = ((ScriptingComponent) e).getScriptItem();
-                item.invokeMethod("onCreate");
+            for(OxyEntity e : allModelEntities){
+                if(!(e instanceof OxyModel)) continue;
+                for (ScriptingComponent c : e.getScripts()) {
+                    OxyScriptItem item = c.getScriptItem();
+                    item.invokeMethod("onCreate");
+                }
             }
         }
     }
@@ -125,9 +126,12 @@ public class SceneLayer extends Layer {
             initHdrTexture = true;
         }
 
-        for (EntityComponent e : cachedScriptComponents) {
-            OxyScriptItem item = ((ScriptingComponent) e).getScriptItem();
-            item.invokeMethod("onUpdate", ts);
+        for(OxyEntity e : allModelEntities){
+            if(!(e instanceof OxyModel)) continue;
+            for (ScriptingComponent c : e.getScripts()) {
+                OxyScriptItem item = c.getScriptItem();
+                item.invokeMethod("onUpdate", ts);
+            }
         }
 
         scene.getFrameBuffer().bind();
@@ -242,7 +246,6 @@ public class SceneLayer extends Layer {
 
     public void clear() {
         cachedLightEntities.clear();
-        cachedScriptComponents.clear();
         cachedCameraComponents.clear();
         allModelEntities.clear();
     }

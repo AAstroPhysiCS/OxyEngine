@@ -56,7 +56,7 @@ public final class Scene implements OxyDisposable {
     public final OxyNativeObject createNativeObjectEntity(int size) {
         OxyNativeObject e = new OxyNativeObject(this, size);
         put(e);
-        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal), new EntitySerializationInfo(false, false));
+        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal), new EntitySerializationInfo(false, false), new UUIDComponent(UUID.randomUUID()));
         return e;
     }
 
@@ -85,6 +85,7 @@ public final class Scene implements OxyDisposable {
             put(e);
             e.originPos = new Vector3f(assimpMesh.pos);
             e.addComponent(
+                    new UUIDComponent(UUID.randomUUID()),
                     shader,
                     new BoundingBoxComponent(
                             assimpMesh.min,
@@ -114,6 +115,7 @@ public final class Scene implements OxyDisposable {
         put(e);
         e.originPos = new Vector3f(assimpMesh.pos);
         e.addComponent(
+                new UUIDComponent(UUID.randomUUID()),
                 shader,
                 new BoundingBoxComponent(
                         assimpMesh.min,

@@ -2,10 +2,7 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
-import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Components.EntitySerializationInfo;
-import OxyEngineEditor.Components.ScriptingComponent;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
 import OxyEngineEditor.UI.Panels.PropertyEntry;
@@ -20,6 +17,7 @@ import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 
 public abstract class OxyEntity {
 
+    private final List<ScriptingComponent> scripts = new ArrayList<>();
     private final List<PropertyEntry> nodes = new ArrayList<>();
 
     public float[] vertices, tcs, normals, tangents, biTangents;
@@ -66,12 +64,18 @@ public abstract class OxyEntity {
             if (c instanceof TransformComponent t && !get(EntitySerializationInfo.class).imported()) {
                 t.validate(this);
             }
-            if (c instanceof ScriptingComponent s) {
-                s.setScene(scene);
-                s.setEntity(this);
-                s.finalizeComponent();
-            }
         }
+    }
+
+    public void addScript(ScriptingComponent component) {
+        component.setScene(scene);
+        component.setEntity(this);
+        component.finalizeComponent();
+        scripts.add(component);
+    }
+
+    public void addScript(List<ScriptingComponent> components){
+        for(ScriptingComponent s : components) addScript(s);
     }
 
     /*
@@ -157,5 +161,9 @@ public abstract class OxyEntity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public List<ScriptingComponent> getScripts() {
+        return scripts;
     }
 }

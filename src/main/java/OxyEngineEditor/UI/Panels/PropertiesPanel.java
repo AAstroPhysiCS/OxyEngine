@@ -3,7 +3,6 @@ package OxyEngineEditor.UI.Panels;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Scripting.OxyScriptItem;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import imgui.ImGui;
@@ -13,7 +12,6 @@ import imgui.type.ImBoolean;
 import imgui.type.ImString;
 
 import java.util.List;
-import java.util.Set;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
@@ -108,21 +106,6 @@ public class PropertiesPanel extends Panel {
             return;
         }
 
-        { // Scripting
-            Set<ScriptingComponent> set = sceneLayer.cachedScriptComponents;
-            for (EntityComponent e : set) {
-                OxyScriptItem item = ((ScriptingComponent) e).getScriptItem();
-                for (var f : item.getFieldsAsObject()) {
-                    if (f.e() instanceof Float m) {
-                        ImGui.alignTextToFramePadding();
-                        ImGui.text(f.name());
-                        ImGui.sameLine();
-                        ImGui.sliderFloat("##hideLabel item1" + f.hashCode(), new float[]{m}, 0, 1000);
-                    }
-                }
-            }
-        }
-
         {
             if (ImGui.treeNodeEx("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
 
@@ -146,7 +129,7 @@ public class PropertiesPanel extends Panel {
                         if (entityContext != null) {
                             List<OxyModel> eList = sceneLayer.getScene().createModelEntities(path, entityContext.get(OxyShader.class));
                             boolean isGrouped = true;
-                            if(eList.size() <= 1) isGrouped = false;
+                            if (eList.size() <= 1) isGrouped = false;
                             for (OxyModel e : eList) {
                                 TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
                                 e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped, false));

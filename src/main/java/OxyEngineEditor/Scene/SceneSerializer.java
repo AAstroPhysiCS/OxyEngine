@@ -74,6 +74,7 @@ public final class SceneSerializer {
 
                 String tag = "null";
                 String grouped = "false";
+                StringBuilder scripts = new StringBuilder();
                 TransformComponent transform = e.get(TransformComponent.class);
                 Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
                 String albedoColor = "null";
@@ -83,6 +84,7 @@ public final class SceneSerializer {
                 String metallicTexture = "null";
                 String aoTexture = "null";
                 String mesh = "null";
+                String id = e.get(UUIDComponent.class).getUUIDString();
                 boolean emitting = false;
 
                 if (e.has(BoundingBoxComponent.class)) {
@@ -105,14 +107,18 @@ public final class SceneSerializer {
                 if (e.has(ModelMesh.class)) mesh = e.get(ModelMesh.class).getPath();
                 if (e.has(EmittingComponent.class)) emitting = true;
 
+                for(ScriptingComponent c : e.getScripts()){
+                    scripts.append(" ").append(c.getPath()).append(",");
+                }
+
                 OxySerializable objInfo = e.getClass().getAnnotation(OxySerializable.class);
                 if (objInfo != null) {
-                    String formatObjTemplate = objInfo.info().formatted(ptr++, tag, grouped, emitting,
+                    String formatObjTemplate = objInfo.info().formatted(ptr++, id, tag, grouped, emitting,
                             transform.position.x, transform.position.y, transform.position.z,
                             transform.rotation.x, transform.rotation.y, transform.rotation.z,
                             transform.scale.x, transform.scale.y, transform.scale.z,
                             minBound.x, minBound.y, minBound.z, maxBound.x, maxBound.y, maxBound.z,
-                            albedoColor, albedoTexture, normalTexture, roughnessTexture, aoTexture, metallicTexture, mesh).trim();
+                            albedoColor, scripts.toString(), albedoTexture, normalTexture, roughnessTexture, aoTexture, metallicTexture, mesh).trim();
                     info.append("\t").append(formatObjTemplate).append("\n");
                 }
             }
@@ -175,6 +181,7 @@ public final class SceneSerializer {
             layer.clear();
             oldScene.dispose();
             Map<String, List<List<EntityComponent>>> listOfEntries = new HashMap<>(objects.size());
+            Map<String, List<ScriptingComponent>> listOfScripts = new HashMap<>(objects.size());
             for (var obj : objects) {
                 for (var entrySet : obj.map.entrySet()) {
                     var key = entrySet.getKey();
@@ -193,7 +200,7 @@ public final class SceneSerializer {
                             }
                         }
                     } else if (key.contains("OxyModel")) {
-                        String name = null, aT = null, nMT = null, rMT = null, aMT = null, mMT = null, mesh = null, grouped = null;
+                        String id = null, name = null, aT = null, nMT = null, rMT = null, aMT = null, mMT = null, mesh = null, grouped = null;
                         Vector3f pos = null, rot = null, scale = null, min = null, max = null;
                         boolean emitting = false;
                         Vector4f color = new Vector4f(1, 1, 1, 1);
@@ -203,6 +210,7 @@ public final class SceneSerializer {
                             String tag = split[0].trim();
                             String sValue = split[1].trim();
                             switch (tag) {
+                                case "ID" -> id = sValue;
                                 case "Name" -> name = sValue;
                                 case "Grouped" -> grouped = sValue;
                                 case "Position" -> pos = getVector3fFromString(sValue);
@@ -216,6 +224,16 @@ public final class SceneSerializer {
                                     String[] subSequence = ((String) sequenceForArrays).trim().strip().split(", ");
                                     color = new Vector4f((float) Double.parseDouble(subSequence[0]), (float) Double.parseDouble(subSequence[1]), (float) Double.parseDouble(subSequence[2]), (float) Double.parseDouble(subSequence[3]));
                                 }
+                                case "Scripts" -> {
+                                    CharSequence sequenceForArrays = sValue.subSequence(sValue.indexOf("[") + 1, sValue.indexOf("]"));
+                                    String[] subSequence = ((String) sequenceForArrays).trim().strip().split(",");
+                                    if(!listOfScripts.containsKey(id)){
+                                        listOfScripts.put(id, new ArrayList<>());
+                                    }
+                                    for(String s : subSequence){
+                                        if(!s.isBlank()) listOfScripts.get(id).add(new ScriptingComponent(s.trim()));
+                                    }
+                                }
                                 case "Albedo Texture" -> aT = sValue;
                                 case "Normal Map Texture" -> nMT = sValue;
                                 case "Roughness Map Texture" -> rMT = sValue;
@@ -224,18 +242,19 @@ public final class SceneSerializer {
                                 case "Mesh" -> mesh = sValue;
                             }
                         }
+
                         if (grouped.equals("true") && !listOfEntries.containsKey(mesh)) {
                             listOfEntries.put(mesh, new ArrayList<>());
                         }
                         if (grouped.equals("true")) {
-                            listOfEntries.get(mesh).add(List.of(new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
+                            listOfEntries.get(mesh).add(List.of(new UUIDComponent(UUID.fromString(id)), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
                                             OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
                                     new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(true, true), new BoundingBoxComponent(min, max))
                             );
                         } else {
                             OxyModel m = scene.createModelEntity(mesh, shader);
                             m.originPos = new Vector3f(0, 0, 0);
-                            m.addComponent(new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
+                            m.addComponent(new UUIDComponent(UUID.fromString(id)), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
                                             OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
                                     new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(min, max)
                             );
@@ -247,7 +266,6 @@ public final class SceneSerializer {
                                         new Vector3f(2f, 2f, 2f),
                                         new Vector3f(5f, 5f, 5f),
                                         new Vector3f(1f, 1f, 1f)));
-                                m.addComponent(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java"));
                             }
                             m.constructData();
                         }
@@ -273,10 +291,15 @@ public final class SceneSerializer {
                 }
                 m = null;
             }
+
+            for(OxyEntity modelInScene : scene.getEntities()){
+                List<ScriptingComponent> components = listOfScripts.get(modelInScene.get(UUIDComponent.class).getUUIDString());
+                modelInScene.addScript(components);
+            }
             return scene;
         }
 
-        private static Vector3f getVector3fFromString(String sValue){
+        private static Vector3f getVector3fFromString(String sValue) {
             String[] splittedVector = sValue.split(", ");
             String[] valuesPos = new String[3];
             int ptr = 0;

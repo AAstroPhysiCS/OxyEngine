@@ -10,7 +10,7 @@ import java.io.File;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-public class ScriptingComponent implements EntityComponent {
+public class ScriptingComponent {
 
     private OxyScriptItem scriptItem;
     private Scene scene;
@@ -54,10 +54,14 @@ public class ScriptingComponent implements EntityComponent {
         if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
             Class<?> classObj = obj.getClass();
             scriptItem = new OxyScriptItem(obj, classObj.getFields(), classObj.getMethods());
-        } else oxyAssert("The script must implement ScriptableEntity interface!");
+        } else oxyAssert("The script must extend ScriptableEntity class!");
     }
 
     public OxyScriptItem getScriptItem() {
         return scriptItem;
+    }
+
+    public String getPath() {
+        return path;
     }
 }
