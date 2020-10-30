@@ -67,6 +67,20 @@ public abstract class OxyEntity {
         }
     }
 
+    public void addComponent(List<EntityComponent> component) {
+        for(EntityComponent c : component){
+            scene.addComponent(this, c);
+            if (c instanceof Mesh m) {
+                m.addToList(this);
+            }
+            //if someone decides to add a seperate TransformComponent, then validate it
+            //if the entity was imported from a oxy scene file, then do not validate it, because it has been already validated.
+            if (c instanceof TransformComponent t && !get(EntitySerializationInfo.class).imported()) {
+                t.validate(this);
+            }
+        }
+    }
+
     public void addScript(ScriptingComponent component) {
         component.setScene(scene);
         component.setEntity(this);

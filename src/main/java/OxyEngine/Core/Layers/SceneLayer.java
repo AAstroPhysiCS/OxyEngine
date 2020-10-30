@@ -193,7 +193,7 @@ public class SceneLayer extends Layer {
 
                 glEnable(GL_CULL_FACE);
                 glCullFace(GL_BACK);
-                if (s.selected) {
+                /*if (s.selected) {
                     glEnable(GL_STENCIL_TEST);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
                     glStencilMask(0xFF);
@@ -216,7 +216,8 @@ public class SceneLayer extends Layer {
                     glDisable(GL_STENCIL_TEST);
                 } else {
                     render(ts, modelMesh, mainCamera);
-                }
+                }*/
+                render(ts, modelMesh, mainCamera);
                 glDisable(GL_CULL_FACE);
             }
         }

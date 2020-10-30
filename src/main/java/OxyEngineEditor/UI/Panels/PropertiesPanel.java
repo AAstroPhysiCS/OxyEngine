@@ -67,6 +67,7 @@ public class PropertiesPanel extends Panel {
             if (name.get().length() == 0) name.set("Unnamed");
             entityContext.get(TagComponent.class).setTag(name.get());
         }
+        ImGui.textDisabled("ID: " + entityContext.get(UUIDComponent.class).getUUIDString());
 
         focusedWindow = ImGui.isWindowFocused();
 

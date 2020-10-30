@@ -5,15 +5,19 @@ import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngineEditor.Components.NativeObjectMesh;
 import OxyEngineEditor.Components.RenderableComponent;
 import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Components.UUIDComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.OxySerializable;
 import OxyEngineEditor.Scene.Scene;
+
+import java.util.UUID;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
 @OxySerializable(info = """
         \t\tOxyNativeObject %s {
                \tID: %s
+               \tNative Name: %s
                \tName: %s
                \tGrouped: %s
                \tEmitting: %s
@@ -52,7 +56,7 @@ public class OxyNativeObject extends OxyEntity {
     public OxyEntity copyMe() {
         OxyNativeObject e = new OxyNativeObject(scene, size);
         e.addToScene();
-        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
+        e.addComponent(new UUIDComponent(UUID.randomUUID()), new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
         return e;
     }
 

@@ -67,7 +67,6 @@ public final class Scene implements OxyDisposable {
     public final OxyModel createModelEntity(ModelType type, OxyShader shader, boolean importedFromFile) {
         return createModelEntity(type.getPath(), shader, importedFromFile);
     }
-
     public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
         return createModelEntities(type.getPath(), shader, false);
     }
@@ -94,6 +93,7 @@ public final class Scene implements OxyDisposable {
                     new TransformComponent(new Vector3f(assimpMesh.pos)),
                     new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                     new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
+                    new NativeTagComponent(assimpMesh.name),
                     new RenderableComponent(RenderingMode.Normal),
                     new EntitySerializationInfo(true, importedFromFile),
                     assimpMesh.material
@@ -124,6 +124,7 @@ public final class Scene implements OxyDisposable {
                 new TransformComponent(new Vector3f(assimpMesh.pos)),
                 new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                 new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
+                new NativeTagComponent(assimpMesh.name),
                 new RenderableComponent(RenderingMode.Normal),
                 new EntitySerializationInfo(false, importedFromFile),
                 assimpMesh.material
