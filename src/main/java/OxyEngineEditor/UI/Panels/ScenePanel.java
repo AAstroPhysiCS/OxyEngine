@@ -5,6 +5,7 @@ import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngineEditor.Components.PerspectiveCamera;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.WorldGrid;
+import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiStyleVar;
@@ -36,7 +37,7 @@ public class ScenePanel extends Panel {
 
     private ScenePanel(SceneLayer sceneLayer) {
         this.sceneLayer = sceneLayer;
-        new WorldGrid(sceneLayer.getScene(), 10);
+        new WorldGrid(SceneRuntime.ACTIVE_SCENE, 10);
     }
 
     @Override
@@ -56,7 +57,7 @@ public class ScenePanel extends Panel {
         ImGui.getCursorPos(offset);
 
         if (keyEventDispatcher.getKeys()[GLFW_KEY_DELETE] && entityContext != null) {
-            sceneLayer.getScene().removeEntity(entityContext);
+            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
             sceneLayer.updateAllModelEntities();
             entityContext = null;
         }
@@ -77,13 +78,13 @@ public class ScenePanel extends Panel {
         ImVec2 availContentRegionSize = new ImVec2();
         ImGui.getContentRegionAvail(availContentRegionSize);
 
-        FrameBuffer frameBuffer = sceneLayer.getScene().getFrameBuffer();
+        FrameBuffer frameBuffer = SceneRuntime.ACTIVE_SCENE.getFrameBuffer();
         if (frameBuffer != null) {
             ImGui.image(frameBuffer.getColorAttachmentTexture(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
 
             if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {
                 frameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
-                if (sceneLayer.getScene().getRenderer().getCamera() instanceof PerspectiveCamera p)
+                if (SceneRuntime.ACTIVE_SCENE.getRenderer().getCamera() instanceof PerspectiveCamera p)
                     p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
             }
         }

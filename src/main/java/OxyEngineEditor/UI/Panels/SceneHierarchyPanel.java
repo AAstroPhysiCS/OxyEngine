@@ -7,6 +7,7 @@ import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
 import OxyEngineEditor.Scene.Objects.Model.ModelType;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 
@@ -36,7 +37,7 @@ public class SceneHierarchyPanel extends Panel {
     }
 
     public void updateEntityPanel() {
-        sceneLayer.getScene().each(entity -> {
+        SceneRuntime.ACTIVE_SCENE.each(entity -> {
             TagComponent tagComponent = entity.get(TagComponent.class);
             if (tagComponent != null) {
                 if (ImGui.treeNodeEx(String.valueOf(entity.hashCode()), ImGuiTreeNodeFlags.OpenOnArrow | (entityContext == entity ? ImGuiTreeNodeFlags.Selected : 0), tagComponent.tag())) {
@@ -70,7 +71,7 @@ public class SceneHierarchyPanel extends Panel {
     }
 
     private void addEntity(byte[] data, OxyShader shader) {
-        OxyEntity model = sceneLayer.getScene().createModelEntity(new String(data), shader);
+        OxyEntity model = SceneRuntime.ACTIVE_SCENE.createModelEntity(new String(data), shader);
         model.addComponent(new SelectedComponent(false));
         model.constructData();
         sceneLayer.rebuild();

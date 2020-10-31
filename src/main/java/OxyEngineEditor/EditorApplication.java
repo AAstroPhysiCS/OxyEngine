@@ -25,6 +25,7 @@ import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Math;
 import org.joml.Vector3f;
@@ -110,17 +111,19 @@ public class EditorApplication extends OxyApplication {
 
         //order matters!
         scene.setUISystem(new OxyUISystem(windowHandle));
-        SceneLayer sceneLayer = new SceneLayer(scene);
-        GizmoLayer gizmoLayer = new GizmoLayer(scene);
-        OverlayPanelLayer overlayPanelLayer = new OverlayPanelLayer(windowHandle, scene);
+        SceneRuntime.ACTIVE_SCENE = scene;
+        SceneLayer sceneLayer = new SceneLayer();
+        GizmoLayer gizmoLayer = new GizmoLayer();
+        OverlayPanelLayer overlayPanelLayer = new OverlayPanelLayer(windowHandle);
 
         overlayPanelLayer.addPanel(StatsPanel.getInstance());
-        overlayPanelLayer.addPanel(ToolbarPanel.getInstance(sceneLayer, gizmoLayer, overlayPanelLayer, oxyShader));
+        overlayPanelLayer.addPanel(ToolbarPanel.getInstance(sceneLayer, gizmoLayer, oxyShader));
         overlayPanelLayer.addPanel(SceneHierarchyPanel.getInstance(sceneLayer, oxyShader));
         overlayPanelLayer.addPanel(PropertiesPanel.getInstance(sceneLayer));
         overlayPanelLayer.addPanel(ScenePanel.getInstance(sceneLayer));
         overlayPanelLayer.addPanel(EnvironmentPanel.getInstance(sceneLayer));
         overlayPanelLayer.addPanel(ProjectPanel.getInstance());
+        overlayPanelLayer.addPanel(SceneRuntime.getPanel());
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, overlayPanelLayer);
         for (Layer l : layerStack.getLayerStack())

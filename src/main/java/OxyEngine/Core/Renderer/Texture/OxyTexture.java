@@ -69,7 +69,7 @@ public class OxyTexture {
     }
 
     public static ImageTexture loadImage(int slot, String path) {
-        assert slotCounter[slot] != 0 : oxyAssert("Texture Slot already being used");
+        assert slot == -1 || slotCounter[slot] != 0 : oxyAssert("Texture Slot already being used");
         return new ImageTexture(slot, path, null);
     }
 
@@ -117,7 +117,9 @@ public class OxyTexture {
     }
 
     public static void bindAllTextureSlots() {
-        for (AbstractTexture t : allTextures) glBindTextureUnit(t.getTextureSlot(), t.getTextureId());
+        for (AbstractTexture t : allTextures){
+            if(t.getTextureSlot() >= 0) glBindTextureUnit(t.getTextureSlot(), t.getTextureId());
+        }
     }
 
     public static void unbindAllTextureSlots() {

@@ -15,13 +15,13 @@ import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
@@ -31,28 +31,24 @@ public class SceneLayer extends Layer {
     private Set<OxyCamera> cachedCameraComponents;
     private Set<OxyEntity> allModelEntities;
 
-    public SceneLayer(Scene scene) {
-        super(scene);
-    }
-
     static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
     public static HDRTexture hdrTexture;
 
     @Override
     public void build() {
         if (hdrTexture == null)
-            hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/birchwood_4k.hdr"), scene);
+            hdrTexture = OxyTexture.loadHDRTexture(OxySystem.FileSystem.getResourceByPath("/hdr/birchwood_4k.hdr"), ACTIVE_SCENE);
 
         if (cachedNativeMeshes == null) {
-            cachedNativeMeshes = scene.view(NativeObjectMesh.class);
+            cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMesh.class);
             for (OxyEntity e : cachedNativeMeshes) {
                 e.get(NativeObjectMesh.class).initList();
             }
         }
 
-        cachedCameraComponents = scene.distinct(OxyCamera.class);
-        cachedLightEntities = scene.view(Light.class);
-        allModelEntities = scene.view(ModelMesh.class);
+        cachedCameraComponents = ACTIVE_SCENE.distinct(OxyCamera.class);
+        cachedLightEntities = ACTIVE_SCENE.view(Light.class);
+        allModelEntities = ACTIVE_SCENE.view(ModelMesh.class);
         //Prep
         {
             for (OxyEntity e : allModelEntities) {
@@ -67,7 +63,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void rebuild() {
-        allModelEntities = scene.view(ModelMesh.class);
+        allModelEntities = ACTIVE_SCENE.view(ModelMesh.class);
 //        cachedNativeMeshes = scene.view(NativeObjectMesh.class);
 
         //Prep
@@ -76,8 +72,8 @@ public class SceneLayer extends Layer {
             if (cachedConverted.size() == 0) return;
             ModelMesh mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMesh.class);
             mesh.initList();
-            for(OxyEntity e : allModelEntities){
-                if(!(e instanceof OxyModel)) continue;
+            for (OxyEntity e : allModelEntities) {
+                if (!(e instanceof OxyModel)) continue;
                 for (ScriptingComponent c : e.getScripts()) {
                     OxyScriptItem item = c.getScriptItem();
                     item.invokeMethod("onCreate");
@@ -87,15 +83,15 @@ public class SceneLayer extends Layer {
     }
 
     public void updateAllModelEntities() {
-        allModelEntities = scene.view(ModelMesh.class);
-        cachedLightEntities = scene.view(Light.class);
+        allModelEntities = ACTIVE_SCENE.view(ModelMesh.class);
+        cachedLightEntities = ACTIVE_SCENE.view(Light.class);
     }
 
     @Override
     public void update(float ts, float deltaTime) {
-        if (scene == null) return;
-        scene.getOxyUISystem().dispatchNativeEvents();
-        scene.getOxyUISystem().updateImGuiContext(deltaTime);
+        if (ACTIVE_SCENE == null) return;
+        ACTIVE_SCENE.getOxyUISystem().dispatchNativeEvents();
+        ACTIVE_SCENE.getOxyUISystem().updateImGuiContext(deltaTime);
 
         int i = 0;
         for (OxyEntity e : cachedLightEntities) {
@@ -118,23 +114,23 @@ public class SceneLayer extends Layer {
 
     @Override
     public void render(float ts, float deltaTime) {
-        if (scene == null) return;
-        scene.getFrameBuffer().blit();
+        if (ACTIVE_SCENE == null) return;
+        ACTIVE_SCENE.getFrameBuffer().blit();
         if (!initHdrTexture && OxyRenderer.currentBoundedCamera != null) {
             hdrTexture.captureFaces(ts);
-            cachedNativeMeshes = scene.view(NativeObjectMesh.class);
+            cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMesh.class);
             initHdrTexture = true;
         }
 
-        for(OxyEntity e : allModelEntities){
-            if(!(e instanceof OxyModel)) continue;
+        for (OxyEntity e : allModelEntities) {
+            if (!(e instanceof OxyModel)) continue;
             for (ScriptingComponent c : e.getScripts()) {
                 OxyScriptItem item = c.getScriptItem();
                 item.invokeMethod("onUpdate", ts);
             }
         }
 
-        scene.getFrameBuffer().bind();
+        ACTIVE_SCENE.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();
 
         //Camera
@@ -221,28 +217,28 @@ public class SceneLayer extends Layer {
                 glDisable(GL_CULL_FACE);
             }
         }
-        scene.getFrameBuffer().unbind();
+        ACTIVE_SCENE.getFrameBuffer().unbind();
     }
 
     public void loadHDRTextureToScene(String path) {
         if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
-        SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, scene);
+        SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, ACTIVE_SCENE);
         SceneLayer.hdrTexture.captureFaces(0);
     }
 
     private void render(float ts, Mesh mesh, OxyCamera camera) {
-        scene.getRenderer().render(ts, mesh, camera);
-        OxyRenderer.Stats.totalShapeCount = scene.getShapeCount();
+        ACTIVE_SCENE.getRenderer().render(ts, mesh, camera);
+        OxyRenderer.Stats.totalShapeCount = ACTIVE_SCENE.getShapeCount();
     }
 
     private void render(float ts, Mesh mesh, OxyCamera camera, OxyShader shader) {
-        scene.getRenderer().render(ts, mesh, camera, shader);
-        OxyRenderer.Stats.totalShapeCount = scene.getShapeCount();
+        ACTIVE_SCENE.getRenderer().render(ts, mesh, camera, shader);
+        OxyRenderer.Stats.totalShapeCount = ACTIVE_SCENE.getShapeCount();
     }
 
     private void render(float ts, Mesh mesh) {
-        scene.getRenderer().render(ts, mesh);
-        OxyRenderer.Stats.totalShapeCount = scene.getShapeCount();
+        ACTIVE_SCENE.getRenderer().render(ts, mesh);
+        OxyRenderer.Stats.totalShapeCount = ACTIVE_SCENE.getShapeCount();
     }
 
     public void clear() {

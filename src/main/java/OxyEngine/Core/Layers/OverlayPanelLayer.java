@@ -2,7 +2,6 @@ package OxyEngine.Core.Layers;
 
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
-import OxyEngineEditor.Scene.Scene;
 import OxyEngine.System.OxyFontSystem;
 import OxyEngineEditor.UI.Panels.*;
 import imgui.ImGui;
@@ -15,14 +14,15 @@ import imgui.flag.ImGuiWindowFlags;
 import java.util.ArrayList;
 import java.util.List;
 
+import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
+
 public class OverlayPanelLayer extends Layer {
 
     private final List<Panel> panelList = new ArrayList<>();
 
     private final WindowHandle windowHandle;
 
-    public OverlayPanelLayer(WindowHandle windowHandle, Scene scene) {
-        super(scene);
+    public OverlayPanelLayer(WindowHandle windowHandle) {
         this.windowHandle = windowHandle;
     }
 
@@ -52,7 +52,7 @@ public class OverlayPanelLayer extends Layer {
         OpenGLRendererAPI.clearBuffer();
         OpenGLRendererAPI.clearColor(32, 32, 32, 1.0f);
 
-        scene.getOxyUISystem().newFrameGLFW();
+        ACTIVE_SCENE.getOxyUISystem().newFrameGLFW();
         ImGui.newFrame();
 
         final ImGuiViewport viewport = ImGui.getMainViewport();
@@ -77,6 +77,6 @@ public class OverlayPanelLayer extends Layer {
         ImGui.popStyleVar();
 
         ImGui.render();
-        scene.getOxyUISystem().renderDrawData();
+        ACTIVE_SCENE.getOxyUISystem().renderDrawData();
     }
 }

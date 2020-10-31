@@ -32,8 +32,8 @@ public class ProjectPanel extends Panel {
 
     @Override
     public void preload() {
-        fileAsset = OxyTexture.loadImage("src/main/resources/assets/fileAsset.png");
-        dirAsset = OxyTexture.loadImage("src/main/resources/assets/dirAsset.png");
+        fileAsset = OxyTexture.loadImage(-1, "src/main/resources/assets/fileAsset.png");
+        dirAsset = OxyTexture.loadImage(-1, "src/main/resources/assets/dirAsset.png");
     }
 
     @Override

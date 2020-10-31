@@ -1,10 +1,9 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.GizmoLayer;
-import OxyEngine.Core.Layers.OverlayPanelLayer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.Scene.SceneSerializer;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -21,21 +20,19 @@ public class ToolbarPanel extends Panel {
 
     private static ToolbarPanel INSTANCE = null;
 
-    public static ToolbarPanel getInstance(SceneLayer layer, GizmoLayer gizmoLayer, OverlayPanelLayer opL, OxyShader shader) {
-        if (INSTANCE == null) INSTANCE = new ToolbarPanel(layer, gizmoLayer, opL, shader);
+    public static ToolbarPanel getInstance(SceneLayer layer, GizmoLayer gizmoLayer, OxyShader shader) {
+        if (INSTANCE == null) INSTANCE = new ToolbarPanel(layer, gizmoLayer, shader);
         return INSTANCE;
     }
 
     private final OxyShader shader;
     private final SceneLayer sceneLayer;
     private final GizmoLayer gizmoLayer;
-    private final OverlayPanelLayer opL;
 
-    public ToolbarPanel(SceneLayer sceneLayer, GizmoLayer gizmoLayer, OverlayPanelLayer opL, OxyShader shader) {
+    public ToolbarPanel(SceneLayer sceneLayer, GizmoLayer gizmoLayer, OxyShader shader) {
         this.shader = shader;
         this.sceneLayer = sceneLayer;
         this.gizmoLayer = gizmoLayer;
-        this.opL = opL;
     }
 
     @Override
@@ -58,18 +55,16 @@ public class ToolbarPanel extends Panel {
                 }
                 if (ImGui.menuItem("Open a scene", "Ctrl+O")) {
                     String openScene = openDialog(extensionName, null);
-                    Scene newScene = SceneSerializer.deserializeScene(openScene, sceneLayer, shader);
-                    gizmoLayer.setScene(newScene);
+                    SceneRuntime.ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, sceneLayer, shader);
                     gizmoLayer.build();
-                    opL.setScene(newScene);
                     sceneLayer.build();
                 }
                 if (ImGui.menuItem("Save the scene", "Ctrl+S")) {
-                    SceneSerializer.serializeScene(sceneLayer);
+                    SceneSerializer.serializeScene(SceneRuntime.ACTIVE_SCENE.getSceneName() + fileExtension);
                 }
                 if (ImGui.menuItem("Save As...")) {
                     String saveAs = saveDialog(extensionName, null);
-                    if(saveAs != null) SceneSerializer.serializeScene(sceneLayer, saveAs + fileExtension);
+                    if (saveAs != null) SceneSerializer.serializeScene(saveAs + fileExtension);
                 }
                 ImGui.endMenu();
             }

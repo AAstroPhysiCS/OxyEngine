@@ -5,6 +5,7 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -128,7 +129,7 @@ public class PropertiesPanel extends Panel {
                     String path = openDialog("", null);
                     if (path != null) {
                         if (entityContext != null) {
-                            List<OxyModel> eList = sceneLayer.getScene().createModelEntities(path, entityContext.get(OxyShader.class));
+                            List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path, entityContext.get(OxyShader.class));
                             boolean isGrouped = true;
                             if (eList.size() <= 1) isGrouped = false;
                             for (OxyModel e : eList) {
@@ -136,7 +137,7 @@ public class PropertiesPanel extends Panel {
                                 e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped, false));
                                 e.constructData();
                             }
-                            sceneLayer.getScene().removeEntity(entityContext);
+                            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
                             sceneLayer.updateAllModelEntities();
                             meshPath = new ImString(path);
                             entityContext = null;

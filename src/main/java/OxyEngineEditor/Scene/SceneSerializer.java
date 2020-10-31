@@ -28,13 +28,9 @@ public final class SceneSerializer {
 
     public static final String fileExtension = ".osc", extensionName = "osc";
 
-    public static void serializeScene(SceneLayer sceneLayer) {
-        serializeScene(sceneLayer, sceneLayer.getScene().getSceneName() + fileExtension);
-    }
-
-    public static void serializeScene(SceneLayer sceneLayer, String path) {
+    public static void serializeScene(String path) {
         try (SceneWriter writer = new SceneWriter(new File(path))) {
-            writer.writeScene(sceneLayer.getScene());
+            writer.writeScene(SceneRuntime.ACTIVE_SCENE);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -42,9 +38,7 @@ public final class SceneSerializer {
 
     public static Scene deserializeScene(String path, SceneLayer layer, OxyShader shader) {
         try (SceneReader reader = new SceneReader(path)) {
-            Scene s = reader.readScene(layer, shader);
-            layer.setScene(s);
-            return s;
+            return reader.readScene(layer, shader);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -154,7 +148,7 @@ public final class SceneSerializer {
 
         @SuppressWarnings("DuplicateExpressions")
         public Scene readScene(SceneLayer layer, OxyShader shader) {
-            if (loadedS == null) return layer.getScene();
+            if (loadedS == null) return SceneRuntime.ACTIVE_SCENE;
             String[] splitted = loadedS.split("\n");
             boolean objFound = false;
             String sceneName = null;
@@ -178,7 +172,7 @@ public final class SceneSerializer {
                 }
                 if (obj != null) objects.add(obj);
             }
-            oldScene = layer.getScene();
+            oldScene = SceneRuntime.ACTIVE_SCENE;
             Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer());
             scene.setUISystem(oldScene.getOxyUISystem());
             OxySelectHandler.entityContext = null;
