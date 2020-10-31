@@ -16,7 +16,7 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 @OxySerializable(info = """
         \t\tOxyModel %s {
                \tID: %s
-               \tNative Name: %s
+               \tMesh Position: %s
                \tName: %s
                \tGrouped: %s
                \tEmitting: %s
@@ -69,7 +69,7 @@ public class OxyModel extends OxyEntity {
                         boundingBox.max()
                 ),
                 new TransformComponent(new TransformComponent(new Vector3f(0, 0, 0), transform.rotation, transform.scale)),
-                new NativeTagComponent(get(NativeTagComponent.class).originalTag()),
+                new MeshPosition(get(MeshPosition.class).meshPos()),
                 new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),
                 new RenderableComponent(RenderingMode.Normal),
                 new OxyMaterial(get(OxyMaterial.class)),

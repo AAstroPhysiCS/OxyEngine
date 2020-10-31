@@ -73,7 +73,7 @@ public final class SceneSerializer {
 
             for (OxyEntity e : scene.getEntities()) {
 
-                String nativeTag = "null";
+                int meshPos = -1;
                 String tag = "null";
                 String grouped = "false";
                 StringBuilder scripts = new StringBuilder();
@@ -95,7 +95,7 @@ public final class SceneSerializer {
                 }
 
                 if (e.has(TagComponent.class)) tag = e.get(TagComponent.class).tag();
-                if (e.has(NativeTagComponent.class)) nativeTag = e.get(NativeTagComponent.class).originalTag();
+                if (e.has(MeshPosition.class)) meshPos = e.get(MeshPosition.class).meshPos();
                 if (e.has(EntitySerializationInfo.class))
                     grouped = String.valueOf(e.get(EntitySerializationInfo.class).grouped());
                 if (e.has(OxyMaterial.class)) {
@@ -116,7 +116,7 @@ public final class SceneSerializer {
 
                 OxySerializable objInfo = e.getClass().getAnnotation(OxySerializable.class);
                 if (objInfo != null) {
-                    String formatObjTemplate = objInfo.info().formatted(ptr++, id, nativeTag, tag, grouped, emitting,
+                    String formatObjTemplate = objInfo.info().formatted(ptr++, id, meshPos, tag, grouped, emitting,
                             transform.position.x, transform.position.y, transform.position.z,
                             transform.rotation.x, transform.rotation.y, transform.rotation.z,
                             transform.scale.x, transform.scale.y, transform.scale.z,
@@ -186,7 +186,6 @@ public final class SceneSerializer {
             oldScene.dispose();
             Map<String, List<List<EntityComponent>>> listOfEntries = new HashMap<>(objects.size());
             Map<String, List<ScriptingComponent>> listOfScripts = new HashMap<>(objects.size());
-            List<NativeTagComponent> listOfNativeTags = new ArrayList<>(objects.size());
             for (var obj : objects) {
                 for (var entrySet : obj.map.entrySet()) {
                     var key = entrySet.getKey();
@@ -205,8 +204,9 @@ public final class SceneSerializer {
                             }
                         }
                     } else if (key.contains("OxyModel")) {
-                        String id = null, name = null, nativeTag = null, aT = null, nMT = null, rMT = null, aMT = null, mMT = null, mesh = null, grouped = null;
+                        String id = null, name = null, aT = null, nMT = null, rMT = null, aMT = null, mMT = null, mesh = null, grouped = null;
                         Vector3f pos = null, rot = null, scale = null, min = null, max = null;
+                        int meshPos = -1;
                         boolean emitting = false;
                         Vector4f color = new Vector4f(1, 1, 1, 1);
                         for (var values : listOfValues) {
@@ -216,7 +216,7 @@ public final class SceneSerializer {
                             String sValue = split[1].trim();
                             switch (tag) {
                                 case "ID" -> id = sValue;
-                                case "Native Name" -> nativeTag = sValue;
+                                case "Mesh Position" -> meshPos = Integer.parseInt(sValue);
                                 case "Name" -> name = sValue;
                                 case "Grouped" -> grouped = sValue;
                                 case "Position" -> pos = getVector3fFromString(sValue);
@@ -253,16 +253,15 @@ public final class SceneSerializer {
                             listOfEntries.put(mesh, new ArrayList<>());
                         }
                         if (grouped.equals("true")) {
-                            listOfNativeTags.add(new NativeTagComponent(nativeTag));
                             //list.of does not work
-                            listOfEntries.get(mesh).add(Arrays.stream(new EntityComponent[]{new UUIDComponent(UUID.fromString(id)), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
-                                            OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
+                            listOfEntries.get(mesh).add(Arrays.stream(new EntityComponent[]{new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
+                                    OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
                                     new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(true, true), new BoundingBoxComponent(min, max)}).collect(Collectors.toList())
                             );
                         } else {
                             OxyModel m = scene.createModelEntity(mesh, shader);
                             m.originPos = new Vector3f(0, 0, 0);
-                            m.addComponent(new UUIDComponent(UUID.fromString(id)), new NativeTagComponent(nativeTag), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
+                            m.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
                                             OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
                                     new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(min, max)
                             );
@@ -281,39 +280,22 @@ public final class SceneSerializer {
                 }
             }
 
-            List<OxyModel> m = null;
-            List<String> meshValue = new ArrayList<>();
             for (var entrySet : listOfEntries.entrySet()) {
                 String mesh = entrySet.getKey();
                 List<List<EntityComponent>> components = entrySet.getValue();
-                if (!meshValue.contains(mesh)) {
-                    m = scene.createModelEntities(mesh, shader);
-                    var iterator = m.iterator();
-                    while(iterator.hasNext()){
-                        OxyModel oxyModel = iterator.next();
-                        String nativeTagComponentFromModel = oxyModel.get(NativeTagComponent.class).originalTag();
-                        int counter = 0;
-                        for (NativeTagComponent importedNativeTag : listOfNativeTags) {
-                            if (!nativeTagComponentFromModel.equals(importedNativeTag.originalTag())) {
-                                counter++;
-                                if (counter == listOfNativeTags.size()) {
-                                    iterator.remove();
-                                    scene.removeEntity(oxyModel);
-                                }
-                            }
+                List<OxyModel> m = new ArrayList<>();
+                for (List<EntityComponent> listC : components) {
+                    for (EntityComponent c : listC) {
+                        if (c instanceof MeshPosition pos) {
+                            m.add(scene.createModelEntity(mesh, shader, true, pos.meshPos()));
                         }
                     }
-                    meshValue.add(mesh);
                 }
-
-                if (m != null) {
-                    for (int i = 0; i < m.size(); i++) {
-                        m.get(i).originPos = new Vector3f(0, 0, 0);
-                        m.get(i).addComponent(components.get(i));
-                        m.get(i).constructData();
-                    }
+                for (int i = 0; i < m.size(); i++) {
+                    m.get(i).originPos = new Vector3f(0, 0, 0);
+                    m.get(i).addComponent(components.get(i));
+                    m.get(i).constructData();
                 }
-                m = null;
             }
 
             for (OxyEntity modelInScene : scene.getEntities()) {

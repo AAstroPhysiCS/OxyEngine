@@ -17,7 +17,7 @@ import static OxyEngine.System.OxySystem.oxyAssert;
 @OxySerializable(info = """
         \t\tOxyNativeObject %s {
                \tID: %s
-               \tNative Name: %s
+               \tMesh Position: %s
                \tName: %s
                \tGrouped: %s
                \tEmitting: %s
