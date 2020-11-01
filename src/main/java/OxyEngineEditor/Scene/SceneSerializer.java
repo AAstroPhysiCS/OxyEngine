@@ -102,7 +102,7 @@ public final class SceneSerializer {
                     if (m.aoTexture != null) aoTexture = m.aoTexture.getPath();
                 }
                 if (e.has(ModelMesh.class)) mesh = e.get(ModelMesh.class).getPath();
-                if (e.has(EmittingComponent.class)) emitting = true;
+                if (e.has(Light.class)) emitting = true;
 
                 for (ScriptingComponent c : e.getScripts()) {
                     scripts.append(" ").append(c.getPath()).append(",");
@@ -259,15 +259,7 @@ public final class SceneSerializer {
                                             OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
                                     new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(min, max)
                             );
-                            if (emitting) {
-                                Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
-                                m.addComponent(pointLightComponent, new EmittingComponent(
-                                        new Vector3f(pos),
-                                        null,
-                                        new Vector3f(2f, 2f, 2f),
-                                        new Vector3f(5f, 5f, 5f),
-                                        new Vector3f(1f, 1f, 1f)));
-                            }
+                            if (emitting) m.addComponent(new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f));
                             m.constructData();
                         }
                     }

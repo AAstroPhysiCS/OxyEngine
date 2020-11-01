@@ -9,11 +9,9 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
-import OxyEngine.Scripting.OxyScriptItem;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 
@@ -49,16 +47,6 @@ public class SceneLayer extends Layer {
         cachedCameraComponents = ACTIVE_SCENE.distinct(OxyCamera.class);
         cachedLightEntities = ACTIVE_SCENE.view(Light.class);
         allModelEntities = ACTIVE_SCENE.view(ModelMesh.class);
-        //Prep
-        {
-            for (OxyEntity e : allModelEntities) {
-                e.get(ModelMesh.class).initList();
-                for (ScriptingComponent c : e.getScripts()) {
-                    OxyScriptItem item = c.getScriptItem();
-                    item.invokeMethod("onCreate");
-                }
-            }
-        }
     }
 
     @Override
@@ -72,13 +60,6 @@ public class SceneLayer extends Layer {
             if (cachedConverted.size() == 0) return;
             ModelMesh mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMesh.class);
             mesh.initList();
-            for (OxyEntity e : allModelEntities) {
-                if (!(e instanceof OxyModel)) continue;
-                for (ScriptingComponent c : e.getScripts()) {
-                    OxyScriptItem item = c.getScriptItem();
-                    item.invokeMethod("onCreate");
-                }
-            }
         }
     }
 
@@ -95,16 +76,8 @@ public class SceneLayer extends Layer {
 
         int i = 0;
         for (OxyEntity e : cachedLightEntities) {
-            if (!e.has(EmittingComponent.class)) continue;
             Light l = e.get(Light.class);
-            EmittingComponent emittingComponent = e.get(EmittingComponent.class);
-            l.setAmbient(emittingComponent.ambient());
-            l.setDiffuse(emittingComponent.diffuse());
-            l.setSpecular(emittingComponent.specular());
-            l.setPosition(emittingComponent.position());
-            l.setDirection(emittingComponent.direction());
-            OxyShader shader = e.get(OxyShader.class);
-            l.update(shader, i);
+            l.update(e, i);
             i++;
         }
     }
@@ -120,14 +93,6 @@ public class SceneLayer extends Layer {
             hdrTexture.captureFaces(ts);
             cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMesh.class);
             initHdrTexture = true;
-        }
-
-        for (OxyEntity e : allModelEntities) {
-            if (!(e instanceof OxyModel)) continue;
-            for (ScriptingComponent c : e.getScripts()) {
-                OxyScriptItem item = c.getScriptItem();
-                item.invokeMethod("onUpdate", ts);
-            }
         }
 
         ACTIVE_SCENE.getFrameBuffer().bind();

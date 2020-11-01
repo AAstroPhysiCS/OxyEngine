@@ -1,45 +1,25 @@
 Scene Name: Test Scene 1
 Environment {
-	Environment Map: D:/programming/Java/OxyEngine/target/classes/hdr/birchwood_4k.hdr
+	Environment Map: D:\programming\Java\OxyEngine\src\main\resources\hdr\pink_sunrise_4k.hdr
 	Environment Gamma Strength: 2.0
 	Environment LOD: 1.0
 	Environment Exposure: 1.0
 }
 Registry {
-	Object count: 15
-	OxyNativeObject 1 {
-       	ID: ac42bd18-4c3b-4422-af82-98bb11ae93fd
-       	Mesh Position: -1
-       	Name: null
-       	Grouped: false
-       	Emitting: false
-       	Position: X 0.0, Y 0.0, Z 0.0
-       	Rotation: X 0.0, Y 0.0, Z 0.0
-       	Scale: X 1.0, Y 1.0, Z 1.0
-       	Bounds Min: X 0.0, Y 0.0, Z 0.0
-       	Bounds Max: X 0.0, Y 0.0, Z 0.0
-       	Color: null
-       	Scripts: []
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: null
-    }
-	OxyModel 2 {
+	Object count: 12
+	OxyModel 1 {
        	ID: bec7134d-5bd5-47a0-82b1-58dd89867190
        	Mesh Position: 0
        	Name: Light Cube
        	Grouped: false
        	Emitting: true
-       	Position: X 0.0, Y -10.0, Z 0.0
+       	Position: X -81.75438, Y -10.0, Z 0.0
        	Rotation: X 0.0, Y 0.0, Z 0.0
        	Scale: X 0.5, Y 0.5, Z 0.5
        	Bounds Min: X 1.0, Y 1.0, Z 1.0
        	Bounds Max: X 1.0, Y 1.0, Z 1.0
-       	Color: [1.0, 1.0, 1.0, 1.0]
-       	Scripts: [ src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java,]
+       	Color: [0.0, 0.9800995, 0.38033703, 1.0]
+       	Scripts: []
        	Albedo Texture: null
        	Normal Map Texture: null
        	Roughness Map Texture: null
@@ -47,7 +27,7 @@ Registry {
        	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
     }
-	OxyModel 3 {
+	OxyModel 2 {
        	ID: 620fe9e0-6138-4532-a4ba-d0f0ae4b5788
        	Mesh Position: 0
        	Name: Light Cube 2
@@ -59,7 +39,7 @@ Registry {
        	Bounds Min: X 1.0, Y 1.0, Z 1.0
        	Bounds Max: X 1.0, Y 1.0, Z 1.0
        	Color: [1.0, 1.0, 1.0, 1.0]
-       	Scripts: [ src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java,]
+       	Scripts: []
        	Albedo Texture: null
        	Normal Map Texture: null
        	Roughness Map Texture: null
@@ -67,147 +47,7 @@ Registry {
        	Metallic Map Texture: null
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
     }
-	OxyModel 4 {
-       	ID: 353c0480-890b-4af0-b82c-68c3b8055212
-       	Mesh Position: 0
-       	Name: Cube
-       	Grouped: true
-       	Emitting: false
-       	Position: X 0.0, Y 0.0, Z 0.0
-       	Rotation: X 0.0, Y 0.0, Z 0.0
-       	Scale: X 1.0, Y 1.0, Z 1.0
-       	Bounds Min: X 10.918967, Y 0.329088, Z 11.644152
-       	Bounds Max: X 10.918967, Y 0.329088, Z 11.644152
-       	Color: [0.8, 0.502477, 0.354984, 1.0]
-       	Scripts: []
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-    }
-	OxyModel 5 {
-       	ID: 350d347a-296f-42f6-8b36-9cb803efe4b7
-       	Mesh Position: 1
-       	Name: Cube.001
-       	Grouped: true
-       	Emitting: false
-       	Position: X 0.0, Y -3.0, Z 6.4697437
-       	Rotation: X 0.0, Y 0.0, Z 0.0
-       	Scale: X 1.0, Y 1.0, Z 1.0
-       	Bounds Min: X 2.0, Y 2.0, Z 1.9999995
-       	Bounds Max: X 2.0, Y 2.0, Z 2.0
-       	Color: [0.167063, 0.8, 0.047106, 1.0]
-       	Scripts: []
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-    }
-	OxyModel 6 {
-       	ID: 1631848d-1b9b-4c5a-9068-331aaa944d12
-       	Mesh Position: 2
-       	Name: Sphere
-       	Grouped: true
-       	Emitting: false
-       	Position: X 0.0, Y -3.0, Z 0.0
-       	Rotation: X 0.0, Y 0.0, Z 0.0
-       	Scale: X 1.0, Y 1.0, Z 1.0
-       	Bounds Min: X 2.0, Y 2.0, Z 2.0
-       	Bounds Max: X 2.0, Y 2.0, Z 2.0
-       	Color: [0.8, 0.086863, 0.093309, 1.0]
-       	Scripts: []
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-    }
-	OxyModel 7 {
-       	ID: 5a8399db-6bbd-46a1-9cb6-3c6879d7d2c3
-       	Mesh Position: 3
-       	Name: Cone
-       	Grouped: true
-       	Emitting: false
-       	Position: X 2746.6484, Y -3.1387882, Z -6.0
-       	Rotation: X 0.0, Y 0.0, Z 0.0
-       	Scale: X 1.0, Y 1.0, Z 1.0
-       	Bounds Min: X 2.0, Y 2.0, Z 2.0
-       	Bounds Max: X 2.0, Y 2.0000002, Z 2.0
-       	Color: [0.09999999, 1.0, 1.0, 1.0]
-       	Scripts: [ src/main/java/OxyEngine/Scripting/NativeScripts/ColorIteratorScript.java, src/main/java/OxyEngine/Scripting/NativeScripts/PositionIteratorScript.java,]
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-    }
-	OxyModel 8 {
-       	ID: 96daffb7-a73f-419f-952d-0934b87ed1c2
-       	Mesh Position: 4
-       	Name: Cube.002
-       	Grouped: true
-       	Emitting: false
-       	Position: X 11.095259, Y -4.321733, Z -0.096618176
-       	Rotation: X 0.0, Y 0.0, Z 0.0
-       	Scale: X 1.0, Y 1.0, Z 1.0
-       	Bounds Min: X 0.32448006, Y 3.9361959, Z 11.781788
-       	Bounds Max: X 0.32448006, Y 3.936196, Z 11.781788
-       	Color: [0.0, 0.0, 0.0, 1.0]
-       	Scripts: []
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
-    }
-	OxyNativeObject 9 {
-       	ID: 4b1119be-8396-4f5b-823d-404ea3af8221
-       	Mesh Position: -1
-       	Name: null
-       	Grouped: false
-       	Emitting: false
-       	Position: X 9.0, Y 0.0, Z 9.0
-       	Rotation: X 0.0, Y 0.0, Z 0.0
-       	Scale: X 20.0, Y 20.0, Z 20.0
-       	Bounds Min: X 0.0, Y 0.0, Z 0.0
-       	Bounds Max: X 0.0, Y 0.0, Z 0.0
-       	Color: [1.0, 1.0, 1.0, 0.2]
-       	Scripts: []
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: null
-    }
-	OxyNativeObject 10 {
-       	ID: ce3c6fd5-8af8-4dea-a8f5-c2f1abd3cce1
-       	Mesh Position: -1
-       	Name: null
-       	Grouped: false
-       	Emitting: false
-       	Position: X 0.0, Y 0.0, Z 0.0
-       	Rotation: X 0.0, Y 0.0, Z 0.0
-       	Scale: X 1.0, Y 1.0, Z 1.0
-       	Bounds Min: X 0.0, Y 0.0, Z 0.0
-       	Bounds Max: X 0.0, Y 0.0, Z 0.0
-       	Color: null
-       	Scripts: []
-       	Albedo Texture: null
-       	Normal Map Texture: null
-       	Roughness Map Texture: null
-       	AO Map Texture: null
-       	Metallic Map Texture: null
-       	Mesh: null
-    }
-	OxyModel 11 {
+	OxyModel 3 {
        	ID: 51a26ad0-c29a-48cc-801e-48f365ecfa1d
        	Mesh Position: 0
        	Name: Plane.010
@@ -227,7 +67,7 @@ Registry {
        	Metallic Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Metallic.png
        	Mesh: C:\Users\okang\Desktop\colt-m1911\source\colt low polyfbx.fbx
     }
-	OxyModel 12 {
+	OxyModel 4 {
        	ID: 5b9e9b57-acd0-499a-adab-0efdec036e13
        	Mesh Position: 0
        	Name: Object001
@@ -247,7 +87,7 @@ Registry {
        	Metallic Map Texture: C:\Users\okang\Desktop\gabrielle-hersh\textures\face_spec.png
        	Mesh: C:\Users\okang\Desktop\gabrielle-hersh\source\Gabrielle.fbx
     }
-	OxyModel 13 {
+	OxyModel 5 {
        	ID: 52b15ddb-2608-4dee-a803-2bd49456e9f6
        	Mesh Position: 3
        	Name: Object030
@@ -267,7 +107,7 @@ Registry {
        	Metallic Map Texture: C:\Users\okang\Desktop\gabrielle-hersh\textures\hair_spec.png
        	Mesh: C:\Users\okang\Desktop\gabrielle-hersh\source\Gabrielle.fbx
     }
-	OxyModel 14 {
+	OxyModel 6 {
        	ID: 79c210c0-5d98-4102-8212-bafe2e00ac6c
        	Mesh Position: 5
        	Name: Object044
@@ -287,7 +127,7 @@ Registry {
        	Metallic Map Texture: null
        	Mesh: C:\Users\okang\Desktop\gabrielle-hersh\source\Gabrielle.fbx
     }
-	OxyModel 15 {
+	OxyModel 7 {
        	ID: 79c210c0-5d98-4102-8212-bafe2e00ac6c
        	Mesh Position: 5
        	Name: Object044
@@ -306,5 +146,105 @@ Registry {
        	AO Map Texture: C:\Users\okang\Desktop\rustediron1-alt2-bl\rustediron1-alt2-bl\ao.png
        	Metallic Map Texture: null
        	Mesh: C:\Users\okang\Desktop\gabrielle-hersh\source\Gabrielle.fbx
+    }
+	OxyModel 8 {
+       	ID: 353c0480-890b-4af0-b82c-68c3b8055212
+       	Mesh Position: 0
+       	Name: Cube
+       	Grouped: true
+       	Emitting: false
+       	Position: X 0.0, Y 0.0, Z 0.0
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
+       	Bounds Min: X 10.918967, Y 0.329088, Z 11.644152
+       	Bounds Max: X 10.918967, Y 0.329088, Z 11.644152
+       	Color: [0.8, 0.502477, 0.354984, 1.0]
+       	Scripts: []
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+    }
+	OxyModel 9 {
+       	ID: 350d347a-296f-42f6-8b36-9cb803efe4b7
+       	Mesh Position: 1
+       	Name: Cube.001
+       	Grouped: true
+       	Emitting: false
+       	Position: X 0.0, Y -3.0, Z 6.4697437
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
+       	Bounds Min: X 2.0, Y 2.0, Z 1.9999995
+       	Bounds Max: X 2.0, Y 2.0, Z 2.0
+       	Color: [0.167063, 0.8, 0.047106, 1.0]
+       	Scripts: []
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+    }
+	OxyModel 10 {
+       	ID: 1631848d-1b9b-4c5a-9068-331aaa944d12
+       	Mesh Position: 2
+       	Name: Sphere
+       	Grouped: true
+       	Emitting: false
+       	Position: X 0.0, Y -3.0, Z 0.0
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
+       	Bounds Min: X 2.0, Y 2.0, Z 2.0
+       	Bounds Max: X 2.0, Y 2.0, Z 2.0
+       	Color: [0.8, 0.086863, 0.093309, 1.0]
+       	Scripts: []
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+    }
+	OxyModel 11 {
+       	ID: 5a8399db-6bbd-46a1-9cb6-3c6879d7d2c3
+       	Mesh Position: 3
+       	Name: Cone
+       	Grouped: true
+       	Emitting: false
+       	Position: X 0.0, Y -3.1387882, Z -6.0
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
+       	Bounds Min: X 2.0, Y 2.0, Z 2.0
+       	Bounds Max: X 2.0, Y 2.0000002, Z 2.0
+       	Color: [0.09999999, 1.0, 1.0, 1.0]
+       	Scripts: [ src/main/java/OxyEngine/Scripting/NativeScripts/PositionIteratorScript.java,]
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+    }
+	OxyModel 12 {
+       	ID: 96daffb7-a73f-419f-952d-0934b87ed1c2
+       	Mesh Position: 4
+       	Name: Cube.002
+       	Grouped: true
+       	Emitting: false
+       	Position: X 11.095259, Y -4.321733, Z -0.096618176
+       	Rotation: X 0.0, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
+       	Bounds Min: X 0.32448006, Y 3.9361959, Z 11.781788
+       	Bounds Max: X 0.32448006, Y 3.936196, Z 11.781788
+       	Color: [0.0, 0.0, 0.0, 1.0]
+       	Scripts: []
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
     }
 }

@@ -62,29 +62,14 @@ public class EditorApplication extends OxyApplication {
         cameraEntity.addComponent(camera);
 
         OxyModel m = scene.createModelEntity(ModelType.Sphere, oxyShader);
-        Light pointLightComponent = new PointLight(1.0f, 0.027f, 0.0028f);
-        m.addComponent(pointLightComponent, new EmittingComponent(
-                new Vector3f(0, -2, 0),
-                null,
-                new Vector3f(2f, 2f, 2f),
-                new Vector3f(5f, 5f, 5f),
-                new Vector3f(1f, 1f, 1f)));
-        m.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
+        Light pointLightComponent = new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f);
+        m.addComponent(pointLightComponent, new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m.constructData();
-        m.addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java"));
 
         OxyModel m2 = scene.createModelEntity(ModelType.Sphere, oxyShader);
-        Light pointLightComponent2 = new PointLight(1.0f, 0.027f, 0.0028f);
-        m2.addComponent(pointLightComponent2, new EmittingComponent(
-                new Vector3f(0, -3, 0),
-                null,
-                new Vector3f(2f, 2f, 2f),
-                new Vector3f(5f, 5f, 5f),
-                new Vector3f(1f, 1f, 1f)));
-        m2.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
+        Light pointLightComponent2 = new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f);
+        m2.addComponent(pointLightComponent2, new TransformComponent(new Vector3f(0, -30, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
         m2.constructData();
-
-        m2.addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/LightPositionScript.java"));
 
         /*OxyEntity directionalLightEntity = scene.createNativeObjectEntity();
         Light directionalLightComponent = new DirectionalLight();
@@ -100,7 +85,6 @@ public class EditorApplication extends OxyApplication {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0)));
             obj.constructData();
         }
-        testObjects.get(3).addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/ColorIteratorScript.java"));
         testObjects.get(3).addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/PositionIteratorScript.java"));
 
         int[] samplers = new int[32];
@@ -132,6 +116,7 @@ public class EditorApplication extends OxyApplication {
 
     @Override
     public void update(float ts, float deltaTime) {
+        SceneRuntime.onUpdate(ts);
         for (Layer l : layerStack.getLayerStack())
             l.update(ts, deltaTime);
     }

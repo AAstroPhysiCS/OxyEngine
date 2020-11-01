@@ -2,7 +2,10 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
-import OxyEngineEditor.Components.*;
+import OxyEngineEditor.Components.EntityComponent;
+import OxyEngineEditor.Components.EntitySerializationInfo;
+import OxyEngineEditor.Components.ScriptingComponent;
+import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
 import OxyEngineEditor.UI.Panels.PropertyEntry;
@@ -68,7 +71,7 @@ public abstract class OxyEntity {
     }
 
     public void addComponent(List<EntityComponent> component) {
-        for(EntityComponent c : component){
+        for (EntityComponent c : component) {
             scene.addComponent(this, c);
             if (c instanceof Mesh m) {
                 m.addToList(this);
@@ -88,8 +91,8 @@ public abstract class OxyEntity {
         scripts.add(component);
     }
 
-    public void addScript(List<ScriptingComponent> components){
-        for(ScriptingComponent s : components) addScript(s);
+    public void addScript(List<ScriptingComponent> components) {
+        for (ScriptingComponent s : components) addScript(s);
     }
 
     /*

@@ -1,29 +1,18 @@
 package OxyEngine.Core.Renderer.Light;
 
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.EntityComponent;
+import OxyEngineEditor.Scene.OxyEntity;
 import org.joml.Vector3f;
 
 public abstract class Light implements EntityComponent {
 
-    protected Vector3f position, direction;
-    protected Vector3f ambient, diffuse, specular;
+    protected final Vector3f ambient;
+    protected final Vector3f specular;
 
-    public void setPosition(Vector3f position) {
-        this.position = position;
-    }
-    public void setDirection(Vector3f direction) {
-        this.direction = direction;
-    }
-    public void setAmbient(Vector3f ambient) {
+    public Light(Vector3f ambient, Vector3f specular) {
         this.ambient = ambient;
-    }
-    public void setDiffuse(Vector3f diffuse) {
-        this.diffuse = diffuse;
-    }
-    public void setSpecular(Vector3f specular) {
         this.specular = specular;
     }
 
-    public abstract void update(OxyShader shader, int i);
+    public abstract void update(OxyEntity e, int i);
 }

@@ -67,6 +67,7 @@ public final class Scene implements OxyDisposable {
     public final OxyModel createModelEntity(ModelType type, OxyShader shader, boolean importedFromFile) {
         return createModelEntity(type.getPath(), shader, importedFromFile);
     }
+
     public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
         return createModelEntities(type.getPath(), shader, false);
     }
@@ -115,7 +116,7 @@ public final class Scene implements OxyDisposable {
     static String cachedPath = "";
 
     public final OxyModel createModelEntity(String path, OxyShader shader, boolean importedFromFile, int i) {
-        if(!cachedPath.equals(path)) {
+        if (!cachedPath.equals(path)) {
             cachedLoader = new OxyModelLoader(path);
             cachedPath = path;
         }
