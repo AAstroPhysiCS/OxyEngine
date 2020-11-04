@@ -20,9 +20,9 @@ public abstract class OxyApplication implements OxyDisposable {
 
     public abstract void init();
 
-    public abstract void update(float ts, float deltaTime);
+    public abstract void update(float ts);
 
-    public abstract void render(float ts, float deltaTime);
+    public abstract void render(float ts);
 
     protected abstract Runnable run();
 }

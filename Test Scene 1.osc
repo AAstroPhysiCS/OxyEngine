@@ -219,7 +219,7 @@ Registry {
        	Bounds Min: X 2.0, Y 2.0, Z 2.0
        	Bounds Max: X 2.0, Y 2.0000002, Z 2.0
        	Color: [0.09999999, 1.0, 1.0, 1.0]
-       	Scripts: [ src/main/java/OxyEngine/Scripting/NativeScripts/PositionIteratorScript.java,]
+       	Scripts: [ D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java,]
        	Albedo Texture: null
        	Normal Map Texture: null
        	Roughness Map Texture: null

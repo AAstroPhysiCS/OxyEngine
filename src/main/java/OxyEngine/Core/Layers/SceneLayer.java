@@ -69,10 +69,10 @@ public class SceneLayer extends Layer {
     }
 
     @Override
-    public void update(float ts, float deltaTime) {
+    public void update(float ts) {
         if (ACTIVE_SCENE == null) return;
         ACTIVE_SCENE.getOxyUISystem().dispatchNativeEvents();
-        ACTIVE_SCENE.getOxyUISystem().updateImGuiContext(deltaTime);
+        ACTIVE_SCENE.getOxyUISystem().updateImGuiContext(ts);
 
         int i = 0;
         for (OxyEntity e : cachedLightEntities) {
@@ -86,7 +86,7 @@ public class SceneLayer extends Layer {
     public static final OxyShader cubemapShader = new OxyShader("shaders/OxySkybox.glsl");
 
     @Override
-    public void render(float ts, float deltaTime) {
+    public void render(float ts) {
         if (ACTIVE_SCENE == null) return;
         ACTIVE_SCENE.getFrameBuffer().blit();
         if (!initHdrTexture && OxyRenderer.currentBoundedCamera != null) {

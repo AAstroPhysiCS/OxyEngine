@@ -24,14 +24,14 @@ public class GizmoLayer extends Layer {
     }
 
     @Override
-    public void update(float ts, float deltaTime) {
+    public void update(float ts) {
         OxySelectHandler.controlRenderableStates();
     }
 
     @Override
-    public void render(float ts, float deltaTime) {
+    public void render(float ts) {
         ACTIVE_SCENE.getFrameBuffer().bind();
-        gizmo3D.renderAllGizmos(ts, deltaTime);
+        gizmo3D.renderAllGizmos(ts);
         ACTIVE_SCENE.getFrameBuffer().unbind();
     }
 }

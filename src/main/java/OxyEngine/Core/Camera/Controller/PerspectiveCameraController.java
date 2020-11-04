@@ -85,6 +85,7 @@ public class PerspectiveCameraController extends OxyCameraController {
 
     @Override
     public void update(float ts, Mode mode) {
+        OxyCameraController.ts = ts;
         if (mode == Mode.SWIPE) updateRotationSwipe();
         else updateRotationFree(ts);
     }

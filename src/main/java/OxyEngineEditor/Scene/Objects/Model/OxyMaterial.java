@@ -115,7 +115,8 @@ public class OxyMaterial implements EntityComponent, UIEditable, OxyDisposable {
         shader.disable();
     }
 
-    public final PropertyEntry node = () -> {
+    @SuppressWarnings("unused") //it is being used by reflection
+    private final PropertyEntry node = () -> {
 
         if (entityContext == null) return;
 
@@ -270,10 +271,5 @@ public class OxyMaterial implements EntityComponent, UIEditable, OxyDisposable {
         if (metallicTexture != null) metallicTexture.dispose();
         if (roughnessTexture != null) roughnessTexture.dispose();
         if (heightTexture != null) heightTexture.dispose();
-    }
-
-    @Override
-    public PropertyEntry node() {
-        return node;
     }
 }

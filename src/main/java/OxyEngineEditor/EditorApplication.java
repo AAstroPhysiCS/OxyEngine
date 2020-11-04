@@ -85,7 +85,7 @@ public class EditorApplication extends OxyApplication {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0)));
             obj.constructData();
         }
-        testObjects.get(3).addScript(new ScriptingComponent("src/main/java/OxyEngine/Scripting/NativeScripts/PositionIteratorScript.java"));
+        testObjects.get(3).addScript(new ScriptingComponent("src/main/java/Scripts/PositionIteratorScript.java"));
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;
@@ -115,18 +115,18 @@ public class EditorApplication extends OxyApplication {
     }
 
     @Override
-    public void update(float ts, float deltaTime) {
+    public void update(float ts) {
         SceneRuntime.onUpdate(ts);
         for (Layer l : layerStack.getLayerStack())
-            l.update(ts, deltaTime);
+            l.update(ts);
     }
 
     @Override
-    public void render(float ts, float deltaTime) {
+    public void render(float ts) {
         OxyTexture.bindAllTextureSlots();
 
         for (Layer l : layerStack.getLayerStack())
-            l.render(ts, deltaTime);
+            l.render(ts);
 
         OpenGLRendererAPI.swapBuffer(windowHandle);
         OpenGLRendererAPI.pollEvents();
@@ -146,11 +146,10 @@ public class EditorApplication extends OxyApplication {
                 if (OxyEventSystem.keyEventDispatcher.getKeys()[GLFW.GLFW_KEY_ESCAPE]) break;
 
                 final float currentTime = (float) glfwGetTime();
-                final float deltaTime = (time > 0) ? (float) (currentTime - time) : 1f / 60f;
                 final float ts = (float) (currentTime - time);
                 time = currentTime;
-                update(ts, deltaTime);
-                render(ts, deltaTime);
+                update(ts);
+                render(ts);
 
                 frames++;
 

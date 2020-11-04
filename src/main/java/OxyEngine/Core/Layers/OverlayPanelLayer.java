@@ -43,12 +43,12 @@ public class OverlayPanelLayer extends Layer {
     }
 
     @Override
-    public void update(float ts, float deltaTime) {
+    public void update(float ts) {
         windowHandle.update();
     }
 
     @Override
-    public void render(float ts, float deltaTime) {
+    public void render(float ts) {
         OpenGLRendererAPI.clearBuffer();
         OpenGLRendererAPI.clearColor(32, 32, 32, 1.0f);
 

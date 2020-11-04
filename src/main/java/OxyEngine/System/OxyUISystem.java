@@ -47,10 +47,9 @@ public class OxyUISystem {
         ImGui.createContext();
 
         io = ImGui.getIO();
-        ImGui.getStyle().setColors(OxyEngine.getLoadedTheme());
-
-        io.setIniFilename(OxySystem.FileSystem.getResourceByPath("/ini/imgui.ini"));
+        io.setIniFilename("D:\\programming\\Java\\OxyEngine\\src\\main\\resources\\ini\\imgui.ini");
         io.setWantSaveIniSettings(true);
+        ImGui.getStyle().setColors(OxyEngine.getLoadedTheme());
         io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard);
         io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
 //        io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);

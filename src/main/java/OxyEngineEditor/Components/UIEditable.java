@@ -28,6 +28,4 @@ public interface UIEditable {
         }
         return names;
     }
-
-    PropertyEntry node();
 }

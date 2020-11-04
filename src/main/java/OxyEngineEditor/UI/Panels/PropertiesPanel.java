@@ -12,6 +12,7 @@ import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
@@ -64,7 +65,7 @@ public class PropertiesPanel extends Panel {
         ImGui.alignTextToFramePadding();
         ImGui.text("Name: ");
         ImGui.sameLine();
-        if (ImGui.inputText("##hidelabel", name, ImGuiInputTextFlags.EnterReturnsTrue)) {
+        if (ImGui.inputText("##hidelabel InputTextTag", name, ImGuiInputTextFlags.EnterReturnsTrue)) {
             if (name.get().length() == 0) name.set("Unnamed");
             entityContext.get(TagComponent.class).setTag(name.get());
         }
@@ -73,7 +74,7 @@ public class PropertiesPanel extends Panel {
         focusedWindow = ImGui.isWindowFocused();
 
         if (!initPanel) ImGui.setNextItemOpen(true);
-        if (ImGui.treeNode("Transform")) {
+        if (ImGui.collapsingHeader("Transform")) {
             ImGui.columns(2, "myColumns");
             if (!initPanel) ImGui.setColumnOffset(0, -90f);
             ImGui.alignTextToFramePadding();
@@ -100,7 +101,6 @@ public class PropertiesPanel extends Panel {
             ImGui.popItemWidth();
             ImGui.columns(1);
             ImGui.separator();
-            ImGui.treePop();
         }
 
         if (entityContext == null) {
@@ -109,7 +109,7 @@ public class PropertiesPanel extends Panel {
         }
 
         {
-            if (ImGui.treeNodeEx("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
+            if (ImGui.collapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
 
                 meshPath = new ImString(entityContext.get(Mesh.class).getPath());
 
@@ -162,7 +162,6 @@ public class PropertiesPanel extends Panel {
                     ImGui.treePop();
                     ImGui.columns(1);
                 }
-                ImGui.treePop();
             }
         }
 
@@ -176,7 +175,9 @@ public class PropertiesPanel extends Panel {
             try {
                 @SuppressWarnings("unchecked")
                 EntityComponent component = entityContext.get((Class<? extends EntityComponent>) Class.forName(componentFullName[0]));
-                PropertyEntry entry = (PropertyEntry) component.getClass().getField("node").get(component);
+                Field f = component.getClass().getDeclaredField("node");
+                f.setAccessible(true);
+                PropertyEntry entry = (PropertyEntry) f.get(component);
                 if (!entityContext.getPropertyEntries().contains(entry))
                     entityContext.getPropertyEntries().add(entry);
             } catch (Exception e) {

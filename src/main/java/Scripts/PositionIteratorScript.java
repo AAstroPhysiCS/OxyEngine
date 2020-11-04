@@ -1,4 +1,4 @@
-package OxyEngine.Scripting.NativeScripts;
+package Scripts;
 
 import OxyEngine.Scripting.ScriptableEntity;
 import OxyEngineEditor.Components.TransformComponent;

@@ -10,6 +10,8 @@ public abstract class OxyCameraController {
     protected double oldMouseX, oldMouseY;
     protected final float mouseSpeed, horizontalSpeed, verticalSpeed;
 
+    protected static float ts;
+
     public OxyCameraController(Vector3f positionRef, Vector3f rotationRef, float mouseSpeed, float horizontalSpeed, float verticalSpeed) {
         this.rotationRef = rotationRef;
         this.mouseSpeed = mouseSpeed;
@@ -22,10 +24,6 @@ public abstract class OxyCameraController {
         SWIPE(), FREE()
     }
 
-    /*public OxyCameraController(float mouseSpeed, float horizontalSpeed, float verticalSpeed) {
-        this(new Ref<>(new Vector3f(0, 0, 0)), new Ref<>(new Vector3f(0, 0, 0)), mouseSpeed, horizontalSpeed, verticalSpeed);
-    }*/
-
     public Vector3f getRotation() {
         return rotationRef;
     }
@@ -36,6 +34,10 @@ public abstract class OxyCameraController {
 
     public float getMouseSpeed() {
         return mouseSpeed;
+    }
+
+    public static float getTs() {
+        return ts;
     }
 
     public abstract void update(float ts, Mode mode);

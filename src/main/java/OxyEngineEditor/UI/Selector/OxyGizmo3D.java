@@ -34,10 +34,10 @@ public class OxyGizmo3D {
         GizmoMode.Scale.gizmoComponent.scaleIt(e);
     }
 
-    public void renderAllGizmos(float ts, float deltaTime) {
+    public void renderAllGizmos(float ts) {
         glDisable(GL_DEPTH_TEST);
-        GizmoMode.Translation.gizmoComponent.render(ts, deltaTime);
-        GizmoMode.Scale.gizmoComponent.render(ts, deltaTime);
+        GizmoMode.Translation.gizmoComponent.render(ts);
+        GizmoMode.Scale.gizmoComponent.render(ts);
         glEnable(GL_DEPTH_TEST);
     }
 }

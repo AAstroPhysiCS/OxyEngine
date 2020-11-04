@@ -139,7 +139,7 @@ enum GizmoMode {
             }
         }
 
-        public void render(float ts, float deltaTime) {
+        public void render(float ts) {
             for (OxyEntity e : models) {
                 RenderableComponent r = e.get(RenderableComponent.class);
                 if (r.mode != RenderingMode.Normal) continue;
