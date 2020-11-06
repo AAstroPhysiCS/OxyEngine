@@ -6,6 +6,7 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngineEditor.Scene.SceneRuntime.currentBoundedCamera;
 
 public class OxyRenderer3D extends OxyRenderer {
 
@@ -32,7 +33,7 @@ public class OxyRenderer3D extends OxyRenderer {
         camera.finalizeCamera(ts);
         shader.setUniformVec3("cameraPos", camera.getCameraController().origin);
         shader.setCamera(camera);
-        OxyRenderer.currentBoundedCamera = camera;
+        currentBoundedCamera = camera;
         if (mesh.empty())
             mesh.load();
         mesh.render();

@@ -84,7 +84,7 @@ public class ScenePanel extends Panel {
 
             if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {
                 frameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
-                if (SceneRuntime.ACTIVE_SCENE.getRenderer().getCamera() instanceof PerspectiveCamera p)
+                if (SceneRuntime.currentBoundedCamera instanceof PerspectiveCamera p)
                     p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
             }
         }

@@ -42,6 +42,7 @@ public class OxyModelLoader {
     public final List<AssimpOxyMesh> meshes = new ArrayList<>();
 
     final String objPath;
+    AIScene aiScene;
 
     public OxyModelLoader(String objPath) {
         this.objPath = objPath;
@@ -55,7 +56,7 @@ public class OxyModelLoader {
                 | aiProcess_FlipUVs
                 | aiProcess_CalcTangentSpace;
 
-        AIScene aiScene = aiImportFile(objPath, flag);
+        aiScene = aiImportFile(objPath, flag);
         PointerBuffer materials = Objects.requireNonNull(aiScene).mMaterials();
         PointerBuffer meshes = Objects.requireNonNull(aiScene).mMeshes();
         for (int i = 0; i < aiScene.mNumMeshes(); i++) {

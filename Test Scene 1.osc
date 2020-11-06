@@ -6,7 +6,7 @@ Environment {
 	Environment Exposure: 1.0
 }
 Registry {
-	Object count: 12
+	Object count: 15
 	OxyModel 1 {
        	ID: bec7134d-5bd5-47a0-82b1-58dd89867190
        	Mesh Position: 0

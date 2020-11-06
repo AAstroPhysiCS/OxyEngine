@@ -18,6 +18,28 @@ import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 import static OxyEngine.Tools.Globals.toPrimitiveFloat;
 import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 
+@OxySerializable(info = """
+        \t\t%s %s {
+               \tID: %s
+               \tMesh Position: %s
+               \tName: %s
+               \tGrouped: %s
+               \tEmitting: %s
+               \tPosition: X %s, Y %s, Z %s
+               \tRotation: X %s, Y %s, Z %s
+               \tScale: X %s, Y %s, Z %s
+               \tBounds Min: X %s, Y %s, Z %s
+               \tBounds Max: X %s, Y %s, Z %s
+               \tColor: %s
+               \tScripts: [%s]
+               \tAlbedo Texture: %s
+               \tNormal Map Texture: %s
+               \tRoughness Map Texture: %s
+               \tAO Map Texture: %s
+               \tMetallic Map Texture: %s
+               \tMesh: %s
+            }"""
+)
 public abstract class OxyEntity {
 
     private final List<ScriptingComponent> scripts = new ArrayList<>();

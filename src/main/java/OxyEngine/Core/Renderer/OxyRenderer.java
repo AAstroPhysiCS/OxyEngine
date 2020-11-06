@@ -7,11 +7,11 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 import OxyEngineEditor.Components.PerspectiveCamera;
 
+import static OxyEngineEditor.Scene.SceneRuntime.currentBoundedCamera;
 import static org.lwjgl.opengl.GL11.*;
 
 public abstract class OxyRenderer {
 
-    public static OxyCamera currentBoundedCamera;
     protected final WindowHandle windowHandle;
     protected static OxyShader currentShader;
 
@@ -80,13 +80,5 @@ public abstract class OxyRenderer {
             reset();
             return s;
         }
-    }
-
-    public OxyCamera getCamera() {
-        return currentBoundedCamera;
-    }
-
-    public static OxyShader getCurrentShader() {
-        return currentShader;
     }
 }

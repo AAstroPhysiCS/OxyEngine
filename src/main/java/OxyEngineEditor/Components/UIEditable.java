@@ -2,7 +2,6 @@ package OxyEngineEditor.Components;
 
 
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.UI.Panels.PropertyEntry;
 
 import java.util.ArrayList;
 import java.util.List;

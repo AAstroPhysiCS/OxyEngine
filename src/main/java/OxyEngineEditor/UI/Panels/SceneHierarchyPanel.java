@@ -2,10 +2,9 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Components.ModelMesh;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
-import OxyEngineEditor.Scene.Objects.Model.ModelType;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.ImGui;
@@ -49,7 +48,7 @@ public class SceneHierarchyPanel extends Panel {
                     entityContext.get(SelectedComponent.class).selected = true;
                 }
             }
-        }, ModelMesh.class); //all entities that have x
+        }, entity -> entity instanceof OxyModel); //all entities that have x
     }
 
     @Override
@@ -61,7 +60,7 @@ public class SceneHierarchyPanel extends Panel {
 
         if (ImGui.beginPopupContextWindow("Entity menu")) {
             if (ImGui.button("Create Entity"))
-                addEntity(ModelType.Sphere.getPath().getBytes(), shader);
+                addEntity(shader);
             ImGui.endPopup();
         }
 
@@ -70,8 +69,8 @@ public class SceneHierarchyPanel extends Panel {
         ImGui.end();
     }
 
-    private void addEntity(byte[] data, OxyShader shader) {
-        OxyEntity model = SceneRuntime.ACTIVE_SCENE.createModelEntity(new String(data), shader);
+    private void addEntity(OxyShader shader) {
+        OxyEntity model = SceneRuntime.ACTIVE_SCENE.createEmptyModel(shader);
         model.addComponent(new SelectedComponent(false));
         model.constructData();
         sceneLayer.rebuild();

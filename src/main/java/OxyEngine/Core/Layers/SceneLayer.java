@@ -11,15 +11,21 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.*;
+import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
+import OxyEngineEditor.UI.Panels.PropertyEntry;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngineEditor.UI.Panels.PropertiesPanel.componentFullName;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
@@ -47,6 +53,8 @@ public class SceneLayer extends Layer {
         cachedCameraComponents = ACTIVE_SCENE.distinct(OxyCamera.class);
         cachedLightEntities = ACTIVE_SCENE.view(Light.class);
         allModelEntities = ACTIVE_SCENE.view(ModelMesh.class);
+
+        fillPropertyEntries();
     }
 
     @Override
@@ -60,6 +68,29 @@ public class SceneLayer extends Layer {
             if (cachedConverted.size() == 0) return;
             ModelMesh mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMesh.class);
             mesh.initList();
+        }
+
+        fillPropertyEntries();
+    }
+
+    private void fillPropertyEntries() {
+        for (OxyEntity entity : SceneRuntime.ACTIVE_SCENE.getEntities()) {
+            if (entity instanceof OxyNativeObject) continue;
+            if (!entity.has(ModelFactory.class)) continue;
+            for (String s : componentFullName) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    EntityComponent component = entity.get((Class<? extends EntityComponent>) Class.forName(s));
+                    if (component == null) continue;
+                    Field f = component.getClass().getDeclaredField("node");
+                    f.setAccessible(true);
+                    PropertyEntry entry = (PropertyEntry) f.get(component);
+                    if (!entity.getPropertyEntries().contains(entry))
+                        entity.getPropertyEntries().add(entry);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -89,7 +120,7 @@ public class SceneLayer extends Layer {
     public void render(float ts) {
         if (ACTIVE_SCENE == null) return;
         ACTIVE_SCENE.getFrameBuffer().blit();
-        if (!initHdrTexture && OxyRenderer.currentBoundedCamera != null) {
+        if (!initHdrTexture && SceneRuntime.currentBoundedCamera != null) {
             hdrTexture.captureFaces(ts);
             cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMesh.class);
             initHdrTexture = true;
@@ -105,7 +136,7 @@ public class SceneLayer extends Layer {
                 if (camera instanceof PerspectiveCamera p) {
                     if (p.isPrimary()) {
                         mainCamera = p;
-                        OxyRenderer.currentBoundedCamera = mainCamera;
+                        SceneRuntime.currentBoundedCamera = mainCamera;
                         break;
                     }
                 }

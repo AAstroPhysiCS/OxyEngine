@@ -6,35 +6,13 @@ import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.OxySerializable;
 import OxyEngineEditor.Scene.Scene;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
-@OxySerializable(info = """
-        \t\tOxyModel %s {
-               \tID: %s
-               \tMesh Position: %s
-               \tName: %s
-               \tGrouped: %s
-               \tEmitting: %s
-               \tPosition: X %s, Y %s, Z %s
-               \tRotation: X %s, Y %s, Z %s
-               \tScale: X %s, Y %s, Z %s
-               \tBounds Min: X %s, Y %s, Z %s
-               \tBounds Max: X %s, Y %s, Z %s
-               \tColor: %s
-               \tScripts: [%s]
-               \tAlbedo Texture: %s
-               \tNormal Map Texture: %s
-               \tRoughness Map Texture: %s
-               \tAO Map Texture: %s
-               \tMetallic Map Texture: %s
-               \tMesh: %s
-            }"""
-)
 public class OxyModel extends OxyEntity {
 
     private ModelFactory factory;
@@ -84,6 +62,7 @@ public class OxyModel extends OxyEntity {
     public void initData(String path) {
         assert has(ModelFactory.class) : oxyAssert("Models should have a Model Template");
         factory = get(ModelFactory.class);
+        translatePos();
         factory.constructData(this);
         addComponent(new ModelMesh.ModelMeshBuilderImpl()
                 .setPath(path)
@@ -101,13 +80,27 @@ public class OxyModel extends OxyEntity {
 
     @Override
     public void constructData() {
+        translatePos();
+        if(factory == null) return;
         factory.constructData(this);
         get(Mesh.class).updateSingleEntityData(0, vertices);
     }
 
     @Override
     public void updateData() {
+        translatePos();
+        if(factory == null) return;
         factory.updateData(this);
         get(Mesh.class).updateSingleEntityData(0, vertices);
+    }
+
+    private void translatePos(){
+        TransformComponent c = get(TransformComponent.class);
+        c.transform = new Matrix4f()
+                .translate(c.position)
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z)
+                .scale(c.scale);
     }
 }

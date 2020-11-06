@@ -18,6 +18,7 @@ public class EnvironmentPanel extends Panel {
         return INSTANCE;
     }
 
+    private static boolean initPanel = false;
     private final SceneLayer sceneLayer;
 
     private EnvironmentPanel(SceneLayer sceneLayer) {
@@ -38,20 +39,22 @@ public class EnvironmentPanel extends Panel {
             if (path != null) sceneLayer.loadHDRTextureToScene(path);
         }
 
+        ImGui.columns(2, "env column");
+        if (!initPanel) ImGui.setColumnOffset(0, -90f);
         ImGui.alignTextToFramePadding();
         ImGui.text("Gamma strength:");
-        ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel g", gammaStrength, 0, 10);
-
         ImGui.alignTextToFramePadding();
         ImGui.text("Environment LOD:");
-        ImGui.sameLine();
-        ImGui.sliderFloat("###hidelabel lod", mipLevelStrength, 0, 5);
-
         ImGui.alignTextToFramePadding();
         ImGui.text("Exposure: ");
-        ImGui.sameLine();
+        ImGui.nextColumn();
+        ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
+        ImGui.sliderFloat("###hidelabel g", gammaStrength, 0, 10);
+        ImGui.sliderFloat("###hidelabel lod", mipLevelStrength, 0, 5);
         ImGui.sliderFloat("###hidelabel exposure", exposure, 0, 10);
+        ImGui.popItemWidth();
+        ImGui.columns(1);
+        initPanel = true;
 
         ImGui.end();
     }

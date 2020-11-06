@@ -1,6 +1,5 @@
 package OxyEngineEditor.UI.Selector;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngineEditor.Components.SelectedComponent;
@@ -8,6 +7,7 @@ import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.Selector.Tools.MouseSelector;
@@ -60,12 +60,12 @@ public class OxySelectHandler {
                     new Vector2f(
                             ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x,
                             ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y),
-                    renderer.getCamera()
+                    SceneRuntime.currentBoundedCamera
             );
             //if a entity is selected in SceneHierarchyPanel then do it to false
             if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
             //if user selected a empty entity then don't show them, instead set it to null and don't draw anything
-            entityContext = mSelector.selectObject(scene.getEntities(), OxyRenderer.currentBoundedCamera.getCameraController().origin, direction);
+            entityContext = mSelector.selectObject(scene.getEntities(), SceneRuntime.currentBoundedCamera.getCameraController().origin, direction);
             //if something was selected then show it
             if (entityContext != null) entityContext.get(SelectedComponent.class).selected = true;
         }

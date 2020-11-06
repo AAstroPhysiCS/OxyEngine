@@ -1,5 +1,6 @@
 package OxyEngineEditor.Scene;
 
+import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scripting.OxyScriptItem;
@@ -14,6 +15,7 @@ public final class SceneRuntime {
 
     private static final SceneRuntimeControlPanel panel = new SceneRuntimeControlPanel();
 
+    public static OxyCamera currentBoundedCamera;
     public static Scene ACTIVE_SCENE;
 
     public SceneRuntime(Scene scene) {

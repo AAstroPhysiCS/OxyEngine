@@ -44,6 +44,7 @@ public class ToolbarPanel extends Panel {
         ImGui.pushStyleColor(ImGuiCol.MenuBarBg, bgC[0], bgC[1], bgC[2], bgC[3]);
         ImGui.pushStyleVar(ImGuiStyleVar.FramePadding, 0f, 10);
 
+
         if (ImGui.beginMainMenuBar()) {
             ImVec2 pos = new ImVec2();
             ImGui.getWindowPos(pos);

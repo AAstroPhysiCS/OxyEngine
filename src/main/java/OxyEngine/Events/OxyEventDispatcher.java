@@ -1,7 +1,7 @@
 package OxyEngine.Events;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.SceneRuntime;
 
 import java.util.*;
 
@@ -22,7 +22,7 @@ public final class OxyEventDispatcher {
         for (var entrySet : listeners.entrySet()) {
             OxyEventListener listener = entrySet.getKey();
             Set<OxyEntity> entities = entrySet.getValue();
-            if (listener instanceof OxyMouseListener m && OxyRenderer.currentBoundedCamera != null) {
+            if (listener instanceof OxyMouseListener m && SceneRuntime.currentBoundedCamera != null) {
                 m.dispatch(entities);
             }
         }

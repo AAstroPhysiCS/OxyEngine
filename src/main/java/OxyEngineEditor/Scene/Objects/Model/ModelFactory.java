@@ -3,7 +3,6 @@ package OxyEngineEditor.Scene.Objects.Model;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.TransformComponent;
-import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -44,16 +43,8 @@ public class ModelFactory implements EntityComponent {
         ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);
 
-        c.transform = new Matrix4f()
-                .translate(c.position)
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z)
-                .scale(c.scale);
-
         int slot = 0;
-        if (texture != null)
-            slot = texture.getTextureSlot();
+        if (texture != null) slot = texture.getTextureSlot();
 
         int vertPtr = 0;
         for (Vector3f v : verticesNonTransformed) {
@@ -102,13 +93,6 @@ public class ModelFactory implements EntityComponent {
         OxyMaterial material = e.get(OxyMaterial.class);
         ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);
-
-        c.transform = new Matrix4f()
-                .translate(c.position)
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z)
-                .scale(c.scale);
 
         int slot = 0;
         if (texture != null)

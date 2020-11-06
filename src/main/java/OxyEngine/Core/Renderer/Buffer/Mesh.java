@@ -4,6 +4,7 @@ import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Components.EntityComponent;
+import OxyEngineEditor.Components.UIEditable;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL45.*;
 
-public abstract class Mesh implements OxyDisposable, EntityComponent {
+public abstract class Mesh implements OxyDisposable, EntityComponent, UIEditable {
 
     protected IndexBuffer indexBuffer;
     protected VertexBuffer vertexBuffer;

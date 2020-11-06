@@ -1,13 +1,12 @@
 package OxyEngineEditor.UI.Selector;
 
-import OxyEngine.Core.Camera.Controller.OxyCameraController;
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Events.OxyMouseListener;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.flag.ImGuiMouseButton;
 import org.joml.Vector2d;
 
@@ -134,13 +133,12 @@ public class OxyGizmoController implements OxyMouseListener {
 
         Vector2d nowMousePos = new Vector2d(mouseCursorPosDispatcher.getXPos(), mouseCursorPosDispatcher.getYPos());
         Vector2d delta = nowMousePos.sub(oldMousePos);
-        if(delta.x <= -50f || delta.x >= 50f || delta.y <= -50f || delta.y >= 50f)
+        if (delta.x <= -50f || delta.x >= 50f || delta.y <= -50f || delta.y >= 50f)
             return;
 
-        float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
-        float ts = OxyCameraController.getTs() * 1000;
-        float deltaX = (float) ((delta.x * mouseSpeed) * ts);
-        float deltaY = (float) ((delta.y * mouseSpeed) * ts);
+        float mouseSpeed = SceneRuntime.currentBoundedCamera.getCameraController().getMouseSpeed();
+        float deltaX = (float) delta.x * mouseSpeed;
+        float deltaY = (float) delta.y * mouseSpeed;
 
         if (pressedZTranslation) {
             xC.position.add(0, 0, -deltaX);
@@ -214,13 +212,12 @@ public class OxyGizmoController implements OxyMouseListener {
 
         Vector2d nowMousePos = new Vector2d(mouseCursorPosDispatcher.getXPos(), mouseCursorPosDispatcher.getYPos());
         Vector2d delta = nowMousePos.sub(oldMousePos);
-        if(delta.x <= -50f || delta.x >= 50f || delta.y <= -50f || delta.y >= 50f)
+        if (delta.x <= -50f || delta.x >= 50f || delta.y <= -50f || delta.y >= 50f)
             return;
 
-        float mouseSpeed = OxyRenderer.currentBoundedCamera.getCameraController().getMouseSpeed();
-        float ts = OxyCameraController.getTs() * 1000;
-        float deltaX = (float) ((delta.x * mouseSpeed) * ts);
-        float deltaY = (float) ((delta.y * mouseSpeed) * ts);
+        float mouseSpeed = SceneRuntime.currentBoundedCamera.getCameraController().getMouseSpeed();
+        float deltaX = (float) delta.x * mouseSpeed;
+        float deltaY = (float) delta.y * mouseSpeed;
 
         if (pressedZScale) {
             currC.scale.x += -deltaX;

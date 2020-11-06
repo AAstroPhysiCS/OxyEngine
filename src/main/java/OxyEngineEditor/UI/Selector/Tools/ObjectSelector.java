@@ -5,6 +5,8 @@ import OxyEngineEditor.Components.BoundingBoxComponent;
 import OxyEngineEditor.Components.SelectedComponent;
 import OxyEngineEditor.Components.TagComponent;
 import OxyEngineEditor.Components.TransformComponent;
+import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
+import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import org.joml.Intersectionf;
 import org.joml.Vector2f;
@@ -27,7 +29,8 @@ public interface ObjectSelector {
         float closestDistance = Float.POSITIVE_INFINITY;
 
         for (OxyEntity entity : entities) {
-
+            if (entity instanceof OxyNativeObject) continue;
+            if (!entity.has(ModelFactory.class)) continue;
             if (!entity.has(SelectedComponent.class) || !entity.has(TransformComponent.class)) continue;
             if (entity.get(SelectedComponent.class).fixedValue) continue;
 

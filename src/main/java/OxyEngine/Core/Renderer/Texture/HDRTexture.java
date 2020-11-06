@@ -1,12 +1,12 @@
 package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngineEditor.Components.NativeObjectMesh;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.Scene.SceneRuntime;
 import org.joml.Matrix4f;
 
 import java.nio.FloatBuffer;
@@ -179,7 +179,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                     GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
             OpenGLRendererAPI.clearBuffer();
-            scene.getRenderer().render(ts, mesh, OxyRenderer.currentBoundedCamera);
+            scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera);
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -257,7 +257,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glViewport(0, 0, 512, 512);
             shader.disable();
             OpenGLRendererAPI.clearBuffer();
-            mainTexture.scene.getRenderer().render(ts, mesh, OxyRenderer.currentBoundedCamera, shader);
+            mainTexture.scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera, shader);
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
     }
@@ -307,7 +307,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
                 OpenGLRendererAPI.clearBuffer();
-                mainTexture.scene.getRenderer().render(ts, mesh, OxyRenderer.currentBoundedCamera, shader);
+                mainTexture.scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera, shader);
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
@@ -367,7 +367,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);
                     OpenGLRendererAPI.clearBuffer();
-                    mainTexture.scene.getRenderer().render(ts, mesh, OxyRenderer.currentBoundedCamera, shader);
+                    mainTexture.scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera, shader);
                 }
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);

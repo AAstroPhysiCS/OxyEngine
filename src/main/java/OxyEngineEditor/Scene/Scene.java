@@ -13,6 +13,8 @@ import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import org.joml.Vector3f;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -56,7 +58,13 @@ public final class Scene implements OxyDisposable {
     public final OxyNativeObject createNativeObjectEntity(int size) {
         OxyNativeObject e = new OxyNativeObject(this, size);
         put(e);
-        e.addComponent(new TransformComponent(), new RenderableComponent(RenderingMode.Normal), new EntitySerializationInfo(false, false), new UUIDComponent(UUID.randomUUID()));
+        e.addComponent(
+                new TransformComponent(),
+                new SelectedComponent(false),
+                new RenderableComponent(RenderingMode.Normal),
+                new EntitySerializationInfo(false, false),
+                new UUIDComponent(UUID.randomUUID())
+        );
         return e;
     }
 
@@ -74,6 +82,23 @@ public final class Scene implements OxyDisposable {
 
     public final OxyModel createModelEntity(ModelType type, OxyShader shader) {
         return createModelEntity(type.getPath(), shader, false);
+    }
+
+    public final OxyModel createEmptyModel(OxyShader shader) {
+        OxyModel e = new OxyModel(this);
+        put(e);
+        e.originPos = new Vector3f(0, 0, 0);
+        e.addComponent(
+                new UUIDComponent(UUID.randomUUID()),
+                shader,
+                new TransformComponent(new Vector3f(0, 0, 0)),
+                new TagComponent("Empty Entity"),
+                new MeshPosition(0),
+                new RenderableComponent(RenderingMode.Normal),
+                new EntitySerializationInfo(false, false),
+                new SelectedComponent(false)
+        );
+        return e;
     }
 
     public final List<OxyModel> createModelEntities(String path, OxyShader shader, boolean importedFromFile) {
@@ -152,8 +177,8 @@ public final class Scene implements OxyDisposable {
     }
 
     public final void removeEntity(OxyEntity e) {
-        e.get(OxyMaterial.class).dispose();
-        e.get(Mesh.class).dispose();
+        if (e.has(OxyMaterial.class)) e.get(OxyMaterial.class).dispose();
+        if (e.has(Mesh.class)) e.get(Mesh.class).dispose();
         var value = registry.entityList.remove(e);
         assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");
     }
@@ -232,6 +257,15 @@ public final class Scene implements OxyDisposable {
         });
     }
 
+    public final void each(RegistryEach.Single<OxyEntity> registryEach, Predicate<OxyEntity> predicate) {
+        Set<OxyEntity> entities = getEntities();
+        entities.forEach(oxyEntity -> {
+            if(predicate.test(oxyEntity)){
+                registryEach.each(oxyEntity);
+            }
+        });
+    }
+
     public final <U extends EntityComponent, K extends U> void each(RegistryEach.View<OxyEntity, K> registryEach, Class<K> destClass) {
         Set<OxyEntity> entities = view(destClass);
         entities.forEach(oxyEntity -> registryEach.each(oxyEntity, oxyEntity.get(destClass)));
@@ -268,6 +302,10 @@ public final class Scene implements OxyDisposable {
         return registry.entityList.keySet();
     }
 
+    Set<Map.Entry<OxyEntity, Set<EntityComponent>>> getNativeObjects() {
+        return registry.entityList.entrySet().stream().filter(oxyEntitySetEntry -> oxyEntitySetEntry.getKey() instanceof OxyNativeObject).collect(Collectors.toSet());
+    }
+
     public FrameBuffer getFrameBuffer() {
         return frameBuffer;
     }
@@ -282,8 +320,8 @@ public final class Scene implements OxyDisposable {
         while (it.hasNext()) {
             OxyEntity e = it.next();
             if (e instanceof OxyModel) {
-                e.get(Mesh.class).dispose();
-                e.get(OxyMaterial.class).dispose();
+                if (e.has(Mesh.class)) e.get(Mesh.class).dispose();
+                if (e.has(OxyMaterial.class)) e.get(OxyMaterial.class).dispose();
                 it.remove();
             }
         }

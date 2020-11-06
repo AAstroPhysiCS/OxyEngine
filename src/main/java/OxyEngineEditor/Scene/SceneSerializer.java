@@ -3,7 +3,6 @@ package OxyEngineEditor.Scene;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
@@ -60,13 +59,12 @@ public final class SceneSerializer {
 
         public void writeScene(Scene scene) {
             OxySerializable sceneInfo = scene.getClass().getAnnotation(OxySerializable.class);
-            String formattedOriginal = sceneInfo.info().formatted(scene.getSceneName(), SceneLayer.hdrTexture.getPath(),
+            String formattedOriginalEntity = sceneInfo.info().formatted(scene.getSceneName(), SceneLayer.hdrTexture.getPath(),
                     EnvironmentPanel.gammaStrength[0], EnvironmentPanel.mipLevelStrength[0], EnvironmentPanel.exposure[0], scene.getShapeCount());
-            StringBuilder info = new StringBuilder(formattedOriginal);
+            StringBuilder infoEntity = new StringBuilder(formattedOriginalEntity);
             int ptr = 1;
-
             for (OxyEntity e : scene.getEntities()) {
-
+                if(!(e instanceof OxyModel)) continue;
                 int meshPos = -1;
                 String tag = "null";
                 String grouped = "false";
@@ -90,8 +88,7 @@ public final class SceneSerializer {
 
                 if (e.has(TagComponent.class)) tag = e.get(TagComponent.class).tag();
                 if (e.has(MeshPosition.class)) meshPos = e.get(MeshPosition.class).meshPos();
-                if (e.has(EntitySerializationInfo.class))
-                    grouped = String.valueOf(e.get(EntitySerializationInfo.class).grouped());
+                if (e.has(EntitySerializationInfo.class)) grouped = String.valueOf(e.get(EntitySerializationInfo.class).grouped());
                 if (e.has(OxyMaterial.class)) {
                     OxyMaterial m = e.get(OxyMaterial.class);
                     if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
@@ -104,23 +101,19 @@ public final class SceneSerializer {
                 if (e.has(ModelMesh.class)) mesh = e.get(ModelMesh.class).getPath();
                 if (e.has(Light.class)) emitting = true;
 
-                for (ScriptingComponent c : e.getScripts()) {
-                    scripts.append(" ").append(c.getPath()).append(",");
-                }
+                for (ScriptingComponent c : e.getScripts()) scripts.append(" ").append(c.getPath()).append(",");
 
                 OxySerializable objInfo = e.getClass().getAnnotation(OxySerializable.class);
-                if (objInfo != null) {
-                    String formatObjTemplate = objInfo.info().formatted(ptr++, id, meshPos, tag, grouped, emitting,
-                            transform.position.x, transform.position.y, transform.position.z,
-                            transform.rotation.x, transform.rotation.y, transform.rotation.z,
-                            transform.scale.x, transform.scale.y, transform.scale.z,
-                            minBound.x, minBound.y, minBound.z, maxBound.x, maxBound.y, maxBound.z,
-                            albedoColor, scripts.toString(), albedoTexture, normalTexture, roughnessTexture, aoTexture, metallicTexture, mesh).trim();
-                    info.append("\t").append(formatObjTemplate).append("\n");
-                }
+                String formatObjTemplate = objInfo.info().formatted("OxyModel", ptr++, id, meshPos, tag, grouped, emitting,
+                        transform.position.x, transform.position.y, transform.position.z,
+                        transform.rotation.x, transform.rotation.y, transform.rotation.z,
+                        transform.scale.x, transform.scale.y, transform.scale.z,
+                        minBound.x, minBound.y, minBound.z, maxBound.x, maxBound.y, maxBound.z,
+                        albedoColor, scripts.toString(), albedoTexture, normalTexture, roughnessTexture, aoTexture, metallicTexture, mesh).trim();
+                infoEntity.append("\t").append(formatObjTemplate).append("\n");
             }
             try {
-                writer.write(info.toString() + "}");
+                writer.write(infoEntity.toString() + "}");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -174,6 +167,10 @@ public final class SceneSerializer {
             }
             oldScene = SceneRuntime.ACTIVE_SCENE;
             Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer());
+            for(var n : oldScene.getNativeObjects()) {
+                scene.put(n.getKey());
+                scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
+            }
             scene.setUISystem(oldScene.getOxyUISystem());
             OxySelectHandler.entityContext = null;
             layer.clear();
@@ -250,16 +247,17 @@ public final class SceneSerializer {
                             //list.of does not work
                             listOfEntries.get(mesh).add(Arrays.stream(new EntityComponent[]{new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
                                     OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
-                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(true, true), new BoundingBoxComponent(min, max)}).collect(Collectors.toList())
+                                    new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new EntitySerializationInfo(true, true), new BoundingBoxComponent(min, max)}).collect(Collectors.toList())
                             );
                         } else {
                             OxyModel m = scene.createModelEntity(mesh, shader);
                             m.originPos = new Vector3f(0, 0, 0);
                             m.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
                                             OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
-                                    new SelectedComponent(false), OxyRenderer.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(min, max)
+                                    new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(min, max)
                             );
-                            if (emitting) m.addComponent(new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f));
+                            if (emitting)
+                                m.addComponent(new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f));
                             m.constructData();
                         }
                     }
@@ -286,7 +284,7 @@ public final class SceneSerializer {
 
             for (OxyEntity modelInScene : scene.getEntities()) {
                 List<ScriptingComponent> components = listOfScripts.get(modelInScene.get(UUIDComponent.class).getUUIDString());
-                modelInScene.addScript(components);
+                if(components != null) modelInScene.addScript(components);
             }
             return scene;
         }

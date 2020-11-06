@@ -2,8 +2,19 @@ package OxyEngineEditor.Components;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngineEditor.UI.Panels.PropertiesPanel;
+import OxyEngineEditor.UI.Panels.PropertyEntry;
+import imgui.ImGui;
+import imgui.flag.ImGuiTreeNodeFlags;
+import imgui.type.ImString;
 
+import java.util.List;
+
+import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class ModelMesh extends Mesh {
@@ -168,6 +179,69 @@ public class ModelMesh extends Mesh {
             return new ModelMesh(path, shader, usage, mode, vertices, indices, textureCoords, normals, tangents, biTangents);
         }
     }
+
+
+    private static boolean initPanel = false;
+    private static ImString meshPath = new ImString(0);
+    @SuppressWarnings("unused") //it is being used by reflection
+    private final PropertyEntry node = () -> {
+        {
+            if (ImGui.collapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
+
+                meshPath = new ImString(entityContext.get(Mesh.class).getPath());
+
+                ImGui.checkbox("Cast Shadows", false);
+
+                if (!initPanel) ImGui.setNextItemOpen(true);
+                ImGui.columns(2, "myColumns");
+                if (!initPanel) ImGui.setColumnOffset(0, -120f);
+                ImGui.alignTextToFramePadding();
+                ImGui.text("Mesh:");
+                ImGui.nextColumn();
+                ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth() - 30f);
+                ImGui.inputText("##hidelabel", meshPath);
+                ImGui.popItemWidth();
+                ImGui.sameLine();
+                if (ImGui.button("...")) {
+                    String path = openDialog("", null);
+                    if (path != null) {
+                        if (entityContext != null) {
+                            List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path, entityContext.get(OxyShader.class));
+                            boolean isGrouped = true;
+                            if (eList.size() <= 1) isGrouped = false;
+                            for (OxyModel e : eList) {
+                                TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
+                                e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped, false));
+                                e.constructData();
+                            }
+                            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
+                            PropertiesPanel.sceneLayer.updateAllModelEntities();
+                            meshPath = new ImString(path);
+                            entityContext = null;
+                        }
+                    }
+                }
+                ImGui.columns(1);
+                if (ImGui.treeNodeEx("Materials", ImGuiTreeNodeFlags.DefaultOpen)) {
+                    ImGui.columns(2, "myColumnsMesh");
+                    if (!initPanel) ImGui.setNextItemOpen(true);
+                    if (!initPanel) {
+                        ImGui.setColumnOffset(0, -80f);
+                        initPanel = true;
+                    }
+                    ImGui.alignTextToFramePadding();
+                    ImGui.text("Material");
+                    ImGui.sameLine();
+                    ImGui.nextColumn();
+                    ImGui.text("DROP");
+                    //Material code here
+                    ImGui.nextColumn();
+                    ImGui.treePop();
+                    ImGui.columns(1);
+                }
+            }
+        }
+    };
 
     public float[] getTextureCoords() {
         return textureCoords;

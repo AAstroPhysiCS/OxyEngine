@@ -23,7 +23,7 @@ import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.ModelType;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
-import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.*;
@@ -57,9 +57,9 @@ public class EditorApplication extends OxyApplication {
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
         scene = new Scene("Test Scene 1", oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
-        OxyEntity cameraEntity = scene.createNativeObjectEntity();
+        OxyNativeObject editorCameraEntity = scene.createNativeObjectEntity();
         PerspectiveCamera camera = new PerspectiveCamera(true, Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
-        cameraEntity.addComponent(camera);
+        editorCameraEntity.addComponent(camera, new TagComponent("Editor Camera"));
 
         OxyModel m = scene.createModelEntity(ModelType.Sphere, oxyShader);
         Light pointLightComponent = new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f);

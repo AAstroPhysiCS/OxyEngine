@@ -1,7 +1,7 @@
 package OxyEngine.Events;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import OxyEngineEditor.UI.Selector.Tools.MouseSelector;
 import imgui.ImGui;
@@ -23,8 +23,8 @@ public interface OxyMouseListener extends OxyEventListener {
     void mouseReleased(OxyEntity selectedEntity, int mouseButton);
 
     default void dispatch(Set<OxyEntity> entities) {
-        Vector3f direction = MouseSelector.getInstance().getObjectPosRelativeToCamera(ScenePanel.windowSize.x - ScenePanel.offset.x, ScenePanel.windowSize.y - ScenePanel.offset.y, new Vector2f(ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x, ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y), OxyRenderer.currentBoundedCamera);
-        OxyEntity e = MouseSelector.getInstance().selectObjectGizmo(entities, OxyRenderer.currentBoundedCamera.getCameraController().origin, direction);
+        Vector3f direction = MouseSelector.getInstance().getObjectPosRelativeToCamera(ScenePanel.windowSize.x - ScenePanel.offset.x, ScenePanel.windowSize.y - ScenePanel.offset.y, new Vector2f(ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x, ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y), SceneRuntime.currentBoundedCamera);
+        OxyEntity e = MouseSelector.getInstance().selectObjectGizmo(entities, SceneRuntime.currentBoundedCamera.getCameraController().origin, direction);
         dispatchMethods(e);
     }
 

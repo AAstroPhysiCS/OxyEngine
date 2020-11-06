@@ -1,6 +1,5 @@
 package OxyEngineEditor.UI.Selector;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxySystem;
@@ -10,6 +9,7 @@ import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.Scene.SceneRuntime;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -146,7 +146,7 @@ enum GizmoMode {
                 ModelMesh modelMesh = e.get(ModelMesh.class);
                 OxyMaterial material = e.get(OxyMaterial.class);
                 material.push(modelMesh.getShader());
-                scene.getRenderer().render(ts, modelMesh, OxyRenderer.currentBoundedCamera);
+                scene.getRenderer().render(ts, modelMesh, SceneRuntime.currentBoundedCamera);
             }
         }
 
