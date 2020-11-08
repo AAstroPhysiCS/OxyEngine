@@ -116,14 +116,13 @@ public class OxyMaterial implements EntityComponent, UIEditable, OxyDisposable {
         shader.disable();
     }
 
-    @SuppressWarnings("unused") //it is being used by reflection
-    private final PropertyEntry node = () -> {
+    public static final PropertyEntry node = () -> {
 
         if (entityContext == null) return;
 
         if (ImGui.collapsingHeader("Material", ImGuiTreeNodeFlags.DefaultOpen)) {
 
-            albedo = entityContext.get(OxyMaterial.class).albedoColor.getNumbers();
+            float[] albedo = entityContext.get(OxyMaterial.class).albedoColor.getNumbers();
 
             ImGui.alignTextToFramePadding();
             { // BASE COLOR

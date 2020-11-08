@@ -1,11 +1,10 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngineEditor.Components.TagComponent;
-import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Components.UIEditable;
-import OxyEngineEditor.Components.UUIDComponent;
+import OxyEngineEditor.Components.*;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import imgui.ImGui;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiPopupFlags;
 import imgui.type.ImBoolean;
@@ -34,6 +33,7 @@ public class PropertiesPanel extends Panel {
     private static final ImBoolean helpWindowBool = new ImBoolean();
 
     ImString name = new ImString(0);
+    final ImString searchAddComponent = new ImString(100);
 
     public static final String[] componentNames = UIEditable.allUIEditableNames();
     public static final String[] componentFullName = UIEditable.allUIEditableFullNames();
@@ -104,20 +104,48 @@ public class PropertiesPanel extends Panel {
         for (PropertyEntry n : entityContext.getPropertyEntries()) n.runEntry();
 
         final float windowWidth = ImGui.getWindowWidth();
-        ImGui.spacing();
-        ImGui.spacing();
-        ImGui.setCursorPosX(windowWidth / 2 - 150);
+        ImGui.dummy(0, 25);
+        ImGui.setCursorPosX(windowWidth / 2 - 125);
         ImGui.pushItemWidth(-1);
-        if (ImGui.button("Add Component", 300, 25)) ImGui.openPopup("comp_popup", ImGuiPopupFlags.AnyPopup);
+        if (ImGui.button("Add Component", 250, 25)) ImGui.openPopup("comp_popup", ImGuiPopupFlags.AnyPopup);
+        float buttonY = ImGui.getCursorScreenPosY();
         ImGui.popItemWidth();
 
+        ImGui.setNextWindowPos(ImGui.getWindowPosX() + (windowWidth / 2 - 150), buttonY - 165);
+        ImGui.pushStyleColor(ImGuiCol.PopupBg, 36, 36, 36, 255);
         if (ImGui.beginPopup("comp_popup")) {
             ImGui.alignTextToFramePadding();
             ImGui.text("Search:");
             ImGui.sameLine();
-            ImGui.inputText("##hidelabel comp_popup_search", new ImString(""), ImGuiInputTextFlags.EnterReturnsTrue);
+            ImGui.inputText("##hidelabel comp_popup_search", searchAddComponent);
+            if (ImGui.beginMenu("Mesh")) {
+                if (ImGui.menuItem("Mesh Renderer"))
+                    if(!entityContext.getPropertyEntries().contains(ModelMesh.node)) entityContext.getPropertyEntries().add(ModelMesh.node);
+                if (ImGui.menuItem("Material"))
+                    if(!entityContext.getPropertyEntries().contains(OxyMaterial.node)) entityContext.getPropertyEntries().add(OxyMaterial.node);
+                ImGui.endMenu();
+            }
+            if (ImGui.beginMenu("Scripts")) {
+                if(ImGui.menuItem("Basic Script"))
+                    if(!entityContext.getPropertyEntries().contains(ScriptingComponent.node)) entityContext.getPropertyEntries().add(ScriptingComponent.node);
+                ImGui.endMenu();
+            }
+            if (ImGui.beginMenu("Physics")) {
+                ImGui.menuItem("Mesh Collider");
+                ImGui.endMenu();
+            }
+            if (ImGui.beginMenu("UI")) {
+                ImGui.endMenu();
+            }
+            if (ImGui.beginMenu("Audio")) {
+                ImGui.endMenu();
+            }
+            if (ImGui.beginMenu("Light")) {
+                ImGui.endMenu();
+            }
             ImGui.endPopup();
         }
+        ImGui.popStyleColor();
 
         ImGui.checkbox("Demo", helpWindowBool);
         if (helpWindowBool.get()) ImGui.showDemoWindow();

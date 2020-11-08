@@ -70,7 +70,7 @@ Registry {
 	OxyModel 4 {
        	ID: 5b9e9b57-acd0-499a-adab-0efdec036e13
        	Mesh Position: 0
-       	Name: Object001
+       	Name: Face
        	Grouped: true
        	Emitting: false
        	Position: X -128.189, Y -16.154816, Z -17.458458

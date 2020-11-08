@@ -69,8 +69,6 @@ public class SceneLayer extends Layer {
             ModelMesh mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMesh.class);
             mesh.initList();
         }
-
-        fillPropertyEntries();
     }
 
     private void fillPropertyEntries() {
@@ -83,7 +81,6 @@ public class SceneLayer extends Layer {
                     EntityComponent component = entity.get((Class<? extends EntityComponent>) Class.forName(s));
                     if (component == null) continue;
                     Field f = component.getClass().getDeclaredField("node");
-                    f.setAccessible(true);
                     PropertyEntry entry = (PropertyEntry) f.get(component);
                     if (!entity.getPropertyEntries().contains(entry))
                         entity.getPropertyEntries().add(entry);

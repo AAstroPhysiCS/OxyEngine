@@ -5,6 +5,11 @@ import OxyEngine.Scripting.ScriptableEntity;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.UI.Panels.PropertyEntry;
+import imgui.ImGui;
+import imgui.flag.ImGuiInputTextFlags;
+import imgui.flag.ImGuiTreeNodeFlags;
+import imgui.type.ImString;
 
 import java.io.File;
 
@@ -50,12 +55,29 @@ public class ScriptingComponent {
         return null;
     }
 
-    public void finalizeComponent(){
+    public void finalizeComponent() {
         if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
             Class<?> classObj = obj.getClass();
             scriptItem = new OxyScriptItem(obj, classObj.getFields(), classObj.getMethods());
         } else oxyAssert("The script must extend ScriptableEntity class!");
     }
+
+    private static final ImString textBuffer = new ImString(100);
+    public static final PropertyEntry node = () -> {
+        if (ImGui.collapsingHeader("Scripts", ImGuiTreeNodeFlags.DefaultOpen)) {
+            ImGui.button("Add Script", 120, 25);
+
+            ImGui.text("Script 1");
+            ImGui.alignTextToFramePadding();
+            ImGui.text("Script Path:");
+            ImGui.sameLine();
+            ImGui.inputText("##hidelabel", textBuffer, ImGuiInputTextFlags.ReadOnly);
+            ImGui.sameLine();
+            ImGui.button("...");
+
+            ImGui.button("Run Script");
+        }
+    };
 
     public OxyScriptItem getScriptItem() {
         return scriptItem;
