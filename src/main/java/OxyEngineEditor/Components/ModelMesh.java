@@ -2,11 +2,13 @@ package OxyEngineEditor.Components;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngineEditor.UI.Panels.GUIProperty;
 import OxyEngineEditor.UI.Panels.PropertiesPanel;
-import OxyEngineEditor.UI.Panels.PropertyEntry;
 import imgui.ImGui;
+import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 
@@ -184,7 +186,7 @@ public class ModelMesh extends Mesh {
 
     private static final boolean initPanel = false;
     private static ImString meshPath = new ImString(0);
-    public static final PropertyEntry node = () -> {
+    public static final GUIProperty guiNode = () -> {
         {
             if (ImGui.collapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
                 if (entityContext.has(Mesh.class))
@@ -201,7 +203,7 @@ public class ModelMesh extends Mesh {
                 ImGui.text("Mesh:");
                 ImGui.nextColumn();
                 ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth() - 30f);
-                ImGui.inputText("##hidelabel", meshPath);
+                ImGui.inputText("##hidelabel", meshPath, ImGuiInputTextFlags.ReadOnly);
                 ImGui.popItemWidth();
                 ImGui.sameLine();
                 if (ImGui.button("...")) {
@@ -218,8 +220,9 @@ public class ModelMesh extends Mesh {
                             }
                             for (OxyModel e : eList) {
                                 TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
-                                e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped, false));
-                                e.getPropertyEntries().add(ModelMesh.node);
+                                e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped, false), entityContext.get(OxyMaterial.class));
+                                e.getGUINodes().add(ModelMesh.guiNode);
+                                e.getGUINodes().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
                             if (!exception) {

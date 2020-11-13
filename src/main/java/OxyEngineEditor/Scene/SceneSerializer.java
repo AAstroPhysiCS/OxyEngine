@@ -6,6 +6,7 @@ import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
@@ -101,7 +102,7 @@ public final class SceneSerializer {
                 if (e.has(ModelMesh.class)) mesh = e.get(ModelMesh.class).getPath();
                 if (e.has(Light.class)) emitting = true;
 
-                for (ScriptingComponent c : e.getScripts()) scripts.append(" ").append(c.getPath()).append(",");
+                for (OxyScript c : e.getScripts()) scripts.append(" ").append(c.getPath()).append(",");
 
                 OxySerializable objInfo = e.getClass().getAnnotation(OxySerializable.class);
                 String formatObjTemplate = objInfo.info().formatted("OxyModel", ptr++, id, meshPos, tag, grouped, emitting,
@@ -176,7 +177,7 @@ public final class SceneSerializer {
             layer.clear();
             oldScene.dispose();
             Map<String, List<List<EntityComponent>>> listOfEntries = new HashMap<>(objects.size());
-            Map<String, List<ScriptingComponent>> listOfScripts = new HashMap<>(objects.size());
+            Map<String, List<OxyScript>> listOfScripts = new HashMap<>(objects.size());
             for (var obj : objects) {
                 for (var entrySet : obj.map.entrySet()) {
                     var key = entrySet.getKey();
@@ -228,7 +229,7 @@ public final class SceneSerializer {
                                         listOfScripts.put(id, new ArrayList<>());
                                     }
                                     for (String s : subSequence) {
-                                        if (!s.isBlank()) listOfScripts.get(id).add(new ScriptingComponent(s.trim()));
+                                        if (!s.isBlank()) listOfScripts.get(id).add(new OxyScript(s.trim()));
                                     }
                                 }
                                 case "Albedo Texture" -> aT = sValue;
@@ -283,7 +284,7 @@ public final class SceneSerializer {
             }
 
             for (OxyEntity modelInScene : scene.getEntities()) {
-                List<ScriptingComponent> components = listOfScripts.get(modelInScene.get(UUIDComponent.class).getUUIDString());
+                List<OxyScript> components = listOfScripts.get(modelInScene.get(UUIDComponent.class).getUUIDString());
                 if(components != null) modelInScene.addScript(components);
             }
             return scene;

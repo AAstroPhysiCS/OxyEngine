@@ -11,7 +11,7 @@ public class PositionIteratorScript extends ScriptableEntity {
         super(scene, entity);
     }
 
-    TransformComponent c;
+    public TransformComponent c;
 
     @Override
     public void onCreate() {

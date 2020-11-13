@@ -15,7 +15,7 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.Scripting.OxyScriptItem;
+import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxyEventSystem;
 import OxyEngine.System.OxySystem;
 import OxyEngine.System.OxyUISystem;
@@ -85,7 +85,7 @@ public class EditorApplication extends OxyApplication {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0)));
             obj.constructData();
         }
-        testObjects.get(3).addScript(new ScriptingComponent("src/main/java/Scripts/PositionIteratorScript.java"));
+        testObjects.get(3).addScript(new OxyScript("src/main/java/Scripts/PositionIteratorScript.java"));
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;
@@ -169,7 +169,7 @@ public class EditorApplication extends OxyApplication {
     @Override
     public void dispose() {
         oxyEngine.dispose();
-        OxyScriptItem.suspendAll();
+        OxyScript.suspendAll();
         scene.getOxyUISystem().dispose();
         scene.dispose();
     }

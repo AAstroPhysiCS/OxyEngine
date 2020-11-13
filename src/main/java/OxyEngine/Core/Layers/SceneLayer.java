@@ -17,7 +17,7 @@ import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
-import OxyEngineEditor.UI.Panels.PropertyEntry;
+import OxyEngineEditor.UI.Panels.GUIProperty;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -75,15 +75,16 @@ public class SceneLayer extends Layer {
         for (OxyEntity entity : SceneRuntime.ACTIVE_SCENE.getEntities()) {
             if (entity instanceof OxyNativeObject) continue;
             if (!entity.has(ModelFactory.class)) continue;
+            //COMPONENTS
             for (String s : componentFullName) {
                 try {
                     @SuppressWarnings("unchecked")
                     EntityComponent component = entity.get((Class<? extends EntityComponent>) Class.forName(s));
                     if (component == null) continue;
-                    Field f = component.getClass().getDeclaredField("node");
-                    PropertyEntry entry = (PropertyEntry) f.get(component);
-                    if (!entity.getPropertyEntries().contains(entry))
-                        entity.getPropertyEntries().add(entry);
+                    Field f = component.getClass().getDeclaredField("guiNode");
+                    GUIProperty entry = (GUIProperty) f.get(component);
+                    if (!entity.getGUINodes().contains(entry))
+                        entity.getGUINodes().add(entry);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

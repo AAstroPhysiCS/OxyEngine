@@ -3,8 +3,7 @@ package OxyEngineEditor.Scene;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Scripting.OxyScriptItem;
-import OxyEngineEditor.Components.ScriptingComponent;
+import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
@@ -68,8 +67,8 @@ public final class SceneRuntime {
     static void onCreate() {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
-            for (ScriptingComponent c : e.getScripts()) {
-                OxyScriptItem item = c.getScriptItem();
+            for (OxyScript c : e.getScripts()) {
+                OxyScript.Item item = c.getScriptItem();
                 item.invokeMethod("onCreate");
             }
         }
@@ -79,8 +78,8 @@ public final class SceneRuntime {
         if(!running) return;
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
-            for (ScriptingComponent c : e.getScripts()) {
-                OxyScriptItem item = c.getScriptItem();
+            for (OxyScript c : e.getScripts()) {
+                OxyScript.Item item = c.getScriptItem();
                 item.invokeMethod("onUpdate", ts);
             }
         }

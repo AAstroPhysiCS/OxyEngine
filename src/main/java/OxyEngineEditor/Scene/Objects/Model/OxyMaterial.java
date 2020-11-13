@@ -7,7 +7,7 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.UIEditable;
-import OxyEngineEditor.UI.Panels.PropertyEntry;
+import OxyEngineEditor.UI.Panels.GUIProperty;
 import imgui.ImGui;
 import imgui.flag.ImGuiColorEditFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -116,7 +116,7 @@ public class OxyMaterial implements EntityComponent, UIEditable, OxyDisposable {
         shader.disable();
     }
 
-    public static final PropertyEntry node = () -> {
+    public static final GUIProperty guiNode = () -> {
 
         if (entityContext == null) return;
 

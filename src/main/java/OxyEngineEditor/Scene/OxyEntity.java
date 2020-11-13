@@ -4,11 +4,11 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngineEditor.Components.EntityComponent;
 import OxyEngineEditor.Components.EntitySerializationInfo;
-import OxyEngineEditor.Components.ScriptingComponent;
+import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
-import OxyEngineEditor.UI.Panels.PropertyEntry;
+import OxyEngineEditor.UI.Panels.GUIProperty;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -42,8 +42,8 @@ import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 )
 public abstract class OxyEntity {
 
-    private final List<ScriptingComponent> scripts = new ArrayList<>();
-    private final List<PropertyEntry> nodes = new ArrayList<>();
+    private final List<OxyScript> scripts = new ArrayList<>();
+    private final List<GUIProperty> guiNodes = new ArrayList<>();
 
     public float[] vertices, tcs, normals, tangents, biTangents;
     public int[] indices;
@@ -106,15 +106,15 @@ public abstract class OxyEntity {
         }
     }
 
-    public void addScript(ScriptingComponent component) {
+    public void addScript(OxyScript component) {
         component.setScene(scene);
         component.setEntity(this);
         component.finalizeComponent();
         scripts.add(component);
     }
 
-    public void addScript(List<ScriptingComponent> components) {
-        for (ScriptingComponent s : components) addScript(s);
+    public void addScript(List<OxyScript> components) {
+        for (OxyScript s : components) addScript(s);
     }
 
     /*
@@ -189,8 +189,8 @@ public abstract class OxyEntity {
         return tcs;
     }
 
-    public List<PropertyEntry> getPropertyEntries() {
-        return nodes;
+    public List<GUIProperty> getGUINodes() {
+        return guiNodes;
     }
 
     public Object clone() {
@@ -202,7 +202,7 @@ public abstract class OxyEntity {
         return null;
     }
 
-    public List<ScriptingComponent> getScripts() {
+    public List<OxyScript> getScripts() {
         return scripts;
     }
 }
