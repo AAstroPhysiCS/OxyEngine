@@ -69,6 +69,7 @@ public final class SceneRuntime {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
                 OxyScript.Item item = c.getScriptItem();
+                if(item == null) continue;
                 item.invokeMethod("onCreate");
             }
         }
@@ -80,6 +81,7 @@ public final class SceneRuntime {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
                 OxyScript.Item item = c.getScriptItem();
+                if(item == null) continue;
                 item.invokeMethod("onUpdate", ts);
             }
         }

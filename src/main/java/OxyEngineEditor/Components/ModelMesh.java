@@ -183,16 +183,13 @@ public class ModelMesh extends Mesh {
         }
     }
 
-
     private static final boolean initPanel = false;
     private static ImString meshPath = new ImString(0);
     public static final GUIProperty guiNode = () -> {
         {
             if (ImGui.collapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
-                if (entityContext.has(Mesh.class))
-                    meshPath = new ImString(entityContext.get(Mesh.class).getPath());
-                else
-                    meshPath = new ImString("");
+                if (entityContext.has(Mesh.class)) meshPath = new ImString(entityContext.get(Mesh.class).getPath());
+                else meshPath = new ImString("");
 
                 ImGui.checkbox("Cast Shadows", false);
 
@@ -221,8 +218,8 @@ public class ModelMesh extends Mesh {
                             for (OxyModel e : eList) {
                                 TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
                                 e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped, false), entityContext.get(OxyMaterial.class));
-                                e.getGUINodes().add(ModelMesh.guiNode);
-                                e.getGUINodes().add(OxyMaterial.guiNode);
+                                e.getGUIProperties().add(ModelMesh.guiNode);
+                                e.getGUIProperties().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
                             if (!exception) {

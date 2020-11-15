@@ -75,16 +75,25 @@ public class SceneLayer extends Layer {
         for (OxyEntity entity : SceneRuntime.ACTIVE_SCENE.getEntities()) {
             if (entity instanceof OxyNativeObject) continue;
             if (!entity.has(ModelFactory.class)) continue;
-            //COMPONENTS
             for (String s : componentFullName) {
                 try {
                     @SuppressWarnings("unchecked")
                     EntityComponent component = entity.get((Class<? extends EntityComponent>) Class.forName(s));
                     if (component == null) continue;
-                    Field f = component.getClass().getDeclaredField("guiNode");
-                    GUIProperty entry = (GUIProperty) f.get(component);
-                    if (!entity.getGUINodes().contains(entry))
-                        entity.getGUINodes().add(entry);
+                    //overhead, i know. getDeclaredField() method throw an exception if the given field isn't declared... => no checking for the field
+                    //so you have to manually do the checking by getting all the fields that the class has.
+                    Field[] allFields = component.getClass().getDeclaredFields();
+                    Field guiNodeField = null;
+                    for (Field f : allFields) {
+                        if (f.getName().equals("guiNode")) {
+                            f.setAccessible(true);
+                            guiNodeField = f;
+                            break;
+                        }
+                    }
+                    if (guiNodeField == null) continue;
+                    GUIProperty entry = (GUIProperty) guiNodeField.get(component);
+                    if (!entity.getGUIProperties().contains(entry)) entity.getGUIProperties().add(entry);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

@@ -43,7 +43,7 @@ import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 public abstract class OxyEntity {
 
     private final List<OxyScript> scripts = new ArrayList<>();
-    private final List<GUIProperty> guiNodes = new ArrayList<>();
+    private final List<GUIProperty> guiProperties = new ArrayList<>();
 
     public float[] vertices, tcs, normals, tangents, biTangents;
     public int[] indices;
@@ -110,6 +110,7 @@ public abstract class OxyEntity {
         component.setScene(scene);
         component.setEntity(this);
         component.finalizeComponent();
+        getGUIProperties().add(component.guiNode);
         scripts.add(component);
     }
 
@@ -189,8 +190,8 @@ public abstract class OxyEntity {
         return tcs;
     }
 
-    public List<GUIProperty> getGUINodes() {
-        return guiNodes;
+    public List<GUIProperty> getGUIProperties() {
+        return guiProperties;
     }
 
     public Object clone() {

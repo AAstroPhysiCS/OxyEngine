@@ -37,8 +37,8 @@ public class PropertiesPanel extends Panel {
     ImString name = new ImString(0);
     final ImString searchAddComponent = new ImString(100);
 
-    public static final String[] componentNames = UIEditable.allUIEditableNames();
-    public static final String[] componentFullName = UIEditable.allUIEditableFullNames();
+    public static final String[] componentNames = EntityComponent.allComponentNames();
+    public static final String[] componentFullName = EntityComponent.allComponentFullNames();
 
     @Override
     public void preload() {
@@ -103,7 +103,7 @@ public class PropertiesPanel extends Panel {
             return;
         }
 
-        for (GUIProperty n : entityContext.getGUINodes()) n.runEntry();
+        for (GUIProperty guiProperty : entityContext.getGUIProperties()) guiProperty.runEntry();
 
         final float windowWidth = ImGui.getWindowWidth();
         ImGui.dummy(0, 25);
@@ -122,18 +122,17 @@ public class PropertiesPanel extends Panel {
             ImGui.inputText("##hidelabel comp_popup_search", searchAddComponent);
             if (ImGui.beginMenu("Mesh")) {
                 if (ImGui.menuItem("Mesh Renderer"))
-                    if(!entityContext.getGUINodes().contains(ModelMesh.guiNode)) entityContext.getGUINodes().add(ModelMesh.guiNode);
+                    if (!entityContext.getGUIProperties().contains(ModelMesh.guiNode))
+                        entityContext.getGUIProperties().add(ModelMesh.guiNode);
                 if (ImGui.menuItem("Material"))
-                    if(!entityContext.getGUINodes().contains(OxyMaterial.guiNode)){
+                    if (!entityContext.getGUIProperties().contains(OxyMaterial.guiNode)) {
                         entityContext.addComponent(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 1.0f, 1.0f));
-                        entityContext.getGUINodes().add(OxyMaterial.guiNode);
+                        entityContext.getGUIProperties().add(OxyMaterial.guiNode);
                     }
                 ImGui.endMenu();
             }
             if (ImGui.beginMenu("Scripts")) {
-                if(ImGui.menuItem("Basic Script")) {
-                    entityContext.getGUINodes().add(new OxyScript.ScriptingClassGUI());
-                }
+                if (ImGui.menuItem("Basic Script")) entityContext.addScript(new OxyScript(null));
                 ImGui.endMenu();
             }
             if (ImGui.beginMenu("Physics")) {

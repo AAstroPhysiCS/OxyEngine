@@ -1,6 +1,7 @@
 package OxyEngine.Scripting;
 
 import OxyEngine.System.OxySystem;
+import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Components.UUIDComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,7 +31,7 @@ public class OxyScript {
 
     private static final ExecutorService scriptExecutor = Executors.newSingleThreadExecutor();
 
-    private final String path;
+    private String path;
 
     public OxyScript(String path) {
         this.path = path;
@@ -64,6 +66,7 @@ public class OxyScript {
     }
 
     public void finalizeComponent() {
+        if (path == null) return;
         if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
             Class<?> classObj = obj.getClass();
             scriptItem = new Item(obj, classObj.getFields(), classObj.getMethods());
@@ -83,7 +86,8 @@ public class OxyScript {
             this.methods = allMethods;
         }
 
-        public static final record ScriptEntry(String name, Object e) {}
+        public static final record ScriptEntry(String name, Object e) {
+        }
 
         public Item.ScriptEntry[] getFieldsAsObject() {
             Item.ScriptEntry[] objects = new Item.ScriptEntry[fields.length];
@@ -113,42 +117,56 @@ public class OxyScript {
         }
     }
 
-    public static void suspendAll(){
+    public static void suspendAll() {
         scriptExecutor.shutdown();
     }
 
-    public static final class ScriptingClassGUI implements GUIProperty {
+    private final ImString buffer = new ImString(100);
+    public final GUIProperty guiNode = () -> {
+        buffer.set(Objects.requireNonNullElse(path, ""));
+        final int hashCode = entityContext.hashCode();
 
-        final ImString buffer = new ImString(100);
-
-        @Override
-        public void runEntry() {
-            if (ImGui.collapsingHeader("Scripts", ImGuiTreeNodeFlags.DefaultOpen)) {
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Script Path:");
-                ImGui.sameLine();
-                ImGui.inputText("##hidelabel" + entityContext.get(UUIDComponent.class).id(), buffer, ImGuiInputTextFlags.ReadOnly);
-                ImGui.sameLine();
-                ImGui.pushID(entityContext.get(UUIDComponent.class).id().hashCode());
-                if (ImGui.button("...")) {
-                    String path = openDialog("java", null);
-                    if(path != null){
-                        buffer.set(path);
-                        entityContext.addScript(new OxyScript(path));
+        if (ImGui.collapsingHeader("Scripts", ImGuiTreeNodeFlags.DefaultOpen)) {
+            ImGui.alignTextToFramePadding();
+            ImGui.text("Script Path:");
+            ImGui.sameLine();
+            ImGui.inputText("##hidelabel oxyScript" + hashCode, buffer, ImGuiInputTextFlags.ReadOnly);
+            ImGui.sameLine();
+            ImGui.pushID(entityContext.get(UUIDComponent.class).getUUIDString() + hashCode());
+            if (ImGui.button("...")) {
+                String pathDialog = openDialog("java", null);
+                if (pathDialog != null) {
+                    if (this.path == null) {
+                        this.path = pathDialog;
+                        finalizeComponent();
                     }
+                    buffer.set(pathDialog);
                 }
-                ImGui.popID();
-                for(OxyScript s : entityContext.getScripts()){
-                    Item item = s.getScriptItem();
-                    Item.ScriptEntry[] entries = item.getFieldsAsObject();
-                    for(var entry : entries){
-                        ImGui.text(entry.name());
-                    }
-                }
-                ImGui.button("Run Script");
             }
+            ImGui.popID();
+            Item item = getScriptItem();
+            if(item != null) {
+                Item.ScriptEntry[] entries = item.getFieldsAsObject();
+                for (var entry : entries) {
+                    ImGui.text(entry.name());
+                    if (entry.e instanceof TransformComponent t) {
+                        ImGui.columns(2, "myColumns" + hashCode);
+                        ImGui.alignTextToFramePadding();
+                        ImGui.setColumnOffset(0, -90f);
+                        ImGui.text("");
+                        ImGui.nextColumn();
+                        ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
+                        float[] translationArr = new float[]{t.position.x, t.position.y, t.position.z};
+                        ImGui.dragFloat3("##hidelabel T" + hashCode, translationArr, 0.1f);
+                        t.position.set(translationArr);
+                        ImGui.popItemWidth();
+                        ImGui.columns(1);
+                    }
+                }
+            }
+            ImGui.button("Run Script");
         }
-    }
+    };
 
     public Item getScriptItem() {
         return scriptItem;

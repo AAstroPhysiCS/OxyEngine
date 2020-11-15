@@ -6,7 +6,6 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Components.UIEditable;
 import OxyEngineEditor.UI.Panels.GUIProperty;
 import imgui.ImGui;
 import imgui.flag.ImGuiColorEditFlags;
@@ -17,7 +16,7 @@ import org.joml.Vector4f;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
-public class OxyMaterial implements EntityComponent, UIEditable, OxyDisposable {
+public class OxyMaterial implements EntityComponent, OxyDisposable {
 
     public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture;
     public final OxyColor albedoColor;
