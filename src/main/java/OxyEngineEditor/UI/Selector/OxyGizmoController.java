@@ -2,7 +2,7 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Events.OxyMouseListener;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;

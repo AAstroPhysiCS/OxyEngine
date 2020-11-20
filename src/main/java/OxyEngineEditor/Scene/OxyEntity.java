@@ -2,10 +2,10 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Events.OxyEventListener;
-import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Components.EntitySerializationInfo;
+import OxyEngine.Components.EntityComponent;
+import OxyEngine.Components.EntitySerializationInfo;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
 import OxyEngineEditor.UI.Panels.GUIProperty;
@@ -31,7 +31,7 @@ import static OxyEngine.Tools.Globals.toPrimitiveInteger;
                \tBounds Min: X %s, Y %s, Z %s
                \tBounds Max: X %s, Y %s, Z %s
                \tColor: %s
-               \tScripts: [%s]
+               \tScripts: %s
                \tAlbedo Texture: %s
                \tNormal Map Texture: %s
                \tRoughness Map Texture: %s
@@ -109,7 +109,7 @@ public abstract class OxyEntity {
     public void addScript(OxyScript component) {
         component.setScene(scene);
         component.setEntity(this);
-        component.finalizeComponent();
+        component.loadAssembly();
         getGUIProperties().add(component.guiNode);
         scripts.add(component);
     }

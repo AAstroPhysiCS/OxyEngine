@@ -2,7 +2,7 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngineEditor.Components.*;
+import OxyEngine.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;

@@ -2,8 +2,8 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Components.SelectedComponent;
-import OxyEngineEditor.Components.TagComponent;
+import OxyEngine.Components.SelectedComponent;
+import OxyEngine.Components.TagComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;

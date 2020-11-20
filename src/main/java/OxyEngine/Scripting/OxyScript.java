@@ -1,8 +1,7 @@
 package OxyEngine.Scripting;
 
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Components.UUIDComponent;
+import OxyEngine.Components.UUIDComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Panels.GUIProperty;
@@ -16,8 +15,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -25,11 +22,9 @@ import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
 public class OxyScript {
 
-    private Item scriptItem;
     private Scene scene;
     private OxyEntity entity;
-
-    private static final ExecutorService scriptExecutor = Executors.newSingleThreadExecutor();
+    private EntityInfoProvider provider;
 
     private String path;
 
@@ -65,72 +60,52 @@ public class OxyScript {
         return null;
     }
 
-    public void finalizeComponent() {
-        if (path == null) return;
-        if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
-            Class<?> classObj = obj.getClass();
-            scriptItem = new Item(obj, classObj.getFields(), classObj.getMethods());
-        } else oxyAssert("The script must extend ScriptableEntity class!");
-    }
+    public static class EntityInfoProvider {
 
-    public static class Item {
+        private final ScriptableEntity obj;
 
-        private final ScriptableEntity e;
+        private final Field[] allFields;
+        private final Method[] allMethods;
 
-        private final Field[] fields;
-        private final Method[] methods;
-
-        public Item(ScriptableEntity e, Field[] allFields, Method[] allMethods) {
-            this.e = e;
-            this.fields = allFields;
-            this.methods = allMethods;
+        public EntityInfoProvider(ScriptableEntity obj) {
+            this.obj = obj;
+            this.allFields = obj.getClass().getDeclaredFields();
+            for (Field f : allFields) f.setAccessible(true);
+            this.allMethods = obj.getClass().getDeclaredMethods();
         }
 
-        public static final record ScriptEntry(String name, Object e) {
-        }
-
-        public Item.ScriptEntry[] getFieldsAsObject() {
-            Item.ScriptEntry[] objects = new Item.ScriptEntry[fields.length];
-            for (int i = 0; i < fields.length; i++) {
-                try {
-                    objects[i] = new Item.ScriptEntry(fields[i].getName(), fields[i].get(e));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-            return objects;
-        }
-
-
-        public void invokeMethod(String nameOfMethod, Object... args) {
-            scriptExecutor.submit(() -> {
-                for (Method m : methods) {
+        public Runnable invokeMethod(String nameOfMethod, Object... args) {
+            return () -> {
+                for (Method m : allMethods) {
                     if (m.getName().equals(nameOfMethod)) {
                         try {
-                            m.invoke(e, args);
+                            m.invoke(obj, args);
                         } catch (IllegalAccessException | InvocationTargetException e) {
                             e.printStackTrace();
                         }
                     }
                 }
-            });
+            };
         }
     }
 
-    public static void suspendAll() {
-        scriptExecutor.shutdown();
+    public void loadAssembly() {
+        if (path == null) return;
+        if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
+            provider = new EntityInfoProvider(obj);
+        } else oxyAssert("The script must extend ScriptableEntity class!");
     }
 
-    private final ImString buffer = new ImString(100);
+    private final ImString bufferPath = new ImString(100);
     public final GUIProperty guiNode = () -> {
-        buffer.set(Objects.requireNonNullElse(path, ""));
+        bufferPath.set(Objects.requireNonNullElse(path, ""));
         final int hashCode = entityContext.hashCode();
 
         if (ImGui.collapsingHeader("Scripts", ImGuiTreeNodeFlags.DefaultOpen)) {
             ImGui.alignTextToFramePadding();
             ImGui.text("Script Path:");
             ImGui.sameLine();
-            ImGui.inputText("##hidelabel oxyScript" + hashCode, buffer, ImGuiInputTextFlags.ReadOnly);
+            ImGui.inputText("##hidelabel oxyScript" + hashCode, bufferPath, ImGuiInputTextFlags.ReadOnly);
             ImGui.sameLine();
             ImGui.pushID(entityContext.get(UUIDComponent.class).getUUIDString() + hashCode());
             if (ImGui.button("...")) {
@@ -138,38 +113,73 @@ public class OxyScript {
                 if (pathDialog != null) {
                     if (this.path == null) {
                         this.path = pathDialog;
-                        finalizeComponent();
+                        loadAssembly();
                     }
-                    buffer.set(pathDialog);
+                    bufferPath.set(pathDialog);
                 }
             }
             ImGui.popID();
-            Item item = getScriptItem();
-            if(item != null) {
-                Item.ScriptEntry[] entries = item.getFieldsAsObject();
-                for (var entry : entries) {
-                    ImGui.text(entry.name());
-                    if (entry.e instanceof TransformComponent t) {
-                        ImGui.columns(2, "myColumns" + hashCode);
-                        ImGui.alignTextToFramePadding();
-                        ImGui.setColumnOffset(0, -90f);
-                        ImGui.text("");
-                        ImGui.nextColumn();
-                        ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
-                        float[] translationArr = new float[]{t.position.x, t.position.y, t.position.z};
-                        ImGui.dragFloat3("##hidelabel T" + hashCode, translationArr, 0.1f);
-                        t.position.set(translationArr);
-                        ImGui.popItemWidth();
-                        ImGui.columns(1);
+            if (provider != null) {
+                Field[] allFields = provider.allFields;
+                for (var entry : allFields) {
+                    Object obj = null;
+                    try {
+                        obj = entry.get(provider.obj);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
                     }
+                    ImGui.columns(2, "myColumns" + hashCode);
+                    ImGui.alignTextToFramePadding();
+                    ImGui.text(entry.getName());
+                    ImGui.nextColumn();
+                    ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
+                    try {
+                        if (obj instanceof Number n) {
+                            double convertedD = Double.parseDouble(n.toString());
+                            float[] buffer = new float[]{(float) convertedD};
+                            ImGui.dragFloat("##hidelabel entrySlider" + entityContext.hashCode() + entry.getName(), buffer);
+                            //int has an speciality
+                            if (obj instanceof Integer) entry.set(provider.obj, Float.valueOf(buffer[0]).intValue());
+                            else if (obj instanceof Long) entry.set(provider.obj, Float.valueOf(buffer[0]).longValue());
+                            else if (obj instanceof Short)
+                                entry.set(provider.obj, Float.valueOf(buffer[0]).shortValue());
+                            else if (obj instanceof Byte) entry.set(provider.obj, Float.valueOf(buffer[0]).byteValue());
+                            else entry.set(provider.obj, buffer[0]);
+                        }
+                        if (obj instanceof Boolean b) {
+                            if (ImGui.radioButton("##hidelabel entryRadioButton" + entityContext.hashCode() + entry.getName(), b)) {
+                                entry.set(provider.obj, !b);
+                            }
+                        }
+                        if (obj instanceof Character c) {
+                            ImString buffer = new ImString(1);
+                            buffer.set(String.valueOf(c));
+                            ImGui.inputText("##hidelabel entryCharacter" + entityContext.hashCode() + entry.getName(), buffer);
+                            if (buffer.getLength() > 0) entry.set(provider.obj, buffer.get().charAt(0));
+                        }
+                        if (obj instanceof String s) {
+                            ImString buffer = new ImString(100);
+                            buffer.set(s);
+                            ImGui.inputText("##hidelabel entryString" + entityContext.hashCode() + entry.getName(), buffer);
+                            entry.set(provider.obj, buffer.get());
+                        }
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    ImGui.popItemWidth();
+                    ImGui.columns(1);
                 }
             }
             ImGui.button("Run Script");
+            ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 100);
+            if (ImGui.button("Reload Assembly")) {
+                loadAssembly();
+            }
         }
     };
 
-    public Item getScriptItem() {
-        return scriptItem;
+    public EntityInfoProvider getProvider() {
+        return provider;
     }
 
     public String getPath() {

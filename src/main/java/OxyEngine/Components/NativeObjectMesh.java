@@ -1,4 +1,4 @@
-package OxyEngineEditor.Components;
+package OxyEngine.Components;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.IndexBuffer;

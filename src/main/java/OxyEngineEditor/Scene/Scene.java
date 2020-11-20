@@ -7,7 +7,7 @@ import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxyUISystem;
-import OxyEngineEditor.Components.*;
+import OxyEngine.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.*;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import org.joml.Vector3f;

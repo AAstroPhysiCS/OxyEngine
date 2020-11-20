@@ -15,11 +15,10 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxyEventSystem;
 import OxyEngine.System.OxySystem;
 import OxyEngine.System.OxyUISystem;
-import OxyEngineEditor.Components.*;
+import OxyEngine.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.ModelType;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
@@ -85,7 +84,6 @@ public class EditorApplication extends OxyApplication {
             obj.addComponent(new SelectedComponent(false), new TransformComponent(new Vector3f(0, 0, 0)));
             obj.constructData();
         }
-        testObjects.get(3).addScript(new OxyScript("src/main/java/Scripts/PositionIteratorScript.java"));
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;
@@ -116,7 +114,6 @@ public class EditorApplication extends OxyApplication {
 
     @Override
     public void update(float ts) {
-        SceneRuntime.onUpdate(ts);
         for (Layer l : layerStack.getLayerStack())
             l.update(ts);
     }
@@ -169,8 +166,8 @@ public class EditorApplication extends OxyApplication {
     @Override
     public void dispose() {
         oxyEngine.dispose();
-        OxyScript.suspendAll();
         scene.getOxyUISystem().dispose();
+        SceneRuntime.dispose();
         scene.dispose();
     }
 }

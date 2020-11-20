@@ -2,8 +2,8 @@ package OxyEngineEditor.UI.Selector;
 
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.RenderingMode;
-import OxyEngineEditor.Components.SelectedComponent;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Components.SelectedComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;

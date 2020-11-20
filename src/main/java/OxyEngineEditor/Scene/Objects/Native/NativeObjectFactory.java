@@ -1,8 +1,8 @@
 package OxyEngineEditor.Scene.Objects.Native;
 
-import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Components.NativeObjectMesh;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Components.EntityComponent;
+import OxyEngine.Components.NativeObjectMesh;
+import OxyEngine.Components.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 

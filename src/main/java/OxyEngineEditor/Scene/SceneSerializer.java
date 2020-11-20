@@ -1,5 +1,6 @@
 package OxyEngineEditor.Scene;
 
+import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
@@ -8,7 +9,6 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -65,11 +66,11 @@ public final class SceneSerializer {
             StringBuilder infoEntity = new StringBuilder(formattedOriginalEntity);
             int ptr = 1;
             for (OxyEntity e : scene.getEntities()) {
-                if(!(e instanceof OxyModel)) continue;
+                if (!(e instanceof OxyModel)) continue;
                 int meshPos = -1;
                 String tag = "null";
                 String grouped = "false";
-                StringBuilder scripts = new StringBuilder();
+                StringBuilder scripts = new StringBuilder("[\n");
                 TransformComponent transform = e.get(TransformComponent.class);
                 Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
                 String albedoColor = "null";
@@ -89,7 +90,8 @@ public final class SceneSerializer {
 
                 if (e.has(TagComponent.class)) tag = e.get(TagComponent.class).tag();
                 if (e.has(MeshPosition.class)) meshPos = e.get(MeshPosition.class).meshPos();
-                if (e.has(EntitySerializationInfo.class)) grouped = String.valueOf(e.get(EntitySerializationInfo.class).grouped());
+                if (e.has(EntitySerializationInfo.class))
+                    grouped = String.valueOf(e.get(EntitySerializationInfo.class).grouped());
                 if (e.has(OxyMaterial.class)) {
                     OxyMaterial m = e.get(OxyMaterial.class);
                     if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
@@ -102,7 +104,14 @@ public final class SceneSerializer {
                 if (e.has(ModelMesh.class)) mesh = e.get(ModelMesh.class).getPath();
                 if (e.has(Light.class)) emitting = true;
 
-                for (OxyScript c : e.getScripts()) scripts.append(" ").append(c.getPath()).append(",");
+                int size = e.getScripts().size();
+                if (size == 0) scripts.replace(0, scripts.length(), "[]");
+                else {
+                    for (OxyScript c : e.getScripts()) {
+                        scripts.append("\t\t\t").append(c.getPath()).append("\n");
+                    }
+                    scripts.append("\t\t").append("]");
+                }
 
                 OxySerializable objInfo = e.getClass().getAnnotation(OxySerializable.class);
                 String formatObjTemplate = objInfo.info().formatted("OxyModel", ptr++, id, meshPos, tag, grouped, emitting,
@@ -140,8 +149,9 @@ public final class SceneSerializer {
             if (path != null) loadedS = OxySystem.FileSystem.load(path);
         }
 
-        @SuppressWarnings("DuplicateExpressions")
         public Scene readScene(SceneLayer layer, OxyShader shader) {
+            SceneRuntime.stop();
+            SceneRuntime.scriptExecutor.shutdownNow();
             if (loadedS == null) return SceneRuntime.ACTIVE_SCENE;
             String[] splitted = loadedS.split("\n");
             boolean objFound = false;
@@ -166,9 +176,14 @@ public final class SceneSerializer {
                 }
                 if (obj != null) objects.add(obj);
             }
+            for (SceneFileObject fileObject : objects) {
+                for (var e : fileObject.map.entrySet()) {
+//                    for(var s : e.getValue()) System.out.println(s);
+                }
+            }
             oldScene = SceneRuntime.ACTIVE_SCENE;
             Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer());
-            for(var n : oldScene.getNativeObjects()) {
+            for (var n : oldScene.getNativeObjects()) {
                 scene.put(n.getKey());
                 scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
             }
@@ -201,9 +216,11 @@ public final class SceneSerializer {
                         int meshPos = -1;
                         boolean emitting = false;
                         Vector4f color = new Vector4f(1, 1, 1, 1);
-                        for (var values : listOfValues) {
+                        for (int i = 0; i < listOfValues.size(); i++) {
+                            String values = listOfValues.get(i);
                             if (values.isEmpty()) continue;
                             String[] split = values.split(": ");
+                            if (split.length != 2) continue;
                             String tag = split[0].trim();
                             String sValue = split[1].trim();
                             switch (tag) {
@@ -222,22 +239,24 @@ public final class SceneSerializer {
                                     String[] subSequence = ((String) sequenceForArrays).trim().strip().split(", ");
                                     color = new Vector4f((float) Double.parseDouble(subSequence[0]), (float) Double.parseDouble(subSequence[1]), (float) Double.parseDouble(subSequence[2]), (float) Double.parseDouble(subSequence[3]));
                                 }
-                                case "Scripts" -> {
-                                    CharSequence sequenceForArrays = sValue.subSequence(sValue.indexOf("[") + 1, sValue.indexOf("]"));
-                                    String[] subSequence = ((String) sequenceForArrays).trim().strip().split(",");
-                                    if (!listOfScripts.containsKey(id)) {
-                                        listOfScripts.put(id, new ArrayList<>());
-                                    }
-                                    for (String s : subSequence) {
-                                        if (!s.isBlank()) listOfScripts.get(id).add(new OxyScript(s.trim()));
-                                    }
-                                }
                                 case "Albedo Texture" -> aT = sValue;
                                 case "Normal Map Texture" -> nMT = sValue;
                                 case "Roughness Map Texture" -> rMT = sValue;
                                 case "AO Map Texture" -> aMT = sValue;
                                 case "Metallic Map Texture" -> mMT = sValue;
                                 case "Mesh" -> mesh = sValue;
+                            }
+                            //SCRIPT
+                            if (tag.equals("Scripts") && sValue.equals("[")) { //inner objects
+                                int ptr = i;
+                                while (true) {
+                                    String valuesIter = listOfValues.get(++ptr);
+                                    if (!listOfScripts.containsKey(id)) {
+                                        listOfScripts.put(id, new ArrayList<>());
+                                    }
+                                    if (valuesIter.equals("]")) break;
+                                    else if (!valuesIter.isBlank()) listOfScripts.get(id).add(new OxyScript(valuesIter));
+                                }
                             }
                         }
 
@@ -285,8 +304,9 @@ public final class SceneSerializer {
 
             for (OxyEntity modelInScene : scene.getEntities()) {
                 List<OxyScript> components = listOfScripts.get(modelInScene.get(UUIDComponent.class).getUUIDString());
-                if(components != null) modelInScene.addScript(components);
+                if (components != null) modelInScene.addScript(components);
             }
+            SceneRuntime.scriptExecutor = Executors.newSingleThreadExecutor();
             return scene;
         }
 

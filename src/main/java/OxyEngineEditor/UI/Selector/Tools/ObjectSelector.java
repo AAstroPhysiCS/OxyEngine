@@ -1,10 +1,10 @@
 package OxyEngineEditor.UI.Selector.Tools;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngineEditor.Components.BoundingBoxComponent;
-import OxyEngineEditor.Components.SelectedComponent;
-import OxyEngineEditor.Components.TagComponent;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Components.BoundingBoxComponent;
+import OxyEngine.Components.SelectedComponent;
+import OxyEngine.Components.TagComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;

@@ -10,7 +10,7 @@ import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Components.*;
+import OxyEngine.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
@@ -108,6 +108,7 @@ public class SceneLayer extends Layer {
 
     @Override
     public void update(float ts) {
+        SceneRuntime.onUpdate(ts);
         if (ACTIVE_SCENE == null) return;
         ACTIVE_SCENE.getOxyUISystem().dispatchNativeEvents();
         ACTIVE_SCENE.getOxyUISystem().updateImGuiContext(ts);

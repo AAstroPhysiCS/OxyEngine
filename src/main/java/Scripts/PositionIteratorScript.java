@@ -1,7 +1,7 @@
 package Scripts;
 
+import OxyEngine.Components.TransformComponent;
 import OxyEngine.Scripting.ScriptableEntity;
-import OxyEngineEditor.Components.TransformComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
@@ -11,16 +11,25 @@ public class PositionIteratorScript extends ScriptableEntity {
         super(scene, entity);
     }
 
-    public TransformComponent c;
+    public float Speed = 1f;
+    public double SpeedDouble = 1.5d;
+    public int SpeedInt = 2;
+    public char SpeedChar;
+    public short SpeedShort;
+    public long SpeedLong;
+    public boolean SpeedBoolean = false;
+    public byte SpeedByte = 0;
+    public String SpeedString = "UAHSDJHAD";
+    TransformComponent TransformComponent;
 
     @Override
     public void onCreate() {
-        c = getComponent(TransformComponent.class);
+        TransformComponent = getComponent(TransformComponent.class);
     }
 
     @Override
     public void onUpdate(float ts) {
-        c.position.add(0.01f, 0f, 0f);
+        TransformComponent.position.add(Speed, 0f, 0f);
         updateData();
     }
 }

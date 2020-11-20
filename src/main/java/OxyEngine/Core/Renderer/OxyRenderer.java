@@ -5,7 +5,7 @@ import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
-import OxyEngineEditor.Components.PerspectiveCamera;
+import OxyEngine.Components.PerspectiveCamera;
 
 import static OxyEngineEditor.Scene.SceneRuntime.currentBoundedCamera;
 import static org.lwjgl.opengl.GL11.*;

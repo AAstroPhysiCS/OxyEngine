@@ -1,6 +1,6 @@
 package OxyEngineEditor.Scene;
 
-import OxyEngineEditor.Components.EntityComponent;
+import OxyEngine.Components.EntityComponent;
 
 import java.util.Set;
 

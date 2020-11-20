@@ -2,8 +2,8 @@ package OxyEngineEditor.Scene.Objects;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Components.NativeObjectMesh;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Components.NativeObjectMesh;
+import OxyEngine.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Native.GridFactory;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
@@ -11,7 +11,7 @@ import OxyEngineEditor.Scene.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static OxyEngineEditor.Components.NativeObjectMesh.*;
+import static OxyEngine.Components.NativeObjectMesh.*;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
 public class WorldGrid {

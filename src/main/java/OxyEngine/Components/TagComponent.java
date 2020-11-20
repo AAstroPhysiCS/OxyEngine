@@ -1,4 +1,4 @@
-package OxyEngineEditor.Components;
+package OxyEngine.Components;
 
 public class TagComponent implements EntityComponent {
 

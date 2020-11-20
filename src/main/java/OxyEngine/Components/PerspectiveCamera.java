@@ -1,4 +1,4 @@
-package OxyEngineEditor.Components;
+package OxyEngine.Components;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
 import OxyEngine.Core.Camera.Controller.PerspectiveCameraController;

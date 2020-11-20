@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
 import org.joml.Vector3f;

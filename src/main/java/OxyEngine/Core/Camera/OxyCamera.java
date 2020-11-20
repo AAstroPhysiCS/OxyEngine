@@ -1,7 +1,7 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
-import OxyEngineEditor.Components.EntityComponent;
+import OxyEngine.Components.EntityComponent;
 import OxyEngineEditor.Scene.OxySerializable;
 import org.joml.Matrix4f;
 

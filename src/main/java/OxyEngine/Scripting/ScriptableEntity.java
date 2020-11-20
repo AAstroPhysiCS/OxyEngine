@@ -1,6 +1,6 @@
 package OxyEngine.Scripting;
 
-import OxyEngineEditor.Components.EntityComponent;
+import OxyEngine.Components.EntityComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 

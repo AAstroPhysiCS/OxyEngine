@@ -1,4 +1,4 @@
-package OxyEngineEditor.Components;
+package OxyEngine.Components;
 
 import OxyEngineEditor.Scene.Objects.Model.OxyModelLoader;
 import org.joml.Vector3f;

@@ -10,6 +10,9 @@ import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public final class SceneRuntime {
 
     private static final SceneRuntimeControlPanel panel = new SceneRuntimeControlPanel();
@@ -64,13 +67,15 @@ public final class SceneRuntime {
 
     static boolean running = false;
 
+    static ExecutorService scriptExecutor = Executors.newSingleThreadExecutor();
+
     static void onCreate() {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
-                OxyScript.Item item = c.getScriptItem();
-                if(item == null) continue;
-                item.invokeMethod("onCreate");
+                OxyScript.EntityInfoProvider provider = c.getProvider();
+                if(provider == null) continue;
+                scriptExecutor.execute(provider.invokeMethod("onCreate"));
             }
         }
     }
@@ -80,15 +85,19 @@ public final class SceneRuntime {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
-                OxyScript.Item item = c.getScriptItem();
-                if(item == null) continue;
-                item.invokeMethod("onUpdate", ts);
+                OxyScript.EntityInfoProvider provider = c.getProvider();
+                if(provider == null) continue;
+                scriptExecutor.execute(provider.invokeMethod("onUpdate", ts));
             }
         }
     }
 
     static void stop() {
         running = false;
+    }
+
+    public static void dispose(){
+        scriptExecutor.shutdown();
     }
 
     public static SceneRuntimeControlPanel getPanel() {

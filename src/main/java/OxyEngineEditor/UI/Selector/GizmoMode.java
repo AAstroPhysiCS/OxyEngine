@@ -3,7 +3,7 @@ package OxyEngineEditor.UI.Selector;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Components.*;
+import OxyEngine.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static OxyEngineEditor.Components.PerspectiveCamera.zoom;
+import static OxyEngine.Components.PerspectiveCamera.zoom;
 
 enum GizmoMode {
     None(), Translation(), Rotation(), Scale();

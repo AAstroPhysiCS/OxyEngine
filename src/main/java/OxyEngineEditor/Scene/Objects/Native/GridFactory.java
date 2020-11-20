@@ -1,6 +1,6 @@
 package OxyEngineEditor.Scene.Objects.Native;
 
-import OxyEngineEditor.Components.NativeObjectMesh;
+import OxyEngine.Components.NativeObjectMesh;
 
 public class GridFactory extends NativeObjectFactory {
 

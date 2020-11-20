@@ -2,10 +2,10 @@ package OxyEngineEditor.Scene.Objects.Native;
 
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.RenderingMode;
-import OxyEngineEditor.Components.NativeObjectMesh;
-import OxyEngineEditor.Components.RenderableComponent;
-import OxyEngineEditor.Components.TransformComponent;
-import OxyEngineEditor.Components.UUIDComponent;
+import OxyEngine.Components.NativeObjectMesh;
+import OxyEngine.Components.RenderableComponent;
+import OxyEngine.Components.TransformComponent;
+import OxyEngine.Components.UUIDComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 

@@ -1,4 +1,4 @@
-package OxyEngineEditor.Components;
+package OxyEngine.Components;
 
 import OxyEngineEditor.Scene.OxyEntity;
 import org.joml.AxisAngle4f;

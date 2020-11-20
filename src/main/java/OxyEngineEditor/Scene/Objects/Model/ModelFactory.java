@@ -1,8 +1,8 @@
 package OxyEngineEditor.Scene.Objects.Model;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Components.TransformComponent;
+import OxyEngine.Components.EntityComponent;
+import OxyEngine.Components.TransformComponent;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;

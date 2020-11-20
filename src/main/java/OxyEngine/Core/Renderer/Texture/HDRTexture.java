@@ -3,7 +3,7 @@ package OxyEngine.Core.Renderer.Texture;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
-import OxyEngineEditor.Components.NativeObjectMesh;
+import OxyEngine.Components.NativeObjectMesh;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;

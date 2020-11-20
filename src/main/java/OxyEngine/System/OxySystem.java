@@ -20,7 +20,6 @@ public interface OxySystem {
      * @since 11.04.2020
      **/
 
-
     Logger logger = Logger.getLogger(OxySystem.class.getName());
 
     String BASE_PATH = System.getProperty("user.dir");

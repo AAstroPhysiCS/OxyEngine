@@ -2,8 +2,8 @@ package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Components.EntityComponent;
-import OxyEngineEditor.Components.NativeObjectMesh;
+import OxyEngine.Components.EntityComponent;
+import OxyEngine.Components.NativeObjectMesh;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 
