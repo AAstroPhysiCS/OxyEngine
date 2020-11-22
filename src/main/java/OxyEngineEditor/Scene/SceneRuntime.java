@@ -3,15 +3,13 @@ package OxyEngineEditor.Scene;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Threading.OxySubThread;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public final class SceneRuntime {
 
@@ -50,54 +48,71 @@ public final class SceneRuntime {
             ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 253, 76, 61, 255);
             ImGui.sameLine(20);
             ImGui.setCursorPosY(5);
-            if (ImGui.imageButton(playTexture.getTextureId(), height, height, 0, 1, 1, 0, 1)){
+            if (ImGui.imageButton(playTexture.getTextureId(), height, height, 0, 1, 1, 0, 1)) {
                 SceneRuntime.onCreate();
                 running = true;
+                stopped = false;
             }
             ImGui.sameLine(60);
             if (ImGui.imageButton(stopTexture.getTextureId(), height, height, 0, 1, 1, 0, 1))
-                SceneRuntime.stop();
-            ImGui.popStyleColor();
-            ImGui.popStyleColor();
-            ImGui.popStyleColor();
-            ImGui.popStyleColor();
+                SceneRuntime.interrupt();
+            ImGui.popStyleColor(4);
             ImGui.end();
         }
     }
 
-    static boolean running = false;
-
-    static ExecutorService scriptExecutor = Executors.newSingleThreadExecutor();
+    static boolean running = false; //for MainThread
+    static boolean stopped = false; //for SubThread
 
     static void onCreate() {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
                 OxyScript.EntityInfoProvider provider = c.getProvider();
-                if(provider == null) continue;
-                scriptExecutor.execute(provider.invokeMethod("onCreate"));
+                if (provider == null) continue;
+                provider.invokeCreate();
             }
         }
     }
 
-    public static void onUpdate(float ts){
-        if(!running) return;
+    public static void onUpdate(float ts) {
+        if (!running) return;
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
                 OxyScript.EntityInfoProvider provider = c.getProvider();
-                if(provider == null) continue;
-                scriptExecutor.execute(provider.invokeMethod("onUpdate", ts));
+                if (provider == null) continue;
+                if (c.getOxySubThread() == null) {
+                    OxySubThread subThread = new OxySubThread();
+                    subThread.setTarget(() -> {
+                        while (c.getOxySubThread().getRunningState().get()) {
+                            if (!stopped) provider.invokeUpdate(ts);
+                        }
+                    });
+                    subThread.start();
+                    c.setOxySubThread(subThread);
+                }
             }
         }
     }
 
-    static void stop() {
-        running = false;
+    static void interrupt() {
+        stopped = true;
+        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
+            if (!(e instanceof OxyModel)) continue;
+            for (OxyScript c : e.getScripts()) {
+                c.getOxySubThread().interrupt();
+            }
+        }
     }
 
-    public static void dispose(){
-        scriptExecutor.shutdown();
+    public static void dispose() {
+        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
+            if (!(e instanceof OxyModel)) continue;
+            for (OxyScript c : e.getScripts()) {
+                c.dispose();
+            }
+        }
     }
 
     public static SceneRuntimeControlPanel getPanel() {

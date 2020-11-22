@@ -1,7 +1,9 @@
 package OxyEngine.Scripting;
 
-import OxyEngine.System.OxySystem;
 import OxyEngine.Components.UUIDComponent;
+import OxyEngine.Core.Threading.OxySubThread;
+import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.UI.Panels.GUIProperty;
@@ -12,19 +14,19 @@ import imgui.type.ImString;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Objects;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
-public class OxyScript {
+public class OxyScript implements OxyDisposable {
 
     private Scene scene;
     private OxyEntity entity;
     private EntityInfoProvider provider;
+
+    private OxySubThread oxySubThread;
 
     private String path;
 
@@ -60,32 +62,29 @@ public class OxyScript {
         return null;
     }
 
+    @Override
+    public void dispose() {
+        oxySubThread.shutdown();
+    }
+
     public static class EntityInfoProvider {
 
         private final ScriptableEntity obj;
 
         private final Field[] allFields;
-        private final Method[] allMethods;
 
         public EntityInfoProvider(ScriptableEntity obj) {
             this.obj = obj;
             this.allFields = obj.getClass().getDeclaredFields();
             for (Field f : allFields) f.setAccessible(true);
-            this.allMethods = obj.getClass().getDeclaredMethods();
         }
 
-        public Runnable invokeMethod(String nameOfMethod, Object... args) {
-            return () -> {
-                for (Method m : allMethods) {
-                    if (m.getName().equals(nameOfMethod)) {
-                        try {
-                            m.invoke(obj, args);
-                        } catch (IllegalAccessException | InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            };
+        public void invokeCreate() {
+            obj.onCreate();
+        }
+
+        public void invokeUpdate(float ts) {
+            obj.onUpdate(ts);
         }
     }
 
@@ -184,5 +183,13 @@ public class OxyScript {
 
     public String getPath() {
         return path;
+    }
+
+    public OxySubThread getOxySubThread() {
+        return oxySubThread;
+    }
+
+    public void setOxySubThread(OxySubThread oxySubThread) {
+        this.oxySubThread = oxySubThread;
     }
 }

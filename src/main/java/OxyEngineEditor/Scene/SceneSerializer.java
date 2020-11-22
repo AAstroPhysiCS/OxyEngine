@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -150,8 +149,7 @@ public final class SceneSerializer {
         }
 
         public Scene readScene(SceneLayer layer, OxyShader shader) {
-            SceneRuntime.stop();
-            SceneRuntime.scriptExecutor.shutdownNow();
+            SceneRuntime.interrupt();
             if (loadedS == null) return SceneRuntime.ACTIVE_SCENE;
             String[] splitted = loadedS.split("\n");
             boolean objFound = false;
@@ -175,11 +173,6 @@ public final class SceneSerializer {
                     if (whileS.endsWith("}")) objFound = false;
                 }
                 if (obj != null) objects.add(obj);
-            }
-            for (SceneFileObject fileObject : objects) {
-                for (var e : fileObject.map.entrySet()) {
-//                    for(var s : e.getValue()) System.out.println(s);
-                }
             }
             oldScene = SceneRuntime.ACTIVE_SCENE;
             Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer());
@@ -306,7 +299,6 @@ public final class SceneSerializer {
                 List<OxyScript> components = listOfScripts.get(modelInScene.get(UUIDComponent.class).getUUIDString());
                 if (components != null) modelInScene.addScript(components);
             }
-            SceneRuntime.scriptExecutor = Executors.newSingleThreadExecutor();
             return scene;
         }
 
