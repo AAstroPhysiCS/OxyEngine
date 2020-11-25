@@ -51,18 +51,17 @@ public final class SceneRuntime {
             if (ImGui.imageButton(playTexture.getTextureId(), height, height, 0, 1, 1, 0, 1)) {
                 SceneRuntime.onCreate();
                 running = true;
-                stopped = false;
+                resume();
             }
             ImGui.sameLine(60);
             if (ImGui.imageButton(stopTexture.getTextureId(), height, height, 0, 1, 1, 0, 1))
-                SceneRuntime.interrupt();
+                SceneRuntime.stop();
             ImGui.popStyleColor(4);
             ImGui.end();
         }
     }
 
     static boolean running = false; //for MainThread
-    static boolean stopped = false; //for SubThread
 
     static void onCreate() {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
@@ -85,28 +84,35 @@ public final class SceneRuntime {
                 if (c.getOxySubThread() == null) {
                     OxySubThread subThread = new OxySubThread();
                     subThread.setTarget(() -> {
-                        while (c.getOxySubThread().getRunningState().get()) {
-                            if (!stopped) provider.invokeUpdate(ts);
-                        }
+                        while(subThread.getRunningState().get()) provider.invokeUpdate(ts);
                     });
-                    subThread.start();
                     c.setOxySubThread(subThread);
+                    subThread.start();
                 }
             }
         }
     }
 
-    static void interrupt() {
-        stopped = true;
+    static void stop() {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
-                c.getOxySubThread().interrupt();
+                if(c.getOxySubThread() != null)  c.getOxySubThread().stop();
+            }
+        }
+    }
+
+    public static void resume() {
+        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
+            if (!(e instanceof OxyModel)) continue;
+            for (OxyScript c : e.getScripts()) {
+                if(c.getOxySubThread() != null) c.getOxySubThread().restart();
             }
         }
     }
 
     public static void dispose() {
+        running = false;
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {

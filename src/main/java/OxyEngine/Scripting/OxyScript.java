@@ -65,6 +65,7 @@ public class OxyScript implements OxyDisposable {
     @Override
     public void dispose() {
         oxySubThread.shutdown();
+        oxySubThread = null;
     }
 
     public static class EntityInfoProvider {
@@ -140,8 +141,7 @@ public class OxyScript implements OxyDisposable {
                             //int has an speciality
                             if (obj instanceof Integer) entry.set(provider.obj, Float.valueOf(buffer[0]).intValue());
                             else if (obj instanceof Long) entry.set(provider.obj, Float.valueOf(buffer[0]).longValue());
-                            else if (obj instanceof Short)
-                                entry.set(provider.obj, Float.valueOf(buffer[0]).shortValue());
+                            else if (obj instanceof Short) entry.set(provider.obj, Float.valueOf(buffer[0]).shortValue());
                             else if (obj instanceof Byte) entry.set(provider.obj, Float.valueOf(buffer[0]).byteValue());
                             else entry.set(provider.obj, buffer[0]);
                         }

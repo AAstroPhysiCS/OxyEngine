@@ -149,8 +149,8 @@ public final class SceneSerializer {
         }
 
         public Scene readScene(SceneLayer layer, OxyShader shader) {
-            SceneRuntime.interrupt();
             if (loadedS == null) return SceneRuntime.ACTIVE_SCENE;
+            SceneRuntime.dispose();
             String[] splitted = loadedS.split("\n");
             boolean objFound = false;
             String sceneName = null;

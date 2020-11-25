@@ -15,7 +15,8 @@ public class OxySubThread {
     }
 
     public void setTarget(Runnable r){
-        worker = new Thread(r, "OxySubThread");
+        running.set(true);
+        worker = new Thread(r);
     }
 
     public void start() {
@@ -23,8 +24,10 @@ public class OxySubThread {
         worker.start();
     }
 
+    @SuppressWarnings("deprecation")
     public void shutdown() {
-        running.set(false);
+        worker.checkAccess();
+        worker.stop(); //deprecated, should not be used
         try {
             worker.join();
         } catch (InterruptedException e) {
@@ -32,12 +35,18 @@ public class OxySubThread {
         }
     }
 
-    public void interrupt(){
-        worker.interrupt();
+    @SuppressWarnings("removal")
+    public void restart(){
+        running.set(true);
+        worker.checkAccess();
+        worker.resume(); //deprecated, should not be used
     }
 
-    public Thread.State getState(){
-        return worker.getState();
+    @SuppressWarnings("removal")
+    public void stop(){
+        running.set(false);
+        worker.checkAccess();
+        worker.suspend(); //deprecated, should not be used
     }
 
     public AtomicBoolean getRunningState() {
