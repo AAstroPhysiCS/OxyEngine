@@ -50,7 +50,7 @@ public class OverlayPanelLayer extends Layer {
     @Override
     public void render(float ts) {
         OpenGLRendererAPI.clearBuffer();
-        OpenGLRendererAPI.clearColor(32, 32, 32, 1.0f);
+        OpenGLRendererAPI.clearColor(0, 0, 0, 1.0f);
 
         ACTIVE_SCENE.getOxyUISystem().newFrameGLFW();
         ImGui.newFrame();

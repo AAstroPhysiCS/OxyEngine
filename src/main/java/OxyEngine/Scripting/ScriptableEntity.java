@@ -23,7 +23,7 @@ public abstract class ScriptableEntity {
     }
 
     protected void updateData() {
-        if(entity == null) return;
+        if (entity == null) return;
         entity.updateData();
     }
 

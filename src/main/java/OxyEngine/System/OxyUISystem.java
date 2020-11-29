@@ -52,7 +52,7 @@ public class OxyUISystem {
         ImGui.getStyle().setColors(OxyEngine.getLoadedTheme());
         io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard);
         io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
-//        io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
+        io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
         io.setConfigViewportsNoTaskBarIcon(true);
         setKeymap();
 

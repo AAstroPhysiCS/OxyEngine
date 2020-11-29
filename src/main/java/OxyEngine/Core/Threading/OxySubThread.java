@@ -11,10 +11,10 @@ public class OxySubThread {
         worker = new Thread(r, name);
     }
 
-    public OxySubThread(){
+    public OxySubThread() {
     }
 
-    public void setTarget(Runnable r){
+    public void setTarget(Runnable r) {
         running.set(true);
         worker = new Thread(r);
     }
@@ -24,10 +24,14 @@ public class OxySubThread {
         worker.start();
     }
 
+    //** FOR STOP(), SUSPEND(), RESUME() METHODS **
+    //deprecated, should not be used... it is being used because you cannot directly kill a thread immediately with wait(), notify() methods.
+    //with methods wait() and notify() you can stop a thread but the implementation would be horrible for long action processes (for example 3 for loops).
+
     @SuppressWarnings("deprecation")
     public void shutdown() {
         worker.checkAccess();
-        worker.stop(); //deprecated, should not be used
+        worker.stop();
         try {
             worker.join();
         } catch (InterruptedException e) {
@@ -36,17 +40,17 @@ public class OxySubThread {
     }
 
     @SuppressWarnings("removal")
-    public void restart(){
+    public void restart() {
         running.set(true);
         worker.checkAccess();
-        worker.resume(); //deprecated, should not be used
+        worker.resume();
     }
 
     @SuppressWarnings("removal")
-    public void stop(){
+    public void stop() {
         running.set(false);
         worker.checkAccess();
-        worker.suspend(); //deprecated, should not be used
+        worker.suspend();
     }
 
     public AtomicBoolean getRunningState() {

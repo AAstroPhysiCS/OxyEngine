@@ -54,14 +54,13 @@ public final class SceneRuntime {
                 resume();
             }
             ImGui.sameLine(60);
-            if (ImGui.imageButton(stopTexture.getTextureId(), height, height, 0, 1, 1, 0, 1))
-                SceneRuntime.stop();
+            if (ImGui.imageButton(stopTexture.getTextureId(), height, height, 0, 1, 1, 0, 1)) SceneRuntime.stop();
             ImGui.popStyleColor(4);
             ImGui.end();
         }
     }
 
-    static boolean running = false; //for MainThread
+    static boolean running = false;
 
     static void onCreate() {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
@@ -93,16 +92,18 @@ public final class SceneRuntime {
         }
     }
 
-    static void stop() {
+    public static void stop() {
+        running = false;
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
-                if(c.getOxySubThread() != null)  c.getOxySubThread().stop();
+                if(c.getOxySubThread() != null) c.getOxySubThread().stop();
             }
         }
     }
 
     public static void resume() {
+        running = true;
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {

@@ -9,6 +9,8 @@ public abstract class Light implements EntityComponent {
     protected final Vector3f ambient;
     protected final Vector3f specular;
 
+    protected float colorIntensity = 1;
+
     public Light(Vector3f ambient, Vector3f specular) {
         this.ambient = ambient;
         this.specular = specular;

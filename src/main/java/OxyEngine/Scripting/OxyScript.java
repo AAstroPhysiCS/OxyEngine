@@ -6,6 +6,7 @@ import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.GUIProperty;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -64,8 +65,10 @@ public class OxyScript implements OxyDisposable {
 
     @Override
     public void dispose() {
-        oxySubThread.shutdown();
-        oxySubThread = null;
+        if(oxySubThread != null){
+            oxySubThread.shutdown();
+            oxySubThread = null;
+        }
     }
 
     public static class EntityInfoProvider {
@@ -114,6 +117,7 @@ public class OxyScript implements OxyDisposable {
                     if (this.path == null) {
                         this.path = pathDialog;
                         loadAssembly();
+                        SceneRuntime.stop();
                     }
                     bufferPath.set(pathDialog);
                 }

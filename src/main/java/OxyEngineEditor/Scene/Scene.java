@@ -1,5 +1,6 @@
 package OxyEngineEditor.Scene;
 
+import OxyEngine.Components.*;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
@@ -7,7 +8,6 @@ import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxyUISystem;
-import OxyEngine.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.*;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import org.joml.Vector3f;
@@ -47,7 +47,7 @@ public final class Scene implements OxyDisposable {
         this.sceneName = sceneName;
     }
 
-    final void put(OxyEntity e) {
+    public final void put(OxyEntity e) {
         registry.entityList.put(e, new LinkedHashSet<>(15));
     }
 
@@ -260,7 +260,7 @@ public final class Scene implements OxyDisposable {
     public final void each(RegistryEach.Single<OxyEntity> registryEach, Predicate<OxyEntity> predicate) {
         Set<OxyEntity> entities = getEntities();
         entities.forEach(oxyEntity -> {
-            if(predicate.test(oxyEntity)){
+            if (predicate.test(oxyEntity)) {
                 registryEach.each(oxyEntity);
             }
         });
@@ -302,7 +302,7 @@ public final class Scene implements OxyDisposable {
         return registry.entityList.keySet();
     }
 
-    Set<Map.Entry<OxyEntity, Set<EntityComponent>>> getNativeObjects() {
+    public Set<Map.Entry<OxyEntity, Set<EntityComponent>>> getNativeObjects() {
         return registry.entityList.entrySet().stream().filter(oxyEntitySetEntry -> oxyEntitySetEntry.getKey() instanceof OxyNativeObject).collect(Collectors.toSet());
     }
 

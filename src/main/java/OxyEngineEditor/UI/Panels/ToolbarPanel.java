@@ -1,8 +1,10 @@
 package OxyEngineEditor.UI.Panels;
 
+import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Layers.GizmoLayer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.Scene.SceneSerializer;
 import imgui.ImGui;
@@ -50,9 +52,20 @@ public class ToolbarPanel extends Panel {
             ImGui.getWindowPos(pos);
             ImGui.setCursorPosY(ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable) ? pos.y - 20f : pos.y + 3);
             if (ImGui.beginMenu("File")) {
-                if (ImGui.beginMenu("New")) {
-                    ImGui.menuItem("New Scene");
-                    ImGui.endMenu();
+                if (ImGui.menuItem("New Scene")) {
+                    Scene oldScene = SceneRuntime.ACTIVE_SCENE;
+
+                    oldScene.dispose();
+                    Scene scene = new Scene("Test Scene 1", oldScene.getRenderer(), oldScene.getFrameBuffer());
+                    scene.setUISystem(oldScene.getOxyUISystem());
+                    for (var n : oldScene.getNativeObjects()) {
+                        scene.put(n.getKey());
+                        scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
+                    }
+                    SceneRuntime.ACTIVE_SCENE = scene;
+                    SceneLayer.hdrTexture.dispose();
+                    gizmoLayer.build();
+                    sceneLayer.build();
                 }
                 if (ImGui.menuItem("Open a scene", "Ctrl+O")) {
                     String openScene = openDialog(extensionName, null);

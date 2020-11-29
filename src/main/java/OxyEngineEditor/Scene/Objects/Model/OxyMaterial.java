@@ -1,11 +1,11 @@
 package OxyEngineEditor.Scene.Objects.Model;
 
+import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyDisposable;
-import OxyEngine.Components.EntityComponent;
 import OxyEngineEditor.UI.Panels.GUIProperty;
 import imgui.ImGui;
 import imgui.flag.ImGuiColorEditFlags;
@@ -18,7 +18,7 @@ import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
 public class OxyMaterial implements EntityComponent, OxyDisposable {
 
-    public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture;
+    public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture;
     public final OxyColor albedoColor;
 
     public float[] metalness;
@@ -30,13 +30,12 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
     float[] albedo = {0, 0, 0, 0};
 
     public OxyMaterial(ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
-                       ImageTexture heightTexture, OxyColor albedoColor) {
+                       OxyColor albedoColor) {
         this.albedoTexture = albedoTexture;
         this.roughnessTexture = roughnessTexture;
         this.metallicTexture = metallicTexture;
         this.aoTexture = aoTexture;
         this.normalTexture = normalTexture;
-        this.heightTexture = heightTexture;
         this.albedoColor = albedoColor;
         metalness = new float[]{0.0f};
         roughness = new float[]{1.0f};
@@ -46,15 +45,15 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
     }
 
     public OxyMaterial(Vector4f albedoColor) {
-        this(null, null, null, null, null, null, new OxyColor(albedoColor));
+        this(null, null, null, null, null, new OxyColor(albedoColor));
     }
 
     public OxyMaterial(float r, float g, float b, float a) {
-        this(null, null, null, null, null, null, new OxyColor(new Vector4f(r, g, b, a)));
+        this(null, null, null, null, null, new OxyColor(new Vector4f(r, g, b, a)));
     }
 
     public OxyMaterial(Vector4f albedoColor, float metalness, float roughness, float aoStrength) {
-        this(null, null, null, null, null, null, new OxyColor(albedoColor));
+        this(null, null, null, null, null, new OxyColor(albedoColor));
         this.metalness = new float[]{metalness};
         this.roughness = new float[]{roughness};
         this.aoStrength = new float[]{aoStrength};
@@ -66,7 +65,6 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
         this.normalTexture = other.normalTexture;
         this.albedoTexture = other.albedoTexture;
         this.metallicTexture = other.metallicTexture;
-        this.heightTexture = other.heightTexture;
         this.albedoColor = new OxyColor(other.albedoColor.getNumbers().clone());
         this.metalness = other.metalness.clone();
         this.roughness = other.roughness.clone();
@@ -105,12 +103,6 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
         } else {
             shader.setUniform1f("roughnessFloat", roughness[0]);
             shader.setUniform1i("roughnessSlot", 0);
-        }
-        if (heightTexture != null) {
-            shader.setUniform1i("heightSlot", heightTexture.getTextureSlot());
-            shader.setUniform1f("heightScale", heightScale[0]);
-        } else {
-            shader.setUniform1i("heightSlot", 0);
         }
         shader.disable();
     }
@@ -244,23 +236,6 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
                 ImGui.text("AO strength:");
                 ImGui.sameLine();
                 ImGui.sliderFloat("###hidelabel ao", m.aoStrength, 0, 1);
-
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Height Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 130);
-                boolean nullHeight = entityContext.get(OxyMaterial.class).heightTexture == null;
-                if (ImGui.imageButton(nullHeight ? -6 : entityContext.get(OxyMaterial.class).heightTexture.getTextureId(), 80, 60)) {
-                    String path = openDialog("", null);
-                    if (path != null) {
-                        if (!nullHeight) entityContext.get(OxyMaterial.class).heightTexture.dispose();
-                        entityContext.get(OxyMaterial.class).heightTexture = OxyTexture.loadImage(path);
-                    }
-                }
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
-                if (ImGui.button("Remove H")) {
-                    entityContext.get(OxyMaterial.class).heightTexture.dispose();
-                    entityContext.get(OxyMaterial.class).heightTexture = null;
-                }
             }
         }
     };
@@ -272,6 +247,5 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
         if (normalTexture != null) normalTexture.dispose();
         if (metallicTexture != null) metallicTexture.dispose();
         if (roughnessTexture != null) roughnessTexture.dispose();
-        if (heightTexture != null) heightTexture.dispose();
     }
 }

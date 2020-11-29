@@ -184,6 +184,7 @@ public final class SceneSerializer {
             OxySelectHandler.entityContext = null;
             layer.clear();
             oldScene.dispose();
+            SceneRuntime.ACTIVE_SCENE = scene;
             Map<String, List<List<EntityComponent>>> listOfEntries = new HashMap<>(objects.size());
             Map<String, List<OxyScript>> listOfScripts = new HashMap<>(objects.size());
             for (var obj : objects) {
@@ -259,14 +260,14 @@ public final class SceneSerializer {
                         if (grouped.equals("true")) {
                             //list.of does not work
                             listOfEntries.get(mesh).add(Arrays.stream(new EntityComponent[]{new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
-                                    OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
+                                    OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), new OxyColor(color)),
                                     new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new EntitySerializationInfo(true, true), new BoundingBoxComponent(min, max)}).collect(Collectors.toList())
                             );
                         } else {
                             OxyModel m = scene.createModelEntity(mesh, shader);
                             m.originPos = new Vector3f(0, 0, 0);
                             m.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
-                                            OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), null, new OxyColor(color)),
+                                            OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), new OxyColor(color)),
                                     new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(min, max)
                             );
                             if (emitting)

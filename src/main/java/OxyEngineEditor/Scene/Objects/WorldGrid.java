@@ -37,7 +37,7 @@ public class WorldGrid {
         mainObj.addComponent(worldGridMesh, new GridFactory(), new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 0.2f)));
         for (int x = -size; x < size; x++) {
             for (int z = -size; z < size; z++) {
-                mainObj.pushVertexData(new TransformComponent(new Vector3f(x, 0, z), 20f));
+                mainObj.pushVertexData(new TransformComponent(new Vector3f(x, 0, z), 2f));
             }
         }
     }

@@ -172,15 +172,6 @@ public class OxyModelLoader {
         }
         pathAO.clear();
 
-        AIString pathHeight = AIString.calloc();
-        aiGetMaterialTexture(aiMaterial, aiTextureType_NORMALS, 0, pathHeight, (IntBuffer) null, null, null, null, null, null);
-        String textPathHeight = pathHeight.dataString();
-        ImageTexture heightTexture = null;
-        if (!textPathAO.equals("")) {
-            heightTexture = OxyTexture.loadImage(textPathHeight);
-        }
-        pathHeight.clear();
-
         AIColor4D color = AIColor4D.create();
         Vector4f diffuse = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, aiTextureType_NONE, 0, color);
@@ -200,7 +191,7 @@ public class OxyModelLoader {
 //            System.out.println(Arrays.toString(roughness));
         }
 
-        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, heightTexture, new OxyColor(diffuse));
+        oxyMesh.material = new OxyMaterial(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, new OxyColor(diffuse));
     }
 
     public String getPath() {

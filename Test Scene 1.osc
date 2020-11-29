@@ -1,24 +1,24 @@
 Scene Name: Test Scene 1
 Environment {
-	Environment Map: D:/programming/Java/OxyEngine/target/classes/hdr/birchwood_4k.hdr
+	Environment Map: D:\programming\Java\OxyEngine\src\main\resources\hdr\pink_sunrise_4k.hdr
 	Environment Gamma Strength: 2.0
 	Environment LOD: 1.0
 	Environment Exposure: 1.0
 }
 Registry {
-	Object count: 10
+	Object count: 12
 	OxyModel 1 {
-       	ID: 98d2284f-a584-444c-91e6-b55c043f2b9e
+       	ID: 1c9d4907-4633-4dfe-b5c5-66907682c1de
        	Mesh Position: 0
        	Name: Light Cube
        	Grouped: false
        	Emitting: true
-       	Position: X 0.0, Y -10.0, Z 0.0
+       	Position: X -11.150001, Y -6.999989, Z 0.0
        	Rotation: X 0.0, Y 0.0, Z 0.0
        	Scale: X 0.5, Y 0.5, Z 0.5
        	Bounds Min: X 1.0, Y 1.0, Z 1.0
        	Bounds Max: X 1.0, Y 1.0, Z 1.0
-       	Color: [1.0, 1.0, 1.0, 1.0]
+       	Color: [0.53731346, 0.0, 1.0, 1.0]
        	Scripts: []
        	Albedo Texture: null
        	Normal Map Texture: null
@@ -28,7 +28,7 @@ Registry {
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
     }
 	OxyModel 2 {
-       	ID: 7610f7d1-3174-42a7-b10f-4a9e86756666
+       	ID: 6b295dc5-c321-40f1-8f4f-bc39999b7643
        	Mesh Position: 0
        	Name: Light Cube 2
        	Grouped: false
@@ -48,7 +48,27 @@ Registry {
        	Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
     }
 	OxyModel 3 {
-       	ID: 5457c28e-1ff1-4c76-a8c2-292edd3eae15
+       	ID: 1a42c214-5759-41d7-a4f7-9c63b7ce69ed
+       	Mesh Position: 0
+       	Name: Gun
+       	Grouped: false
+       	Emitting: false
+       	Position: X -2.6603622, Y -0.46310413, Z 21.999998
+       	Rotation: X 3.1, Y 0.0, Z 0.0
+       	Scale: X 1.0, Y 1.0, Z 1.0
+       	Bounds Min: X 4.817081, Y 3.0327969, Z 0.6683631
+       	Bounds Max: X 4.817081, Y 3.0327969, Z 0.6683631
+       	Color: [0.96517414, 0.5089973, 0.5089973, 1.0]
+       	Scripts: []
+       	Albedo Texture: null
+       	Normal Map Texture: null
+       	Roughness Map Texture: null
+       	AO Map Texture: null
+       	Metallic Map Texture: null
+       	Mesh: C:\Users\okang\Desktop\colt-m1911\source\colt low polyfbx.fbx
+    }
+	OxyModel 4 {
+       	ID: 06489dbe-5c89-4f92-8488-aff3606cf88d
        	Mesh Position: 0
        	Name: Cube
        	Grouped: true
@@ -65,10 +85,10 @@ Registry {
        	Roughness Map Texture: null
        	AO Map Texture: null
        	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+       	Mesh: C:\Users\okang\Desktop\untitled.obj
     }
-	OxyModel 4 {
-       	ID: 1734e309-d35b-4a0f-91f0-06be36c9d16b
+	OxyModel 5 {
+       	ID: fe0b27e8-6910-4cac-a811-a6507a94a8e2
        	Mesh Position: 1
        	Name: Cube.001
        	Grouped: true
@@ -85,10 +105,10 @@ Registry {
        	Roughness Map Texture: null
        	AO Map Texture: null
        	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+       	Mesh: C:\Users\okang\Desktop\untitled.obj
     }
-	OxyModel 5 {
-       	ID: 5d020962-cbd3-4a51-a192-14432825e68e
+	OxyModel 6 {
+       	ID: 1d161266-2ac2-4ce1-b64f-fba3105f452b
        	Mesh Position: 2
        	Name: Sphere
        	Grouped: true
@@ -100,7 +120,6 @@ Registry {
        	Bounds Max: X 2.0, Y 2.0, Z 2.0
        	Color: [0.8, 0.086863, 0.093309, 1.0]
        	Scripts: [
-			D:\programming\Java\OxyEngine\src\main\java\Scripts\ColorIteratorScript.java
 			D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		]
        	Albedo Texture: null
@@ -108,10 +127,10 @@ Registry {
        	Roughness Map Texture: null
        	AO Map Texture: null
        	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+       	Mesh: C:\Users\okang\Desktop\untitled.obj
     }
-	OxyModel 6 {
-       	ID: 52611919-ea4a-4e7a-aaa6-9c8b2bb1c1f3
+	OxyModel 7 {
+       	ID: 92d37a3b-b165-44d5-8519-b250692b97d6
        	Mesh Position: 3
        	Name: Cone
        	Grouped: true
@@ -128,10 +147,10 @@ Registry {
        	Roughness Map Texture: null
        	AO Map Texture: null
        	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+       	Mesh: C:\Users\okang\Desktop\untitled.obj
     }
-	OxyModel 7 {
-       	ID: 3a8a5931-5736-4f57-9107-95e3ff01d1b9
+	OxyModel 8 {
+       	ID: 41381c64-0e7c-4998-9970-514db771ba7f
        	Mesh Position: 4
        	Name: Cube.002
        	Grouped: true
@@ -148,6 +167,26 @@ Registry {
        	Roughness Map Texture: null
        	AO Map Texture: null
        	Metallic Map Texture: null
-       	Mesh: D:/programming/Java/OxyEngine/target/classes/models/mainTestScene.obj
+       	Mesh: C:\Users\okang\Desktop\untitled.obj
+    }
+	OxyModel 9 {
+       	ID: c4668412-45e6-419e-a53d-536b36f2c8a6
+       	Mesh Position: 0
+       	Name: Revolver
+       	Grouped: false
+       	Emitting: false
+       	Position: X -0.68640757, Y -6.615999, Z -14.214956
+       	Rotation: X 1.5, Y 0.0, Z 0.0
+       	Scale: X 0.1, Y 0.1, Z 0.1
+       	Bounds Min: X 16.25672, Y 78.05304, Z 32.99376
+       	Bounds Max: X 16.25672, Y 78.05304, Z 32.99376
+       	Color: [0.5882353, 0.5882353, 0.5882353, 1.0]
+       	Scripts: []
+       	Albedo Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_A.tga
+       	Normal Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_N.tga
+       	Roughness Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_R.tga
+       	AO Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Raw\Cerberus_AO.tga
+       	Metallic Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_M.tga
+       	Mesh: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Cerberus_LP.FBX
     }
 }

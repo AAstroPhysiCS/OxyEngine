@@ -21,7 +21,7 @@ public class StatsPanel extends Panel {
 
     @Override
     public void renderPanel() {
-        ImGui.begin("Stats", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDocking);
+        ImGui.begin("Stats", ImGuiWindowFlags.NoBackground);
 
         ImGui.textColored(normalizeColor(200), normalizeColor(200), normalizeColor(200), 1.0f, OxyRenderer.Stats.getStats());
         ImGui.spacing();
