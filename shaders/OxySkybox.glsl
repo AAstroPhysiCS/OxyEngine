@@ -7,13 +7,12 @@ in vec3 tcsOut;
 uniform samplerCube skyBoxTexture;
 uniform float mipLevel;
 uniform float exposure;
+uniform float gamma;
 
 void main(){
     vec3 textureRGB = textureLod(skyBoxTexture, tcsOut, mipLevel).rgb;
-    textureRGB = textureRGB / (textureRGB + vec3(1.0));
     textureRGB = vec3(1.0) - exp(-textureRGB * exposure);
-    textureRGB = pow(textureRGB, vec3(1.0/2.2));
-
+    textureRGB = pow(textureRGB, vec3(1.0/gamma));
     color = vec4(textureRGB, 1.0);
 }
 

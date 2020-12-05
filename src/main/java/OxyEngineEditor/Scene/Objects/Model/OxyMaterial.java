@@ -25,23 +25,24 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
     public float[] roughness;
     public float[] aoStrength;
     public final float[] normalStrength;
-    public final float[] heightScale;
-
-    float[] albedo = {0, 0, 0, 0};
 
     public OxyMaterial(ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
                        OxyColor albedoColor) {
+        this(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, albedoColor, 1.0f, 1.0f, 1.0f, 0.0f);
+    }
+
+    public OxyMaterial(ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
+                       OxyColor albedoColor, float m_normalStrength, float m_aoStrength, float m_roughness, float m_metalness) {
         this.albedoTexture = albedoTexture;
         this.roughnessTexture = roughnessTexture;
         this.metallicTexture = metallicTexture;
         this.aoTexture = aoTexture;
         this.normalTexture = normalTexture;
         this.albedoColor = albedoColor;
-        metalness = new float[]{0.0f};
-        roughness = new float[]{1.0f};
-        aoStrength = new float[]{1.0f};
-        normalStrength = new float[]{1.0f};
-        heightScale = new float[]{1.0f};
+        metalness = new float[]{m_metalness};
+        roughness = new float[]{m_roughness};
+        aoStrength = new float[]{m_aoStrength};
+        normalStrength = new float[]{m_normalStrength};
     }
 
     public OxyMaterial(Vector4f albedoColor) {
@@ -70,7 +71,6 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
         this.roughness = other.roughness.clone();
         this.aoStrength = other.aoStrength.clone();
         this.normalStrength = other.normalStrength.clone();
-        this.heightScale = other.heightScale.clone();
     }
 
     public void push(OxyShader shader) {
@@ -172,7 +172,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Normal map strength:");
                 ImGui.sameLine();
-                ImGui.sliderFloat("###hidelabel n", m.normalStrength, 0, 100);
+                ImGui.sliderFloat("###hidelabel n", m.normalStrength, 0, 5);
 
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Roughness Map: ");

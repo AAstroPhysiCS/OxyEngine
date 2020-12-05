@@ -7,7 +7,7 @@ import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 
 public class EnvironmentPanel extends Panel {
 
-    public static float[] gammaStrength = new float[]{2f};
+    public static float[] gammaStrength = new float[]{2.2f};
     public static float[] mipLevelStrength = new float[]{1.0f};
     public static float[] exposure = new float[]{1.0f};
 

@@ -185,12 +185,12 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         if (irradianceTexture == null || prefilterTexture == null || bdrf == null) {
             oxyAssert("HDR Texture Algorithms are null!");
             return;
         }
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
-        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         irradianceTexture.captureFaces(ts);
         prefilterTexture.captureFaces(ts);
         bdrf.captureFaces(ts);
@@ -260,9 +260,25 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
 
+            Matrix4f captureProjection = new Matrix4f().perspective((float) Math.toRadians(90), 1.0f, 0.4762f, 10.0f);
+            Matrix4f[] captureViews = new Matrix4f[]{
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f),
+            };
+
             shader.enable();
             shader.setUniform1i("skyBoxTexture", 0);
-            shader.setUniformMatrix4fv("projection", mainTexture.captureProjection, true);
+            shader.setUniformMatrix4fv("projection", captureProjection, true);
             shader.disable();
 
             glActiveTexture(GL_TEXTURE0);
@@ -270,7 +286,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glViewport(0, 0, 32, 32);
             for (int i = 0; i < 6; ++i) {
                 shader.enable();
-                shader.setUniformMatrix4fv("view", mainTexture.captureViews[i], true);
+                shader.setUniformMatrix4fv("view", captureViews[i], true);
                 shader.disable();
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
@@ -309,19 +325,35 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
             glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
+            Matrix4f captureProjection = new Matrix4f().perspective((float) Math.toRadians(90), 1.0f, 0.4762f, 10.0f);
             shader.enable();
             shader.setUniform1i("skyBoxTexture", 0);
-            shader.setUniformMatrix4fv("projection", mainTexture.captureProjection, true);
+            shader.setUniformMatrix4fv("projection", captureProjection, true);
             shader.disable();
 
+            Matrix4f[] captureViews = new Matrix4f[]{
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f),
+                    new Matrix4f()
+                            .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f),
+            };
+
+            glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_CUBE_MAP, mainTexture.textureId);
-            glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
+            glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
             int maxMipLevels = 10;
             for (int mip = 0; mip < maxMipLevels; ++mip) {
                 int mipWidth = (int) (512 * Math.pow(0.5f, mip));
                 int mipHeight = (int) (512 * Math.pow(0.5f, mip));
-                glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
                 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
                 glViewport(0, 0, mipWidth, mipHeight);
                 float roughness = (float) mip / (float) (maxMipLevels - 1);
@@ -330,7 +362,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 shader.disable();
                 for (int i = 0; i < 6; ++i) {
                     shader.enable();
-                    shader.setUniformMatrix4fv("view", mainTexture.captureViews[i], true);
+                    shader.setUniformMatrix4fv("view", captureViews[i], true);
                     shader.disable();
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);

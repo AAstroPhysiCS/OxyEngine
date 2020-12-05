@@ -3,6 +3,7 @@ package OxyEngine.Core.Renderer.Buffer;
 import OxyEngine.OxyEngine;
 
 import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL30.*;
@@ -57,7 +58,7 @@ public class FrameBuffer extends Buffer {
         glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
         colorAttachmentTexture = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, colorAttachmentTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (ByteBuffer) null);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, (FloatBuffer) null);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachmentTexture, 0);

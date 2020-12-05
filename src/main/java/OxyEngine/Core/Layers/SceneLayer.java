@@ -162,9 +162,11 @@ public class SceneLayer extends Layer {
                     if (mesh.equals(hdrTexture.getMesh())) {
                         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
                         cubemapShader.enable();
-                        cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
+                        if (EnvironmentPanel.mipLevelStrength[0] > 0) cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
+                        else cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
                         cubemapShader.setUniform1f("mipLevel", EnvironmentPanel.mipLevelStrength[0]);
                         cubemapShader.setUniform1f("exposure", EnvironmentPanel.exposure[0]);
+                        cubemapShader.setUniform1f("gamma", EnvironmentPanel.gammaStrength[0]);
                         cubemapShader.disable();
                         render(ts, mesh, mainCamera, cubemapShader);
                         glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
@@ -194,6 +196,7 @@ public class SceneLayer extends Layer {
                 modelMesh.getShader().setUniform1i("prefilterMap", prefilterSlot);
                 modelMesh.getShader().setUniform1i("brdfLUT", brdfLUTSlot);
                 modelMesh.getShader().setUniform1f("gamma", EnvironmentPanel.gammaStrength[0]);
+                modelMesh.getShader().setUniform1f("exposure", EnvironmentPanel.exposure[0]);
                 modelMesh.getShader().disable();
                 material.push(modelMesh.getShader());
 

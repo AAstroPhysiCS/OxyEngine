@@ -74,10 +74,10 @@ public final class SceneSerializer {
                 Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
                 String albedoColor = "null";
                 String albedoTexture = "null";
-                String normalTexture = "null";
-                String roughnessTexture = "null";
-                String metallicTexture = "null";
-                String aoTexture = "null";
+                String normalTexture = "null", normalTextureStrength = "0";
+                String roughnessTexture = "null", roughnessTextureStrength = "0";
+                String metallicTexture = "null", metalnessTextureStrength = "0";
+                String aoTexture = "null", aoTextureStrength = "0";
                 String mesh = "null";
                 String id = e.get(UUIDComponent.class).getUUIDString();
                 boolean emitting = false;
@@ -96,9 +96,13 @@ public final class SceneSerializer {
                     if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
                     if (m.albedoTexture != null) albedoTexture = m.albedoTexture.getPath();
                     if (m.normalTexture != null) normalTexture = m.normalTexture.getPath();
+                    else normalTextureStrength = String.valueOf(m.normalStrength[0]);
                     if (m.roughnessTexture != null) roughnessTexture = m.roughnessTexture.getPath();
+                    else roughnessTextureStrength = String.valueOf(m.roughness[0]);
                     if (m.metallicTexture != null) metallicTexture = m.metallicTexture.getPath();
+                    else metalnessTextureStrength = String.valueOf(m.metalness[0]);
                     if (m.aoTexture != null) aoTexture = m.aoTexture.getPath();
+                    else aoTextureStrength = String.valueOf(m.aoStrength[0]);
                 }
                 if (e.has(ModelMesh.class)) mesh = e.get(ModelMesh.class).getPath();
                 if (e.has(Light.class)) emitting = true;
@@ -118,7 +122,8 @@ public final class SceneSerializer {
                         transform.rotation.x, transform.rotation.y, transform.rotation.z,
                         transform.scale.x, transform.scale.y, transform.scale.z,
                         minBound.x, minBound.y, minBound.z, maxBound.x, maxBound.y, maxBound.z,
-                        albedoColor, scripts.toString(), albedoTexture, normalTexture, roughnessTexture, aoTexture, metallicTexture, mesh).trim();
+                        albedoColor, scripts.toString(), albedoTexture, normalTexture, normalTextureStrength,
+                        roughnessTexture, roughnessTextureStrength, aoTexture, aoTextureStrength, metallicTexture, metalnessTextureStrength, mesh).trim();
                 infoEntity.append("\t").append(formatObjTemplate).append("\n");
             }
             try {
@@ -207,6 +212,7 @@ public final class SceneSerializer {
                     } else if (key.contains("OxyModel")) {
                         String id = null, name = null, aT = null, nMT = null, rMT = null, aMT = null, mMT = null, mesh = null, grouped = null;
                         Vector3f pos = null, rot = null, scale = null, min = null, max = null;
+                        float normalStrength = 0, aoStrength = 0, roughnessStrength = 0, metalnessStrength = 0;
                         int meshPos = -1;
                         boolean emitting = false;
                         Vector4f color = new Vector4f(1, 1, 1, 1);
@@ -235,9 +241,13 @@ public final class SceneSerializer {
                                 }
                                 case "Albedo Texture" -> aT = sValue;
                                 case "Normal Map Texture" -> nMT = sValue;
+                                case "Normal Map Strength" -> normalStrength = Float.parseFloat(sValue);
                                 case "Roughness Map Texture" -> rMT = sValue;
+                                case "Roughness Map Strength" -> roughnessStrength = Float.parseFloat(sValue);
                                 case "AO Map Texture" -> aMT = sValue;
+                                case "AO Map Strength" -> aoStrength = Float.parseFloat(sValue);
                                 case "Metallic Map Texture" -> mMT = sValue;
+                                case "Metallic Map Strength" -> metalnessStrength = Float.parseFloat(sValue);
                                 case "Mesh" -> mesh = sValue;
                             }
                             //SCRIPT
@@ -249,7 +259,8 @@ public final class SceneSerializer {
                                         listOfScripts.put(id, new ArrayList<>());
                                     }
                                     if (valuesIter.equals("]")) break;
-                                    else if (!valuesIter.isBlank()) listOfScripts.get(id).add(new OxyScript(valuesIter));
+                                    else if (!valuesIter.isBlank())
+                                        listOfScripts.get(id).add(new OxyScript(valuesIter));
                                 }
                             }
                         }
@@ -260,14 +271,14 @@ public final class SceneSerializer {
                         if (grouped.equals("true")) {
                             //list.of does not work
                             listOfEntries.get(mesh).add(Arrays.stream(new EntityComponent[]{new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
-                                    OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), new OxyColor(color)),
+                                    OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), new OxyColor(color), normalStrength, aoStrength, roughnessStrength, metalnessStrength),
                                     new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new EntitySerializationInfo(true, true), new BoundingBoxComponent(min, max)}).collect(Collectors.toList())
                             );
                         } else {
                             OxyModel m = scene.createModelEntity(mesh, shader);
                             m.originPos = new Vector3f(0, 0, 0);
                             m.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(pos, rot, scale), new OxyMaterial(OxyTexture.loadImage(aT),
-                                            OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), new OxyColor(color)),
+                                            OxyTexture.loadImage(nMT), OxyTexture.loadImage(rMT), OxyTexture.loadImage(mMT), OxyTexture.loadImage(aMT), new OxyColor(color), normalStrength, aoStrength, roughnessStrength, metalnessStrength),
                                     new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(min, max)
                             );
                             if (emitting)

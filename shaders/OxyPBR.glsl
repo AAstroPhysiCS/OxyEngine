@@ -69,6 +69,8 @@ uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 //irradiance
 uniform samplerCube irradianceMap;
+//hdr
+uniform float exposure;
 
 #define PI 3.14159265358979323
 
@@ -190,7 +192,8 @@ void beginPBR(vec3 norm, vec3 lightPos, vec3 viewDir, vec3 vertexPos, vec2 texCo
         vec3 ambient = (kD * diffuseMap + specular) * aoMap;
 
         vec3 result = ambient + Lo;
-        result = result / (result + vec3(1.0));
+        //result = result / (result + vec3(1.0));
+        result = vec3(1.0) - exp(-result * exposure);
         result = pow(result, vec3(1f / gamma));
         color = vec4(result, 1.0f);
     } else {

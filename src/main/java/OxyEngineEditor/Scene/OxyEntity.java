@@ -34,9 +34,13 @@ import static OxyEngine.Tools.Globals.toPrimitiveInteger;
                \tScripts: %s
                \tAlbedo Texture: %s
                \tNormal Map Texture: %s
+               \tNormal Map Strength: %s
                \tRoughness Map Texture: %s
+               \tRoughness Map Strength: %s
                \tAO Map Texture: %s
+               \tAO Map Strength: %s
                \tMetallic Map Texture: %s
+               \tMetallic Map Strength: %s
                \tMesh: %s
             }"""
 )
