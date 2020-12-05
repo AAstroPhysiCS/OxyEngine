@@ -29,7 +29,7 @@ public class PositionIteratorScript extends ScriptableEntity {
 
     @Override
     public void onUpdate(float ts) {
-        TransformComponent.position.add(Speed, 0f, 0f);
+        TransformComponent.position.add(Speed * ts, 0f, 0f);
         updateData();
     }
 }

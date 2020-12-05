@@ -82,7 +82,8 @@ public final class SceneRuntime {
                 if (c.getOxySubThread() == null) {
                     OxySubThread subThread = new OxySubThread();
                     subThread.setTarget(() -> {
-                        while(subThread.getRunningState().get()) provider.invokeUpdate(ts);
+                        //noinspection InfiniteLoopStatement
+                        while(true) provider.invokeUpdate(ts);
                     });
                     c.setOxySubThread(subThread);
                     subThread.start();

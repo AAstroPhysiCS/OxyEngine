@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class OxySubThread {
 
     private Thread worker;
-    private final AtomicBoolean running = new AtomicBoolean(false);
 
     public OxySubThread(Runnable r, String name) {
         worker = new Thread(r, name);
@@ -15,12 +14,10 @@ public class OxySubThread {
     }
 
     public void setTarget(Runnable r) {
-        running.set(true);
         worker = new Thread(r);
     }
 
     public void start() {
-        running.set(true);
         worker.start();
     }
 
@@ -41,19 +38,13 @@ public class OxySubThread {
 
     @SuppressWarnings("removal")
     public void restart() {
-        running.set(true);
         worker.checkAccess();
         worker.resume();
     }
 
     @SuppressWarnings("removal")
     public void stop() {
-        running.set(false);
         worker.checkAccess();
         worker.suspend();
-    }
-
-    public AtomicBoolean getRunningState() {
-        return running;
     }
 }
