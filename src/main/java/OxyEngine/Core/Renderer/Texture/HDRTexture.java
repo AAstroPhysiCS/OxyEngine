@@ -1,9 +1,9 @@
 package OxyEngine.Core.Renderer.Texture;
 
+import OxyEngine.Components.NativeObjectMesh;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.OpenGL.OpenGLRendererAPI;
-import OxyEngine.Components.NativeObjectMesh;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
@@ -80,7 +80,16 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         this.scene = scene;
         assert slot != 0 : oxyAssert("Slot can not be 0");
 
-        stbi_set_flip_vertically_on_load(false);
+        captureFBO = glGenFramebuffers();
+        captureRBO = glGenRenderbuffers();
+        glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
+        glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
+
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 1920, 1920);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
+        assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
+
+        stbi_set_flip_vertically_on_load(true);
         int[] width = new int[1];
         int[] height = new int[1];
         int[] nrComponents = new int[1];
@@ -101,42 +110,35 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         textureId = glGenTextures();
         allTextures.add(this);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; ++i) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F,
-                    3840, 3840, 0, GL_RGB, GL_FLOAT, (FloatBuffer) null);
+                    1920, 1920, 0, GL_RGB, GL_FLOAT, (FloatBuffer) null);
         }
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-
-        captureFBO = glGenFramebuffers();
-        captureRBO = glGenRenderbuffers();
-        glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
-        glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
-
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 3840, 3840);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, captureRBO);
-        assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
 
         captureProjection = new Matrix4f().perspective((float) Math.toRadians(90), 1.0f, 0.478f, 10.0f);
         captureViews = new Matrix4f[]{
                 new Matrix4f()
-                        .lookAt(0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
-                new Matrix4f()
+                        .rotateX((float) Math.toRadians(180))
                         .lookAt(0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
                 new Matrix4f()
-                        .rotateY((float) Math.toRadians(180))
-                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f),
+                        .rotateX((float) Math.toRadians(180))
+                        .lookAt(0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f),
                 new Matrix4f()
-                        .rotateY((float) Math.toRadians(180))
                         .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f),
                 new Matrix4f()
-                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f),
+                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, -1.0f),
                 new Matrix4f()
+                        .rotateX((float) Math.toRadians(180))
                         .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f),
+                new Matrix4f()
+                        .rotateX((float) Math.toRadians(180))
+                        .lookAt(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, -1.0f, 0.0f),
         };
     }
 
@@ -171,8 +173,8 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, hdrTexture);
-        glViewport(0, 0, 3840, 3840);
-        for (int i = 0; i < 6; i++) {
+        glViewport(0, 0, 1920, 1920);
+        for (int i = 0; i < 6; ++i) {
             shader.enable();
             shader.setUniformMatrix4fv("view", captureViews[i], true);
             shader.disable();
@@ -187,6 +189,8 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             oxyAssert("HDR Texture Algorithms are null!");
             return;
         }
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
+        glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         irradianceTexture.captureFaces(ts);
         prefilterTexture.captureFaces(ts);
         bdrf.captureFaces(ts);
@@ -226,42 +230,6 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         return bdrf.getTextureSlot();
     }
 
-    static class BDRF extends OxyTexture.AbstractTexture {
-
-        private final HDRTexture mainTexture;
-
-        BDRF(int slot, String path, HDRTexture mainTexture) {
-            super(slot, path);
-            this.mainTexture = mainTexture;
-            allTextures.add(this);
-        }
-
-        final static OxyShader shader = new OxyShader("shaders/OxyBDRF.glsl");
-
-        public void captureFaces(float ts) {
-            textureId = glGenTextures();
-            glBindTexture(GL_TEXTURE_2D, textureId);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0,
-                    GL_RG, GL_FLOAT, (FloatBuffer) null);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glBindTexture(GL_TEXTURE_2D, 0);
-
-            glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
-            glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
-            shader.enable();
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
-            glViewport(0, 0, 512, 512);
-            shader.disable();
-            OpenGLRendererAPI.clearBuffer();
-            mainTexture.scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera, shader);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        }
-    }
-
     static class IrradianceTexture extends OxyTexture.AbstractTexture {
 
         private final HDRTexture mainTexture;
@@ -277,7 +245,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         void captureFaces(float ts) {
             textureId = glGenTextures();
             glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 6; ++i) {
                 glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 32, 32, 0,
                         GL_RGB, GL_FLOAT, (FloatBuffer) null);
             }
@@ -300,7 +268,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_CUBE_MAP, mainTexture.textureId);
             glViewport(0, 0, 32, 32);
-            for (int i = 0; i < 6; i++) {
+            for (int i = 0; i < 6; ++i) {
                 shader.enable();
                 shader.setUniformMatrix4fv("view", mainTexture.captureViews[i], true);
                 shader.disable();
@@ -329,8 +297,8 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
             textureId = glGenTextures();
             glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
-            for (int i = 0; i < 6; i++) {
-                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 128, 128, 0,
+            for (int i = 0; i < 6; ++i) {
+                glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 512, 512, 0,
                         GL_RGB, GL_FLOAT, (FloatBuffer) null);
             }
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -346,13 +314,13 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             shader.setUniformMatrix4fv("projection", mainTexture.captureProjection, true);
             shader.disable();
 
-            glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_CUBE_MAP, mainTexture.textureId);
-            int maxMipLevels = 5;
-            for (int mip = 0; mip < maxMipLevels; mip++) {
-                int mipWidth = (int) (128 * Math.pow(0.5f, mip));
-                int mipHeight = (int) (128 * Math.pow(0.5f, mip));
+            glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
+            int maxMipLevels = 10;
+            for (int mip = 0; mip < maxMipLevels; ++mip) {
+                int mipWidth = (int) (512 * Math.pow(0.5f, mip));
+                int mipHeight = (int) (512 * Math.pow(0.5f, mip));
                 glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
                 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
                 glViewport(0, 0, mipWidth, mipHeight);
@@ -360,7 +328,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 shader.enable();
                 shader.setUniform1f("roughness", roughness);
                 shader.disable();
-                for (int i = 0; i < 6; i++) {
+                for (int i = 0; i < 6; ++i) {
                     shader.enable();
                     shader.setUniformMatrix4fv("view", mainTexture.captureViews[i], true);
                     shader.disable();
@@ -371,6 +339,65 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 }
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+    }
+
+    static class BDRF extends OxyTexture.AbstractTexture {
+
+        private final HDRTexture mainTexture;
+
+        BDRF(int slot, String path, HDRTexture mainTexture) {
+            super(slot, path);
+            this.mainTexture = mainTexture;
+            allTextures.add(this);
+        }
+
+        final static OxyShader shader = new OxyShader("shaders/OxyBDRF.glsl");
+
+        public void captureFaces(float ts) {
+            textureId = glGenTextures();
+            glBindTexture(GL_TEXTURE_2D, textureId);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RG16F, 512, 512, 0, GL_RG, GL_FLOAT, 0);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
+            glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
+            glViewport(0, 0, 512, 512);
+            OpenGLRendererAPI.clearBuffer();
+            shader.enable();
+            renderQuad();
+            shader.disable();
+//            mainTexture.scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera, shader);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+
+        //TODO: Rendering 2D
+        private void renderQuad() {
+            float[] quadVertices = {
+                    -1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+                    -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+                    1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
+                    1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+            };
+            // setup plane VAO
+            int quadVAO = glGenVertexArrays();
+            int quadVBO = glGenBuffers();
+            glBindVertexArray(quadVAO);
+            glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+            glBufferData(GL_ARRAY_BUFFER, quadVertices, GL_STATIC_DRAW);
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, false, 5 * Float.BYTES, 0);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 2, GL_FLOAT, false, 5 * Float.BYTES, 3 * Float.BYTES);
+            glBindVertexArray(quadVAO);
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            glBindVertexArray(0);
         }
     }
 

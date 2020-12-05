@@ -172,7 +172,7 @@ void beginPBR(vec3 norm, vec3 lightPos, vec3 viewDir, vec3 vertexPos, vec2 texCo
     }
 
     vec3 irradiance = texture(irradianceMap, norm).rgb;
-    if(irradiance.rgb != vec3(0.0f, 0.0f, 0.0f)){ //the scene isn't black (has env map)
+    if(irradiance.rgb != vec3(0.0f, 0.0f, 0.0f)){ //the scene has env map
         vec3 F0 = vec3(0.04);
         F0 = mix(F0, albedo, metallicMap);
         vec3 Lo = calcPBR(lightPos, diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);

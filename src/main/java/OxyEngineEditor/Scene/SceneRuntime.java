@@ -32,7 +32,6 @@ public final class SceneRuntime {
 
         }
 
-        @SuppressWarnings("SuspiciousNameCombination")
         @Override
         public void renderPanel() {
             ImGui.pushStyleColor(ImGuiCol.Button, 36, 36, 36, 0);
