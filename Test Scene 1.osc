@@ -12,7 +12,7 @@ Registry {
        	Mesh Position: 0
        	Name: Light Cube
        	Grouped: false
-       	Emitting: true
+       	Emitting: true, PointLight
        	Position: X -11.150001, Y -6.999989, Z 0.0
        	Rotation: X 0.0, Y 0.0, Z 0.0
        	Scale: X 0.5, Y 0.5, Z 0.5
@@ -36,7 +36,7 @@ Registry {
        	Mesh Position: 0
        	Name: Light Cube 2
        	Grouped: false
-       	Emitting: true
+       	Emitting: true, PointLight
        	Position: X 0.0, Y -15.0, Z 0.0
        	Rotation: X 0.0, Y 0.0, Z 0.0
        	Scale: X 0.5, Y 0.5, Z 0.5

@@ -203,13 +203,13 @@ void beginPBR(vec3 norm, vec3 lightPos, vec3 viewDir, vec3 vertexPos, vec2 texCo
 
 void calcDirectionalLightImpl(DirectionalLight d_Light){
     vec3 vertexPos = inVar.vertexPos;
-    vec3 lightPos = d_Light.position;
+    vec3 lightPos = vec3(0.0f);
     vec3 cameraPosVec3 = cameraPos;
     vec2 texCoordsOut = inVar.texCoordsOut;
 
     if(normalMapSlot != 0){
         vertexPos = inVar.TBN * inVar.vertexPos;
-        lightPos = inVar.TBN * d_Light.position;
+        //lightPos = inVar.TBN * d_Light.position;
         cameraPosVec3 = inVar.TBN * cameraPos;
     }
 

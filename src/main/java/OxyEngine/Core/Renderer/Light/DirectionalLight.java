@@ -24,7 +24,7 @@ public class DirectionalLight extends Light {
         shader.enable();
         shader.setUniform1f("currentLightIndex", 1);
         shader.setUniformVec3("d_Light.position", e.get(TransformComponent.class).position);
-        shader.setUniformVec3("d_Light.direction", e.get(TransformComponent.class).rotation);
+        shader.setUniformVec3("d_Light.direction", new Vector3f(e.get(TransformComponent.class).rotation).mul((float) (180 / Math.PI)));
 //        shader.setUniformVec3("d_Light.ambient", ambient);
 //        shader.setUniformVec3("d_Light.specular", specular);
         shader.setUniformVec3("d_Light.diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));

@@ -1,17 +1,18 @@
 package OxyEngineEditor.Scene;
 
+import OxyEngine.Components.*;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Events.OxyEventListener;
-import OxyEngine.Components.EntityComponent;
-import OxyEngine.Components.EntitySerializationInfo;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngine.Components.TransformComponent;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
 import OxyEngineEditor.UI.Panels.GUIProperty;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static OxyEngine.System.OxyEventSystem.eventDispatcher;
@@ -24,7 +25,7 @@ import static OxyEngine.Tools.Globals.toPrimitiveInteger;
                \tMesh Position: %s
                \tName: %s
                \tGrouped: %s
-               \tEmitting: %s
+               \tEmitting: %s%s
                \tPosition: X %s, Y %s, Z %s
                \tRotation: X %s, Y %s, Z %s
                \tScale: X %s, Y %s, Z %s
@@ -205,6 +206,65 @@ public abstract class OxyEntity {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public String dump(int ptr) {
+        int meshPos = -1;
+        String tag = "null";
+        String grouped = "false";
+        StringBuilder scripts = new StringBuilder("[\n");
+        TransformComponent transform = get(TransformComponent.class);
+        Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
+        String albedoColor = "null";
+        String albedoTexture = "null";
+        String normalTexture = "null", normalTextureStrength = "0";
+        String roughnessTexture = "null", roughnessTextureStrength = "0";
+        String metallicTexture = "null", metalnessTextureStrength = "0";
+        String aoTexture = "null", aoTextureStrength = "0";
+        String mesh = "null";
+        String id = get(UUIDComponent.class).getUUIDString();
+        boolean emitting = false;
+
+        if (has(BoundingBoxComponent.class)) {
+            minBound = get(BoundingBoxComponent.class).min();
+            maxBound = get(BoundingBoxComponent.class).max();
+        }
+        if (has(TagComponent.class)) tag = get(TagComponent.class).tag();
+        if (has(MeshPosition.class)) meshPos = get(MeshPosition.class).meshPos();
+        if (has(EntitySerializationInfo.class)) grouped = String.valueOf(get(EntitySerializationInfo.class).grouped());
+        if (has(OxyMaterial.class)) {
+            OxyMaterial m = get(OxyMaterial.class);
+            if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
+            if (m.albedoTexture != null) albedoTexture = m.albedoTexture.getPath();
+            if (m.normalTexture != null) normalTexture = m.normalTexture.getPath();
+            else normalTextureStrength = String.valueOf(m.normalStrength[0]);
+            if (m.roughnessTexture != null) roughnessTexture = m.roughnessTexture.getPath();
+            else roughnessTextureStrength = String.valueOf(m.roughness[0]);
+            if (m.metallicTexture != null) metallicTexture = m.metallicTexture.getPath();
+            else metalnessTextureStrength = String.valueOf(m.metalness[0]);
+            if (m.aoTexture != null) aoTexture = m.aoTexture.getPath();
+            else aoTextureStrength = String.valueOf(m.aoStrength[0]);
+        }
+        if (has(ModelMesh.class)) mesh = get(ModelMesh.class).getPath();
+        if (has(Light.class)) emitting = true;
+
+        int size = getScripts().size();
+        if (size == 0) scripts.replace(0, scripts.length(), "[]");
+        else {
+            for (OxyScript c : getScripts()) {
+                scripts.append("\t\t\t").append(c.getPath()).append("\n");
+            }
+            scripts.append("\t\t").append("]");
+        }
+
+        OxySerializable objInfo = getClass().getAnnotation(OxySerializable.class);
+        return objInfo.info().formatted("OxyModel", ptr, id, meshPos, tag, grouped, emitting, emitting ? ", " + get(Light.class).getClass().getSimpleName() : "",
+                transform.position.x, transform.position.y, transform.position.z,
+                transform.rotation.x, transform.rotation.y, transform.rotation.z,
+                transform.scale.x, transform.scale.y, transform.scale.z,
+                minBound.x, minBound.y, minBound.z, maxBound.x, maxBound.y, maxBound.z,
+                albedoColor, scripts.toString(), albedoTexture, normalTexture, normalTextureStrength,
+                roughnessTexture, roughnessTextureStrength, aoTexture, aoTextureStrength, metallicTexture, metalnessTextureStrength, mesh).trim();
     }
 
     public List<OxyScript> getScripts() {
