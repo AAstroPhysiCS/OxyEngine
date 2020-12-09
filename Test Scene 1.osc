@@ -81,7 +81,7 @@ Registry [
 		ID: e56437c7-53ad-4dc9-93b3-6351c79d20e3
 		Mesh Position: 0
 		Name: Cube
-		Grouped: true
+		Grouped: false
 		Emitting: false
 		Emitting Type: null
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -107,7 +107,7 @@ Registry [
 		ID: 1d4fd892-372e-4fd8-9de8-71a30852efa5
 		Mesh Position: 1
 		Name: Cube.001
-		Grouped: true
+		Grouped: false
 		Emitting: false
 		Emitting Type: null
 		Position: ( 0.000E+0 -3.000E+0  6.470E+0)
@@ -133,7 +133,7 @@ Registry [
 		ID: d38dbd9e-3f9c-406c-8402-29d19f349c32
 		Mesh Position: 2
 		Name: Sphere
-		Grouped: true
+		Grouped: false
 		Emitting: false
 		Emitting Type: null
 		Position: ( 0.000E+0 -3.000E+0  0.000E+0)
@@ -159,7 +159,7 @@ Registry [
 		ID: 1a87c4ca-49b2-43c2-97a0-8a645d52ab89
 		Mesh Position: 3
 		Name: Cone
-		Grouped: true
+		Grouped: false
 		Emitting: false
 		Emitting Type: null
 		Position: ( 0.000E+0 -3.139E+0 -6.000E+0)
@@ -185,7 +185,7 @@ Registry [
 		ID: 450428ea-1ad5-41ee-8e74-04d3765b160f
 		Mesh Position: 4
 		Name: Cube.002
-		Grouped: true
+		Grouped: false
 		Emitting: false
 		Emitting Type: null
 		Position: ( 1.110E+1 -4.322E+0 -9.662E-2)
@@ -207,6 +207,84 @@ Registry [
 		Script: {
 		}
 	}
+	OxyModel 8: {
+		ID: 4a5c2f09-1609-44db-8ff0-0d76afba8b9f
+		Mesh Position: 0
+		Name: Gun
+		Grouped: false
+		Emitting: false
+		Emitting Type: null
+		Position: (-1.103E-1 -4.631E-1 -1.620E+1)
+		Rotation: ( 3.100E+0  0.000E+0  0.000E+0)
+		Scale: ( 2.100E+0  2.100E+0  2.100E+0)
+		Bounds Min: ( 4.817E+0  3.033E+0  6.684E-1)
+		Bounds Max: ( 4.817E+0  3.033E+0  6.684E-1)
+		Color: [0.8, 0.8, 0.8, 1.0]
+		Albedo Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_BaseColor.png
+		Normal Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Normal.png
+		Normal Map Strength: 1.111
+		Roughness Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Roughness.png
+		Roughness Map Strength: 0.0
+		AO Map Texture: C:\Users\okang\Desktop\rustediron1-alt2-bl\rustediron1-alt2-bl\ao.png
+		AO Map Strength: 0.0
+		Metallic Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Metallic.png
+		Metallic Map Strength: 0.0
+		Mesh: C:\Users\okang\Desktop\colt-m1911\source\colt low polyfbx.fbx
+		Script: {
+		}
+	}
+	OxyModel 9: {
+		ID: 4a5c2f09-1609-44db-8ff0-0d76afba8b9f
+		Mesh Position: 0
+		Name: Gun
+		Grouped: false
+		Emitting: false
+		Emitting Type: null
+		Position: (-5.587E+0 -9.725E-1  1.865E+1)
+		Rotation: ( 3.100E+0  0.000E+0  0.000E+0)
+		Scale: ( 2.100E+0  2.100E+0  2.100E+0)
+		Bounds Min: ( 4.817E+0  3.033E+0  6.684E-1)
+		Bounds Max: ( 4.817E+0  3.033E+0  6.684E-1)
+		Color: [0.8, 0.8, 0.8, 1.0]
+		Albedo Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_BaseColor.png
+		Normal Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Normal.png
+		Normal Map Strength: 1.057
+		Roughness Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Roughness.png
+		Roughness Map Strength: 0.0
+		AO Map Texture: C:\Users\okang\Desktop\rustediron1-alt2-bl\rustediron1-alt2-bl\ao.png
+		AO Map Strength: 0.0
+		Metallic Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Metallic.png
+		Metallic Map Strength: 0.0
+		Mesh: C:\Users\okang\Desktop\colt-m1911\source\colt low polyfbx.fbx
+		Script: {
+		}
+	}
+	OxyModel 10: {
+		ID: 111d7aac-1ab3-48ee-8962-9de747d46547
+		Mesh Position: 0
+		Name: Revolver
+		Grouped: false
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0 -1.670E+1  0.000E+0)
+		Rotation: ( 1.500E+0  0.000E+0  1.500E+0)
+		Scale: ( 2.000E-1  2.000E-1  2.000E-1)
+		Bounds Min: ( 1.626E+1  7.805E+1  3.299E+1)
+		Bounds Max: ( 1.626E+1  7.805E+1  3.299E+1)
+		Color: [0.5882353, 0.5882353, 0.5882353, 1.0]
+		Albedo Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_A.tga
+		Normal Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_N.tga
+		Normal Map Strength: 1.057
+		Roughness Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_R.tga
+		Roughness Map Strength: 0.0
+		AO Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Raw\Cerberus_AO.tga
+		AO Map Strength: 0.0
+		Metallic Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_M.tga
+		Metallic Map Strength: 0.0
+		Mesh: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Cerberus_LP.FBX
+		Script: {
+		}
+	}
 ]
 Scene: {
 	Scene Name: Test Scene 1
@@ -214,6 +292,6 @@ Scene: {
 Environment: {
 	Environment Map: C:\Users\okang\Desktop\pink_sunrise_4k.hdr
 	Environment Gamma Strength: 2.2
-	Environment LOD: 0.0
+	Environment LOD: 1.632
 	Environment Exposure: 1.0
 }

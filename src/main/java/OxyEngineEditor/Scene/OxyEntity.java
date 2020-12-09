@@ -210,13 +210,13 @@ public abstract class OxyEntity {
             if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
             if (m.albedoTexture != null) albedoTexture = m.albedoTexture.getPath();
             if (m.normalTexture != null) normalTexture = m.normalTexture.getPath();
-            else normalTextureStrength = String.valueOf(m.normalStrength[0]);
+            normalTextureStrength = String.valueOf(m.normalStrength[0]);
             if (m.roughnessTexture != null) roughnessTexture = m.roughnessTexture.getPath();
-            else roughnessTextureStrength = String.valueOf(m.roughness[0]);
+            roughnessTextureStrength = String.valueOf(m.roughness[0]);
             if (m.metallicTexture != null) metallicTexture = m.metallicTexture.getPath();
-            else metalnessTextureStrength = String.valueOf(m.metalness[0]);
+            metalnessTextureStrength = String.valueOf(m.metalness[0]);
             if (m.aoTexture != null) aoTexture = m.aoTexture.getPath();
-            else aoTextureStrength = String.valueOf(m.aoStrength[0]);
+            aoTextureStrength = String.valueOf(m.aoStrength[0]);
         }
         if (has(ModelMesh.class)) mesh = get(ModelMesh.class).getPath();
         if (has(Light.class)) emitting = true;

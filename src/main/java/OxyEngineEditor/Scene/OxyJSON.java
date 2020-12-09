@@ -243,12 +243,11 @@ public class OxyJSON {
         public void writeAndCloseStream() {
             try {
                 writer.write(builder.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
                 writer.flush();
                 writer.close();
+                builder.setLength(0);
+                oxyJSONArrays.clear();
+                oxyJSONSingleObjects.clear();
             } catch (IOException e) {
                 e.printStackTrace();
             }

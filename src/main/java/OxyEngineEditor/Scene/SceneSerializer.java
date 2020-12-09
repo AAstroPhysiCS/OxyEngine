@@ -63,7 +63,6 @@ public final class SceneSerializer {
     private static final class SceneReader {
 
         public Scene readScene(String path, SceneLayer layer, OxyShader shader) {
-//            if (loadedS == null) return SceneRuntime.ACTIVE_SCENE;
             SceneRuntime.dispose();
 
             var modelsJSON = new OxyJSON.OxyJSONArray();
