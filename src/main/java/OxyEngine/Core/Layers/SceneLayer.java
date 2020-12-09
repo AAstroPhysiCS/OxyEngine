@@ -234,6 +234,7 @@ public class SceneLayer extends Layer {
     }
 
     public void loadHDRTextureToScene(String path) {
+        if(path == null) return;
         if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
         SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, ACTIVE_SCENE);
         SceneLayer.hdrTexture.captureFaces(0);

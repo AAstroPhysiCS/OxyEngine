@@ -2,7 +2,6 @@ package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.OxyEngine;
 
-import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
 import static OxyEngine.System.OxySystem.oxyAssert;

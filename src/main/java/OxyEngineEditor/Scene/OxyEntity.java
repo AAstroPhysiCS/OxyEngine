@@ -19,32 +19,6 @@ import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 import static OxyEngine.Tools.Globals.toPrimitiveFloat;
 import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 
-@OxySerializable(info = """
-        \t\t%s %s {
-               \tID: %s
-               \tMesh Position: %s
-               \tName: %s
-               \tGrouped: %s
-               \tEmitting: %s%s
-               \tPosition: X %s, Y %s, Z %s
-               \tRotation: X %s, Y %s, Z %s
-               \tScale: X %s, Y %s, Z %s
-               \tBounds Min: X %s, Y %s, Z %s
-               \tBounds Max: X %s, Y %s, Z %s
-               \tColor: %s
-               \tScripts: %s
-               \tAlbedo Texture: %s
-               \tNormal Map Texture: %s
-               \tNormal Map Strength: %s
-               \tRoughness Map Texture: %s
-               \tRoughness Map Strength: %s
-               \tAO Map Texture: %s
-               \tAO Map Strength: %s
-               \tMetallic Map Texture: %s
-               \tMetallic Map Strength: %s
-               \tMesh: %s
-            }"""
-)
 public abstract class OxyEntity {
 
     private final List<OxyScript> scripts = new ArrayList<>();
@@ -208,11 +182,10 @@ public abstract class OxyEntity {
         return null;
     }
 
-    public String dump(int ptr) {
+    public void dump(int i, OxyJSON.OxyJSONArray arr) {
         int meshPos = -1;
         String tag = "null";
         String grouped = "false";
-        StringBuilder scripts = new StringBuilder("[\n");
         TransformComponent transform = get(TransformComponent.class);
         Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
         String albedoColor = "null";
@@ -248,23 +221,31 @@ public abstract class OxyEntity {
         if (has(ModelMesh.class)) mesh = get(ModelMesh.class).getPath();
         if (has(Light.class)) emitting = true;
 
-        int size = getScripts().size();
-        if (size == 0) scripts.replace(0, scripts.length(), "[]");
-        else {
-            for (OxyScript c : getScripts()) {
-                scripts.append("\t\t\t").append(c.getPath()).append("\n");
-            }
-            scripts.append("\t\t").append("]");
-        }
-
-        OxySerializable objInfo = getClass().getAnnotation(OxySerializable.class);
-        return objInfo.info().formatted("OxyModel", ptr, id, meshPos, tag, grouped, emitting, emitting ? ", " + get(Light.class).getClass().getSimpleName() : "",
-                transform.position.x, transform.position.y, transform.position.z,
-                transform.rotation.x, transform.rotation.y, transform.rotation.z,
-                transform.scale.x, transform.scale.y, transform.scale.z,
-                minBound.x, minBound.y, minBound.z, maxBound.x, maxBound.y, maxBound.z,
-                albedoColor, scripts.toString(), albedoTexture, normalTexture, normalTextureStrength,
-                roughnessTexture, roughnessTextureStrength, aoTexture, aoTextureStrength, metallicTexture, metalnessTextureStrength, mesh).trim();
+        var obj = arr.createOxyJSONObject("OxyModel " + i)
+                .putField("ID", id)
+                .putField("Mesh Position", String.valueOf(meshPos))
+                .putField("Name", tag)
+                .putField("Grouped", grouped)
+                .putField("Emitting", String.valueOf(emitting))
+                .putField("Emitting Type", emitting ? get(Light.class).getClass().getSimpleName() : "null")
+                .putField("Position", transform.position.toString())
+                .putField("Rotation", transform.rotation.toString())
+                .putField("Scale", transform.scale.toString())
+                .putField("Bounds Min", minBound.toString())
+                .putField("Bounds Max", maxBound.toString())
+                .putField("Color", albedoColor)
+                .putField("Albedo Texture", albedoTexture)
+                .putField("Normal Map Texture", normalTexture)
+                .putField("Normal Map Strength", normalTextureStrength)
+                .putField("Roughness Map Texture", roughnessTexture)
+                .putField("Roughness Map Strength", roughnessTextureStrength)
+                .putField("AO Map Texture", aoTexture)
+                .putField("AO Map Strength", aoTextureStrength)
+                .putField("Metallic Map Texture", metallicTexture)
+                .putField("Metallic Map Strength", metalnessTextureStrength)
+                .putField("Mesh", mesh)
+                .createInnerObject("Script");
+        for(var scripts : getScripts()) obj.putField("Path", scripts.getPath());
     }
 
     public List<OxyScript> getScripts() {

@@ -19,18 +19,6 @@ import java.util.stream.Stream;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-@OxySerializable(info = """
-        Scene Name: %s
-        Environment {
-        \tEnvironment Map: %s
-        \tEnvironment Gamma Strength: %s
-        \tEnvironment LOD: %s
-        \tEnvironment Exposure: %s
-        }
-        Registry {
-        \tObject count: %s
-        """
-)
 public final class Scene implements OxyDisposable {
 
     private final Registry registry = new Registry();

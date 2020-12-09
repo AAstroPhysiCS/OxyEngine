@@ -1,7 +1,5 @@
 package OxyEngine.Core.Threading;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class OxySubThread {
 
     private Thread worker;

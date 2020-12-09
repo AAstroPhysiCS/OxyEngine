@@ -69,9 +69,11 @@ public class ToolbarPanel extends Panel {
                 }
                 if (ImGui.menuItem("Open a scene", "Ctrl+O")) {
                     String openScene = openDialog(extensionName, null);
-                    SceneRuntime.ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, sceneLayer, shader);
-                    gizmoLayer.build();
-                    sceneLayer.build();
+                    if(openScene != null) {
+                        SceneRuntime.ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, sceneLayer, shader);
+                        gizmoLayer.build();
+                        sceneLayer.build();
+                    }
                 }
                 if (ImGui.menuItem("Save the scene", "Ctrl+S")) {
                     SceneSerializer.serializeScene(SceneRuntime.ACTIVE_SCENE.getSceneName() + fileExtension);

@@ -2,15 +2,8 @@ package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Camera.Controller.OxyCameraController;
 import OxyEngine.Components.EntityComponent;
-import OxyEngineEditor.Scene.OxySerializable;
 import org.joml.Matrix4f;
 
-@OxySerializable(info = """
-        \t\t%s %s {
-               \tPosition: X %s, Y %s, Z %s
-               \tRotation: X %s, Y %s, Z %s
-            }"""
-)
 public abstract class OxyCamera implements EntityComponent {
 
     protected final boolean transpose;
