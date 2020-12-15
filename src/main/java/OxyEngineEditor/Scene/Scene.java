@@ -45,12 +45,12 @@ public final class Scene implements OxyDisposable {
 
     public final OxyNativeObject createNativeObjectEntity(int size) {
         OxyNativeObject e = new OxyNativeObject(this, size);
+        e.importedFromFile = false;
         put(e);
         e.addComponent(
                 new TransformComponent(),
                 new SelectedComponent(false),
                 new RenderableComponent(RenderingMode.Normal),
-                new EntitySerializationInfo(false, false),
                 new UUIDComponent(UUID.randomUUID())
         );
         return e;
@@ -74,6 +74,7 @@ public final class Scene implements OxyDisposable {
 
     public final OxyModel createEmptyModel(OxyShader shader) {
         OxyModel e = new OxyModel(this);
+        e.importedFromFile = false;
         put(e);
         e.originPos = new Vector3f(0, 0, 0);
         e.addComponent(
@@ -83,7 +84,6 @@ public final class Scene implements OxyDisposable {
                 new TagComponent("Empty Entity"),
                 new MeshPosition(0),
                 new RenderableComponent(RenderingMode.Normal),
-                new EntitySerializationInfo(false, false),
                 new SelectedComponent(false)
         );
         return e;
@@ -96,6 +96,7 @@ public final class Scene implements OxyDisposable {
         int pos = 0;
         for (OxyModelLoader.AssimpOxyMesh assimpMesh : loader.meshes) {
             OxyModel e = new OxyModel(this);
+            e.importedFromFile = importedFromFile;
             put(e);
             e.originPos = new Vector3f(assimpMesh.pos);
             e.addComponent(
@@ -110,7 +111,6 @@ public final class Scene implements OxyDisposable {
                     new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                     new MeshPosition(pos),
                     new RenderableComponent(RenderingMode.Normal),
-                    new EntitySerializationInfo(true, importedFromFile),
                     assimpMesh.material
             );
             e.initData(path);
@@ -135,6 +135,7 @@ public final class Scene implements OxyDisposable {
         }
         OxyModelLoader.AssimpOxyMesh assimpMesh = cachedLoader.meshes.get(i);
         OxyModel e = new OxyModel(this);
+        e.importedFromFile = importedFromFile;
         put(e);
         e.originPos = new Vector3f(assimpMesh.pos);
         e.addComponent(
@@ -149,7 +150,6 @@ public final class Scene implements OxyDisposable {
                 new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                 new MeshPosition(i),
                 new RenderableComponent(RenderingMode.Normal),
-                new EntitySerializationInfo(false, importedFromFile),
                 assimpMesh.material
         );
         e.initData(path);

@@ -1,10 +1,10 @@
 package OxyEngineEditor.Scene.Objects.Model;
 
+import OxyEngine.Components.*;
 import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
 import OxyEngine.Core.Renderer.Buffer.Mesh;
 import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Components.*;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import org.joml.Matrix4f;
@@ -38,6 +38,7 @@ public class OxyModel extends OxyEntity {
         e.addToScene();
         var boundingBox = get(BoundingBoxComponent.class);
         var transform = get(TransformComponent.class);
+        e.importedFromFile = this.importedFromFile;
         e.addComponent(
                 get(UUIDComponent.class),
                 get(ModelFactory.class),
@@ -51,8 +52,7 @@ public class OxyModel extends OxyEntity {
                 new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),
                 new RenderableComponent(RenderingMode.Normal),
                 new OxyMaterial(get(OxyMaterial.class)),
-                new SelectedComponent(false),
-                new EntitySerializationInfo(get(EntitySerializationInfo.class))
+                new SelectedComponent(false)
         );
         e.initData(get(Mesh.class).getPath());
         return e;

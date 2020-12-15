@@ -37,6 +37,8 @@ public class SceneLayer extends Layer {
     static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
     public static HDRTexture hdrTexture;
 
+    private PerspectiveCamera mainCamera;
+
     @Override
     public void build() {
         cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMesh.class);
@@ -54,6 +56,7 @@ public class SceneLayer extends Layer {
     @Override
     public void rebuild() {
         allModelEntities = ACTIVE_SCENE.view(ModelMesh.class);
+        cachedLightEntities = ACTIVE_SCENE.view(Light.class);
 //        cachedNativeMeshes = scene.view(NativeObjectMesh.class);
 
         //Prep
@@ -107,6 +110,22 @@ public class SceneLayer extends Layer {
         ACTIVE_SCENE.getOxyUISystem().dispatchNativeEvents();
         ACTIVE_SCENE.getOxyUISystem().updateImGuiContext(ts);
 
+        //Camera
+        {
+            for (EntityComponent camera : cachedCameraComponents) {
+                if (camera instanceof PerspectiveCamera p) {
+                    if (p.isPrimary()) {
+                        mainCamera = p;
+                        SceneRuntime.currentBoundedCamera = mainCamera;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(mainCamera != null) mainCamera.finalizeCamera(ts);
+
+        //Lights
         int i = 0;
         for (OxyEntity e : cachedLightEntities) {
             Light l = e.get(Light.class);
@@ -131,20 +150,6 @@ public class SceneLayer extends Layer {
         ACTIVE_SCENE.getFrameBuffer().bind();
         OpenGLRendererAPI.clearBuffer();
         OpenGLRendererAPI.clearColor(32, 32, 32, 1.0f);
-
-        //Camera
-        PerspectiveCamera mainCamera = null;
-        {
-            for (EntityComponent camera : cachedCameraComponents) {
-                if (camera instanceof PerspectiveCamera p) {
-                    if (p.isPrimary()) {
-                        mainCamera = p;
-                        SceneRuntime.currentBoundedCamera = mainCamera;
-                        break;
-                    }
-                }
-            }
-        }
 
         //Rendering
         {

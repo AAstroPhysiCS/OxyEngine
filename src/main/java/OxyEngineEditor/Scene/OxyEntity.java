@@ -30,6 +30,8 @@ public abstract class OxyEntity {
     public Vector3f originPos;
     protected final Scene scene;
 
+    protected boolean importedFromFile;
+
     public OxyEntity(Scene scene) {
         this.scene = scene;
     }
@@ -65,7 +67,7 @@ public abstract class OxyEntity {
             }
             //if someone decides to add a seperate TransformComponent, then validate it
             //if the entity was imported from a oxy scene file, then do not validate it, because it has been already validated.
-            if (c instanceof TransformComponent t && !get(EntitySerializationInfo.class).imported()) {
+            if (c instanceof TransformComponent t && !importedFromFile) {
                 t.validate(this);
             }
         }
@@ -79,7 +81,7 @@ public abstract class OxyEntity {
             }
             //if someone decides to add a seperate TransformComponent, then validate it
             //if the entity was imported from a oxy scene file, then do not validate it, because it has been already validated.
-            if (c instanceof TransformComponent t && !get(EntitySerializationInfo.class).imported()) {
+            if (c instanceof TransformComponent t) {
                 t.validate(this);
             }
         }
@@ -185,7 +187,6 @@ public abstract class OxyEntity {
     public void dump(int i, OxyJSON.OxyJSONArray arr) {
         int meshPos = -1;
         String tag = "null";
-        String grouped = "false";
         TransformComponent transform = get(TransformComponent.class);
         Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
         String albedoColor = "null";
@@ -204,7 +205,6 @@ public abstract class OxyEntity {
         }
         if (has(TagComponent.class)) tag = get(TagComponent.class).tag();
         if (has(MeshPosition.class)) meshPos = get(MeshPosition.class).meshPos();
-        if (has(EntitySerializationInfo.class)) grouped = String.valueOf(get(EntitySerializationInfo.class).grouped());
         if (has(OxyMaterial.class)) {
             OxyMaterial m = get(OxyMaterial.class);
             if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
@@ -225,7 +225,6 @@ public abstract class OxyEntity {
                 .putField("ID", id)
                 .putField("Mesh Position", String.valueOf(meshPos))
                 .putField("Name", tag)
-                .putField("Grouped", grouped)
                 .putField("Emitting", String.valueOf(emitting))
                 .putField("Emitting Type", emitting ? get(Light.class).getClass().getSimpleName() : "null")
                 .putField("Position", transform.position.toString())

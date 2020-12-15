@@ -63,7 +63,7 @@ public class ToolbarPanel extends Panel {
                         scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
                     }
                     SceneRuntime.ACTIVE_SCENE = scene;
-                    SceneLayer.hdrTexture.dispose();
+                    if(SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
                     gizmoLayer.build();
                     sceneLayer.build();
                 }

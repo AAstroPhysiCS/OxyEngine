@@ -1,11 +1,11 @@
 package OxyEngineEditor.UI.Panels;
 
+import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngine.Components.*;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
@@ -150,19 +150,21 @@ public class PropertiesPanel extends Panel {
                 ImGui.endMenu();
             }
             if (ImGui.beginMenu("Light")) {
-                if(ImGui.menuItem("Point Light")){
-                    if(!entityContext.has(Light.class)){
+                if (ImGui.menuItem("Point Light")) {
+                    if (!entityContext.has(Light.class)) {
                         PointLight pointLight = new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f);
-                        entityContext.addComponent(pointLight);
+                        entityContext.addComponent(pointLight, new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
                         entityContext.getGUIProperties().add(PointLight.guiNode);
+                        sceneLayer.rebuild();
                     }
                     //error or hint that lights are single instanced. TODO
                 }
-                if(ImGui.menuItem("Directional Light")){
-                    if(!entityContext.has(Light.class)){
+                if (ImGui.menuItem("Directional Light")) {
+                    if (!entityContext.has(Light.class)) {
                         DirectionalLight directionalLight = new DirectionalLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f));
-                        entityContext.addComponent(directionalLight);
+                        entityContext.addComponent(directionalLight, new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
                         entityContext.getGUIProperties().add(DirectionalLight.guiNode);
+                        sceneLayer.rebuild();
                     }
                     //error or hint that lights are single instanced. TODO
                 }

@@ -1,7 +1,6 @@
 package OxyEngineEditor;
 
 import OxyEngine.Components.PerspectiveCamera;
-import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Layers.GizmoLayer;
@@ -9,9 +8,6 @@ import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Layers.OverlayPanelLayer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
-import OxyEngine.Core.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Renderer.Light.Light;
-import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -22,7 +18,6 @@ import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxyEventSystem;
 import OxyEngine.System.OxyUISystem;
-import OxyEngineEditor.Scene.Objects.Model.ModelType;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
@@ -61,20 +56,14 @@ public class EditorApplication extends OxyApplication {
         PerspectiveCamera camera = new PerspectiveCamera(true, Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
         editorCameraEntity.addComponent(camera, new TagComponent("Editor Camera"));
 
-        OxyModel m = scene.createModelEntity(ModelType.Sphere, oxyShader);
-        Light pointLightComponent = new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f);
-        m.addComponent(pointLightComponent, new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
-        m.constructData();
+        OxyModel m = scene.createEmptyModel(oxyShader);
+        m.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new TagComponent("Point Light"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
 
-        OxyModel m2 = scene.createModelEntity(ModelType.Sphere, oxyShader);
-        Light pointLightComponent2 = new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f);
-        m2.addComponent(pointLightComponent2, new TransformComponent(new Vector3f(0, -30, 0), 0.5f), new SelectedComponent(false), new TagComponent("Light Cube 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
-        m2.constructData();
+        OxyModel m2 = scene.createEmptyModel(oxyShader);
+        m2.addComponent(new TransformComponent(new Vector3f(0, -30, 0), 0.5f), new TagComponent("Point Light 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
 
-        OxyModel directionalLightEntity = scene.createModelEntity(ModelType.Cone, oxyShader);
-        Light directionalLightComponent = new DirectionalLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f));
-        directionalLightEntity.addComponent(oxyShader, directionalLightComponent, new TransformComponent(new Vector3f(-12.5f, -7.5f, 14.9f), new Vector3f(42.4f, -20.9f, -37.9f)), new SelectedComponent(false));
-        directionalLightEntity.constructData();
+        OxyModel directionalLightEntity = scene.createEmptyModel(oxyShader);
+        directionalLightEntity.addComponent(oxyShader, new TagComponent("Directional Light"), new TransformComponent(new Vector3f(-12.5f, -7.5f, 14.9f)));
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;

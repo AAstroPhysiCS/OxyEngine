@@ -122,7 +122,12 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 vec3 Lo = vec3(0.0);
 vec3 calcPBR(vec3 lightPos, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic, float attenuation){
      //calculate per-light radiance
-     vec3 L = normalize(lightPos - vertexPos);
+     vec3 L;
+     if(lightPos.xyz == vec3(0.0f)){
+        L = normalize(-d_Light.direction);
+     } else {
+        L = normalize(lightPos - vertexPos);
+     }
      vec3 H = normalize(V + L);
      vec3 radiance = lightDiffuseColor * attenuation;
 
@@ -161,13 +166,13 @@ void beginPBR(vec3 norm, vec3 lightPos, vec3 viewDir, vec3 vertexPos, vec2 texCo
     float metallicMap, roughnessMap, aoMap;
 
     if (int(round(inVar.textureSlotOut)) == 0){ //color
-        albedo = pow(vec3(material.diffuse), vec3(2.2));
+        albedo = pow(vec3(material.diffuse), vec3(gamma));
         metallicMap = metallicFloat;
         roughnessMap = roughnessFloat;
         aoMap = aoFloat;
     }
     else { //texture
-        albedo = pow(texture(tex[int(round(inVar.textureSlotOut))], texCoordsOut).rgb, vec3(2.2));
+        albedo = pow(texture(tex[int(round(inVar.textureSlotOut))], texCoordsOut).rgb, vec3(gamma));
         metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
         roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
         aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
@@ -203,7 +208,7 @@ void beginPBR(vec3 norm, vec3 lightPos, vec3 viewDir, vec3 vertexPos, vec2 texCo
 
 void calcDirectionalLightImpl(DirectionalLight d_Light){
     vec3 vertexPos = inVar.vertexPos;
-    vec3 lightPos = vec3(0.0f);
+    //vec3 lightPos = d_Light.position;
     vec3 cameraPosVec3 = cameraPos;
     vec2 texCoordsOut = inVar.texCoordsOut;
 
@@ -230,8 +235,7 @@ void calcDirectionalLightImpl(DirectionalLight d_Light){
     float attenuation = 1.0;
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = d_Light.diffuse * diff;
-
-    beginPBR(norm, lightPos, viewDir, vertexPos, texCoordsOut, attenuation, diffuse);
+    beginPBR(norm, vec3(0.0f), viewDir, vertexPos, texCoordsOut, attenuation, diffuse);
 }
 
 void calcPointLightImpl(PointLight p_Light){

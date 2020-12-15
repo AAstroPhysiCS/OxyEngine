@@ -15,7 +15,6 @@ import imgui.type.ImString;
 import java.util.List;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
-import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
@@ -208,26 +207,17 @@ public class ModelMesh extends Mesh {
                     if (path != null) {
                         if (entityContext != null) {
                             List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path, entityContext.get(OxyShader.class));
-                            boolean isGrouped = true;
-                            boolean exception = false;
-                            if (eList.size() == 1) isGrouped = false;
-                            if (eList.size() == 0) {
-                                exception = true;
-                                logger.warning("Could not load the mesh");
-                            }
                             for (OxyModel e : eList) {
                                 TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
-                                e.addComponent(t, new SelectedComponent(true, false), new EntitySerializationInfo(isGrouped, false), entityContext.get(OxyMaterial.class));
+                                e.addComponent(t, new SelectedComponent(true, false), entityContext.get(OxyMaterial.class));
                                 e.getGUIProperties().add(ModelMesh.guiNode);
                                 e.getGUIProperties().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
-                            if (!exception) {
-                                SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
-                                PropertiesPanel.sceneLayer.updateAllModelEntities();
-                                meshPath = new ImString(path);
-                                entityContext = null;
-                            }
+                            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
+                            PropertiesPanel.sceneLayer.updateAllModelEntities();
+                            meshPath = new ImString(path);
+                            entityContext = null;
                         }
                     }
                 }

@@ -129,9 +129,10 @@ public final class SceneSerializer {
                 }
 
                 modelInstance.originPos = new Vector3f(0, 0, 0);
+                modelInstance.importedFromFile = true;
                 modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(position, rot, scale), new OxyMaterial(OxyTexture.loadImage(albedoTPath),
                                 OxyTexture.loadImage(normalMapTPath), OxyTexture.loadImage(roughnessMapTPath), OxyTexture.loadImage(metallicMapTPath), OxyTexture.loadImage(aoMapTPath), new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength),
-                        new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new EntitySerializationInfo(false, true), new BoundingBoxComponent(minB, maxB));
+                        new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new BoundingBoxComponent(minB, maxB));
                 modelInstance.constructData();
 
                 var scripts = models.getInnerObjectByName("Script");
