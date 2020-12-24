@@ -153,14 +153,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         shader.disable();
 
         if (mesh == null) {
-            mesh = new NativeObjectMeshOpenGL.NativeMeshBuilderImpl()
-                    .setShader(shader)
-                    .setMode(GL_TRIANGLES)
-                    .setUsage(BufferLayoutProducer.Usage.STATIC)
-                    .setVerticesBufferAttributes(
-                            new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0)
-                    )
-                    .create();
+            mesh = new NativeObjectMeshOpenGL(shader, GL_TRIANGLES, BufferLayoutProducer.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));
             OxyNativeObject cube = scene.createNativeObjectEntity();
             cube.vertices = skyboxVertices;
             int[] indices = new int[skyboxVertices.length];

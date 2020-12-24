@@ -24,12 +24,69 @@ import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class ModelMeshOpenGL extends OpenGLMesh {
 
+    public static final BufferLayoutAttributes attributeVert = new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0);
+    public static final BufferLayoutAttributes attributeTXSlot = new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
+
+    private static final BufferLayoutAttributes attributeTXCoords = new BufferLayoutAttributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0);
+
+    private static final BufferLayoutAttributes attributeNormals = new BufferLayoutAttributes(OxyShader.NORMALS, 3, GL_FLOAT, false, 0, 0);
+
+    private static final BufferLayoutAttributes attributeTangent = new BufferLayoutAttributes(OxyShader.TANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
+    private static final BufferLayoutAttributes attributeBiTangent = new BufferLayoutAttributes(OxyShader.BITANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
+
     private final String path;
 
-    private ModelMeshOpenGL(String path, OxyShader shader, int mode, BufferLayoutRecord layout) {
+    public ModelMeshOpenGL(String path, OxyShader shader, int mode, BufferLayoutProducer.Usage usage, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
         this.path = path;
         this.shader = shader;
         this.mode = mode;
+
+        assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
+
+        BufferLayoutRecord layout = BufferLayoutProducer.create()
+                .createLayout(VertexBuffer.class)
+                .setStrideSize(4)
+                .setUsage(usage)
+                .setAttribPointer(
+                        attributeVert,
+                        attributeTXSlot
+                )
+                .create()
+                .createLayout(IndexBuffer.class).create()
+                .createLayout(TextureBuffer.class)
+                .setAttribPointer(
+                        attributeTXCoords
+                )
+                .create()
+                .createLayout(NormalsBuffer.class)
+                .setAttribPointer(
+                        attributeNormals
+                )
+                .create()
+                .createLayout(TangentBuffer.class)
+                .setAttribPointer(
+                        attributeTangent,
+                        attributeBiTangent
+                )
+                .create()
+                .finalizeLayout();
+
+        layout.vertexBuffer().setVertices(vertices);
+        layout.indexBuffer().setIndices(indices);
+        layout.textureBuffer().setTextureCoords(textureCoords);
+        layout.normalsBuffer().setNormals(normals);
+
+        float[] biAndTangents = new float[tangents.length + biTangents.length];
+        int tangentPtr = 0, biTangentPtr = 0;
+        for (int i = 0; i < biAndTangents.length; ) {
+            biAndTangents[i++] = tangents[tangentPtr++];
+            biAndTangents[i++] = tangents[tangentPtr++];
+            biAndTangents[i++] = tangents[tangentPtr++];
+            biAndTangents[i++] = biTangents[biTangentPtr++];
+            biAndTangents[i++] = biTangents[biTangentPtr++];
+            biAndTangents[i++] = biTangents[biTangentPtr++];
+        }
+        layout.tangentBuffer().setBiAndTangent(biAndTangents);
 
         vertexBuffer = (OpenGLVertexBuffer) layout.vertexBuffer();
         indexBuffer = (OpenGLIndexBuffer) layout.indexBuffer();
@@ -38,159 +95,13 @@ public class ModelMeshOpenGL extends OpenGLMesh {
         textureBuffer = (OpenGLTextureBuffer) layout.textureBuffer();
     }
 
-    interface ModelMeshBuilder {
-
-        ModelMeshBuilder setShader(OxyShader shader);
-
-        ModelMeshBuilder setVertices(float[] vertices);
-
-        ModelMeshBuilder setIndices(int[] vertices);
-
-        ModelMeshBuilder setTextureCoords(float[] vertices);
-
-        ModelMeshBuilder setNormals(float[] normals);
-
-        ModelMeshBuilder setTangents(float[] tangents);
-
-        ModelMeshBuilder setBiTangents(float[] biTangents);
-
-        ModelMeshBuilder setMode(int mode);
-
-        ModelMeshBuilder setUsage(BufferLayoutProducer.Usage usage);
-
-        ModelMeshBuilder setPath(String path);
-
-        ModelMeshOpenGL create();
-    }
-
-    public static class ModelMeshBuilderImpl implements ModelMeshBuilder {
-
-        private OxyShader shader;
-        private float[] vertices, textureCoords, normals, tangents, biTangents;
-        private int[] indices;
-        private int mode;
-        private BufferLayoutProducer.Usage usage;
-        private String path;
-
-        @Override
-        public ModelMeshBuilderImpl setShader(OxyShader shader) {
-            this.shader = shader;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setVertices(float[] vertices) {
-            this.vertices = vertices;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setIndices(int[] indices) {
-            this.indices = indices;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setTextureCoords(float[] textureCoords) {
-            this.textureCoords = textureCoords;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setNormals(float[] normals) {
-            this.normals = normals;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setTangents(float[] tangents) {
-            this.tangents = tangents;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setBiTangents(float[] biTangents) {
-            this.biTangents = biTangents;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setMode(int mode) {
-            this.mode = mode;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setUsage(BufferLayoutProducer.Usage usage) {
-            this.usage = usage;
-            return this;
-        }
-
-        @Override
-        public ModelMeshBuilderImpl setPath(String path) {
-            this.path = path;
-            return this;
-        }
-
-        @Override
-        public ModelMeshOpenGL create() {
-            assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
-
-            BufferLayoutRecord layout = BufferLayoutProducer.create()
-                    .createLayout(VertexBuffer.class)
-                        .setStrideSize(4)
-                        .setUsage(usage)
-                        .setAttribPointer(
-                                new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0),
-                                new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES)
-                        )
-                        .create()
-                    .createLayout(IndexBuffer.class).create()
-                    .createLayout(TextureBuffer.class)
-                        .setAttribPointer(
-                            new BufferLayoutAttributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0)
-                        )
-                        .create()
-                    .createLayout(NormalsBuffer.class)
-                        .setAttribPointer(
-                            new BufferLayoutAttributes(OxyShader.NORMALS, 3, GL_FLOAT, false, 0, 0)
-                        )
-                        .create()
-                    .createLayout(TangentBuffer.class)
-                        .setAttribPointer(
-                            new BufferLayoutAttributes(OxyShader.TANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 0),
-                            new BufferLayoutAttributes(OxyShader.BITANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES)
-                        )
-                        .create()
-                    .finalizeLayout();
-
-            layout.vertexBuffer().setVertices(vertices);
-            layout.indexBuffer().setIndices(indices);
-            layout.textureBuffer().setTextureCoords(textureCoords);
-            layout.normalsBuffer().setNormals(normals);
-
-            float[] biAndTangents = new float[tangents.length + biTangents.length];
-            int tangentPtr = 0, biTangentPtr = 0;
-            for (int i = 0; i < biAndTangents.length; ) {
-                biAndTangents[i++] = tangents[tangentPtr++];
-                biAndTangents[i++] = tangents[tangentPtr++];
-                biAndTangents[i++] = tangents[tangentPtr++];
-                biAndTangents[i++] = biTangents[biTangentPtr++];
-                biAndTangents[i++] = biTangents[biTangentPtr++];
-                biAndTangents[i++] = biTangents[biTangentPtr++];
-            }
-            layout.tangentBuffer().setBiAndTangent(biAndTangents);
-
-            return new ModelMeshOpenGL(path, shader, mode, layout);
-        }
-    }
-
     private static final boolean initPanel = false;
     private static ImString meshPath = new ImString(0);
     public static final GUINode guiNode = () -> {
         {
             if (ImGui.collapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
-                if (entityContext.has(OpenGLMesh.class)) meshPath = new ImString(entityContext.get(OpenGLMesh.class).getPath());
+                if (entityContext.has(OpenGLMesh.class))
+                    meshPath = new ImString(entityContext.get(OpenGLMesh.class).getPath());
                 else meshPath = new ImString("");
 
                 ImGui.checkbox("Cast Shadows", false);

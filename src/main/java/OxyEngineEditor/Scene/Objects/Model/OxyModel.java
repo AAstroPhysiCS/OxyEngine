@@ -85,18 +85,7 @@ public class OxyModel extends OxyEntity {
         assert factory != null : oxyAssert("Models should have a Model Template");
         translatePos();
         factory.constructData(this);
-        addComponent(new ModelMeshOpenGL.ModelMeshBuilderImpl()
-                .setPath(path)
-                .setShader(get(OxyShader.class))
-                .setMode(GL_TRIANGLES)
-                .setUsage(BufferLayoutProducer.Usage.DYNAMIC)
-                .setVertices(vertices)
-                .setIndices(indices)
-                .setTextureCoords(tcs)
-                .setNormals(normals)
-                .setTangents(tangents)
-                .setBiTangents(biTangents)
-                .create());
+        addComponent(new ModelMeshOpenGL(path, get(OxyShader.class), GL_TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
     }
 
     @Override
@@ -104,7 +93,7 @@ public class OxyModel extends OxyEntity {
         translatePos();
         if (factory == null) return;
         factory.constructData(this);
-        if(has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
+        if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 
     @Override
@@ -112,7 +101,7 @@ public class OxyModel extends OxyEntity {
         translatePos();
         if (factory == null) return;
         factory.updateData(this);
-        if(has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
+        if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 
     private void translatePos() {

@@ -17,11 +17,6 @@ import static org.lwjgl.stb.STBImage.stbi_load;
 public class OxyTexture {
 
     static final List<AbstractTexture> allTextures = new ArrayList<>();
-    public static final int[] slotCounter = new int[32];
-
-    static {
-        Arrays.fill(slotCounter, 0);
-    }
 
     private OxyTexture() {
     }
@@ -48,7 +43,6 @@ public class OxyTexture {
         public void dispose() {
             glDeleteTextures(textureId);
             allTextures.remove(this);
-            if (textureSlot != -1) slotCounter[textureSlot - 1] = 0;
         }
 
         public boolean empty() {
@@ -71,34 +65,20 @@ public class OxyTexture {
     public static ImageTexture loadImage(int slot, String path) {
         if (path == null) return null;
         if (path.equals("null")) return null;
-//        System.out.println(Arrays.toString(slotCounter));
-//        assert slot == -1 || slotCounter[slot] != 0 : oxyAssert("Texture Slot already being used");
         return new ImageTexture(slot, path, null);
     }
 
-    /*public static ImageTexture loadImage(String path) {
-        if (path == null) return null;
-        if (path.equals("null")) return null;
-        return new ImageTexture(getLatestSlot(), path, null);
-    }*/
-
-    /*public static ImageTexture loadImage(String path, float[] tcs) {
-        if (path == null) return null;
-        if (path.equals("null")) return null;
-        return new ImageTexture(getLatestSlot(), path, tcs);
-    }*/
-
     public static ImageTexture loadImage(int slot, String path, float[] tcs) {
         if (path.equals("null")) return null;
-        assert slotCounter[slot] != 0 : oxyAssert("Texture Slot already being used");
+        assert slot > 0 : oxyAssert("Texture Slot already being used");
         return new ImageTexture(slot, path, tcs);
     }
 
-    /*public static CubemapTexture loadCubemap(String path, Scene scene) {
+    public static CubemapTexture loadCubemap(int slot, String path, Scene scene) {
         if (path == null) return null;
         if (path.equals("null")) return null;
-        return new CubemapTexture(getLatestSlot(), path, scene);
-    }*/
+        return new CubemapTexture(slot, path, scene);
+    }
 
     public static HDRTexture loadHDRTexture(String path, Scene scene) {
         HDRTexture hdrTexture = new HDRTexture(6, path, scene);
@@ -128,19 +108,5 @@ public class OxyTexture {
 
     public static void unbindAllTextureSlots() {
         for (int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
-    }
-
-    public static void resetTextureSlots(){
-        Arrays.fill(slotCounter, 0); //resetting slotCounter
-    }
-
-    private static int getLatestSlot() {
-        for (int i = 0; i < slotCounter.length - 1; i++) {
-            if (slotCounter[i] == 0) {
-                slotCounter[i] = 1;
-                return i + 1;
-            }
-        }
-        return -10;
     }
 }

@@ -131,15 +131,7 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
             shader.setUniform1i("skyBoxTexture", textureSlot);
             shader.disable();
 
-            NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL.NativeMeshBuilderImpl()
-                    .setShader(shader)
-                    .setMode(GL_TRIANGLES)
-                    .setUsage(BufferLayoutProducer.Usage.STATIC)
-                    .setVerticesBufferAttributes(
-                            new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0)
-                    )
-                    .create();
-
+            NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL(shader, GL_TRIANGLES, BufferLayoutProducer.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));
             OxyNativeObject cube = scene.createNativeObjectEntity();
             cube.vertices = skyboxVertices;
             int[] indices = new int[skyboxVertices.length];

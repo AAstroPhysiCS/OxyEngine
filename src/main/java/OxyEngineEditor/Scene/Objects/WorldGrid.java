@@ -1,10 +1,9 @@
 package OxyEngineEditor.Scene.Objects;
 
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Native.GridFactory;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
@@ -12,8 +11,8 @@ import OxyEngineEditor.Scene.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL.*;
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL.attributeTXSlot;
+import static OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL.attributeVert;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
 public class WorldGrid {
@@ -24,15 +23,8 @@ public class WorldGrid {
     public WorldGrid(Scene scene, int size) {
         this.scene = scene;
         OxyShader shader = new OxyShader("shaders/OxyGrid.glsl");
-        worldGridMesh = new NativeMeshBuilderImpl()
-                .setShader(shader)
-                .setMode(GL_LINES)
-                .setUsage(BufferLayoutProducer.Usage.STATIC)
-                .setVerticesBufferAttributes(
-                        new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0),
-                        new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES)
-                )
-                .create();
+        worldGridMesh = new NativeObjectMeshOpenGL(shader, GL_LINES, BufferLayoutProducer.Usage.STATIC,
+                attributeVert, attributeTXSlot);
         add(size);
         worldGridMesh.initList();
     }
