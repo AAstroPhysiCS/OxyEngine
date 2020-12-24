@@ -1,8 +1,8 @@
 package OxyEngineEditor.Scene.Objects.Native;
 
-import OxyEngine.Core.Renderer.Buffer.Mesh;
-import OxyEngine.Core.Renderer.RenderingMode;
-import OxyEngine.Components.NativeObjectMesh;
+import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Components.RenderingMode;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Components.RenderableComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Components.UUIDComponent;
@@ -40,15 +40,15 @@ public class OxyNativeObject extends OxyEntity {
 
     @Override
     public void initData(String path) {
-        assert has(NativeObjectFactory.class) && has(Mesh.class) : oxyAssert("Game object need to have a template and a Mesh!");
+        assert has(NativeObjectFactory.class) && has(OpenGLMesh.class) : oxyAssert("Game object need to have a template and a Mesh!");
 
-        Mesh mesh = get(Mesh.class);
+        OpenGLMesh mesh = get(OpenGLMesh.class);
         factory = get(NativeObjectFactory.class);
 
         this.type = factory.type;
         factory.constructData(this, size);
-        assert mesh instanceof NativeObjectMesh : oxyAssert("Native Object needs to have a NativeObjectMesh");
-        factory.initData(this, (NativeObjectMesh) mesh);
+        assert mesh instanceof NativeObjectMeshOpenGL : oxyAssert("Native Object needs to have a NativeObjectMesh");
+        factory.initData(this, (NativeObjectMeshOpenGL) mesh);
     }
 
     @Override

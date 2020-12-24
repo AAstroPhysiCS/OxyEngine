@@ -15,7 +15,8 @@ import OxyEngineEditor.UI.Selector.OxySelectHandler;
 import org.joml.Vector3f;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.UUID;
 
 public final class SceneSerializer {
 
@@ -63,6 +64,7 @@ public final class SceneSerializer {
     private static final class SceneReader {
 
         public Scene readScene(String path, SceneLayer layer, OxyShader shader) {
+            SceneRuntime.stop();
             SceneRuntime.dispose();
 
             var modelsJSON = new OxyJSON.OxyJSONArray();
@@ -96,7 +98,7 @@ public final class SceneSerializer {
             EnvironmentPanel.mipLevelStrength = new float[]{Float.parseFloat(envJSON.getField("Environment LOD").value())};
             EnvironmentPanel.exposure = new float[]{Float.parseFloat(envJSON.getField("Environment Exposure").value())};
 
-            for(var models : modelsJSON.getObjectList()){
+            for (var models : modelsJSON.getObjectList()) {
                 String id = models.getField("ID").value();
                 int meshPos = Integer.parseInt(models.getField("Mesh Position").value());
                 String name = models.getField("Name").value();
@@ -119,24 +121,31 @@ public final class SceneSerializer {
                 float metallicMapStrength = Float.parseFloat(models.getField("Metallic Map Strength").value());
                 String meshPath = models.getField("Mesh").value();
 
-                OxyModel modelInstance = scene.createModelEntity(meshPath, shader, true, meshPos);
-                if(emitting){
+                OxyModel modelInstance;
+                if (!meshPath.equals("null")) {
+                    modelInstance = scene.createModelEntity(meshPath, shader, true, meshPos);
+                } else {
+                    modelInstance = scene.createEmptyModel(shader, true, meshPos);
+                }
+                if (emitting) {
                     if (emittingType.equals(PointLight.class.getSimpleName())) {
                         modelInstance.addComponent(new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f));
-                    } else {
+                        modelInstance.getGUINodes().add(PointLight.guiNode);
+                    } else if (emittingType.equals(DirectionalLight.class.getSimpleName())) {
                         modelInstance.addComponent(new DirectionalLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f)));
+                        modelInstance.getGUINodes().add(DirectionalLight.guiNode);
                     }
                 }
 
                 modelInstance.originPos = new Vector3f(0, 0, 0);
                 modelInstance.importedFromFile = true;
-                modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(position, rot, scale), new OxyMaterial(OxyTexture.loadImage(albedoTPath),
-                                OxyTexture.loadImage(normalMapTPath), OxyTexture.loadImage(roughnessMapTPath), OxyTexture.loadImage(metallicMapTPath), OxyTexture.loadImage(aoMapTPath), new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength),
+                modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(position, rot, scale), new OxyMaterial(OxyTexture.loadImage(1, albedoTPath),
+                                OxyTexture.loadImage(2, normalMapTPath), OxyTexture.loadImage(3, roughnessMapTPath), OxyTexture.loadImage(4, metallicMapTPath), OxyTexture.loadImage(5, aoMapTPath), new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength),
                         new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new BoundingBoxComponent(minB, maxB));
                 modelInstance.constructData();
 
                 var scripts = models.getInnerObjectByName("Script");
-                for(var f : scripts.getFieldList()) modelInstance.addScript(new OxyScript(f.value()));
+                for (var f : scripts.getFieldList()) modelInstance.addScript(new OxyScript(f.value()));
             }
             //I don't have to do this... but just to be sure
             System.gc();
@@ -149,15 +158,19 @@ public final class SceneSerializer {
         String[] valuesPos = new String[3];
         int ptr = 0;
         for (String s : splittedVector) {
-            if(s.isBlank() || s.isEmpty()) continue;
+            if (s.isBlank() || s.isEmpty()) continue;
             valuesPos[ptr++] = s;
         }
         return new Vector3f(Float.parseFloat(valuesPos[0]), Float.parseFloat(valuesPos[1]), Float.parseFloat(valuesPos[2]));
     }
 
-    private static float[] parseStringToFloatArray(String sValue, int len){
-        String[] splittedVector = sValue.replace("[", "").replace("]", "").split(", ");
+    private static float[] parseStringToFloatArray(String sValue, int len) {
         float[] valuesPos = new float[len];
+        if (sValue.equals("null")) {
+            Arrays.fill(valuesPos, 0f);
+            return valuesPos;
+        }
+        String[] splittedVector = sValue.replace("[", "").replace("]", "").split(", ");
         for (int i = 0; i < valuesPos.length; i++) {
             valuesPos[i] = Float.parseFloat(splittedVector[i]);
         }

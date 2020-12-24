@@ -10,12 +10,14 @@ import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
+import java.io.File;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import static OxyEngine.Components.BoundingBoxComponent.*;
+import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.assimp.Assimp.*;
 
 public class OxyModelLoader {
@@ -57,6 +59,10 @@ public class OxyModelLoader {
                 | aiProcess_CalcTangentSpace;
 
         aiScene = aiImportFile(objPath, flag);
+        if(aiScene == null) {
+            logger.warning("Mesh is null");
+            return;
+        }
         PointerBuffer materials = Objects.requireNonNull(aiScene).mMaterials();
         PointerBuffer meshes = Objects.requireNonNull(aiScene).mMeshes();
         for (int i = 0; i < aiScene.mNumMeshes(); i++) {
@@ -128,12 +134,16 @@ public class OxyModelLoader {
     }
 
     private void addMaterial(AIMaterial aiMaterial, AssimpOxyMesh oxyMesh) {
+
+        String parentPath = new File(objPath).getParent();
+
         AIString path = AIString.calloc();
         aiGetMaterialTexture(aiMaterial, aiTextureType_DIFFUSE, 0, path, (IntBuffer) null, null, null, null, null, null);
         String textPath = path.dataString();
         ImageTexture albedoTexture = null;
-        if (!textPath.equals(""))
-            albedoTexture = OxyTexture.loadImage(textPath);
+        if (!textPath.equals("")) {
+            albedoTexture = OxyTexture.loadImage(1, parentPath + "\\" + textPath);
+        }
         path.clear();
 
         AIString pathNormals = AIString.calloc();
@@ -141,7 +151,7 @@ public class OxyModelLoader {
         String textPathNormals = pathNormals.dataString();
         ImageTexture normalTexture = null;
         if (!textPathNormals.equals("")) {
-            normalTexture = OxyTexture.loadImage(textPathNormals);
+            normalTexture = OxyTexture.loadImage(2, parentPath + "\\" + textPathNormals);
         }
         pathNormals.clear();
 
@@ -150,7 +160,7 @@ public class OxyModelLoader {
         String textPathRoughness = pathRoughness.dataString();
         ImageTexture roughnessTexture = null;
         if (!textPathRoughness.equals("")) {
-            roughnessTexture = OxyTexture.loadImage(textPathRoughness);
+            roughnessTexture = OxyTexture.loadImage(3, parentPath + "\\" + textPathRoughness);
         }
         pathRoughness.clear();
 
@@ -159,7 +169,7 @@ public class OxyModelLoader {
         String textPathMetallic = pathMetallic.dataString();
         ImageTexture metallicTexture = null;
         if (!textPathMetallic.equals("")) {
-            metallicTexture = OxyTexture.loadImage(textPathMetallic);
+            metallicTexture = OxyTexture.loadImage(4, parentPath + "\\" + textPathMetallic);
         }
         pathMetallic.clear();
 
@@ -168,7 +178,7 @@ public class OxyModelLoader {
         String textPathAO = pathAO.dataString();
         ImageTexture aoTexture = null;
         if (!textPathAO.equals("")) {
-            aoTexture = OxyTexture.loadImage(textPathAO);
+            aoTexture = OxyTexture.loadImage(5, parentPath + "\\" + textPathAO);
         }
         pathAO.clear();
 

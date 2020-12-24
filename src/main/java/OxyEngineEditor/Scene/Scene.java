@@ -1,11 +1,12 @@
 package OxyEngineEditor.Scene;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
-import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
+import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
-import OxyEngine.Core.Renderer.RenderingMode;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Scene.Objects.Model.*;
@@ -26,17 +27,19 @@ public final class Scene implements OxyDisposable {
     private final OxyRenderer3D renderer;
     private OxyUISystem oxyUISystem;
 
-    private final FrameBuffer frameBuffer;
+    private final OpenGLFrameBuffer frameBuffer;
     private final String sceneName;
 
-    public Scene(String sceneName, OxyRenderer3D renderer, FrameBuffer frameBuffer) {
+    public SceneState STATE = SceneState.IDLE;
+
+    public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer) {
         this.renderer = renderer;
         this.frameBuffer = frameBuffer;
         this.sceneName = sceneName;
     }
 
     public final void put(OxyEntity e) {
-        registry.entityList.put(e, new LinkedHashSet<>(15));
+        registry.entityList.put(e, new LinkedHashSet<>(14));
     }
 
     public final OxyNativeObject createNativeObjectEntity() {
@@ -89,6 +92,23 @@ public final class Scene implements OxyDisposable {
         return e;
     }
 
+    public final OxyModel createEmptyModel(OxyShader shader, boolean importedFromFile, int i) {
+        OxyModel e = new OxyModel(this);
+        e.importedFromFile = importedFromFile;
+        put(e);
+        e.originPos = new Vector3f(0, 0, 0);
+        e.addComponent(
+                new UUIDComponent(UUID.randomUUID()),
+                shader,
+                new TransformComponent(new Vector3f(0, 0, 0)),
+                new TagComponent("Empty Entity"),
+                new MeshPosition(i),
+                new RenderableComponent(RenderingMode.Normal),
+                new SelectedComponent(false)
+        );
+        return e;
+    }
+
     public final List<OxyModel> createModelEntities(String path, OxyShader shader, boolean importedFromFile) {
         List<OxyModel> models = new ArrayList<>();
         OxyModelLoader loader = new OxyModelLoader(path);
@@ -99,6 +119,7 @@ public final class Scene implements OxyDisposable {
             e.importedFromFile = importedFromFile;
             put(e);
             e.originPos = new Vector3f(assimpMesh.pos);
+            e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
             e.addComponent(
                     new UUIDComponent(UUID.randomUUID()),
                     shader,
@@ -107,7 +128,6 @@ public final class Scene implements OxyDisposable {
                             assimpMesh.max
                     ),
                     new TransformComponent(new Vector3f(assimpMesh.pos)),
-                    new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                     new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                     new MeshPosition(pos),
                     new RenderableComponent(RenderingMode.Normal),
@@ -138,6 +158,7 @@ public final class Scene implements OxyDisposable {
         e.importedFromFile = importedFromFile;
         put(e);
         e.originPos = new Vector3f(assimpMesh.pos);
+        e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
@@ -146,7 +167,6 @@ public final class Scene implements OxyDisposable {
                         assimpMesh.max
                 ),
                 new TransformComponent(new Vector3f(assimpMesh.pos)),
-                new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents),
                 new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                 new MeshPosition(i),
                 new RenderableComponent(RenderingMode.Normal),
@@ -166,7 +186,11 @@ public final class Scene implements OxyDisposable {
 
     public final void removeEntity(OxyEntity e) {
         if (e.has(OxyMaterial.class)) e.get(OxyMaterial.class).dispose();
-        if (e.has(Mesh.class)) e.get(Mesh.class).dispose();
+        if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
+        if (e.has(Light.class)) e.get(Light.class).dispose();
+        for (var scripts : e.getScripts()) {
+            if (scripts.getProvider() != null) OxyScript.scriptThread.getProviders().remove(scripts.getProvider());
+        }
         var value = registry.entityList.remove(e);
         assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");
     }
@@ -294,7 +318,7 @@ public final class Scene implements OxyDisposable {
         return registry.entityList.entrySet().stream().filter(oxyEntitySetEntry -> oxyEntitySetEntry.getKey() instanceof OxyNativeObject).collect(Collectors.toSet());
     }
 
-    public FrameBuffer getFrameBuffer() {
+    public OpenGLFrameBuffer getFrameBuffer() {
         return frameBuffer;
     }
 
@@ -308,7 +332,7 @@ public final class Scene implements OxyDisposable {
         while (it.hasNext()) {
             OxyEntity e = it.next();
             if (e instanceof OxyModel) {
-                if (e.has(Mesh.class)) e.get(Mesh.class).dispose();
+                if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
                 if (e.has(OxyMaterial.class)) e.get(OxyMaterial.class).dispose();
                 it.remove();
             }

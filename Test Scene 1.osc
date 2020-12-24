@@ -1,15 +1,15 @@
 Registry [
 	OxyModel 0: {
-		ID: 3a0b2931-8f79-4cc9-be57-ffb12c271ed7
+		ID: bdb3a1db-a4ce-4312-99f2-87c37fe76691
 		Mesh Position: 0
-		Name: Light Cube
-		Emitting: true
-		Emitting Type: PointLight
-		Position: ( 0.000E+0 -1.000E+1  0.000E+0)
+		Name: Point Light
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0 -2.000E+1  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
 		Scale: ( 5.000E-1  5.000E-1  5.000E-1)
-		Bounds Min: ( 1.000E+0  1.000E+0  1.000E+0)
-		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
 		Color: [1.0, 1.0, 1.0, 1.0]
 		Albedo Texture: null
 		Normal Map Texture: null
@@ -20,21 +20,22 @@ Registry [
 		AO Map Strength: 1.0
 		Metallic Map Texture: null
 		Metallic Map Strength: 0.0
-		Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
+		Mesh: null
 		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		}
 	}
 	OxyModel 1: {
-		ID: b49c3f9a-2d9c-49f3-8785-6f92464aa720
+		ID: d1a560ab-99ba-46de-bc57-446ea9a02940
 		Mesh Position: 0
-		Name: Light Cube 2
-		Emitting: true
-		Emitting Type: PointLight
-		Position: ( 0.000E+0 -1.500E+1  0.000E+0)
+		Name: Point Light 2
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0 -3.000E+1  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
 		Scale: ( 5.000E-1  5.000E-1  5.000E-1)
-		Bounds Min: ( 1.000E+0  1.000E+0  1.000E+0)
-		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
 		Color: [1.0, 1.0, 1.0, 1.0]
 		Albedo Texture: null
 		Normal Map Texture: null
@@ -45,22 +46,23 @@ Registry [
 		AO Map Strength: 1.0
 		Metallic Map Texture: null
 		Metallic Map Strength: 0.0
-		Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/sphere.obj
+		Mesh: null
 		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		}
 	}
 	OxyModel 2: {
-		ID: ef973ee1-872f-4dff-ab08-580f2546fbfc
+		ID: 041b560f-7efe-48f1-918d-0df429657d5d
 		Mesh Position: 0
-		Name: Cone_Cone.001
+		Name: Directional Light
 		Emitting: true
 		Emitting Type: DirectionalLight
 		Position: (-1.250E+1 -7.500E+0  1.490E+1)
-		Rotation: ( 1.189E+2 -2.700E+0 -5.100E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-		Bounds Min: ( 1.000E+0  1.000E+0  1.000E+0)
-		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
-		Color: [0.8, 0.8, 0.8, 1.0]
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Color: [1.0, 1.0, 1.0, 1.0]
 		Albedo Texture: null
 		Normal Map Texture: null
 		Normal Map Strength: 1.0
@@ -70,12 +72,13 @@ Registry [
 		AO Map Strength: 1.0
 		Metallic Map Texture: null
 		Metallic Map Strength: 0.0
-		Mesh: D:/programming/Java/OxyEngine/target/classes/models/native/cone.obj
+		Mesh: null
 		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		}
 	}
 	OxyModel 3: {
-		ID: e56437c7-53ad-4dc9-93b3-6351c79d20e3
+		ID: c12b63bc-895c-4bb6-8a39-c0c7fc661599
 		Mesh Position: 0
 		Name: Cube
 		Emitting: false
@@ -97,10 +100,11 @@ Registry [
 		Metallic Map Strength: 0.0
 		Mesh: C:\Users\okang\Desktop\untitled.obj
 		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		}
 	}
 	OxyModel 4: {
-		ID: 1d4fd892-372e-4fd8-9de8-71a30852efa5
+		ID: aa895bf3-16b3-42c9-8ccb-6249603376c7
 		Mesh Position: 1
 		Name: Cube.001
 		Emitting: false
@@ -122,15 +126,16 @@ Registry [
 		Metallic Map Strength: 0.0
 		Mesh: C:\Users\okang\Desktop\untitled.obj
 		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		}
 	}
 	OxyModel 5: {
-		ID: d38dbd9e-3f9c-406c-8402-29d19f349c32
+		ID: 24240386-5270-4dc1-8646-c807c9a06032
 		Mesh Position: 2
 		Name: Sphere
 		Emitting: false
 		Emitting Type: null
-		Position: (-3.000E-1 -5.200E+0  0.000E+0)
+		Position: ( 0.000E+0 -3.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
 		Bounds Min: ( 2.000E+0  2.000E+0  2.000E+0)
@@ -140,17 +145,18 @@ Registry [
 		Normal Map Texture: null
 		Normal Map Strength: 1.0
 		Roughness Map Texture: null
-		Roughness Map Strength: 0.308
+		Roughness Map Strength: 1.0
 		AO Map Texture: null
 		AO Map Strength: 1.0
 		Metallic Map Texture: null
-		Metallic Map Strength: 0.28
+		Metallic Map Strength: 0.0
 		Mesh: C:\Users\okang\Desktop\untitled.obj
 		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		}
 	}
 	OxyModel 6: {
-		ID: 1a87c4ca-49b2-43c2-97a0-8a645d52ab89
+		ID: 4e55711c-64ba-45a1-8c9f-0daf11df64a5
 		Mesh Position: 3
 		Name: Cone
 		Emitting: false
@@ -172,10 +178,11 @@ Registry [
 		Metallic Map Strength: 0.0
 		Mesh: C:\Users\okang\Desktop\untitled.obj
 		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		}
 	}
 	OxyModel 7: {
-		ID: 450428ea-1ad5-41ee-8e74-04d3765b160f
+		ID: 2852e087-9a55-47ec-ab73-1281aa2a6434
 		Mesh Position: 4
 		Name: Cube.002
 		Emitting: false
@@ -197,81 +204,7 @@ Registry [
 		Metallic Map Strength: 0.0
 		Mesh: C:\Users\okang\Desktop\untitled.obj
 		Script: {
-		}
-	}
-	OxyModel 8: {
-		ID: 4a5c2f09-1609-44db-8ff0-0d76afba8b9f
-		Mesh Position: 0
-		Name: Gun
-		Emitting: false
-		Emitting Type: null
-		Position: (-1.103E-1 -4.631E-1 -1.620E+1)
-		Rotation: ( 3.100E+0  0.000E+0  0.000E+0)
-		Scale: ( 2.100E+0  2.100E+0  2.100E+0)
-		Bounds Min: ( 4.817E+0  3.033E+0  6.684E-1)
-		Bounds Max: ( 4.817E+0  3.033E+0  6.684E-1)
-		Color: [0.8, 0.8, 0.8, 1.0]
-		Albedo Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_BaseColor.png
-		Normal Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Normal.png
-		Normal Map Strength: 1.111
-		Roughness Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Roughness.png
-		Roughness Map Strength: 0.0
-		AO Map Texture: C:\Users\okang\Desktop\rustediron1-alt2-bl\rustediron1-alt2-bl\ao.png
-		AO Map Strength: 0.0
-		Metallic Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Metallic.png
-		Metallic Map Strength: 0.0
-		Mesh: C:\Users\okang\Desktop\colt-m1911\source\colt low polyfbx.fbx
-		Script: {
-		}
-	}
-	OxyModel 9: {
-		ID: 4a5c2f09-1609-44db-8ff0-0d76afba8b9f
-		Mesh Position: 0
-		Name: Gun
-		Emitting: false
-		Emitting Type: null
-		Position: (-5.587E+0 -9.725E-1  1.865E+1)
-		Rotation: ( 3.100E+0  0.000E+0  0.000E+0)
-		Scale: ( 2.100E+0  2.100E+0  2.100E+0)
-		Bounds Min: ( 4.817E+0  3.033E+0  6.684E-1)
-		Bounds Max: ( 4.817E+0  3.033E+0  6.684E-1)
-		Color: [0.8, 0.8, 0.8, 1.0]
-		Albedo Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_BaseColor.png
-		Normal Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Normal.png
-		Normal Map Strength: 1.057
-		Roughness Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Roughness.png
-		Roughness Map Strength: 0.0
-		AO Map Texture: C:\Users\okang\Desktop\rustediron1-alt2-bl\rustediron1-alt2-bl\ao.png
-		AO Map Strength: 0.0
-		Metallic Map Texture: C:\Users\okang\Desktop\colt-m1911\textures\colt_low_polyfbx_m1911_Metallic.png
-		Metallic Map Strength: 0.0
-		Mesh: C:\Users\okang\Desktop\colt-m1911\source\colt low polyfbx.fbx
-		Script: {
-		}
-	}
-	OxyModel 10: {
-		ID: 111d7aac-1ab3-48ee-8962-9de747d46547
-		Mesh Position: 0
-		Name: Revolver
-		Emitting: false
-		Emitting Type: null
-		Position: ( 0.000E+0 -1.670E+1  0.000E+0)
-		Rotation: ( 1.500E+0  0.000E+0  1.500E+0)
-		Scale: ( 2.000E-1  2.000E-1  2.000E-1)
-		Bounds Min: ( 1.626E+1  7.805E+1  3.299E+1)
-		Bounds Max: ( 1.626E+1  7.805E+1  3.299E+1)
-		Color: [0.5882353, 0.5882353, 0.5882353, 1.0]
-		Albedo Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_A.tga
-		Normal Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_N.tga
-		Normal Map Strength: 1.057
-		Roughness Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_R.tga
-		Roughness Map Strength: 0.0
-		AO Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Raw\Cerberus_AO.tga
-		AO Map Strength: 0.0
-		Metallic Map Texture: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Textures\Cerberus_M.tga
-		Metallic Map Strength: 0.0
-		Mesh: C:\Users\okang\Desktop\Cerberus_by_Andrew_Maximov\Cerberus_by_Andrew_Maximov\Cerberus_LP.FBX
-		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\java\Scripts\PositionIteratorScript.java
 		}
 	}
 ]
@@ -281,6 +214,6 @@ Scene: {
 Environment: {
 	Environment Map: C:\Users\okang\Desktop\pink_sunrise_4k.hdr
 	Environment Gamma Strength: 2.2
-	Environment LOD: 1.632
+	Environment LOD: 0.0
 	Environment Exposure: 1.0
 }

@@ -1,20 +1,47 @@
 package OxyEngine.Core.Window;
 
+import OxyEngine.System.OxyDisposable;
+
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 
-public class WindowHandle {
+public class WindowHandle implements OxyDisposable {
 
     private final WindowMode mode;
+    private final WindowSpecs specs;
     private int width;
     private int height;
     private long pointer;
     private final String title;
 
-    public WindowHandle(String title, int width, int height, WindowMode mode) {
+    public WindowHandle(String title, int width, int height, WindowMode mode, WindowSpecs specs) {
         this.width = width;
         this.height = height;
         this.title = title;
         this.mode = mode;
+        this.specs = specs;
+    }
+
+    public WindowHandle(String title, int width, int height, WindowMode mode) {
+        this(title, width, height, mode, new WindowSpecs(GLFW_TRUE, GLFW_TRUE));
+    }
+
+    public void init() {
+        glfwMakeContextCurrent(pointer);
+        glfwShowWindow(pointer);
+    }
+
+    @Override
+    public void dispose() {
+        glfwFreeCallbacks(pointer);
+        glfwDestroyWindow(pointer);
+    }
+
+    public record WindowSpecs(int resizable, int doubleBuffered){
+        public WindowSpecs {
+            this.resizable = GLFW_TRUE;
+            this.doubleBuffered = GLFW_TRUE;
+        }
     }
 
     public enum WindowMode {
@@ -54,5 +81,9 @@ public class WindowHandle {
 
     public String getTitle() {
         return title;
+    }
+
+    public WindowSpecs getSpecs() {
+        return specs;
     }
 }

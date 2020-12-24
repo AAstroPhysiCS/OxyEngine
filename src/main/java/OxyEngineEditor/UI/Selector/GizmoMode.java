@@ -1,10 +1,9 @@
 package OxyEngineEditor.UI.Selector;
 
-import OxyEngine.Core.Renderer.RenderingMode;
+import OxyEngine.Components.*;
+import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxySystem;
-import OxyEngine.Components.*;
-import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
@@ -92,10 +91,10 @@ enum GizmoMode {
                 cM.tcs = m.tcs;
                 cM.normals = m.normals;
                 cM.originPos = m.originPos;
+                cM.factory = ((OxyModel) m).factory;
                 cM.addComponent(new TransformComponent(3f),
                         new SelectedComponent(false, true),
                         new RenderableComponent(RenderingMode.None),
-                        m.get(ModelFactory.class),
                         m.get(OxyShader.class),
                         m.get(OxyMaterial.class),
                         m.get(TagComponent.class),
@@ -143,7 +142,7 @@ enum GizmoMode {
             for (OxyEntity e : models) {
                 RenderableComponent r = e.get(RenderableComponent.class);
                 if (r.mode != RenderingMode.Normal) continue;
-                ModelMesh modelMesh = e.get(ModelMesh.class);
+                ModelMeshOpenGL modelMesh = e.get(ModelMeshOpenGL.class);
                 OxyMaterial material = e.get(OxyMaterial.class);
                 material.push(modelMesh.getShader());
                 scene.getRenderer().render(ts, modelMesh, SceneRuntime.currentBoundedCamera);

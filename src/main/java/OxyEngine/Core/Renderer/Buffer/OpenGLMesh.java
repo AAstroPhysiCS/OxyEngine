@@ -1,9 +1,10 @@
 package OxyEngine.Core.Renderer.Buffer;
 
+import OxyEngine.Components.EntityComponent;
+import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
-import OxyEngine.Components.EntityComponent;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
@@ -13,18 +14,17 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL45.*;
 
-public abstract class Mesh implements OxyDisposable, EntityComponent {
+//TODO: Make a Mesh class that this class will inherit from, as well as the VulkanMesh class.
+public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
 
-    protected IndexBuffer indexBuffer;
-    protected VertexBuffer vertexBuffer;
-    protected TextureBuffer textureBuffer;
-    protected NormalsBuffer normalsBuffer;
-    protected TangentBuffer tangentBuffer;
+    protected OpenGLIndexBuffer indexBuffer;
+    protected OpenGLVertexBuffer vertexBuffer;
+    protected OpenGLTextureBuffer textureBuffer;
+    protected OpenGLNormalsBuffer normalsBuffer;
+    protected OpenGLTangentBuffer tangentBuffer;
 
     protected OxyShader shader;
     protected String path;
-
-    protected final List<OxyEntity> entities = new ArrayList<>();
 
     protected int mode, vao;
 
@@ -37,6 +37,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     }
 
     public void load() {
+
         if (vao == 0) vao = glCreateVertexArrays();
         glBindVertexArray(vao);
 
@@ -47,7 +48,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         if (tangentBuffer != null) if (tangentBuffer.empty()) tangentBuffer.load();
         if (textureBuffer != null) if (textureBuffer.empty()) textureBuffer.load();
 
-        if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC) {
+        if (vertexBuffer.getImplementation().getUsage() == BufferLayoutProducer.Usage.DYNAMIC) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.getBufferId());
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer.getVertices());
         }
@@ -60,7 +61,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
     private void bind() {
         glBindVertexArray(vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.bufferId);
-        if (vertexBuffer.getImplementation().getUsage() == BufferTemplate.Usage.DYNAMIC && vertexBuffer.offsetToUpdate != -1) {
+        if (vertexBuffer.getImplementation().getUsage() == BufferLayoutProducer.Usage.DYNAMIC && vertexBuffer.offsetToUpdate != -1) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.bufferId);
             glBufferSubData(GL_ARRAY_BUFFER, vertexBuffer.offsetToUpdate, vertexBuffer.dataToUpdate);
 
@@ -77,6 +78,8 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         OxyRenderer.Stats.totalIndicesCount += indexBuffer.getIndices().length;
     }
 
+    private final List<OxyEntity> entities = new ArrayList<>();
+
     public void addToList(OxyEntity e) {
         entities.add(e);
     }
@@ -86,6 +89,7 @@ public abstract class Mesh implements OxyDisposable, EntityComponent {
         indexBuffer.addToBuffer(OxyEntity.sumAllIndices(entities));
 
         load();
+        entities.clear();
     }
 
     public void render() {

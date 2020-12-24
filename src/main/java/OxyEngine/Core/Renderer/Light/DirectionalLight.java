@@ -1,10 +1,9 @@
 package OxyEngine.Core.Renderer.Light;
 
-import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.UI.Panels.GUIProperty;
+import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Vector3f;
@@ -19,41 +18,51 @@ public class DirectionalLight extends Light {
         super(ambient, specular);
     }
 
+    private int index;
+    private OxyEntity e;
+
     @Override
     public void update(OxyEntity e, int i) {
+        this.e = e;
+        index = i;
         OxyShader shader = e.get(OxyShader.class);
         OxyMaterial material = e.get(OxyMaterial.class);
         shader.enable();
-        shader.setUniform1f("currentLightIndex", 1);
-        shader.setUniformVec3("d_Light.position", e.get(TransformComponent.class).position);
-        shader.setUniformVec3("d_Light.direction", dir);
+        shader.setUniformVec3("d_Light[" + i + "].direction", dir);
 //        shader.setUniformVec3("d_Light.ambient", ambient);
 //        shader.setUniformVec3("d_Light.specular", specular);
-        shader.setUniformVec3("d_Light.diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
+        shader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
         shader.disable();
     }
 
-    private static final float[] colorIntensityArr = new float[1];
-    private static final float[] dirArr = new float[3];
-    public static final GUIProperty guiNode = () -> {
+    final float[] colorIntensityArr = new float[1];
+    final float[] dirArr = new float[3];
+    public static final GUINode guiNode = () -> {
         if (ImGui.collapsingHeader("Directional Light", ImGuiTreeNodeFlags.DefaultOpen)) {
-
+            DirectionalLight dL = entityContext.get(DirectionalLight.class);
             ImGui.columns(2, "env column");
             ImGui.alignTextToFramePadding();
             ImGui.text("Color intensity:");
             ImGui.text("Light Direction:");
             ImGui.nextColumn();
             ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
-            colorIntensityArr[0] = entityContext.get(DirectionalLight.class).colorIntensity;
-            ImGui.dragFloat("###hidelabel intensity d", colorIntensityArr);
-            ImGui.dragFloat3("##hidelabel direction d", dirArr, 0.01f);
-//            entityContext.get(PointLight.class).ambient.set(ambientArr[0], ambientArr[1], ambientArr[2]);
-//            entityContext.get(PointLight.class).specular.set(specularArr[0], specularArr[1], specularArr[2]);
-            entityContext.get(DirectionalLight.class).colorIntensity = colorIntensityArr[0];
-            entityContext.get(DirectionalLight.class).dir.set(dirArr[0], dirArr[1], dirArr[2]);
+            dL.colorIntensityArr[0] = dL.colorIntensity;
+            ImGui.dragFloat("###hidelabel intensity d", dL.colorIntensityArr, 0.1f, 0f, 1000f);
+            ImGui.dragFloat3("##hidelabel direction d", dL.dirArr);
+            dL.colorIntensity = dL.colorIntensityArr[0];
+            dL.dir.set(dL.dirArr[0], dL.dirArr[1], dL.dirArr[2]);
             ImGui.popItemWidth();
             ImGui.columns(1);
         }
     };
+
+    @Override
+    public void dispose() {
+        OxyShader shader = e.get(OxyShader.class);
+        shader.enable();
+        shader.setUniformVec3("d_Light[" + index + "].direction", new Vector3f(0, 0, 0));
+        shader.setUniformVec3("d_Light[" + index + "].diffuse", new Vector3f(0, 0, 0));
+        shader.disable();
+    }
 }
 

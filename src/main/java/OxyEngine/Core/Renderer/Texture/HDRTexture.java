@@ -1,9 +1,9 @@
 package OxyEngine.Core.Renderer.Texture;
 
-import OxyEngine.Components.NativeObjectMesh;
-import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
@@ -11,9 +11,11 @@ import org.joml.Matrix4f;
 
 import java.nio.FloatBuffer;
 
+import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.Core.Renderer.Texture.OxyTexture.allTextures;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 import static org.lwjgl.stb.STBImage.*;
 
 public class HDRTexture extends OxyTexture.AbstractTexture {
@@ -63,7 +65,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
     };
 
     private final Scene scene;
-    private static NativeObjectMesh mesh;
+    private static NativeObjectMeshOpenGL mesh;
 
     private final Matrix4f[] captureViews;
     private final Matrix4f captureProjection;
@@ -150,14 +152,14 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         shader.setUniformMatrix4fv("projection", captureProjection, true);
         shader.disable();
 
-        BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0);
-
         if (mesh == null) {
-            mesh = new NativeObjectMesh.NativeMeshBuilderImpl()
+            mesh = new NativeObjectMeshOpenGL.NativeMeshBuilderImpl()
                     .setShader(shader)
                     .setMode(GL_TRIANGLES)
-                    .setUsage(BufferTemplate.Usage.STATIC)
-                    .setVerticesBufferAttributes(attributesVert)
+                    .setUsage(BufferLayoutProducer.Usage.STATIC)
+                    .setVerticesBufferAttributes(
+                            new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0)
+                    )
                     .create();
             OxyNativeObject cube = scene.createNativeObjectEntity();
             cube.vertices = skyboxVertices;
@@ -180,7 +182,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             shader.disable();
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                     GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
-            OpenGLRendererAPI.clearBuffer();
+            rendererAPI.clearBuffer();
             scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera);
         }
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -228,6 +230,13 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
     public int getBDRFSlot() {
         return bdrf.getTextureSlot();
+    }
+
+    public void bindAll() {
+        glBindTextureUnit(bdrf.getTextureSlot(), bdrf.textureId);
+        glBindTextureUnit(prefilterTexture.getTextureSlot(), prefilterTexture.textureId);
+        glBindTextureUnit(irradianceTexture.getTextureSlot(), irradianceTexture.textureId);
+        glBindTextureUnit(this.getTextureSlot(), this.textureId);
     }
 
     static class IrradianceTexture extends OxyTexture.AbstractTexture {
@@ -290,7 +299,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 shader.disable();
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
-                OpenGLRendererAPI.clearBuffer();
+                rendererAPI.clearBuffer();
                 mainTexture.scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera, shader);
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -366,7 +375,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                     shader.disable();
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);
-                    OpenGLRendererAPI.clearBuffer();
+                    rendererAPI.clearBuffer();
                     mainTexture.scene.getRenderer().render(ts, mesh, SceneRuntime.currentBoundedCamera, shader);
                 }
             }
@@ -401,7 +410,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
             glViewport(0, 0, 512, 512);
-            OpenGLRendererAPI.clearBuffer();
+            rendererAPI.clearBuffer();
             shader.enable();
             renderQuad();
             shader.disable();
@@ -433,7 +442,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         }
     }
 
-    public NativeObjectMesh getMesh() {
+    public NativeObjectMeshOpenGL getMesh() {
         return mesh;
     }
 }

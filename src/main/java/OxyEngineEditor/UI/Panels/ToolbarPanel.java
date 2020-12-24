@@ -7,6 +7,7 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.Scene.SceneSerializer;
+import OxyEngineEditor.UI.Selector.OxySelectHandler;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
@@ -53,6 +54,7 @@ public class ToolbarPanel extends Panel {
             ImGui.setCursorPosY(ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable) ? pos.y - 20f : pos.y + 3);
             if (ImGui.beginMenu("File")) {
                 if (ImGui.menuItem("New Scene")) {
+                    OxySelectHandler.entityContext = null;
                     Scene oldScene = SceneRuntime.ACTIVE_SCENE;
 
                     oldScene.dispose();

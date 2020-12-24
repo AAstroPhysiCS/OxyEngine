@@ -7,15 +7,15 @@ import OxyEngine.Core.Layers.GizmoLayer;
 import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Layers.OverlayPanelLayer;
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.OxyRendererPlatform;
 import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngine.OpenGL.OpenGLRendererAPI;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
+import OxyEngine.OxyEngineSpecs;
 import OxyEngine.System.OxyEventSystem;
 import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
@@ -28,6 +28,7 @@ import org.joml.Math;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererContext;
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
@@ -38,11 +39,11 @@ public class EditorApplication extends OxyApplication {
 
     public EditorApplication() {
         windowHandle = new WindowHandle("OxyEngine - Editor", 1366, 768, WindowHandle.WindowMode.WINDOWEDFULLSCREEN);
-        oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, OxyRendererType.Oxy3D);
+        oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, true, new OxyEngineSpecs(OxyRendererPlatform.OpenGL, OxyRendererType.Oxy3D));
         oxyEngine.start();
     }
 
-    OxyShader oxyShader;
+    public static OxyShader oxyShader;
 
     @Override
     public void init() {
@@ -50,10 +51,10 @@ public class EditorApplication extends OxyApplication {
 
         oxyShader = new OxyShader("shaders/OxyPBR.glsl");
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
-        scene = new Scene("Test Scene 1", oxyRenderer, new FrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
+        scene = new Scene("Test Scene 1", oxyRenderer, BufferProducer.createFrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
         OxyNativeObject editorCameraEntity = scene.createNativeObjectEntity();
-        PerspectiveCamera camera = new PerspectiveCamera(true, Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 0.003f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
+        PerspectiveCamera camera = new PerspectiveCamera(true, Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 1f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
         editorCameraEntity.addComponent(camera, new TagComponent("Editor Camera"));
 
         OxyModel m = scene.createEmptyModel(oxyShader);
@@ -100,14 +101,11 @@ public class EditorApplication extends OxyApplication {
 
     @Override
     public void render(float ts) {
-        OxyTexture.bindAllTextureSlots();
-
         for (Layer l : layerStack.getLayerStack())
             l.render(ts);
 
-        OpenGLRendererAPI.swapBuffer(windowHandle);
-        OpenGLRendererAPI.pollEvents();
-        OxyTexture.unbindAllTextureSlots();
+        rendererContext.swapBuffer(windowHandle);
+        rendererContext.pollEvents();
     }
 
     protected Runnable run() {

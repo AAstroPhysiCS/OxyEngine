@@ -1,7 +1,7 @@
 package OxyEngineEditor.Scene.Objects.Native;
 
 import OxyEngine.Components.EntityComponent;
-import OxyEngine.Components.NativeObjectMesh;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Components.TransformComponent;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -33,6 +33,6 @@ public abstract class NativeObjectFactory implements EntityComponent {
         }
     }
 
-    public abstract void initData(OxyNativeObject e, NativeObjectMesh mesh);
+    public abstract void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh);
 }
 

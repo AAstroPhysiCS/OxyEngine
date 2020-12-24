@@ -16,8 +16,9 @@ public class WindowHint {
         return this;
     }
 
-    public void create() {
+    public WindowHint create() {
         glfwWindowHint(GLFW_RESIZABLE, resizable);
         glfwWindowHint(GLFW_DOUBLEBUFFER, doubleBuffered);
+        return this;
     }
 }

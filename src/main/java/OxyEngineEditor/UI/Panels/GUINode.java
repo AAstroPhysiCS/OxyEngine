@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI.Panels;
 
 @FunctionalInterface
-public interface GUIProperty {
+public interface GUINode {
     void runEntry();
 }

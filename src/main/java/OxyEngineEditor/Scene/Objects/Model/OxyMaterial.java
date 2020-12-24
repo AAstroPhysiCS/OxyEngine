@@ -6,7 +6,7 @@ import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.UI.Panels.GUIProperty;
+import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiColorEditFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -15,8 +15,17 @@ import org.joml.Vector4f;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
+import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public class OxyMaterial implements EntityComponent, OxyDisposable {
+
+    /*
+     * Albedo 1
+     * Normal 2
+     * Roughness 3
+     * Metallic 4
+     * AO 5
+     */
 
     public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture;
     public final OxyColor albedoColor;
@@ -61,11 +70,11 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
     }
 
     public OxyMaterial(OxyMaterial other) {
-        this.roughnessTexture = other.roughnessTexture;
-        this.aoTexture = other.aoTexture;
-        this.normalTexture = other.normalTexture;
-        this.albedoTexture = other.albedoTexture;
-        this.metallicTexture = other.metallicTexture;
+        if(other.roughnessTexture != null) this.roughnessTexture = new ImageTexture(other.roughnessTexture);
+        if(other.aoTexture != null) this.aoTexture = new ImageTexture(other.aoTexture);
+        if(other.normalTexture != null) this.normalTexture = new ImageTexture(other.normalTexture);
+        if(other.albedoTexture != null) this.albedoTexture = new ImageTexture(other.albedoTexture);
+        if(other.metallicTexture != null) this.metallicTexture = new ImageTexture(other.metallicTexture);
         this.albedoColor = new OxyColor(other.albedoColor.getNumbers().clone());
         this.metalness = other.metalness.clone();
         this.roughness = other.roughness.clone();
@@ -73,8 +82,17 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
         this.normalStrength = other.normalStrength.clone();
     }
 
+    private void bindTextures() {
+        if (roughnessTexture != null) glBindTextureUnit(roughnessTexture.getTextureSlot(), roughnessTexture.getTextureId());
+        if (metallicTexture != null) glBindTextureUnit(metallicTexture.getTextureSlot(), metallicTexture.getTextureId());
+        if (normalTexture != null) glBindTextureUnit(normalTexture.getTextureSlot(), normalTexture.getTextureId());
+        if (aoTexture != null) glBindTextureUnit(aoTexture.getTextureSlot(), aoTexture.getTextureId());
+        if (albedoTexture != null) glBindTextureUnit(albedoTexture.getTextureSlot(), albedoTexture.getTextureId());
+    }
+
     public void push(OxyShader shader) {
         shader.enable();
+        bindTextures();
         if (albedoColor != null) {
             shader.setUniformVec3("material.diffuse", new Vector3f(albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]));
             shader.setUniformVec3("colorOut", new Vector3f(albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]));
@@ -107,7 +125,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
         shader.disable();
     }
 
-    public static final GUIProperty guiNode = () -> {
+    public static final GUINode guiNode = () -> {
 
         if (entityContext == null) return;
 
@@ -144,7 +162,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
                     String path = openDialog("", null);
                     if (path != null) {
                         if (!nullT) entityContext.get(OxyMaterial.class).albedoTexture.dispose();
-                        entityContext.get(OxyMaterial.class).albedoTexture = OxyTexture.loadImage(path);
+                        entityContext.get(OxyMaterial.class).albedoTexture = OxyTexture.loadImage(1, path);
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
@@ -161,7 +179,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
                     String path = openDialog("", null);
                     if (path != null) {
                         if (!nullN) entityContext.get(OxyMaterial.class).normalTexture.dispose();
-                        entityContext.get(OxyMaterial.class).normalTexture = OxyTexture.loadImage(path);
+                        entityContext.get(OxyMaterial.class).normalTexture = OxyTexture.loadImage(2, path);
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
@@ -182,7 +200,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
                     String path = openDialog("", null);
                     if (path != null) {
                         if (!nullR) entityContext.get(OxyMaterial.class).roughnessTexture.dispose();
-                        entityContext.get(OxyMaterial.class).roughnessTexture = OxyTexture.loadImage(path);
+                        entityContext.get(OxyMaterial.class).roughnessTexture = OxyTexture.loadImage(3, path);
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
@@ -203,7 +221,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
                     String path = openDialog("", null);
                     if (path != null) {
                         if (!nullM) entityContext.get(OxyMaterial.class).metallicTexture.dispose();
-                        entityContext.get(OxyMaterial.class).metallicTexture = OxyTexture.loadImage(path);
+                        entityContext.get(OxyMaterial.class).metallicTexture = OxyTexture.loadImage(4, path);
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
@@ -224,7 +242,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
                     String path = openDialog("", null);
                     if (path != null) {
                         if (!nullAO) entityContext.get(OxyMaterial.class).aoTexture.dispose();
-                        entityContext.get(OxyMaterial.class).aoTexture = OxyTexture.loadImage(path);
+                        entityContext.get(OxyMaterial.class).aoTexture = OxyTexture.loadImage(5, path);
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);

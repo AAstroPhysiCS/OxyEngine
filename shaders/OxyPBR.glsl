@@ -38,7 +38,6 @@ struct PointLight {
 };
 
 struct DirectionalLight{
-    vec3 position;
     vec3 direction;
     vec3 ambient;
     vec3 diffuse;
@@ -46,8 +45,8 @@ struct DirectionalLight{
 };
 
 uniform Material material;
-uniform PointLight p_Light[2];
-uniform DirectionalLight d_Light;
+uniform PointLight p_Light[4];
+uniform DirectionalLight d_Light[4];
 uniform float currentLightIndex = -1;
 
 //NORMAL MAP
@@ -120,14 +119,8 @@ vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
 }
 
 vec3 Lo = vec3(0.0);
-vec3 calcPBR(vec3 lightPos, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic, float attenuation){
+vec3 calcPBR(vec3 L, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic, float attenuation){
      //calculate per-light radiance
-     vec3 L;
-     if(lightPos.xyz == vec3(0.0f)){
-        L = normalize(-d_Light.direction);
-     } else {
-        L = normalize(lightPos - vertexPos);
-     }
      vec3 H = normalize(V + L);
      vec3 radiance = lightDiffuseColor * attenuation;
 
@@ -160,7 +153,7 @@ vec3 calcPBR(vec3 lightPos, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexP
 }
 
 
-void beginPBR(vec3 norm, vec3 lightPos, vec3 viewDir, vec3 vertexPos, vec2 texCoordsOut, float attenuation, vec3 diffuse){
+vec4 beginPBR(vec3 norm, vec3 L, vec3 viewDir, vec3 vertexPos, vec2 texCoordsOut, float attenuation, vec3 diffuse){
     const float MAX_REFLECTION_LOD = 4.0;
     vec3 albedo;
     float metallicMap, roughnessMap, aoMap;
@@ -182,7 +175,7 @@ void beginPBR(vec3 norm, vec3 lightPos, vec3 viewDir, vec3 vertexPos, vec2 texCo
     if(irradiance.rgb != vec3(0.0f, 0.0f, 0.0f)){ //the scene has env map
         vec3 F0 = vec3(0.04);
         F0 = mix(F0, albedo, metallicMap);
-        vec3 Lo = calcPBR(lightPos, diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);
+        vec3 Lo = calcPBR(L, diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);
 
         vec3 kS = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
         vec3 kD = 1.0 - kS;
@@ -200,88 +193,76 @@ void beginPBR(vec3 norm, vec3 lightPos, vec3 viewDir, vec3 vertexPos, vec2 texCo
         //result = result / (result + vec3(1.0));
         result = vec3(1.0) - exp(-result * exposure);
         result = pow(result, vec3(1f / gamma));
-        color = vec4(result, 1.0f);
-    } else {
-        color = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+        return vec4(result, 1.0f);
     }
+    return vec4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-void calcDirectionalLightImpl(DirectionalLight d_Light){
-    vec3 vertexPos = inVar.vertexPos;
-    //vec3 lightPos = d_Light.position;
-    vec3 cameraPosVec3 = cameraPos;
-    vec2 texCoordsOut = inVar.texCoordsOut;
-
-    if(normalMapSlot != 0){
-        vertexPos = inVar.TBN * inVar.vertexPos;
-        //lightPos = inVar.TBN * d_Light.position;
-        cameraPosVec3 = inVar.TBN * cameraPos;
-    }
-
+vec4 calcDirectionalLightImpl(DirectionalLight d_Light, vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
     vec3 lightDir = normalize(-d_Light.direction);
-    vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
-
-    vec3 norm;
-    if(normalMapSlot != 0){
-        vec3 normalMap = texture(tex[normalMapSlot], texCoordsOut).rgb;
-        normalMap = normalMap * 2.0 - 1.0;
-        normalMap.xy *= normalMapStrength;
-        normalMap = normalize(normalMap);
-        norm = normalMap;
-    } else {
-        norm = vec3(normalize(inVar.lightModelNormal));
-    }
-
     float attenuation = 1.0;
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = d_Light.diffuse * diff;
-    beginPBR(norm, vec3(0.0f), viewDir, vertexPos, texCoordsOut, attenuation, diffuse);
+
+    return beginPBR(norm, lightDir, viewDir, vertexPos, texCoordsOut, attenuation, diffuse);
 }
 
-void calcPointLightImpl(PointLight p_Light){
-
-    vec3 vertexPos = inVar.vertexPos;
+vec4 calcPointLightImpl(PointLight p_Light, vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
     vec3 lightPos = p_Light.position;
-    vec3 cameraPosVec3 = cameraPos;
-    vec2 texCoordsOut = inVar.texCoordsOut;
-
     if(normalMapSlot != 0){
-        vertexPos = inVar.TBN * inVar.vertexPos;
         lightPos = inVar.TBN * p_Light.position;
-        cameraPosVec3 = inVar.TBN * cameraPos;
     }
-
     vec3 lightDir = normalize(lightPos - vertexPos);
-    vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
-
-    vec3 norm;
-    //NORMAL MAP
-    if(normalMapSlot != 0){
-        vec3 normalMap = texture(tex[normalMapSlot], texCoordsOut).rgb;
-        normalMap = normalMap * 2.0 - 1.0;
-        normalMap.xy *= normalMapStrength;
-        normalMap = normalize(normalMap);
-        norm = normalMap;
-    } else {
-        norm = vec3(normalize(inVar.lightModelNormal));
-    }
-
     float distance = length(lightPos - vertexPos);
     float attenuation = 1.0 / (p_Light.constant + p_Light.linear * distance + p_Light.quadratic * (distance * distance));
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = p_Light.diffuse * diff;
 
-    beginPBR(norm, lightPos, viewDir, vertexPos, texCoordsOut, attenuation, diffuse);
+    return beginPBR(norm, lightDir, viewDir, vertexPos, texCoordsOut, attenuation, diffuse);
+}
+
+vec4 calcNoLightImpl(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
+    vec3 lightDir = normalize(-vertexPos);
+    return beginPBR(norm, lightDir, viewDir, vertexPos, texCoordsOut, 1, material.diffuse);
 }
 
 void main(){
-    if (currentLightIndex == 0){
-        for(int i = 0; i < p_Light.length; i++){
-            calcPointLightImpl(p_Light[i]);
-        }
-    } else if (currentLightIndex == 1){
-        calcDirectionalLightImpl(d_Light);
+
+    vec4 result;
+
+    vec3 vertexPos = inVar.vertexPos;
+    vec3 cameraPosVec3 = cameraPos;
+    vec2 texCoordsOut = inVar.texCoordsOut;
+    if(normalMapSlot != 0){
+        vertexPos = inVar.TBN * inVar.vertexPos;
+        cameraPosVec3 = inVar.TBN * cameraPos;
     }
+    vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
+
+    vec3 norm;
+    if(normalMapSlot != 0){
+        vec3 normalMap = texture(tex[normalMapSlot], texCoordsOut).rgb;
+        normalMap = normalMap * 2.0 - 1.0;
+        normalMap.xy *= normalMapStrength;
+        normalMap = normalize(normalMap);
+        norm = normalMap;
+    } else {
+        norm = vec3(normalize(inVar.lightModelNormal));
+    }
+
+    if (currentLightIndex == 0) result += calcNoLightImpl(vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
+    for(int i = 0; i < p_Light.length; i++){
+        if(p_Light[i].diffuse != vec3(0.0f)){
+           result += calcPointLightImpl(p_Light[i], vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
+        }
+    }
+    for(int i = 0; i < d_Light.length; i++){
+        if(d_Light[i].diffuse != vec3(0.0f)){
+            result = calcDirectionalLightImpl(d_Light[i], vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm); //dunno why?
+        }
+    }
+
+    color = vec4(result.xyz, 1.0f);
 }
 
 //#type vertex

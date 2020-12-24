@@ -1,7 +1,7 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Components.PerspectiveCamera;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.WorldGrid;
@@ -58,14 +58,15 @@ public class ScenePanel extends Panel {
 
         if (keyEventDispatcher.getKeys()[GLFW_KEY_DELETE] && entityContext != null) {
             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
-            sceneLayer.updateAllModelEntities();
+            SceneRuntime.stop();
+            sceneLayer.updateAllEntities();
             entityContext = null;
         }
 
         if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && keyEventDispatcher.getKeys()[GLFW_KEY_C] &&
                 entityContext instanceof OxyModel m && !cPressed && focusedWindow) {
             m.copyMe();
-            sceneLayer.updateAllModelEntities();
+            sceneLayer.updateAllEntities();
             cPressed = true;
         }
         if (!keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && !keyEventDispatcher.getKeys()[GLFW_KEY_C])
@@ -78,7 +79,7 @@ public class ScenePanel extends Panel {
         ImVec2 availContentRegionSize = new ImVec2();
         ImGui.getContentRegionAvail(availContentRegionSize);
 
-        FrameBuffer frameBuffer = SceneRuntime.ACTIVE_SCENE.getFrameBuffer();
+        OpenGLFrameBuffer frameBuffer = SceneRuntime.ACTIVE_SCENE.getFrameBuffer();
         if (frameBuffer != null) {
             ImGui.image(frameBuffer.getColorAttachmentTexture(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
 

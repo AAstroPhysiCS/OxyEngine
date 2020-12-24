@@ -1,14 +1,15 @@
 package OxyEngineEditor.Scene;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.Light;
+import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Events.OxyEventListener;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.ObjectType;
-import OxyEngineEditor.UI.Panels.GUIProperty;
+import OxyEngineEditor.UI.Panels.GUINode;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -18,11 +19,12 @@ import java.util.List;
 import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 import static OxyEngine.Tools.Globals.toPrimitiveFloat;
 import static OxyEngine.Tools.Globals.toPrimitiveInteger;
+import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public abstract class OxyEntity {
 
     private final List<OxyScript> scripts = new ArrayList<>();
-    private final List<GUIProperty> guiProperties = new ArrayList<>();
+    private final List<GUINode> guiNodes = new ArrayList<>();
 
     public float[] vertices, tcs, normals, tangents, biTangents;
     public int[] indices;
@@ -49,6 +51,12 @@ public abstract class OxyEntity {
 
     public abstract OxyEntity copyMe();
 
+    public void unbindTextures() {
+        for (int i = 1; i <= 5; i++) {
+            glBindTextureUnit(i, 0);
+        }
+    }
+
     protected void addToScene() {
         scene.put(this);
     }
@@ -62,7 +70,7 @@ public abstract class OxyEntity {
     public void addComponent(EntityComponent... component) {
         scene.addComponent(this, component);
         for (EntityComponent c : component) {
-            if (c instanceof Mesh m) {
+            if (c instanceof OpenGLMesh m) {
                 m.addToList(this);
             }
             //if someone decides to add a seperate TransformComponent, then validate it
@@ -76,12 +84,12 @@ public abstract class OxyEntity {
     public void addComponent(List<EntityComponent> component) {
         for (EntityComponent c : component) {
             scene.addComponent(this, c);
-            if (c instanceof Mesh m) {
+            if (c instanceof OpenGLMesh m) {
                 m.addToList(this);
             }
             //if someone decides to add a seperate TransformComponent, then validate it
             //if the entity was imported from a oxy scene file, then do not validate it, because it has been already validated.
-            if (c instanceof TransformComponent t) {
+            if (c instanceof TransformComponent t && !importedFromFile) {
                 t.validate(this);
             }
         }
@@ -91,7 +99,7 @@ public abstract class OxyEntity {
         component.setScene(scene);
         component.setEntity(this);
         component.loadAssembly();
-        getGUIProperties().add(component.guiNode);
+        getGUINodes().add(component.guiNode);
         scripts.add(component);
     }
 
@@ -171,8 +179,8 @@ public abstract class OxyEntity {
         return tcs;
     }
 
-    public List<GUIProperty> getGUIProperties() {
-        return guiProperties;
+    public List<GUINode> getGUINodes() {
+        return guiNodes;
     }
 
     public Object clone() {
@@ -218,7 +226,7 @@ public abstract class OxyEntity {
             if (m.aoTexture != null) aoTexture = m.aoTexture.getPath();
             aoTextureStrength = String.valueOf(m.aoStrength[0]);
         }
-        if (has(ModelMesh.class)) mesh = get(ModelMesh.class).getPath();
+        if (has(ModelMeshOpenGL.class)) mesh = get(ModelMeshOpenGL.class).getPath();
         if (has(Light.class)) emitting = true;
 
         var obj = arr.createOxyJSONObject("OxyModel " + i)
@@ -244,7 +252,7 @@ public abstract class OxyEntity {
                 .putField("Metallic Map Strength", metalnessTextureStrength)
                 .putField("Mesh", mesh)
                 .createInnerObject("Script");
-        for(var scripts : getScripts()) obj.putField("Path", scripts.getPath());
+        for (var scripts : getScripts()) obj.putField("Path", scripts.getPath());
     }
 
     public List<OxyScript> getScripts() {

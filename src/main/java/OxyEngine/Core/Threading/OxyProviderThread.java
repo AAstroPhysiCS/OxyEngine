@@ -1,14 +1,19 @@
 package OxyEngine.Core.Threading;
 
-public class OxySubThread {
+import OxyEngine.Scripting.OxyScript;
+
+import java.util.concurrent.ConcurrentLinkedDeque;
+
+public class OxyProviderThread<T extends OxyProvider> {
 
     private Thread worker;
+    private final ConcurrentLinkedDeque<T> providers = new ConcurrentLinkedDeque<>();
 
-    public OxySubThread(Runnable r, String name) {
+    public OxyProviderThread(Runnable r, String name) {
         worker = new Thread(r, name);
     }
 
-    public OxySubThread() {
+    public OxyProviderThread() {
     }
 
     public void setTarget(Runnable r) {
@@ -44,5 +49,14 @@ public class OxySubThread {
     public void stop() {
         worker.checkAccess();
         worker.suspend();
+    }
+
+    public ConcurrentLinkedDeque<T> getProviders() {
+        return providers;
+    }
+
+    @SuppressWarnings({"unchecked", "SuspiciousMethodCalls"})
+    public void addProvider(OxyScript c) {
+        if(!providers.contains(c.getProvider())) providers.add((T) c.getProvider());
     }
 }

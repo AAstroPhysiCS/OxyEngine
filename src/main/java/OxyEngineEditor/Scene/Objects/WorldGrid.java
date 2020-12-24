@@ -1,8 +1,9 @@
 package OxyEngineEditor.Scene.Objects;
 
-import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Components.NativeObjectMesh;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Native.GridFactory;
@@ -11,13 +12,14 @@ import OxyEngineEditor.Scene.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static OxyEngine.Components.NativeObjectMesh.*;
+import static OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL.*;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
 public class WorldGrid {
 
     private final Scene scene;
-    private final NativeObjectMesh worldGridMesh;
+    private final NativeObjectMeshOpenGL worldGridMesh;
 
     public WorldGrid(Scene scene, int size) {
         this.scene = scene;
@@ -25,8 +27,11 @@ public class WorldGrid {
         worldGridMesh = new NativeMeshBuilderImpl()
                 .setShader(shader)
                 .setMode(GL_LINES)
-                .setUsage(BufferTemplate.Usage.STATIC)
-                .setVerticesBufferAttributes(attributesVert, attributesTXSlot)
+                .setUsage(BufferLayoutProducer.Usage.STATIC)
+                .setVerticesBufferAttributes(
+                        new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0),
+                        new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES)
+                )
                 .create();
         add(size);
         worldGridMesh.initList();

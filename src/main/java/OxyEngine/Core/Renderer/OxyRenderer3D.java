@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Renderer.Buffer.Mesh;
+import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 
@@ -23,16 +23,15 @@ public class OxyRenderer3D extends OxyRenderer {
     }
 
     @Override
-    public void render(float ts, Mesh mesh, OxyCamera camera) {
+    public void render(float ts, OpenGLMesh mesh, OxyCamera camera) {
         render(ts, mesh, camera, mesh.getShader());
     }
 
-    public void render(float ts, Mesh mesh, OxyCamera camera, OxyShader shader){
+    public void render(float ts, OpenGLMesh mesh, OxyCamera camera, OxyShader shader){
         assert shader != null : oxyAssert("Shader is not instantiated.");
         shader.enable();
         shader.setUniformVec3("cameraPos", camera.getCameraController().origin);
         shader.setCamera(camera);
-        currentBoundedCamera = camera;
         if (mesh.empty())
             mesh.load();
         mesh.render();
@@ -40,7 +39,7 @@ public class OxyRenderer3D extends OxyRenderer {
     }
 
     @Override
-    public void render(float ts, Mesh mesh) {
+    public void render(float ts, OpenGLMesh mesh) {
         render(ts, mesh, currentBoundedCamera);
     }
 }

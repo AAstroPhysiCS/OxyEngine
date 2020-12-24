@@ -1,11 +1,14 @@
-package OxyEngine.Components;
+package OxyEngine.Core.Renderer.Mesh;
 
+import OxyEngine.Components.SelectedComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Renderer.Buffer.*;
+import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.SceneRuntime;
-import OxyEngineEditor.UI.Panels.GUIProperty;
+import OxyEngineEditor.UI.Panels.GUINode;
 import OxyEngineEditor.UI.Panels.PropertiesPanel;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -19,66 +22,20 @@ import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
-public class ModelMesh extends Mesh {
-
-    public static final BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0);
-    public static final BufferTemplate.Attributes attributesTXSlots = new BufferTemplate.Attributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
-
-    public static final BufferTemplate.Attributes attributesNormals = new BufferTemplate.Attributes(OxyShader.NORMALS, 3, GL_FLOAT, false, 0, 0);
-
-    public static final BufferTemplate.Attributes attributesTangents = new BufferTemplate.Attributes(OxyShader.TANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
-    public static final BufferTemplate.Attributes attributesBiTangents = new BufferTemplate.Attributes(OxyShader.BITANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-
-    public static final BufferTemplate.Attributes attributesTXCoords = new BufferTemplate.Attributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0);
-
-    private final float[] vertices, textureCoords, normals, tangents, biTangents;
-    private final int[] indices;
+public class ModelMeshOpenGL extends OpenGLMesh {
 
     private final String path;
 
-    private ModelMesh(String path, OxyShader shader, BufferTemplate.Usage usage, int mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
+    private ModelMeshOpenGL(String path, OxyShader shader, int mode, BufferLayoutRecord layout) {
         this.path = path;
         this.shader = shader;
-        this.vertices = vertices;
-        this.indices = indices;
-        this.textureCoords = textureCoords;
-        this.normals = normals;
         this.mode = mode;
-        this.tangents = tangents;
-        this.biTangents = biTangents;
 
-        vertexBuffer = new VertexBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-                .setVerticesStrideSize(attributesVert.stride() / Float.BYTES)
-                .setUsage(usage)
-                .setAttribPointer(attributesVert, attributesTXSlots));
-
-        indexBuffer = new IndexBuffer();
-
-        textureBuffer = new TextureBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-                .setAttribPointer(attributesTXCoords));
-
-        normalsBuffer = new NormalsBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-                .setAttribPointer(attributesNormals));
-
-        tangentBuffer = new TangentBuffer(() -> new BufferTemplate.BufferTemplateImpl()
-                .setAttribPointer(attributesTangents, attributesBiTangents));
-
-        vertexBuffer.setVertices(vertices);
-        indexBuffer.setIndices(indices);
-        textureBuffer.setTextureCoords(textureCoords);
-        normalsBuffer.setNormals(normals);
-
-        float[] biAndTangents = new float[tangents.length + biTangents.length];
-        int tangentPtr = 0, biTangentPtr = 0;
-        for (int i = 0; i < biAndTangents.length; ) {
-            biAndTangents[i++] = tangents[tangentPtr++];
-            biAndTangents[i++] = tangents[tangentPtr++];
-            biAndTangents[i++] = tangents[tangentPtr++];
-            biAndTangents[i++] = biTangents[biTangentPtr++];
-            biAndTangents[i++] = biTangents[biTangentPtr++];
-            biAndTangents[i++] = biTangents[biTangentPtr++];
-        }
-        tangentBuffer.setBiAndTangent(biAndTangents);
+        vertexBuffer = (OpenGLVertexBuffer) layout.vertexBuffer();
+        indexBuffer = (OpenGLIndexBuffer) layout.indexBuffer();
+        normalsBuffer = (OpenGLNormalsBuffer) layout.normalsBuffer();
+        tangentBuffer = (OpenGLTangentBuffer) layout.tangentBuffer();
+        textureBuffer = (OpenGLTextureBuffer) layout.textureBuffer();
     }
 
     interface ModelMeshBuilder {
@@ -99,11 +56,11 @@ public class ModelMesh extends Mesh {
 
         ModelMeshBuilder setMode(int mode);
 
-        ModelMeshBuilder setUsage(BufferTemplate.Usage usage);
+        ModelMeshBuilder setUsage(BufferLayoutProducer.Usage usage);
 
         ModelMeshBuilder setPath(String path);
 
-        ModelMesh create();
+        ModelMeshOpenGL create();
     }
 
     public static class ModelMeshBuilderImpl implements ModelMeshBuilder {
@@ -112,7 +69,7 @@ public class ModelMesh extends Mesh {
         private float[] vertices, textureCoords, normals, tangents, biTangents;
         private int[] indices;
         private int mode;
-        private BufferTemplate.Usage usage;
+        private BufferLayoutProducer.Usage usage;
         private String path;
 
         @Override
@@ -164,7 +121,7 @@ public class ModelMesh extends Mesh {
         }
 
         @Override
-        public ModelMeshBuilderImpl setUsage(BufferTemplate.Usage usage) {
+        public ModelMeshBuilderImpl setUsage(BufferLayoutProducer.Usage usage) {
             this.usage = usage;
             return this;
         }
@@ -176,18 +133,64 @@ public class ModelMesh extends Mesh {
         }
 
         @Override
-        public ModelMesh create() {
+        public ModelMeshOpenGL create() {
             assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
-            return new ModelMesh(path, shader, usage, mode, vertices, indices, textureCoords, normals, tangents, biTangents);
+
+            BufferLayoutRecord layout = BufferLayoutProducer.create()
+                    .createLayout(VertexBuffer.class)
+                        .setStrideSize(4)
+                        .setUsage(usage)
+                        .setAttribPointer(
+                                new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0),
+                                new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES)
+                        )
+                        .create()
+                    .createLayout(IndexBuffer.class).create()
+                    .createLayout(TextureBuffer.class)
+                        .setAttribPointer(
+                            new BufferLayoutAttributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0)
+                        )
+                        .create()
+                    .createLayout(NormalsBuffer.class)
+                        .setAttribPointer(
+                            new BufferLayoutAttributes(OxyShader.NORMALS, 3, GL_FLOAT, false, 0, 0)
+                        )
+                        .create()
+                    .createLayout(TangentBuffer.class)
+                        .setAttribPointer(
+                            new BufferLayoutAttributes(OxyShader.TANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 0),
+                            new BufferLayoutAttributes(OxyShader.BITANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES)
+                        )
+                        .create()
+                    .finalizeLayout();
+
+            layout.vertexBuffer().setVertices(vertices);
+            layout.indexBuffer().setIndices(indices);
+            layout.textureBuffer().setTextureCoords(textureCoords);
+            layout.normalsBuffer().setNormals(normals);
+
+            float[] biAndTangents = new float[tangents.length + biTangents.length];
+            int tangentPtr = 0, biTangentPtr = 0;
+            for (int i = 0; i < biAndTangents.length; ) {
+                biAndTangents[i++] = tangents[tangentPtr++];
+                biAndTangents[i++] = tangents[tangentPtr++];
+                biAndTangents[i++] = tangents[tangentPtr++];
+                biAndTangents[i++] = biTangents[biTangentPtr++];
+                biAndTangents[i++] = biTangents[biTangentPtr++];
+                biAndTangents[i++] = biTangents[biTangentPtr++];
+            }
+            layout.tangentBuffer().setBiAndTangent(biAndTangents);
+
+            return new ModelMeshOpenGL(path, shader, mode, layout);
         }
     }
 
     private static final boolean initPanel = false;
     private static ImString meshPath = new ImString(0);
-    public static final GUIProperty guiNode = () -> {
+    public static final GUINode guiNode = () -> {
         {
             if (ImGui.collapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
-                if (entityContext.has(Mesh.class)) meshPath = new ImString(entityContext.get(Mesh.class).getPath());
+                if (entityContext.has(OpenGLMesh.class)) meshPath = new ImString(entityContext.get(OpenGLMesh.class).getPath());
                 else meshPath = new ImString("");
 
                 ImGui.checkbox("Cast Shadows", false);
@@ -210,12 +213,12 @@ public class ModelMesh extends Mesh {
                             for (OxyModel e : eList) {
                                 TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
                                 e.addComponent(t, new SelectedComponent(true, false), entityContext.get(OxyMaterial.class));
-                                e.getGUIProperties().add(ModelMesh.guiNode);
-                                e.getGUIProperties().add(OxyMaterial.guiNode);
+                                e.getGUINodes().add(ModelMeshOpenGL.guiNode);
+                                e.getGUINodes().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
                             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
-                            PropertiesPanel.sceneLayer.updateAllModelEntities();
+                            PropertiesPanel.sceneLayer.updateAllEntities();
                             meshPath = new ImString(path);
                             entityContext = null;
                         }
@@ -225,30 +228,6 @@ public class ModelMesh extends Mesh {
             }
         }
     };
-
-    public float[] getTextureCoords() {
-        return textureCoords;
-    }
-
-    public float[] getVertices() {
-        return vertices;
-    }
-
-    public float[] getNormals() {
-        return normals;
-    }
-
-    public float[] getTangents() {
-        return tangents;
-    }
-
-    public float[] getBiTangents() {
-        return biTangents;
-    }
-
-    public int[] getIndices() {
-        return indices;
-    }
 
     public String getPath() {
         return path;

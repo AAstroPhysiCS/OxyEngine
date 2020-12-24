@@ -24,9 +24,9 @@ public class TestScript extends ScriptableEntity {
 
     @Override
     public void onUpdate(float ts) {
-        if(enableX) t.rotation.x += speed;
-        if(enableY) t.rotation.y += speed;
-        if(enableZ) t.rotation.z += speed;
+        if(enableX) t.rotation.x += speed * ts;
+        if(enableY) t.rotation.y += speed * ts;
+        if(enableZ) t.rotation.z += speed * ts;
         updateData();
     }
 }

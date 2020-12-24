@@ -1,11 +1,10 @@
 package OxyEngine.Core.Renderer;
 
+import OxyEngine.Components.PerspectiveCamera;
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Renderer.Buffer.Mesh;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
-import OxyEngine.Components.PerspectiveCamera;
 
 import static OxyEngineEditor.Scene.SceneRuntime.currentBoundedCamera;
 import static org.lwjgl.opengl.GL11.*;
@@ -13,7 +12,6 @@ import static org.lwjgl.opengl.GL11.*;
 public abstract class OxyRenderer {
 
     protected final WindowHandle windowHandle;
-    protected static OxyShader currentShader;
 
     protected static OxyRendererType type;
 
@@ -21,9 +19,9 @@ public abstract class OxyRenderer {
         this.windowHandle = windowHandle;
     }
 
-    public abstract void render(float ts, Mesh mesh, OxyCamera camera);
+    public abstract void render(float ts, OpenGLMesh mesh, OxyCamera camera);
 
-    public abstract void render(float ts, Mesh mesh);
+    public abstract void render(float ts, OpenGLMesh mesh);
 
     public static record Stats() {
 

@@ -5,7 +5,7 @@ import OxyEngine.Components.BoundingBoxComponent;
 import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Components.TransformComponent;
-import OxyEngineEditor.Scene.Objects.Model.ModelFactory;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import org.joml.Intersectionf;
@@ -30,7 +30,7 @@ public interface ObjectSelector {
 
         for (OxyEntity entity : entities) {
             if (entity instanceof OxyNativeObject) continue;
-            if (!entity.has(ModelFactory.class)) continue;
+            if (((OxyModel)entity).factory == null) continue;
             if (!entity.has(SelectedComponent.class) || !entity.has(TransformComponent.class)) continue;
             if (entity.get(SelectedComponent.class).fixedValue) continue;
 

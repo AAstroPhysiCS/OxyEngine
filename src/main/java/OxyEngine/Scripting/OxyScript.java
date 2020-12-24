@@ -1,13 +1,14 @@
 package OxyEngine.Scripting;
 
 import OxyEngine.Components.UUIDComponent;
-import OxyEngine.Core.Threading.OxySubThread;
+import OxyEngine.Core.Threading.OxyProvider;
+import OxyEngine.Core.Threading.OxyProviderThread;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
-import OxyEngineEditor.UI.Panels.GUIProperty;
+import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -19,6 +20,7 @@ import java.util.Objects;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngineEditor.Scene.SceneRuntime.TS;
 import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
 public class OxyScript implements OxyDisposable {
@@ -27,7 +29,18 @@ public class OxyScript implements OxyDisposable {
     private OxyEntity entity;
     private EntityInfoProvider provider;
 
-    private OxySubThread oxySubThread;
+    public static OxyProviderThread<EntityInfoProvider> scriptThread;
+
+    static {
+        scriptThread = new OxyProviderThread<>();
+        scriptThread.setTarget(() -> {
+            //noinspection InfiniteLoopStatement
+            while (true) {
+                for(OxyScript.EntityInfoProvider providerF : scriptThread.getProviders()) providerF.invokeUpdate(TS);
+            }
+        });
+        scriptThread.start();
+    }
 
     private String path;
 
@@ -65,13 +78,13 @@ public class OxyScript implements OxyDisposable {
 
     @Override
     public void dispose() {
-        if(oxySubThread != null){
-            oxySubThread.shutdown();
-            oxySubThread = null;
+        if(scriptThread != null){
+            scriptThread.shutdown();
+            scriptThread = null;
         }
     }
 
-    public static class EntityInfoProvider {
+    public static class EntityInfoProvider implements OxyProvider {
 
         private final ScriptableEntity obj;
 
@@ -83,10 +96,12 @@ public class OxyScript implements OxyDisposable {
             for (Field f : allFields) f.setAccessible(true);
         }
 
+        @Override
         public void invokeCreate() {
             obj.onCreate();
         }
 
+        @Override
         public void invokeUpdate(float ts) {
             obj.onUpdate(ts);
         }
@@ -100,7 +115,7 @@ public class OxyScript implements OxyDisposable {
     }
 
     private final ImString bufferPath = new ImString(100);
-    public final GUIProperty guiNode = () -> {
+    public final GUINode guiNode = () -> {
         bufferPath.set(Objects.requireNonNullElse(path, ""));
         final int hashCode = entityContext.hashCode();
 
@@ -173,11 +188,12 @@ public class OxyScript implements OxyDisposable {
                     ImGui.columns(1);
                 }
             }
-            ImGui.button("Run Script");
-            ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 100);
-            if (ImGui.button("Reload Assembly")) {
-                loadAssembly();
+            if (ImGui.button("Run Script")){
+               //TODO: run just the specific script
             }
+            ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 100);
+            if (ImGui.button("Reload Assembly"))
+                loadAssembly();
         }
     };
 
@@ -189,11 +205,7 @@ public class OxyScript implements OxyDisposable {
         return path;
     }
 
-    public OxySubThread getOxySubThread() {
-        return oxySubThread;
-    }
-
-    public void setOxySubThread(OxySubThread oxySubThread) {
-        this.oxySubThread = oxySubThread;
+    public OxyProviderThread<EntityInfoProvider> getOxySubThread() {
+        return scriptThread;
     }
 }

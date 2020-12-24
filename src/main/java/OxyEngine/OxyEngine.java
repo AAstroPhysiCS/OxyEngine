@@ -1,28 +1,32 @@
 package OxyEngine;
 
+import OxyEngine.Core.Renderer.Context.OxyRenderCommand;
+import OxyEngine.Core.Renderer.Context.RendererAPI;
+import OxyEngine.Core.Renderer.Context.RendererContext;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
+import OxyEngine.Core.Renderer.OxyRendererPlatform;
 import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.Core.Window.WindowHandle;
-import OxyEngine.Core.Window.WindowHint;
-import OxyEngine.OpenGL.OpenGLContext;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Loader.UIThemeLoader;
+import org.lwjgl.glfw.GLFWErrorCallback;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 
 import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class OxyEngine implements OxyDisposable {
 
     private final WindowHandle windowHandle;
     private static Antialiasing antialiasing;
+
     private final boolean vSync;
+    private final boolean debug;
 
     private final Thread thread;
 
@@ -30,11 +34,17 @@ public class OxyEngine implements OxyDisposable {
 
     private static final float[][] LOADED_THEME = UIThemeLoader.getInstance().load();
 
-    public OxyEngine(Supplier<Runnable> supplier, WindowHandle windowHandle, Antialiasing antialiasing, boolean vSync, OxyRendererType type) {
+    public OxyEngine(Supplier<Runnable> supplier, WindowHandle windowHandle, Antialiasing antialiasing, boolean vSync, boolean debug, OxyEngineSpecs specs) {
         thread = new Thread(supplier.get(), "OxyEngine - 1");
         this.windowHandle = windowHandle;
-        OxyEngine.antialiasing = antialiasing;
         this.vSync = vSync;
+        this.debug = debug;
+        OxyEngine.antialiasing = antialiasing;
+
+        OxyRendererType type = specs.type();
+        OxyRendererPlatform platform = specs.platform();
+
+        OxyRenderCommand.getInstance(RendererContext.getContext(platform), RendererAPI.getContext(platform));
 
         if (type == OxyRendererType.Oxy3D)
             renderer = OxyRenderer3D.getInstance(windowHandle);
@@ -60,27 +70,30 @@ public class OxyEngine implements OxyDisposable {
     }
 
     public void init() {
-        if(!glfwInit()) oxyAssert("Can't init GLFW");
+        if (!glfwInit()) oxyAssert("Can't init GLFW");
         logger.info("GLFW init successful");
+        GLFWErrorCallback.createPrint(System.err).set();
 
+        WindowHandle.WindowSpecs specs = windowHandle.getSpecs();
         WindowBuilder builder = new WindowBuilder.WindowFactory();
-        WindowHint windowHint = builder.createHints()
-                .resizable(GLFW_TRUE)
-                .doubleBuffered(GLFW_TRUE);
-        windowHint.create();
+        builder.createHints()
+                .resizable(specs.resizable())
+                .doubleBuffered(specs.doubleBuffered())
+                .create();
         windowHandle.setPointer(switch (windowHandle.getMode()) {
             case WINDOWED -> builder.createOpenGLWindow(windowHandle.getWidth(), windowHandle.getHeight(), windowHandle.getTitle());
             case FULLSCREEN -> builder.createFullscreenOpenGLWindow(windowHandle.getTitle());
             case WINDOWEDFULLSCREEN -> builder.createWindowedFullscreenOpenGLWindow(windowHandle.getTitle());
         });
-        OpenGLContext.init(windowHandle);
+        windowHandle.init();
         glfwSwapInterval(vSync ? 1 : 0);
+
+        OxyRenderCommand.init(debug);
     }
 
     @Override
     public void dispose() {
-        glfwFreeCallbacks(windowHandle.getPointer());
-        glfwDestroyWindow(windowHandle.getPointer());
+        windowHandle.dispose();
 
         glfwTerminate();
         Objects.requireNonNull(glfwSetErrorCallback(null)).free();

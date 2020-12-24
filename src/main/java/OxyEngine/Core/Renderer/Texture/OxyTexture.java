@@ -26,7 +26,7 @@ public class OxyTexture {
     private OxyTexture() {
     }
 
-    static abstract class AbstractTexture implements OxyDisposable {
+    public static abstract class AbstractTexture implements OxyDisposable {
 
         protected int textureId;
         protected final int textureSlot;
@@ -40,7 +40,7 @@ public class OxyTexture {
         protected ByteBuffer loadTextureFile(String path, int[] width, int[] height, int[] channels) {
             ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
             if (buffer == null)
-                logger.warning("Texture: " + path + " could not be loaded! Gonna give some default color");
+                logger.warning("Texture: " + path + " could not be loaded!");
             return buffer;
         }
 
@@ -69,38 +69,42 @@ public class OxyTexture {
     }
 
     public static ImageTexture loadImage(int slot, String path) {
-        assert slot == -1 || slotCounter[slot] != 0 : oxyAssert("Texture Slot already being used");
+        if (path == null) return null;
+        if (path.equals("null")) return null;
+//        System.out.println(Arrays.toString(slotCounter));
+//        assert slot == -1 || slotCounter[slot] != 0 : oxyAssert("Texture Slot already being used");
         return new ImageTexture(slot, path, null);
     }
 
-    public static ImageTexture loadImage(String path) {
+    /*public static ImageTexture loadImage(String path) {
         if (path == null) return null;
         if (path.equals("null")) return null;
         return new ImageTexture(getLatestSlot(), path, null);
-    }
+    }*/
 
-    public static ImageTexture loadImage(String path, float[] tcs) {
+    /*public static ImageTexture loadImage(String path, float[] tcs) {
         if (path == null) return null;
         if (path.equals("null")) return null;
         return new ImageTexture(getLatestSlot(), path, tcs);
-    }
+    }*/
 
     public static ImageTexture loadImage(int slot, String path, float[] tcs) {
+        if (path.equals("null")) return null;
         assert slotCounter[slot] != 0 : oxyAssert("Texture Slot already being used");
         return new ImageTexture(slot, path, tcs);
     }
 
-    public static CubemapTexture loadCubemap(String path, Scene scene) {
+    /*public static CubemapTexture loadCubemap(String path, Scene scene) {
         if (path == null) return null;
         if (path.equals("null")) return null;
         return new CubemapTexture(getLatestSlot(), path, scene);
-    }
+    }*/
 
     public static HDRTexture loadHDRTexture(String path, Scene scene) {
-        HDRTexture hdrTexture = new HDRTexture(getLatestSlot(), path, scene);
-        HDRTexture.IrradianceTexture irradianceTexture = new HDRTexture.IrradianceTexture(getLatestSlot(), path, hdrTexture);
-        HDRTexture.PrefilterTexture prefilterTexture = new HDRTexture.PrefilterTexture(getLatestSlot(), path, hdrTexture);
-        HDRTexture.BDRF bdrfTexture = new HDRTexture.BDRF(getLatestSlot(), path, hdrTexture);
+        HDRTexture hdrTexture = new HDRTexture(6, path, scene);
+        HDRTexture.IrradianceTexture irradianceTexture = new HDRTexture.IrradianceTexture(7, path, hdrTexture);
+        HDRTexture.PrefilterTexture prefilterTexture = new HDRTexture.PrefilterTexture(8, path, hdrTexture);
+        HDRTexture.BDRF bdrfTexture = new HDRTexture.BDRF(9, path, hdrTexture);
         hdrTexture.setIrradianceTexture(irradianceTexture);
         hdrTexture.setPrefilterTexture(prefilterTexture);
         hdrTexture.setBdrf(bdrfTexture);
@@ -124,6 +128,10 @@ public class OxyTexture {
 
     public static void unbindAllTextureSlots() {
         for (int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
+    }
+
+    public static void resetTextureSlots(){
+        Arrays.fill(slotCounter, 0); //resetting slotCounter
     }
 
     private static int getLatestSlot() {

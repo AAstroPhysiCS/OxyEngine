@@ -1,9 +1,10 @@
 package OxyEngine.Core.Renderer.Texture;
 
-import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Components.EntityComponent;
-import OxyEngine.Components.NativeObjectMesh;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 
@@ -130,13 +131,13 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
             shader.setUniform1i("skyBoxTexture", textureSlot);
             shader.disable();
 
-            BufferTemplate.Attributes attributesVert = new BufferTemplate.Attributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0);
-
-            NativeObjectMesh mesh = new NativeObjectMesh.NativeMeshBuilderImpl()
+            NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL.NativeMeshBuilderImpl()
                     .setShader(shader)
                     .setMode(GL_TRIANGLES)
-                    .setUsage(BufferTemplate.Usage.STATIC)
-                    .setVerticesBufferAttributes(attributesVert)
+                    .setUsage(BufferLayoutProducer.Usage.STATIC)
+                    .setVerticesBufferAttributes(
+                            new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0)
+                    )
                     .create();
 
             OxyNativeObject cube = scene.createNativeObjectEntity();

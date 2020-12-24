@@ -1,12 +1,14 @@
 package OxyEngineEditor.Scene.Objects.Model;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Renderer.Buffer.BufferTemplate;
-import OxyEngine.Core.Renderer.Buffer.Mesh;
-import OxyEngine.Core.Renderer.RenderingMode;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
+import OxyEngineEditor.Scene.SceneRuntime;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -15,7 +17,7 @@ import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class OxyModel extends OxyEntity {
 
-    private ModelFactory factory;
+    public ModelFactory factory;
 
     public OxyModel(Scene scene) {
         super(scene);
@@ -39,9 +41,9 @@ public class OxyModel extends OxyEntity {
         var boundingBox = get(BoundingBoxComponent.class);
         var transform = get(TransformComponent.class);
         e.importedFromFile = this.importedFromFile;
+        e.factory = this.factory;
         e.addComponent(
                 get(UUIDComponent.class),
-                get(ModelFactory.class),
                 get(OxyShader.class),
                 new BoundingBoxComponent(
                         boundingBox.min(),
@@ -54,21 +56,40 @@ public class OxyModel extends OxyEntity {
                 new OxyMaterial(get(OxyMaterial.class)),
                 new SelectedComponent(false)
         );
-        e.initData(get(Mesh.class).getPath());
+
+        //SCRIPTS (with GUINode-Script)
+        for (OxyScript s : this.getScripts()) e.addScript(new OxyScript(s.getPath()));
+
+        //adding all the parent gui nodes (except OxyScript, bcs that gui node is instance dependent)
+        e.getGUINodes().addAll(this.getGUINodes());
+        var iterator = e.getGUINodes().iterator();
+        for (OxyScript s : this.getScripts()) {
+            while (iterator.hasNext()) {
+                var guiNode = iterator.next();
+                if (s.guiNode.equals(guiNode)) {
+                    iterator.remove();
+                    break;
+                }
+            }
+        }
+
+        SceneRuntime.onCreate();
+        SceneRuntime.stop();
+
+        e.initData(get(OpenGLMesh.class).getPath());
         return e;
     }
 
     @Override
     public void initData(String path) {
-        assert has(ModelFactory.class) : oxyAssert("Models should have a Model Template");
-        factory = get(ModelFactory.class);
+        assert factory != null : oxyAssert("Models should have a Model Template");
         translatePos();
         factory.constructData(this);
-        addComponent(new ModelMesh.ModelMeshBuilderImpl()
+        addComponent(new ModelMeshOpenGL.ModelMeshBuilderImpl()
                 .setPath(path)
                 .setShader(get(OxyShader.class))
                 .setMode(GL_TRIANGLES)
-                .setUsage(BufferTemplate.Usage.DYNAMIC)
+                .setUsage(BufferLayoutProducer.Usage.DYNAMIC)
                 .setVertices(vertices)
                 .setIndices(indices)
                 .setTextureCoords(tcs)
@@ -81,20 +102,20 @@ public class OxyModel extends OxyEntity {
     @Override
     public void constructData() {
         translatePos();
-        if(factory == null) return;
+        if (factory == null) return;
         factory.constructData(this);
-        get(Mesh.class).updateSingleEntityData(0, vertices);
+        if(has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 
     @Override
     public void updateData() {
         translatePos();
-        if(factory == null) return;
+        if (factory == null) return;
         factory.updateData(this);
-        get(Mesh.class).updateSingleEntityData(0, vertices);
+        if(has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 
-    private void translatePos(){
+    private void translatePos() {
         TransformComponent c = get(TransformComponent.class);
         c.transform = new Matrix4f()
                 .translate(c.position)

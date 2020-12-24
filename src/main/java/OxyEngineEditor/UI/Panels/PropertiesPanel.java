@@ -5,6 +5,7 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
+import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import imgui.ImGui;
@@ -40,9 +41,6 @@ public class PropertiesPanel extends Panel {
 
     ImString name = new ImString(0);
     final ImString searchAddComponent = new ImString(100);
-
-    public static final String[] componentNames = EntityComponent.allComponentNames();
-    public static final String[] componentFullName = EntityComponent.allComponentFullNames();
 
     @Override
     public void preload() {
@@ -107,7 +105,7 @@ public class PropertiesPanel extends Panel {
             return;
         }
 
-        for (GUIProperty guiProperty : entityContext.getGUIProperties()) guiProperty.runEntry();
+        for (GUINode guiNode : entityContext.getGUINodes()) guiNode.runEntry();
 
         final float windowWidth = ImGui.getWindowWidth();
         ImGui.dummy(0, 25);
@@ -126,12 +124,12 @@ public class PropertiesPanel extends Panel {
             ImGui.inputText("##hidelabel comp_popup_search", searchAddComponent);
             if (ImGui.beginMenu("Mesh")) {
                 if (ImGui.menuItem("Mesh Renderer"))
-                    if (!entityContext.getGUIProperties().contains(ModelMesh.guiNode))
-                        entityContext.getGUIProperties().add(ModelMesh.guiNode);
+                    if (!entityContext.getGUINodes().contains(ModelMeshOpenGL.guiNode))
+                        entityContext.getGUINodes().add(ModelMeshOpenGL.guiNode);
                 if (ImGui.menuItem("Material"))
-                    if (!entityContext.getGUIProperties().contains(OxyMaterial.guiNode)) {
+                    if (!entityContext.getGUINodes().contains(OxyMaterial.guiNode)) {
                         entityContext.addComponent(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 1.0f, 1.0f));
-                        entityContext.getGUIProperties().add(OxyMaterial.guiNode);
+                        entityContext.getGUINodes().add(OxyMaterial.guiNode);
                     }
                 ImGui.endMenu();
             }
@@ -154,8 +152,8 @@ public class PropertiesPanel extends Panel {
                     if (!entityContext.has(Light.class)) {
                         PointLight pointLight = new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f);
                         entityContext.addComponent(pointLight, new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
-                        entityContext.getGUIProperties().add(PointLight.guiNode);
-                        sceneLayer.rebuild();
+                        entityContext.getGUINodes().add(PointLight.guiNode);
+                        sceneLayer.updateAllEntities();
                     }
                     //error or hint that lights are single instanced. TODO
                 }
@@ -163,8 +161,8 @@ public class PropertiesPanel extends Panel {
                     if (!entityContext.has(Light.class)) {
                         DirectionalLight directionalLight = new DirectionalLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f));
                         entityContext.addComponent(directionalLight, new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
-                        entityContext.getGUIProperties().add(DirectionalLight.guiNode);
-                        sceneLayer.rebuild();
+                        entityContext.getGUINodes().add(DirectionalLight.guiNode);
+                        sceneLayer.updateAllEntities();
                     }
                     //error or hint that lights are single instanced. TODO
                 }

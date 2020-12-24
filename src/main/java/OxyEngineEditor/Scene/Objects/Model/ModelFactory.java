@@ -1,7 +1,6 @@
 package OxyEngineEditor.Scene.Objects.Model;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Components.EntityComponent;
 import OxyEngine.Components.TransformComponent;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -12,7 +11,7 @@ import java.util.List;
 
 import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 
-public class ModelFactory implements EntityComponent {
+public class ModelFactory {
 
     private final List<Vector3f> verticesNonTransformed;
     private final List<Vector3f> normals;

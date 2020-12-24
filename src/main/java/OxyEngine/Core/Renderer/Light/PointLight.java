@@ -4,7 +4,7 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Components.TransformComponent;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.UI.Panels.GUIProperty;
+import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Vector3f;
@@ -24,12 +24,16 @@ public class PointLight extends Light {
         this.quadratic = quadratic;
     }
 
+    private OxyEntity e;
+    private int index;
+
     @Override
     public void update(OxyEntity e, int i) {
+        this.e = e;
+        index = i;
         OxyShader shader = e.get(OxyShader.class);
         OxyMaterial material = e.get(OxyMaterial.class);
         shader.enable();
-        shader.setUniform1f("currentLightIndex", 0);
         shader.setUniformVec3("p_Light[" + i + "].position", e.get(TransformComponent.class).position);
 //        shader.setUniformVec3("p_Light[" + i + "].ambient", ambient);
 //        shader.setUniformVec3("p_Light[" + i + "].specular", specular);
@@ -42,28 +46,28 @@ public class PointLight extends Light {
 
     private static final float[] constantArr = new float[1], linearArr = new float[1], quadraticArr = new float[1], colorIntensityArr = new float[1];
 //    private static final float[] ambientArr = new float[3], specularArr = new float[3];
-    public static final GUIProperty guiNode = () -> {
+    public static final GUINode guiNode = () -> {
         if (ImGui.collapsingHeader("Point Light", ImGuiTreeNodeFlags.DefaultOpen)) {
 
             ImGui.columns(2, "env column");
+            ImGui.alignTextToFramePadding();
+            ImGui.text("Color intensity:");
             ImGui.alignTextToFramePadding();
             ImGui.text("Constant value:");
             ImGui.alignTextToFramePadding();
             ImGui.text("Linear value:");
             ImGui.alignTextToFramePadding();
             ImGui.text("Quadratic value:");
-            ImGui.alignTextToFramePadding();
-            ImGui.text("Color intensity:");
             ImGui.nextColumn();
             ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
             constantArr[0] = entityContext.get(PointLight.class).constant;
             linearArr[0] = entityContext.get(PointLight.class).linear;
             quadraticArr[0] = entityContext.get(PointLight.class).quadratic;
             colorIntensityArr[0] = entityContext.get(PointLight.class).colorIntensity;
-            ImGui.sliderFloat("###hidelabel constant", constantArr, 0, 10);
-            ImGui.sliderFloat("###hidelabel linear", linearArr, 0, 1);
-            ImGui.sliderFloat("###hidelabel quadratic", quadraticArr, 0, 1);
-            ImGui.sliderFloat("###hidelabel intensity", colorIntensityArr, 0, 255);
+            ImGui.dragFloat("###hidelabel intensity", colorIntensityArr, 0.1f, 0f, 1000f);
+            ImGui.dragFloat("###hidelabel constant", constantArr, 0.1f, 0, 10);
+            ImGui.dragFloat("###hidelabel linear", linearArr,0.05f, 0, 1);
+            ImGui.dragFloat("###hidelabel quadratic", quadraticArr, 0.05f, 0, 1);
             entityContext.get(PointLight.class).constant = constantArr[0];
             entityContext.get(PointLight.class).linear = linearArr[0];
             entityContext.get(PointLight.class).quadratic = quadraticArr[0];
@@ -75,4 +79,17 @@ public class PointLight extends Light {
         }
     };
 
+    @Override
+    public void dispose() {
+        OxyShader shader = e.get(OxyShader.class);
+        shader.enable();
+        shader.setUniformVec3("p_Light[" + index + "].position", new Vector3f(0, 0, 0));
+//        shader.setUniformVec3("p_Light[" + i + "].ambient", ambient);
+//        shader.setUniformVec3("p_Light[" + i + "].specular", specular);
+        shader.setUniformVec3("p_Light[" + index + "].diffuse", new Vector3f(0, 0, 0));
+        shader.setUniform1f("p_Light[" + index + "].constant", 0);
+        shader.setUniform1f("p_Light[" + index + "].linear", 0);
+        shader.setUniform1f("p_Light[" + index + "].quadratic", 0);
+        shader.disable();
+    }
 }

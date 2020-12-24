@@ -1,6 +1,6 @@
 package OxyEngineEditor.Scene.Objects.Native;
 
-import OxyEngine.Components.NativeObjectMesh;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 
 public class GridFactory extends NativeObjectFactory {
 
@@ -17,7 +17,7 @@ public class GridFactory extends NativeObjectFactory {
     }
 
     @Override
-    public void initData(OxyNativeObject e, NativeObjectMesh mesh) {
+    public void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh) {
         int[] indices = new int[]{
                 mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,
                 3 + mesh.indicesX, mesh.indicesY, 2 + mesh.indicesZ,
