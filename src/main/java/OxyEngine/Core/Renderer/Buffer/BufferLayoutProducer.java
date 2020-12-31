@@ -95,7 +95,7 @@ public class BufferLayoutProducer {
         @Override
         public BufferLayoutRecord finalizeLayout() {
 
-            BufferLayoutImpl vertexLayout = null, normalsLayout = null, tangentLayout = null, textureLayout = null;
+            BufferLayoutImpl vertexLayout = null, normalsLayout = null, tangentLayout = null, textureLayout = null, indexLayout = null;
             for (BufferLayoutImpl impl : implementations) {
                 if (VertexBuffer.class.equals(impl.destClass)) {
                     vertexLayout = impl;
@@ -105,11 +105,13 @@ public class BufferLayoutProducer {
                     normalsLayout = impl;
                 } else if (TextureBuffer.class.equals(impl.destClass)) {
                     textureLayout = impl;
+                } else if (IndexBuffer.class.equals(impl.destClass)){
+                    indexLayout = impl;
                 }
             }
 
             VertexBuffer vertexBuffer = BufferProducer.createVertexBuffer(vertexLayout);
-            IndexBuffer indexBuffer = BufferProducer.createIndexBuffer();
+            IndexBuffer indexBuffer = BufferProducer.createIndexBuffer(indexLayout);
             TangentBuffer tangentBuffer = BufferProducer.createTangentBuffer(tangentLayout);
             NormalsBuffer normalsBuffer = BufferProducer.createNormalsBuffer(normalsLayout);
             TextureBuffer textureBuffer = BufferProducer.createTextureBuffer(textureLayout);

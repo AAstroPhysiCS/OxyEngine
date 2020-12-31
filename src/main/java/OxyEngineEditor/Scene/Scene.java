@@ -1,6 +1,8 @@
 package OxyEngineEditor.Scene;
 
 import OxyEngine.Components.*;
+import OxyEngine.Core.Layers.GizmoLayer;
+import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.Light;
@@ -8,9 +10,9 @@ import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxyDisposable;
-import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Scene.Objects.Model.*;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
+import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -18,17 +20,22 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngineEditor.EditorApplication.oxyShader;
+import static OxyEngineEditor.Scene.SceneSerializer.extensionName;
+import static OxyEngineEditor.Scene.SceneSerializer.fileExtension;
 
 public final class Scene implements OxyDisposable {
 
     private final Registry registry = new Registry();
 
     private final OxyRenderer3D renderer;
-    private OxyUISystem oxyUISystem;
 
     private final OpenGLFrameBuffer frameBuffer;
     private final String sceneName;
+
+    public static int OBJECT_ID_COUNTER = 0;
 
     public SceneState STATE = SceneState.IDLE;
 
@@ -76,10 +83,9 @@ public final class Scene implements OxyDisposable {
     }
 
     public final OxyModel createEmptyModel(OxyShader shader) {
-        OxyModel e = new OxyModel(this);
+        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         e.importedFromFile = false;
         put(e);
-        e.originPos = new Vector3f(0, 0, 0);
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
@@ -93,10 +99,9 @@ public final class Scene implements OxyDisposable {
     }
 
     public final OxyModel createEmptyModel(OxyShader shader, boolean importedFromFile, int i) {
-        OxyModel e = new OxyModel(this);
+        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         e.importedFromFile = importedFromFile;
         put(e);
-        e.originPos = new Vector3f(0, 0, 0);
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
@@ -115,10 +120,9 @@ public final class Scene implements OxyDisposable {
 
         int pos = 0;
         for (OxyModelLoader.AssimpOxyMesh assimpMesh : loader.meshes) {
-            OxyModel e = new OxyModel(this);
+            OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
             e.importedFromFile = importedFromFile;
             put(e);
-            e.originPos = new Vector3f(assimpMesh.pos);
             e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
             e.addComponent(
                     new UUIDComponent(UUID.randomUUID()),
@@ -154,10 +158,9 @@ public final class Scene implements OxyDisposable {
             cachedPath = path;
         }
         OxyModelLoader.AssimpOxyMesh assimpMesh = cachedLoader.meshes.get(i);
-        OxyModel e = new OxyModel(this);
+        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         e.importedFromFile = importedFromFile;
         put(e);
-        e.originPos = new Vector3f(assimpMesh.pos);
         e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
@@ -294,20 +297,12 @@ public final class Scene implements OxyDisposable {
         stream.forEach(registryEach::each);
     }
 
-    public void setUISystem(OxyUISystem oxyUISystem) {
-        this.oxyUISystem = oxyUISystem;
-    }
-
     public int getShapeCount() {
         return registry.entityList.keySet().size();
     }
 
     public OxyRenderer3D getRenderer() {
         return renderer;
-    }
-
-    public OxyUISystem getOxyUISystem() {
-        return oxyUISystem;
     }
 
     public Set<OxyEntity> getEntities() {
@@ -338,5 +333,34 @@ public final class Scene implements OxyDisposable {
             }
         }
 //        assert registry.entityList.keySet().size() == 0 : oxyAssert("Scene dispose failed");
+    }
+
+    public static void openScene() {
+        String openScene = openDialog(extensionName, null);
+        if (openScene != null) {
+            SceneRuntime.ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, SceneLayer.getInstance(), oxyShader);
+            GizmoLayer.getInstance().build();
+            SceneLayer.getInstance().build();
+        }
+    }
+
+    public static void saveScene() {
+        SceneSerializer.serializeScene(SceneRuntime.ACTIVE_SCENE.getSceneName() + fileExtension);
+    }
+
+    public static void newScene() {
+        OxySelectHandler.entityContext = null;
+        Scene oldScene = SceneRuntime.ACTIVE_SCENE;
+
+        oldScene.dispose();
+        Scene scene = new Scene("Test Scene 1", oldScene.getRenderer(), oldScene.getFrameBuffer());
+        for (var n : oldScene.getNativeObjects()) {
+            scene.put(n.getKey());
+            scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
+        }
+        SceneRuntime.ACTIVE_SCENE = scene;
+        if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
+        GizmoLayer.getInstance().build();
+        SceneLayer.getInstance().build();
     }
 }

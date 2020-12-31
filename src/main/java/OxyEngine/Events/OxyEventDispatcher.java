@@ -1,30 +1,32 @@
 package OxyEngine.Events;
 
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.SceneRuntime;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+public class OxyEventDispatcher {
 
-public final class OxyEventDispatcher {
-
-    private static final Map<OxyEventListener, Set<OxyEntity>> listeners = new HashMap<>();
+    private final List<OxyEvent> eventPool = new ArrayList<>();
 
     public OxyEventDispatcher() {
     }
 
-    public void addListeners(OxyEntity entity, OxyEventListener listener) {
-        if (!listeners.containsKey(listener))
-            listeners.put(listener, new LinkedHashSet<>());
-        listeners.get(listener).add(entity);
-    }
-
-    public void dispatch() {
-        for (var entrySet : listeners.entrySet()) {
-            OxyEventListener listener = entrySet.getKey();
-            Set<OxyEntity> entities = entrySet.getValue();
-            if (listener instanceof OxyMouseListener m && SceneRuntime.currentBoundedCamera != null) {
-                m.dispatch(entities);
+    public <T extends OxyEvent> void dispatch(Class<T> eventClass) {
+        if(eventPool.size() != OxyEvent.EventType.values().length) {
+            addClass(eventClass);
+            return;
+        }
+        for(OxyEvent e : eventPool){
+            if(e instanceof OxyKeyEvent e1){
+                e1.onKeyPressed();
+            } else if(e instanceof OxyMouseEvent e1){
+                e1.onMousePressed();
             }
         }
+    }
+
+    private <T extends OxyEvent> void addClass(Class<T> eventClass) {
+        try {
+            eventPool.add(eventClass.getDeclaredConstructor().newInstance());
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

@@ -23,6 +23,7 @@ public class OxyShader implements OxyDisposable, EntityComponent {
     public static final int NORMALS = 4;
     public static final int BITANGENT = 5;
     public static final int TANGENT = 6;
+    public static final int OBJECT_ID = 7;
 
     private final Map<String, ? super Number> uniformLocations = new HashMap<>();
 

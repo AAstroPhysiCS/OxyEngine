@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public interface OxySystem {
 
@@ -49,7 +48,7 @@ public interface OxySystem {
     static File[] getCurrentProjectFiles(boolean hideHiddenFiles){
         File[] f = new File(BASE_PATH).listFiles();
         if(f == null) return null;
-        if(hideHiddenFiles) return Arrays.stream(f).filter(file -> !file.isHidden()).collect(Collectors.toList()).toArray(new File[0]);
+        if(hideHiddenFiles) return Arrays.stream(f).filter(file -> !file.isHidden()).toArray(File[]::new);
         return f;
     }
 

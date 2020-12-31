@@ -14,7 +14,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public class OxyMaterial implements EntityComponent, OxyDisposable {

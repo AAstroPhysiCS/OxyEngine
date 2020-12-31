@@ -7,7 +7,10 @@ public abstract class IndexBuffer extends Buffer {
     protected int length;
     protected int[] indices;
 
-    public IndexBuffer() {
+    protected final BufferLayoutProducer.BufferLayoutImpl impl;
+
+    public IndexBuffer(BufferLayoutProducer.BufferLayoutImpl impl) {
+        this.impl = impl;
     }
 
     protected abstract void copy(int[] m_indices);

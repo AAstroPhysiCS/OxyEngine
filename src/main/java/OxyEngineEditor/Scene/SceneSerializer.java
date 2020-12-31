@@ -11,7 +11,7 @@ import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
-import OxyEngineEditor.UI.Selector.OxySelectHandler;
+import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
 
 import java.io.File;
@@ -85,7 +85,6 @@ public final class SceneSerializer {
                 scene.put(n.getKey());
                 scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
             }
-            scene.setUISystem(oldScene.getOxyUISystem());
             OxySelectHandler.entityContext = null;
             layer.clear();
             oldScene.dispose();
@@ -137,7 +136,7 @@ public final class SceneSerializer {
                     }
                 }
 
-                modelInstance.originPos = new Vector3f(0, 0, 0);
+//                modelInstance.originPos = new Vector3f(0, 0, 0);
                 modelInstance.importedFromFile = true;
                 modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(position, rot, scale), new OxyMaterial(OxyTexture.loadImage(1, albedoTPath),
                                 OxyTexture.loadImage(2, normalMapTPath), OxyTexture.loadImage(3, roughnessMapTPath), OxyTexture.loadImage(4, metallicMapTPath), OxyTexture.loadImage(5, aoMapTPath), new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength),

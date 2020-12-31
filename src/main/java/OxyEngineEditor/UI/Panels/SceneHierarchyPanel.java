@@ -10,7 +10,7 @@ import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class SceneHierarchyPanel extends Panel {
 

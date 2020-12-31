@@ -1,6 +1,8 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Components.*;
+import OxyEngine.Components.TagComponent;
+import OxyEngine.Components.TransformComponent;
+import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
@@ -17,8 +19,7 @@ import imgui.type.ImString;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.gizmoEntityContextControl;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class PropertiesPanel extends Panel {
 
@@ -29,10 +30,10 @@ public class PropertiesPanel extends Panel {
         return INSTANCE;
     }
 
-    public static SceneLayer sceneLayer;
+    public final SceneLayer sceneLayer;
 
     public PropertiesPanel(SceneLayer sceneLayer) {
-        PropertiesPanel.sceneLayer = sceneLayer;
+        this.sceneLayer = sceneLayer;
     }
 
     private static boolean initPanel = false;
@@ -48,7 +49,6 @@ public class PropertiesPanel extends Panel {
 
     @Override
     public void renderPanel() {
-        gizmoEntityContextControl(entityContext);
 
         ImGui.begin("Properties");
 

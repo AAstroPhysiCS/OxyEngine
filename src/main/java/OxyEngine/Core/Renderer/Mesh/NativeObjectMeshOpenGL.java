@@ -6,8 +6,12 @@ import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLVertexBuffer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class NativeObjectMeshOpenGL extends OpenGLMesh {
+
+    public static final BufferLayoutAttributes attributeVert = new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0);
+    public static final BufferLayoutAttributes attributeTXSlot = new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
 
     public int indicesX, indicesY, indicesZ;
 

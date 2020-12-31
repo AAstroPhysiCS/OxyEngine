@@ -19,24 +19,26 @@ public class OxyModel extends OxyEntity {
 
     public ModelFactory factory;
 
-    public OxyModel(Scene scene) {
+    public OxyModel(Scene scene, int id) {
         super(scene);
+        this.object_id = id;
     }
 
-    public OxyModel(OxyModel other) {
+    public OxyModel(OxyModel other, int id) {
         super(other.scene);
         this.tangents = other.tangents.clone();
         this.biTangents = other.biTangents.clone();
-        this.originPos = new Vector3f(other.originPos);
+//        this.originPos = new Vector3f(other.originPos);
         this.normals = other.normals.clone();
         this.vertices = other.vertices.clone();
         this.tcs = other.tcs.clone();
         this.indices = other.indices.clone();
+        this.object_id = id;
     }
 
     @Override
     public OxyEntity copyMe() {
-        OxyModel e = new OxyModel(this);
+        OxyModel e = new OxyModel(this, ++Scene.OBJECT_ID_COUNTER);
         e.addToScene();
         var boundingBox = get(BoundingBoxComponent.class);
         var transform = get(TransformComponent.class);

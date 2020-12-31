@@ -2,6 +2,7 @@
 #version 460 core
 
 layout(location = 0) out vec4 color;
+layout(location = 1) out int o_IDBuffer;
 
 in OUT_VARIABLES {
     vec2 texCoordsOut;
@@ -18,6 +19,8 @@ in OUT_VARIABLES {
 uniform sampler2D tex[32];
 uniform samplerCube skyBoxTexture;
 uniform vec3 cameraPos;
+
+in float v_ObjectID;
 
 struct Material{
     vec3 ambient;
@@ -228,6 +231,8 @@ vec4 calcNoLightImpl(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3
 
 void main(){
 
+    o_IDBuffer = int(round(v_ObjectID));
+
     vec4 result;
 
     vec3 vertexPos = inVar.vertexPos;
@@ -275,9 +280,12 @@ layout(location = 3) in vec4 color;
 layout(location = 4) in vec4 normals;
 layout(location = 5) in vec4 biTangent;
 layout(location = 6) in vec4 tangent;
+layout(location = 7) in float objectID;
 
 uniform mat4 v_Matrix;
 uniform mat4 model;
+
+out float v_ObjectID;
 
 out OUT_VARIABLES {
     vec2 texCoordsOut;
@@ -292,6 +300,8 @@ out OUT_VARIABLES {
 } outVar;
 
 void main(){
+    v_ObjectID = objectID;
+
     outVar.textureSlotOut = textureSlot;
     outVar.texCoordsOut = tcs;
     outVar.colorOut = color;

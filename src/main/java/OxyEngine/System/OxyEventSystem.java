@@ -9,5 +9,6 @@ public record OxyEventSystem() {
     public static GLFWEventDispatcher.KeyEvent keyEventDispatcher;
     public static GLFWEventDispatcher.MouseScrollEvent mouseScrollDispatcher;
 
-    public static OxyEventDispatcher eventDispatcher;
+    //Native
+    public static OxyEventDispatcher dispatcher;
 }

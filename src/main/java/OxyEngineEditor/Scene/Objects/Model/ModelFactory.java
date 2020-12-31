@@ -31,7 +31,7 @@ public class ModelFactory {
     }
 
     public void constructData(OxyModel e) {
-        e.vertices = new float[verticesNonTransformed.size() * 4];
+        e.vertices = new float[verticesNonTransformed.size() * 5];
         e.normals = new float[verticesNonTransformed.size() * 3];
         e.tcs = new float[verticesNonTransformed.size() * 2];
         e.tangents = new float[tangents.size() * 3];
@@ -52,6 +52,7 @@ public class ModelFactory {
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
+            e.vertices[vertPtr++] = e.getObjectId();
         }
 
         int nPtr = 0;
@@ -104,6 +105,7 @@ public class ModelFactory {
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
             e.vertices[vertPtr++] = slot;
+            e.vertices[vertPtr++] = e.getObjectId();
         }
     }
 }

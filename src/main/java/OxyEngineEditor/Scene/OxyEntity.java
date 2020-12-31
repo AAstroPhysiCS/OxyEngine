@@ -4,7 +4,6 @@ import OxyEngine.Components.*;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Events.OxyEventListener;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static OxyEngine.System.OxyEventSystem.eventDispatcher;
 import static OxyEngine.Tools.Globals.toPrimitiveFloat;
 import static OxyEngine.Tools.Globals.toPrimitiveInteger;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
@@ -29,10 +27,10 @@ public abstract class OxyEntity {
     public float[] vertices, tcs, normals, tangents, biTangents;
     public int[] indices;
 
-    public Vector3f originPos;
     protected final Scene scene;
 
     protected boolean importedFromFile;
+    protected int object_id; //for selection
 
     public OxyEntity(Scene scene) {
         this.scene = scene;
@@ -42,7 +40,6 @@ public abstract class OxyEntity {
         this(other.scene);
         this.tangents = other.tangents.clone();
         this.biTangents = other.biTangents.clone();
-        this.originPos = new Vector3f(other.originPos);
         this.normals = other.normals.clone();
         this.vertices = other.vertices.clone();
         this.tcs = other.tcs.clone();
@@ -163,10 +160,6 @@ public abstract class OxyEntity {
         return toPrimitiveInteger(allIndices);
     }
 
-    public void addEventListener(OxyEventListener listener) {
-        eventDispatcher.addListeners(this, listener);
-    }
-
     public float[] getVertices() {
         return vertices;
     }
@@ -177,6 +170,10 @@ public abstract class OxyEntity {
 
     public float[] getTcs() {
         return tcs;
+    }
+
+    public int getObjectId() {
+        return object_id;
     }
 
     public List<GUINode> getGUINodes() {

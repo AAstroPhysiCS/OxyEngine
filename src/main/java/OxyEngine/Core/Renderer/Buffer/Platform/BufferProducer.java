@@ -23,9 +23,9 @@ public class BufferProducer {
         return (T) new OpenGLVertexBuffer(impl);
     }
 
-    public static <T extends IndexBuffer> T createIndexBuffer(){
+    public static <T extends IndexBuffer> T createIndexBuffer(BufferLayoutProducer.BufferLayoutImpl impl){
         contextCheck();
-        return (T) new OpenGLIndexBuffer();
+        return (T) new OpenGLIndexBuffer(impl);
     }
 
     public static <T extends FrameBuffer> T createFrameBuffer(int width, int height){

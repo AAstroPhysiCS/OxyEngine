@@ -2,6 +2,7 @@ package OxyEngine.Core.Layers;
 
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxyFontSystem;
+import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.UI.Panels.*;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
@@ -14,16 +15,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
-import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
 
-public class OverlayPanelLayer extends Layer {
+public class UILayer extends Layer {
 
     private final List<Panel> panelList = new ArrayList<>();
 
-    private final WindowHandle windowHandle;
+    public static WindowHandle windowHandle;
 
-    public OverlayPanelLayer(WindowHandle windowHandle) {
-        this.windowHandle = windowHandle;
+    public static OxyUISystem uiSystem;
+
+    public UILayer(WindowHandle windowHandle) {
+        UILayer.windowHandle = windowHandle;
+        uiSystem = new OxyUISystem(windowHandle);
     }
 
     public void addPanel(Panel panel) {
@@ -52,7 +55,7 @@ public class OverlayPanelLayer extends Layer {
         rendererAPI.clearBuffer();
         rendererAPI.clearColor(0, 0, 0, 1.0f);
 
-        ACTIVE_SCENE.getOxyUISystem().newFrameGLFW();
+        uiSystem.newFrameGLFW();
         ImGui.newFrame();
 
         final ImGuiViewport viewport = ImGui.getMainViewport();
@@ -73,12 +76,14 @@ public class OverlayPanelLayer extends Layer {
         int id = ImGui.getID("MyDockSpace");
         ImGui.dockSpace(id, 0, 0, ImGuiDockNodeFlags.PassthruCentralNode);
         ImGui.end();
+
         for (Panel panel : panelList)
             panel.renderPanel();
         ImGui.popFont();
         ImGui.popStyleVar(3);
 
+        uiSystem.updateImGuiContext(ts);
         ImGui.render();
-        ACTIVE_SCENE.getOxyUISystem().renderDrawData();
+        uiSystem.renderDrawData();
     }
 }

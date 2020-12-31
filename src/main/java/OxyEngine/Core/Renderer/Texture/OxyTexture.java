@@ -5,7 +5,6 @@ import OxyEngineEditor.Scene.Scene;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static OxyEngine.System.OxySystem.logger;

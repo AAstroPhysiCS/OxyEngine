@@ -3,10 +3,7 @@ package OxyEngineEditor;
 import OxyEngine.Components.PerspectiveCamera;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Layers.GizmoLayer;
-import OxyEngine.Core.Layers.Layer;
-import OxyEngine.Core.Layers.OverlayPanelLayer;
-import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Layers.*;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererPlatform;
@@ -17,7 +14,6 @@ import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.OxyEngineSpecs;
 import OxyEngine.System.OxyEventSystem;
-import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
@@ -73,22 +69,21 @@ public class EditorApplication extends OxyApplication {
         oxyShader.disable();
 
         //order matters!
-        scene.setUISystem(new OxyUISystem(windowHandle));
         SceneRuntime.ACTIVE_SCENE = scene;
-        SceneLayer sceneLayer = new SceneLayer();
-        GizmoLayer gizmoLayer = new GizmoLayer();
-        OverlayPanelLayer overlayPanelLayer = new OverlayPanelLayer(windowHandle);
+        SceneLayer sceneLayer = SceneLayer.getInstance();
+        GizmoLayer gizmoLayer = GizmoLayer.getInstance();
+        UILayer uiLayer = new UILayer(windowHandle);
 
-        overlayPanelLayer.addPanel(StatsPanel.getInstance());
-        overlayPanelLayer.addPanel(ToolbarPanel.getInstance(sceneLayer, gizmoLayer, oxyShader));
-        overlayPanelLayer.addPanel(ProjectPanel.getInstance());
-        overlayPanelLayer.addPanel(PropertiesPanel.getInstance(sceneLayer));
-        overlayPanelLayer.addPanel(ScenePanel.getInstance(sceneLayer));
-        overlayPanelLayer.addPanel(EnvironmentPanel.getInstance(sceneLayer));
-        overlayPanelLayer.addPanel(SceneHierarchyPanel.getInstance(sceneLayer, oxyShader));
-        overlayPanelLayer.addPanel(SceneRuntime.getPanel());
+        uiLayer.addPanel(StatsPanel.getInstance());
+        uiLayer.addPanel(ToolbarPanel.getInstance());
+        uiLayer.addPanel(ProjectPanel.getInstance());
+        uiLayer.addPanel(PropertiesPanel.getInstance(sceneLayer));
+        uiLayer.addPanel(ScenePanel.getInstance(sceneLayer));
+        uiLayer.addPanel(EnvironmentPanel.getInstance(sceneLayer));
+        uiLayer.addPanel(SceneHierarchyPanel.getInstance(sceneLayer, oxyShader));
+        uiLayer.addPanel(SceneRuntime.getPanel());
 
-        layerStack.pushLayer(sceneLayer, gizmoLayer, overlayPanelLayer);
+        layerStack.pushLayer(sceneLayer, gizmoLayer, uiLayer);
         for (Layer l : layerStack.getLayerStack())
             l.build();
     }
@@ -144,7 +139,7 @@ public class EditorApplication extends OxyApplication {
     @Override
     public void dispose() {
         oxyEngine.dispose();
-        scene.getOxyUISystem().dispose();
+        UILayer.uiSystem.dispose();
         SceneRuntime.dispose();
         scene.dispose();
     }

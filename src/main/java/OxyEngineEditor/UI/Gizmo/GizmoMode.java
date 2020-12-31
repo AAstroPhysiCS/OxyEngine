@@ -1,4 +1,4 @@
-package OxyEngineEditor.UI.Selector;
+package OxyEngineEditor.UI.Gizmo;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
@@ -14,6 +14,7 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static OxyEngine.Components.PerspectiveCamera.zoom;
 
@@ -49,7 +50,7 @@ enum GizmoMode {
             public final List<EntityComponent> components = new ArrayList<>();
 
             public ComponentModel(Scene scene) {
-                super(scene);
+                super(scene, ThreadLocalRandom.current().nextInt(100, 1000)); //TODO: change it
             }
 
             @Override
@@ -84,15 +85,18 @@ enum GizmoMode {
 
         public GizmoComponent(String path, Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
             List<OxyModel> models = scene.createModelEntities(OxySystem.FileSystem.getResourceByPath(path), shader);
-            for (OxyEntity m : models) {
+            for (OxyModel m : models) {
                 ComponentModel cM = new ComponentModel(scene);
                 cM.vertices = m.vertices;
                 cM.indices = m.indices;
                 cM.tcs = m.tcs;
                 cM.normals = m.normals;
-                cM.originPos = m.originPos;
-                cM.factory = ((OxyModel) m).factory;
-                cM.addComponent(new TransformComponent(3f),
+                cM.biTangents = m.biTangents;
+                cM.tangents = m.tangents;
+                cM.factory = m.factory;
+                cM.addComponent(m.get(UUIDComponent.class),
+                        m.get(MeshPosition.class),
+                        m.get(TransformComponent.class),
                         new SelectedComponent(false, true),
                         new RenderableComponent(RenderingMode.None),
                         m.get(OxyShader.class),
@@ -100,12 +104,10 @@ enum GizmoMode {
                         m.get(TagComponent.class),
                         m.get(BoundingBoxComponent.class)
                 );
-                cM.addEventListener(new OxyGizmoController(gizmo3D));
+//                cM.addEventListener(new OxyGizmoController(gizmo3D));
                 cM.initData(path);
-                cM.constructData();
                 this.models.add(cM);
                 scene.removeEntity(m);
-                //TODO: REMOVING DOES NOT REMOVE FULLY
             }
             this.scene = scene;
             oldZoom = zoom; //default
@@ -160,8 +162,8 @@ enum GizmoMode {
 
         @Override
         void update(OxyModel model, OxyEntity e) {
-            TransformComponent xC = model.get(TransformComponent.class);
-            xC.position.set(new Vector3f(model.originPos).mul(xC.scale).add(e.get(TransformComponent.class).position));
+            TransformComponent c = model.get(TransformComponent.class);
+            c.position.add(new Vector3f(c.position).mul(c.scale));
             model.updateData();
         }
 
@@ -186,13 +188,13 @@ enum GizmoMode {
 
         @Override
         void update(OxyModel model, OxyEntity e) {
-            TransformComponent xC = model.get(TransformComponent.class);
-            xC.position.set(new Vector3f(model.originPos).mul(xC.scale).add(e.get(TransformComponent.class).position));
+            TransformComponent c = model.get(TransformComponent.class);
+            c.position.set(new Vector3f(c.position).mul(c.scale));
             model.updateData();
         }
 
         public OxyModel getXModelScale() {
-            return models.get(2);
+            return models.get(0);
         }
 
         public OxyModel getYModelScale() {
@@ -200,7 +202,7 @@ enum GizmoMode {
         }
 
         public OxyModel getZModelScale() {
-            return models.get(0);
+            return models.get(2);
         }
 
         public OxyModel getScalingCube() {

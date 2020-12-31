@@ -38,9 +38,8 @@ public class WindowHandle implements OxyDisposable {
     }
 
     public record WindowSpecs(int resizable, int doubleBuffered){
-        public WindowSpecs {
-            this.resizable = GLFW_TRUE;
-            this.doubleBuffered = GLFW_TRUE;
+        public WindowSpecs() {
+            this(GLFW_TRUE, GLFW_TRUE);
         }
     }
 

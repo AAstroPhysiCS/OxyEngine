@@ -4,13 +4,10 @@ import OxyEngine.Core.Camera.Controller.OxyCameraController;
 import OxyEngine.Core.Camera.Controller.PerspectiveCameraController;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngineEditor.UI.Panels.ScenePanel;
-import OxyEngineEditor.UI.Selector.OxyGizmo3D;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
 
 public class PerspectiveCamera extends OxyCamera {
 
@@ -63,19 +60,19 @@ public class PerspectiveCamera extends OxyCamera {
         viewMatrixNoTranslation.rotateY(cameraController.getRotation().y);
     }
 
-    static final float zoomSpeed = 0.25f;
+    static final float zoomSpeed = 250f;
 
     @Override
     public void finalizeCamera(float ts) {
         ImGuiIO io = ImGui.getIO();
         if (ScenePanel.hoveredWindow) {
             if (io.getMouseWheel() > 0) {
-                zoom += zoomSpeed;
+                zoom += zoomSpeed * ts;
             } else if (io.getMouseWheel() < 0) {
-                zoom += -zoomSpeed;
+                zoom += -zoomSpeed * ts;
             }
-            if (entityContext != null)
-                OxyGizmo3D.getInstance().scaleAll(entityContext);
+            /*if (entityContext != null)
+                OxyGizmo3D.getInstance().scaleAll(entityContext);*/
             if (zoom >= 500) zoom = 500;
             if (zoom <= -500) zoom = -500;
         }

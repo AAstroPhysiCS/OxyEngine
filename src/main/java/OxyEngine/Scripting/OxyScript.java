@@ -21,7 +21,7 @@ import java.util.Objects;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.Scene.SceneRuntime.TS;
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class OxyScript implements OxyDisposable {
 

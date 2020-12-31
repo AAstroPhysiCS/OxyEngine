@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Mesh;
 
 import OxyEngine.Components.SelectedComponent;
-import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -9,7 +9,6 @@ import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.GUINode;
-import OxyEngineEditor.UI.Panels.PropertiesPanel;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
@@ -19,13 +18,15 @@ import java.util.List;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class ModelMeshOpenGL extends OpenGLMesh {
 
-    public static final BufferLayoutAttributes attributeVert = new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 4 * Float.BYTES, 0);
-    public static final BufferLayoutAttributes attributeTXSlot = new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 4 * Float.BYTES, 3 * Float.BYTES);
+    public static final BufferLayoutAttributes attributeVert = new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 5 * Float.BYTES, 0);
+    public static final BufferLayoutAttributes attributeTXSlot = new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 5 * Float.BYTES, 3 * Float.BYTES);
+
+    private static final BufferLayoutAttributes attributeObjectID = new BufferLayoutAttributes(OxyShader.OBJECT_ID, 1, GL_FLOAT, false, 5 * Float.BYTES, 4 * Float.BYTES);
 
     private static final BufferLayoutAttributes attributeTXCoords = new BufferLayoutAttributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0);
 
@@ -45,11 +46,12 @@ public class ModelMeshOpenGL extends OpenGLMesh {
 
         BufferLayoutRecord layout = BufferLayoutProducer.create()
                 .createLayout(VertexBuffer.class)
-                .setStrideSize(4)
+                .setStrideSize(5)
                 .setUsage(usage)
                 .setAttribPointer(
                         attributeVert,
-                        attributeTXSlot
+                        attributeTXSlot,
+                        attributeObjectID
                 )
                 .create()
                 .createLayout(IndexBuffer.class).create()
@@ -122,14 +124,13 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                         if (entityContext != null) {
                             List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path, entityContext.get(OxyShader.class));
                             for (OxyModel e : eList) {
-                                TransformComponent t = new TransformComponent(entityContext.get(TransformComponent.class));
-                                e.addComponent(t, new SelectedComponent(true, false), entityContext.get(OxyMaterial.class));
+                                e.addComponent(new SelectedComponent(true, false), entityContext.get(OxyMaterial.class));
                                 e.getGUINodes().add(ModelMeshOpenGL.guiNode);
                                 e.getGUINodes().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
                             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
-                            PropertiesPanel.sceneLayer.updateAllEntities();
+                            SceneLayer.getInstance().updateAllEntities();
                             meshPath = new ImString(path);
                             entityContext = null;
                         }

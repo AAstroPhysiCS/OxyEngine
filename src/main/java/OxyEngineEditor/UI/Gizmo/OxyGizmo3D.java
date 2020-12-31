@@ -1,4 +1,4 @@
-package OxyEngineEditor.UI.Selector;
+package OxyEngineEditor.UI.Gizmo;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.OxyEntity;

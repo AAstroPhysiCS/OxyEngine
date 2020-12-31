@@ -12,7 +12,7 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ScenePanel extends Panel {

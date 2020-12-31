@@ -1,7 +1,7 @@
 package OxyEngine.Core.Layers;
 
-import OxyEngineEditor.UI.Selector.OxyGizmo3D;
-import OxyEngineEditor.UI.Selector.OxySelectHandler;
+import OxyEngineEditor.UI.Gizmo.OxyGizmo3D;
+import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 
 import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
 
@@ -9,13 +9,20 @@ public class GizmoLayer extends Layer {
 
     private final OxyGizmo3D gizmo3D;
 
-    public GizmoLayer() {
+    private static GizmoLayer INSTANCE;
+
+    public static GizmoLayer getInstance(){
+        if(INSTANCE == null) return INSTANCE = new GizmoLayer();
+        return INSTANCE;
+    }
+
+    private GizmoLayer() {
         gizmo3D = OxyGizmo3D.getInstance(ACTIVE_SCENE);
     }
 
     @Override
     public void build() {
-        OxySelectHandler.init(ACTIVE_SCENE, gizmo3D);
+        OxySelectHandler.init(gizmo3D);
     }
 
     @Override

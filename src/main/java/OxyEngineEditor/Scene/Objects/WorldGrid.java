@@ -11,8 +11,6 @@ import OxyEngineEditor.Scene.Scene;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import static OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL.attributeTXSlot;
-import static OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL.attributeVert;
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
 public class WorldGrid {
@@ -24,7 +22,7 @@ public class WorldGrid {
         this.scene = scene;
         OxyShader shader = new OxyShader("shaders/OxyGrid.glsl");
         worldGridMesh = new NativeObjectMeshOpenGL(shader, GL_LINES, BufferLayoutProducer.Usage.STATIC,
-                attributeVert, attributeTXSlot);
+                NativeObjectMeshOpenGL.attributeVert, NativeObjectMeshOpenGL.attributeTXSlot);
         add(size);
         worldGridMesh.initList();
     }

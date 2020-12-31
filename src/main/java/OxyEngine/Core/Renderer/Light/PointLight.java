@@ -9,7 +9,7 @@ import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Vector3f;
 
-import static OxyEngineEditor.UI.Selector.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class PointLight extends Light {
 

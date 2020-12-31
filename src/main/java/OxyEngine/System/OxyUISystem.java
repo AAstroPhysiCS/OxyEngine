@@ -4,6 +4,8 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.Events.GLFW.GLFWEventDispatcher;
 import OxyEngine.Events.GLFW.GLFWEventType;
 import OxyEngine.Events.OxyEventDispatcher;
+import OxyEngine.Events.OxyKeyEvent;
+import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.OxyEngine;
 import OxyEngineEditor.UI.Font.FontLoader;
 import imgui.ImGui;
@@ -39,7 +41,7 @@ public class OxyUISystem {
         this.windowHandle = windowHandle;
         imGuiRenderer = new ImGuiImplGl3();
         imGuiGlfw = new ImGuiImplGlfw();
-        eventDispatcher = new OxyEventDispatcher();
+        dispatcher = new OxyEventDispatcher();
         init();
     }
 
@@ -112,7 +114,8 @@ public class OxyUISystem {
     }
 
     public void dispatchNativeEvents() {
-        eventDispatcher.dispatch();
+        dispatcher.dispatch(OxyKeyEvent.class);
+        dispatcher.dispatch(OxyMouseEvent.class);
     }
 
     public void newFrameGLFW() {

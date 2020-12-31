@@ -7,7 +7,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
 import java.io.File;
@@ -16,7 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static OxyEngine.Components.BoundingBoxComponent.*;
+import static OxyEngine.Components.BoundingBoxComponent.calcPos;
+import static OxyEngine.Components.BoundingBoxComponent.sort;
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.assimp.Assimp.*;
 
@@ -31,10 +31,10 @@ public class OxyModelLoader {
         public final List<int[]> faces = new ArrayList<>();
 
         public OxyMaterial material;
-        public Vector3f pos;
+        public Vector3f pos = new Vector3f();
 
         public final String name;
-        public Vector3f min, max;
+        public Vector3f min = new Vector3f(), max = new Vector3f();
 
         public AssimpOxyMesh(String name) {
             this.name = name;
@@ -56,42 +56,43 @@ public class OxyModelLoader {
                 | aiProcess_FixInfacingNormals
                 | aiProcess_OptimizeMeshes
                 | aiProcess_FlipUVs
-                | aiProcess_CalcTangentSpace;
+                | aiProcess_CalcTangentSpace
+                | aiProcess_JoinIdenticalVertices
+                | aiProcess_FindInvalidData
+                | aiProcess_FlipWindingOrder
+//                | aiProcess_PreTransformVertices
+                | aiProcess_ValidateDataStructure
+                | aiProcess_GenBoundingBoxes;
 
         aiScene = aiImportFile(objPath, flag);
-        if(aiScene == null) {
+        if (aiScene == null) {
             logger.warning("Mesh is null");
             return;
         }
-        PointerBuffer materials = Objects.requireNonNull(aiScene).mMaterials();
-        PointerBuffer meshes = Objects.requireNonNull(aiScene).mMeshes();
         for (int i = 0; i < aiScene.mNumMeshes(); i++) {
-            AIMesh aiMesh = AIMesh.create(Objects.requireNonNull(meshes).get(i));
-            AssimpOxyMesh oxyMesh = new AssimpOxyMesh(aiMesh.mName().dataString());
-            AIMaterial material = AIMaterial.create(Objects.requireNonNull(materials).get(aiMesh.mMaterialIndex()));
-            addMesh(aiMesh, oxyMesh);
+            AIMesh mesh = AIMesh.create(Objects.requireNonNull(aiScene.mMeshes()).get(i));
+            AssimpOxyMesh oxyMesh = new AssimpOxyMesh(mesh.mName().dataString());
+            AIMaterial material = AIMaterial.create(Objects.requireNonNull(aiScene.mMaterials()).get(mesh.mMaterialIndex()));
+            processMesh(mesh, oxyMesh);
             addMaterial(material, oxyMesh);
+            AIAABB aiaabb = mesh.mAABB();
+            oxyMesh.min = new Vector3f(aiaabb.mMin().x(), aiaabb.mMin().y(), aiaabb.mMin().z());
+            oxyMesh.max = new Vector3f(aiaabb.mMax().x(), aiaabb.mMax().y(), aiaabb.mMax().z());
             float[][] sortedVertices = sort(oxyMesh);
             calcPos(oxyMesh, sortedVertices);
-            calcMax(oxyMesh, sortedVertices);
-            calcMin(oxyMesh, sortedVertices);
-            this.meshes.add(oxyMesh);
-        }
-
-        //transforming to 0,0,0
-        for (AssimpOxyMesh oxyMesh : this.meshes) {
+            //transforming to 0,0,0
             Matrix4f transform = new Matrix4f()
                     .translate(new Vector3f(oxyMesh.pos).negate());
             for (int j = 0; j < oxyMesh.vertices.size(); j++) {
                 Vector3f vertices3f = oxyMesh.vertices.get(j);
                 Vector4f t4f = new Vector4f(vertices3f, 1.0f).mul(transform);
-                vertices3f.set(t4f.x, t4f.y, t4f.z);
+                oxyMesh.vertices.get(j).set(t4f.x, t4f.y, t4f.z);
             }
+            this.meshes.add(oxyMesh);
         }
     }
 
-    private void addMesh(AIMesh mesh, AssimpOxyMesh oxyMesh) {
-
+    private void processMesh(AIMesh mesh, AssimpOxyMesh oxyMesh) {
         AIVector3D.Buffer bufferVert = mesh.mVertices();
         while (bufferVert.hasRemaining()) {
             AIVector3D vertex = bufferVert.get();

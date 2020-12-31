@@ -3,6 +3,7 @@ package OxyEngine.Core.Layers;
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
@@ -17,6 +18,7 @@ import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import OxyEngineEditor.UI.Panels.GUINode;
+import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,8 +28,9 @@ import java.util.Set;
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngineEditor.EditorApplication.oxyShader;
 import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
+import static org.lwjgl.opengl.GL44.glClearTexImage;
 
 public class SceneLayer extends Layer {
 
@@ -39,6 +42,16 @@ public class SceneLayer extends Layer {
     public static HDRTexture hdrTexture;
 
     private PerspectiveCamera mainCamera;
+
+    private static SceneLayer INSTANCE = null;
+
+    public static SceneLayer getInstance() {
+        if (INSTANCE == null) INSTANCE = new SceneLayer();
+        return INSTANCE;
+    }
+
+    private SceneLayer() {
+    }
 
     @Override
     public void build() {
@@ -71,7 +84,7 @@ public class SceneLayer extends Layer {
     private void fillPropertyEntries() {
         for (OxyEntity entity : SceneRuntime.ACTIVE_SCENE.getEntities()) {
             if (entity instanceof OxyNativeObject) continue;
-            if (((OxyModel)entity).factory == null) continue;
+            if (((OxyModel) entity).factory == null) continue;
             for (Class<? extends EntityComponent> component : EntityComponent.allEntityComponentChildClasses) {
                 if (component == null) continue;
                 if (!entity.has(component)) continue;
@@ -106,8 +119,6 @@ public class SceneLayer extends Layer {
     public void update(float ts) {
         if (ACTIVE_SCENE == null) return;
         SceneRuntime.onUpdate(ts);
-        ACTIVE_SCENE.getOxyUISystem().dispatchNativeEvents();
-        ACTIVE_SCENE.getOxyUISystem().updateImGuiContext(ts);
 
         //Camera
         {
@@ -131,7 +142,7 @@ public class SceneLayer extends Layer {
             l.update(e, i);
             i++;
         }
-        if(cachedLightEntities.size() == 0){
+        if (cachedLightEntities.size() == 0) {
             oxyShader.enable();
             oxyShader.setUniform1f("currentLightIndex", 0);
             oxyShader.disable();
@@ -144,14 +155,17 @@ public class SceneLayer extends Layer {
     @Override
     public void render(float ts) {
         if (ACTIVE_SCENE == null) return;
-        ACTIVE_SCENE.getFrameBuffer().blit();
+
+        OpenGLFrameBuffer frameBuffer = ACTIVE_SCENE.getFrameBuffer();
+
+        frameBuffer.blit();
         if (!initHdrTexture && hdrTexture != null && SceneRuntime.currentBoundedCamera != null) {
             hdrTexture.captureFaces(ts);
             cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
             initHdrTexture = true;
         }
 
-        ACTIVE_SCENE.getFrameBuffer().bind();
+        frameBuffer.bind();
         rendererAPI.clearBuffer();
         rendererAPI.clearColor(32, 32, 32, 1.0f);
 
@@ -172,8 +186,7 @@ public class SceneLayer extends Layer {
                     if (mesh.equals(hdrTexture.getMesh())) {
                         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
                         cubemapShader.enable();
-                        if (EnvironmentPanel.mipLevelStrength[0] > 0)
-                            cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
+                        if (EnvironmentPanel.mipLevelStrength[0] > 0) cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
                         else cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
                         cubemapShader.setUniform1f("mipLevel", EnvironmentPanel.mipLevelStrength[0]);
                         cubemapShader.setUniform1f("exposure", EnvironmentPanel.exposure[0]);
@@ -242,7 +255,13 @@ public class SceneLayer extends Layer {
 //                glDisable(GL_CULL_FACE);
             }
         }
+
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         ACTIVE_SCENE.getFrameBuffer().unbind();
+
+        UILayer.uiSystem.dispatchNativeEvents();
     }
 
     public void loadHDRTextureToScene(String path) {
@@ -271,5 +290,33 @@ public class SceneLayer extends Layer {
         cachedLightEntities.clear();
         cachedCameraComponents.clear();
         allModelEntities.clear();
+    }
+
+    public void startPicking() {
+        if (allModelEntities.size() == 0) return;
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        OpenGLFrameBuffer frameBuffer = ACTIVE_SCENE.getFrameBuffer();
+        //ID RENDER PASS
+        if (frameBuffer.getIdAttachmentFBO() != 0) {
+            int[] clearValue = {-1};
+            frameBuffer.bindPicking();
+            rendererAPI.clearBuffer();
+            rendererAPI.clearColor(32, 32, 32, 1.0f);
+            glClearTexImage(frameBuffer.getIdAttachment(), 0, GL_RED_INTEGER, GL_INT, clearValue);
+            for (OxyEntity e : allModelEntities) render(0, e.get(ModelMeshOpenGL.class), mainCamera);
+        }
+        int id = frameBuffer.getEntityID();
+        if(id == -1) OxySelectHandler.entityContext = null;
+        else {
+            for (OxyEntity e : allModelEntities) {
+                if (e.getObjectId() == id) {
+                    OxySelectHandler.entityContext = e;
+                    break;
+                }
+            }
+        }
+        frameBuffer.unbind();
     }
 }
