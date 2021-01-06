@@ -71,8 +71,6 @@ public class PerspectiveCamera extends OxyCamera {
             } else if (io.getMouseWheel() < 0) {
                 zoom += -zoomSpeed * ts;
             }
-            /*if (entityContext != null)
-                OxyGizmo3D.getInstance().scaleAll(entityContext);*/
             if (zoom >= 500) zoom = 500;
             if (zoom <= -500) zoom = -500;
         }

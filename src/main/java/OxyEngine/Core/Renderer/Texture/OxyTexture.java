@@ -20,6 +20,10 @@ public class OxyTexture {
     private OxyTexture() {
     }
 
+    public static void unbindAllTextures(){
+        for(int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
+    }
+
     public static abstract class AbstractTexture implements OxyDisposable {
 
         protected int textureId;
@@ -80,14 +84,7 @@ public class OxyTexture {
     }
 
     public static HDRTexture loadHDRTexture(String path, Scene scene) {
-        HDRTexture hdrTexture = new HDRTexture(6, path, scene);
-        HDRTexture.IrradianceTexture irradianceTexture = new HDRTexture.IrradianceTexture(7, path, hdrTexture);
-        HDRTexture.PrefilterTexture prefilterTexture = new HDRTexture.PrefilterTexture(8, path, hdrTexture);
-        HDRTexture.BDRF bdrfTexture = new HDRTexture.BDRF(9, path, hdrTexture);
-        hdrTexture.setIrradianceTexture(irradianceTexture);
-        hdrTexture.setPrefilterTexture(prefilterTexture);
-        hdrTexture.setBdrf(bdrfTexture);
-        return hdrTexture;
+        return new HDRTexture(6, path, scene);
     }
 
     public static AbstractTexture loadImageCached(int slot) {

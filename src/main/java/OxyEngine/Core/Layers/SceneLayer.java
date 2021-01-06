@@ -223,9 +223,6 @@ public class SceneLayer extends Layer {
                 modelMesh.getShader().setUniform1f("exposure", EnvironmentPanel.exposure[0]);
                 modelMesh.getShader().disable();
 
-//                glEnable(GL_CULL_FACE);
-//                glCullFace(GL_BACK);
-
                 /*if (s.selected) {
                     glEnable(GL_STENCIL_TEST);
                     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -252,7 +249,6 @@ public class SceneLayer extends Layer {
                 }*/
                 material.push(modelMesh.getShader());
                 render(ts, modelMesh, mainCamera);
-//                glDisable(GL_CULL_FACE);
             }
         }
 
@@ -260,6 +256,7 @@ public class SceneLayer extends Layer {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         ACTIVE_SCENE.getFrameBuffer().unbind();
+        OxyTexture.unbindAllTextures();
 
         UILayer.uiSystem.dispatchNativeEvents();
     }

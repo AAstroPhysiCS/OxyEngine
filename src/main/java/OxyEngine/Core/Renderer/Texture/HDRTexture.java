@@ -182,10 +182,9 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-        if (irradianceTexture == null || prefilterTexture == null || bdrf == null) {
-            oxyAssert("HDR Texture Algorithms are null!");
-            return;
-        }
+        irradianceTexture = new IrradianceTexture(7, path, this);
+        prefilterTexture = new PrefilterTexture(8, path, this);
+        bdrf = new BDRF(9, path, this);
         irradianceTexture.captureFaces(ts);
         prefilterTexture.captureFaces(ts);
         bdrf.captureFaces(ts);
@@ -201,18 +200,6 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         super.dispose();
     }
 
-    public void setIrradianceTexture(IrradianceTexture irradianceTexture) {
-        this.irradianceTexture = irradianceTexture;
-    }
-
-    public void setPrefilterTexture(PrefilterTexture prefilterTexture) {
-        this.prefilterTexture = prefilterTexture;
-    }
-
-    public void setBdrf(BDRF bdrf) {
-        this.bdrf = bdrf;
-    }
-
     public int getIrradianceSlot() {
         return irradianceTexture.getTextureSlot();
     }
@@ -226,10 +213,10 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
     }
 
     public void bindAll() {
-        glBindTextureUnit(bdrf.getTextureSlot(), bdrf.textureId);
-        glBindTextureUnit(prefilterTexture.getTextureSlot(), prefilterTexture.textureId);
-        glBindTextureUnit(irradianceTexture.getTextureSlot(), irradianceTexture.textureId);
-        glBindTextureUnit(this.getTextureSlot(), this.textureId);
+        if (bdrf != null) glBindTextureUnit(bdrf.getTextureSlot(), bdrf.textureId);
+        if (prefilterTexture != null) glBindTextureUnit(prefilterTexture.getTextureSlot(), prefilterTexture.textureId);
+        if (irradianceTexture != null) glBindTextureUnit(irradianceTexture.getTextureSlot(), irradianceTexture.textureId);
+        if (this.textureId != 0) glBindTextureUnit(this.getTextureSlot(), this.textureId);
     }
 
     static class IrradianceTexture extends OxyTexture.AbstractTexture {

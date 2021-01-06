@@ -5,6 +5,8 @@ import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.SceneRuntimeControlPanel;
 
+import static OxyEngine.Scripting.OxyScript.scriptThread;
+
 public final class SceneRuntime {
 
     private static final SceneRuntimeControlPanel panel = new SceneRuntimeControlPanel();
@@ -37,7 +39,7 @@ public final class SceneRuntime {
             for (OxyScript c : e.getScripts()) {
                 OxyScript.EntityInfoProvider provider = c.getProvider();
                 if (provider == null) continue;
-                OxyScript.scriptThread.addProvider(c);
+                scriptThread.addProvider(c);
             }
         }
     }
@@ -64,12 +66,11 @@ public final class SceneRuntime {
 
     public static void dispose() {
         ACTIVE_SCENE.STATE = SceneState.TERMINATED;
-        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
-            if (!(e instanceof OxyModel)) continue;
-            for (OxyScript c : e.getScripts()) {
-                c.dispose();
-            }
+        if(scriptThread != null){
+            scriptThread.shutdown();
+            scriptThread = null;
         }
+        ACTIVE_SCENE.getFrameBuffer().dispose();
     }
 
     public static SceneRuntimeControlPanel getPanel() {

@@ -161,17 +161,28 @@ vec4 beginPBR(vec3 norm, vec3 L, vec3 viewDir, vec3 vertexPos, vec2 texCoordsOut
     vec3 albedo;
     float metallicMap, roughnessMap, aoMap;
 
-    if (int(round(inVar.textureSlotOut)) == 0){ //color
-        albedo = pow(vec3(material.diffuse), vec3(gamma));
+    if(metallicSlot == 0){
         metallicMap = metallicFloat;
-        roughnessMap = roughnessFloat;
-        aoMap = aoFloat;
-    }
-    else { //texture
-        albedo = pow(texture(tex[int(round(inVar.textureSlotOut))], texCoordsOut).rgb, vec3(gamma));
+    } else {
         metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
+    }
+
+    if(roughnessSlot == 0){
+        roughnessMap = roughnessFloat;
+    } else {
         roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
-        aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
+    }
+
+    if(aoSlot == 0){
+       aoMap = aoFloat;
+    } else {
+       aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
+    }
+
+    if(int(round(inVar.textureSlotOut)) == 0){
+        albedo = pow(vec3(material.diffuse), vec3(gamma));
+    } else {
+        albedo = pow(texture(tex[int(round(inVar.textureSlotOut))], texCoordsOut).rgb, vec3(gamma));
     }
 
     vec3 irradiance = texture(irradianceMap, norm).rgb;
@@ -255,7 +266,7 @@ void main(){
         norm = vec3(normalize(inVar.lightModelNormal));
     }
 
-    if (currentLightIndex == 0) result += calcNoLightImpl(vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
+    //if (currentLightIndex == 0) result += calcNoLightImpl(vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
     for(int i = 0; i < p_Light.length; i++){
         if(p_Light[i].diffuse != vec3(0.0f)){
            result += calcPointLightImpl(p_Light[i], vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
@@ -263,10 +274,9 @@ void main(){
     }
     for(int i = 0; i < d_Light.length; i++){
         if(d_Light[i].diffuse != vec3(0.0f)){
-            result = calcDirectionalLightImpl(d_Light[i], vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm); //dunno why?
+            result += calcDirectionalLightImpl(d_Light[i], vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
         }
     }
-
     color = vec4(result.xyz, 1.0f);
 }
 

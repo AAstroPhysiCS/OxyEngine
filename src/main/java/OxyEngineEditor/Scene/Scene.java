@@ -20,6 +20,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.EditorApplication.oxyShader;
@@ -46,7 +47,7 @@ public final class Scene implements OxyDisposable {
     }
 
     public final void put(OxyEntity e) {
-        registry.entityList.put(e, new LinkedHashSet<>(14));
+        registry.entityList.put(e, new LinkedHashSet<>(allEntityComponentChildClasses.size()));
     }
 
     public final OxyNativeObject createNativeObjectEntity() {
@@ -332,7 +333,7 @@ public final class Scene implements OxyDisposable {
                 it.remove();
             }
         }
-//        assert registry.entityList.keySet().size() == 0 : oxyAssert("Scene dispose failed");
+        assert registry.entityList.keySet().size() == 0 : oxyAssert("Scene dispose failed");
     }
 
     public static void openScene() {

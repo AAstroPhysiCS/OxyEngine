@@ -3,7 +3,6 @@ package OxyEngine.Scripting;
 import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Threading.OxyProvider;
 import OxyEngine.Core.Threading.OxyProviderThread;
-import OxyEngine.System.OxyDisposable;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
@@ -23,7 +22,7 @@ import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.Scene.SceneRuntime.TS;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
-public class OxyScript implements OxyDisposable {
+public class OxyScript {
 
     private Scene scene;
     private OxyEntity entity;
@@ -74,14 +73,6 @@ public class OxyScript implements OxyDisposable {
             }
         }
         return null;
-    }
-
-    @Override
-    public void dispose() {
-        if(scriptThread != null){
-            scriptThread.shutdown();
-            scriptThread = null;
-        }
     }
 
     public static class EntityInfoProvider implements OxyProvider {

@@ -284,16 +284,16 @@ public class OxyJSON {
                             int ptr = i;
                             do {
                                 ptr++;
-
                                 if (lineSplitted[ptr].endsWith(": {")) { //inner object
                                     String innerName = lineSplitted[ptr].split(": *")[0].trim().strip();
                                     OxyJSONObject innerRef = new OxyJSONObject();
                                     innerRef.name = innerName;
                                     ref.innerObject.add(innerRef);
                                     innerRef.fatherObjects.add(ref);
-                                    getOxyJSONObject(innerName, innerRef);
                                     do {
                                         ptr++; //check if the inner object fields are still focused, if yes... increment the ptr
+                                        String[] field = lineSplitted[ptr].split(": "); // take the field
+                                        if(field.length > 1) innerRef.putField(field[0], field[1]);
                                     } while (!lineSplitted[ptr].endsWith("}"));
                                 } else { // it's a field
                                     String[] tagValue = lineSplitted[ptr].split(": ");

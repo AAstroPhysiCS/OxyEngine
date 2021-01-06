@@ -10,8 +10,8 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
-import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
+import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import org.joml.Vector3f;
 
 import java.io.File;
@@ -65,7 +65,6 @@ public final class SceneSerializer {
 
         public Scene readScene(String path, SceneLayer layer, OxyShader shader) {
             SceneRuntime.stop();
-            SceneRuntime.dispose();
 
             var modelsJSON = new OxyJSON.OxyJSONArray();
             var sceneJSON = new OxyJSON.OxyJSONObject();
@@ -136,7 +135,6 @@ public final class SceneSerializer {
                     }
                 }
 
-//                modelInstance.originPos = new Vector3f(0, 0, 0);
                 modelInstance.importedFromFile = true;
                 modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(position, rot, scale), new OxyMaterial(OxyTexture.loadImage(1, albedoTPath),
                                 OxyTexture.loadImage(2, normalMapTPath), OxyTexture.loadImage(3, roughnessMapTPath), OxyTexture.loadImage(4, metallicMapTPath), OxyTexture.loadImage(5, aoMapTPath), new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength),

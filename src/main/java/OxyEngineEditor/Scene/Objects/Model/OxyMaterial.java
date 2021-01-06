@@ -25,6 +25,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
      * Roughness 3
      * Metallic 4
      * AO 5
+     * HDR 6, 7, 8, 9
      */
 
     public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture;

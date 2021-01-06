@@ -2,6 +2,7 @@ package OxyEngine.Events;
 
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
+import OxyEngineEditor.UI.Panels.ScenePanel;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -17,7 +18,7 @@ public class OxyMouseEvent extends OxyEvent {
     }
 
     public void onMousePressed(){
-        if(glfwGetMouseButton(UILayer.windowHandle.getPointer(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS)
+        if(glfwGetMouseButton(UILayer.windowHandle.getPointer(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && ScenePanel.hoveredWindow)
             SceneLayer.getInstance().startPicking();
     }
 }

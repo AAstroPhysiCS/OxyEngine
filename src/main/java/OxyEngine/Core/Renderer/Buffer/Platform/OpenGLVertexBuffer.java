@@ -67,6 +67,7 @@ public final class OpenGLVertexBuffer extends VertexBuffer {
         this.offsetToUpdate = pos * Float.BYTES;
         this.dataToUpdate = newVertices;
         for (float newVertex : newVertices) {
+            if(this.vertices == null) return; //for not breaking when object is deleted
             vertices[pos++] = newVertex;
         }
     }
