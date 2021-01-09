@@ -16,9 +16,9 @@ import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import OxyEngineEditor.UI.Panels.GUINode;
-import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
-import static OxyEngineEditor.EditorApplication.oxyShader;
 import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
@@ -142,11 +141,6 @@ public class SceneLayer extends Layer {
             l.update(e, i);
             i++;
         }
-        if (cachedLightEntities.size() == 0) {
-            oxyShader.enable();
-            oxyShader.setUniform1f("currentLightIndex", 0);
-            oxyShader.disable();
-        }
     }
 
     public static boolean initHdrTexture = false;
@@ -207,7 +201,6 @@ public class SceneLayer extends Layer {
                 OxyMaterial material = e.get(OxyMaterial.class);
                 TransformComponent c = e.get(TransformComponent.class);
                 modelMesh.getShader().enable();
-                if (cachedLightEntities.size() == 0) modelMesh.getShader().setUniform1f("currentLightIndex", -1f);
                 modelMesh.getShader().setUniformMatrix4fv("model", c.transform, false);
                 int irradianceSlot = 0, prefilterSlot = 0, brdfLUTSlot = 0;
                 if (hdrTexture != null) {

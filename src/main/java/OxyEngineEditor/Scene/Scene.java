@@ -333,7 +333,7 @@ public final class Scene implements OxyDisposable {
                 it.remove();
             }
         }
-        assert registry.entityList.keySet().size() == 0 : oxyAssert("Scene dispose failed");
+//        assert it.next() == null : oxyAssert("Scene dispose failed");
     }
 
     public static void openScene() {

@@ -2,6 +2,7 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Scripting.OxyScript;
+import OxyEngineEditor.EntryPoint;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.SceneRuntimeControlPanel;
 
@@ -20,13 +21,20 @@ public final class SceneRuntime {
         ACTIVE_SCENE = scene;
     }
 
+    public static Object loadClass(String classBinName, Scene scene, OxyEntity entity){
+        try {
+            return EntryPoint.class.getClassLoader().loadClass(classBinName).getDeclaredConstructor(Scene.class, OxyEntity.class).newInstance(scene, entity);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void onCreate() {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
-                OxyScript.EntityInfoProvider provider = c.getProvider();
-                if (provider == null) continue;
-                provider.invokeCreate();
+                c.invokeCreate();
             }
         }
     }
@@ -37,31 +45,19 @@ public final class SceneRuntime {
         for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
-                OxyScript.EntityInfoProvider provider = c.getProvider();
-                if (provider == null) continue;
-                scriptThread.addProvider(c);
+                scriptThread.addProvider(c.getProvider());
             }
         }
     }
 
     public static void stop() {
         ACTIVE_SCENE.STATE = SceneState.STOPPED;
-        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
-            if (!(e instanceof OxyModel)) continue;
-            for (OxyScript c : e.getScripts()) {
-                if (c.getOxySubThread() != null) c.getOxySubThread().stop();
-            }
-        }
+        scriptThread.stop();
     }
 
     public static void resume() {
         ACTIVE_SCENE.STATE = SceneState.RUNNING;
-        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
-            if (!(e instanceof OxyModel)) continue;
-            for (OxyScript c : e.getScripts()) {
-                if (c.getOxySubThread() != null) c.getOxySubThread().restart();
-            }
-        }
+        scriptThread.restart();
     }
 
     public static void dispose() {

@@ -86,6 +86,11 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         var drawBuffers = new int[]{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
         glDrawBuffers(drawBuffers);
 
+        int depth = glCreateTextures(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, depth);
+        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, width, height);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth, 0);
+
         assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }

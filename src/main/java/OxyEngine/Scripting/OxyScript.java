@@ -13,8 +13,11 @@ import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
@@ -29,13 +32,14 @@ public class OxyScript {
     private EntityInfoProvider provider;
 
     public static OxyProviderThread<EntityInfoProvider> scriptThread;
+    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
     static {
         scriptThread = new OxyProviderThread<>();
         scriptThread.setTarget(() -> {
             //noinspection InfiniteLoopStatement
             while (true) {
-                for(OxyScript.EntityInfoProvider providerF : scriptThread.getProviders()) providerF.invokeUpdate(TS);
+                for (var providerF : scriptThread.getProviders()) providerF.invokeUpdate(TS);
             }
         });
         scriptThread.start();
@@ -56,8 +60,10 @@ public class OxyScript {
     }
 
     private Object getObjectFromFile(String classBinName, Scene scene, OxyEntity entity) {
+        compiler.run(System.in, System.out, System.err, "--enable-preview", "--release", "15",
+                "-classpath", System.getProperty("java.class.path"), "-d", System.getProperty("user.dir") + "\\target\\classes", path);
         try {
-            return this.getClass().getClassLoader().loadClass(classBinName).getConstructor(Scene.class, OxyEntity.class).newInstance(scene, entity);
+            return SceneRuntime.loadClass(classBinName, scene, entity);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -75,7 +81,7 @@ public class OxyScript {
         return null;
     }
 
-    public static class EntityInfoProvider implements OxyProvider {
+    private static class EntityInfoProvider implements OxyProvider {
 
         private final ScriptableEntity obj;
 
@@ -84,6 +90,7 @@ public class OxyScript {
         public EntityInfoProvider(ScriptableEntity obj) {
             this.obj = obj;
             this.allFields = obj.getClass().getDeclaredFields();
+            System.out.println(Arrays.toString(allFields));
             for (Field f : allFields) f.setAccessible(true);
         }
 
@@ -98,10 +105,18 @@ public class OxyScript {
         }
     }
 
+    public void invokeCreate() {
+        EntityInfoProvider provider = getProvider();
+        if (provider == null) return;
+        provider.invokeCreate();
+    }
+
     public void loadAssembly() {
+        if (provider != null) scriptThread.removeProvider(provider);
         if (path == null) return;
         if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
             provider = new EntityInfoProvider(obj);
+            scriptThread.addProvider(provider);
         } else oxyAssert("The script must extend ScriptableEntity class!");
     }
 
@@ -148,7 +163,6 @@ public class OxyScript {
                             double convertedD = Double.parseDouble(n.toString());
                             float[] buffer = new float[]{(float) convertedD};
                             ImGui.dragFloat("##hidelabel entrySlider" + entityContext.hashCode() + entry.getName(), buffer);
-                            //int has an speciality
                             if (obj instanceof Integer) entry.set(provider.obj, Float.valueOf(buffer[0]).intValue());
                             else if (obj instanceof Long) entry.set(provider.obj, Float.valueOf(buffer[0]).longValue());
                             else if (obj instanceof Short) entry.set(provider.obj, Float.valueOf(buffer[0]).shortValue());
@@ -179,12 +193,15 @@ public class OxyScript {
                     ImGui.columns(1);
                 }
             }
-            if (ImGui.button("Run Script")){
-               //TODO: run just the specific script
+            if (ImGui.button("Run Script")) {
+                //TODO: run just the specific script
             }
             ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 100);
-            if (ImGui.button("Reload Assembly"))
+            /*if (ImGui.button("Reload Assembly")) {
+                SceneRuntime.stop();
                 loadAssembly();
+                SceneRuntime.onCreate();
+            }*/
         }
     };
 
@@ -194,9 +211,5 @@ public class OxyScript {
 
     public String getPath() {
         return path;
-    }
-
-    public OxyProviderThread<EntityInfoProvider> getOxySubThread() {
-        return scriptThread;
     }
 }

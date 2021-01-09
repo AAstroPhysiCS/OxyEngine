@@ -38,7 +38,7 @@ public class OxyMaterial implements EntityComponent, OxyDisposable {
 
     public OxyMaterial(ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
                        OxyColor albedoColor) {
-        this(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, albedoColor, 1.0f, 1.0f, 1.0f, 0.0f);
+        this(albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, albedoColor, 0.0f, 0.1f, 1.0f, 0.0f);
     }
 
     public OxyMaterial(ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,

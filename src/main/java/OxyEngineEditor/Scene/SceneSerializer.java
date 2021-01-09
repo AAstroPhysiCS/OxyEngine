@@ -144,6 +144,7 @@ public final class SceneSerializer {
                 var scripts = models.getInnerObjectByName("Script");
                 for (var f : scripts.getFieldList()) modelInstance.addScript(new OxyScript(f.value()));
             }
+            SceneRuntime.onCreate();
             //I don't have to do this... but just to be sure
             System.gc();
             return SceneRuntime.ACTIVE_SCENE;

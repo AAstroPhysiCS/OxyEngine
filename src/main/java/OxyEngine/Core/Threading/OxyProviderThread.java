@@ -1,7 +1,5 @@
 package OxyEngine.Core.Threading;
 
-import OxyEngine.Scripting.OxyScript;
-
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class OxyProviderThread<T extends OxyProvider> {
@@ -55,8 +53,11 @@ public class OxyProviderThread<T extends OxyProvider> {
         return providers;
     }
 
-    @SuppressWarnings({"unchecked", "SuspiciousMethodCalls"})
-    public void addProvider(OxyScript c) {
-        if(!providers.contains(c.getProvider())) providers.add((T) c.getProvider());
+    public void addProvider(T provider) {
+        if(!providers.contains(provider)) providers.add(provider);
+    }
+
+    public void removeProvider(T provider){
+        providers.remove(provider);
     }
 }

@@ -56,7 +56,6 @@ public class PropertiesPanel extends Panel {
             ImGui.end();
             return;
         }
-
         name = new ImString(entityContext.get(TagComponent.class).tag(), 100);
 
         ImGui.alignTextToFramePadding();
@@ -66,6 +65,8 @@ public class PropertiesPanel extends Panel {
             if (name.get().length() == 0) name.set("Unnamed");
             entityContext.get(TagComponent.class).setTag(name.get());
         }
+        ImGui.sameLine();
+        if (ImGui.button("Add Component", 100, 25)) ImGui.openPopup("comp_popup", ImGuiPopupFlags.AnyPopup);
         ImGui.textDisabled("ID: " + entityContext.get(UUIDComponent.class).getUUIDString());
 
         focusedWindow = ImGui.isWindowFocused();
@@ -108,12 +109,7 @@ public class PropertiesPanel extends Panel {
         for (GUINode guiNode : entityContext.getGUINodes()) guiNode.runEntry();
 
         final float windowWidth = ImGui.getWindowWidth();
-        ImGui.dummy(0, 25);
-        ImGui.setCursorPosX(windowWidth / 2 - 125);
-        ImGui.pushItemWidth(-1);
-        if (ImGui.button("Add Component", 250, 25)) ImGui.openPopup("comp_popup", ImGuiPopupFlags.AnyPopup);
         float buttonY = ImGui.getCursorScreenPosY();
-        ImGui.popItemWidth();
 
         ImGui.setNextWindowPos(ImGui.getWindowPosX() + (windowWidth / 2 - 150), buttonY - 165);
         ImGui.pushStyleColor(ImGuiCol.PopupBg, 36, 36, 36, 255);

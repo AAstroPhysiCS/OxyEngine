@@ -62,8 +62,6 @@ public class UILayer extends Layer {
         ImGui.setNextWindowPos(viewport.getWorkPosX(), viewport.getWorkPosY(), ImGuiCond.Always);
         ImGui.setNextWindowSize(viewport.getWorkSizeX(), viewport.getWorkSizeY(), ImGuiCond.Always);
 
-        ImGui.pushStyleVar(ImGuiStyleVar.GrabRounding, 12);
-        ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 12);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 4, 8);
         ImGui.pushFont(OxyFontSystem.getAllFonts().get(0));
 
@@ -80,7 +78,7 @@ public class UILayer extends Layer {
         for (Panel panel : panelList)
             panel.renderPanel();
         ImGui.popFont();
-        ImGui.popStyleVar(3);
+        ImGui.popStyleVar();
 
         uiSystem.updateImGuiContext(ts);
         ImGui.render();
