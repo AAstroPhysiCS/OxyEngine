@@ -86,7 +86,7 @@ public final class SceneSerializer {
             }
             OxySelectHandler.entityContext = null;
             layer.clear();
-            oldScene.dispose();
+            oldScene.disposeAllModels();
             SceneRuntime.ACTIVE_SCENE = scene;
 
             String envMapPath = envJSON.getField("Environment Map").value();

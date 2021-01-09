@@ -322,8 +322,7 @@ public final class Scene implements OxyDisposable {
         return sceneName;
     }
 
-    @Override
-    public void dispose() {
+    public void disposeAllModels() {
         Iterator<OxyEntity> it = registry.entityList.keySet().iterator();
         while (it.hasNext()) {
             OxyEntity e = it.next();
@@ -333,7 +332,16 @@ public final class Scene implements OxyDisposable {
                 it.remove();
             }
         }
-//        assert it.next() == null : oxyAssert("Scene dispose failed");
+    }
+
+    @Override
+    public void dispose() {
+        Iterator<OxyEntity> it = registry.entityList.keySet().iterator();
+        while (it.hasNext()) {
+            if(it.next() != null) it.remove();
+        }
+        frameBuffer.dispose();
+        assert !it.hasNext() : oxyAssert("Scene dispose failed");
     }
 
     public static void openScene() {

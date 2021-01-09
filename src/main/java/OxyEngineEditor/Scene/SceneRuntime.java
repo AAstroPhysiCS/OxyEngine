@@ -66,7 +66,7 @@ public final class SceneRuntime {
             scriptThread.shutdown();
             scriptThread = null;
         }
-        ACTIVE_SCENE.getFrameBuffer().dispose();
+        ACTIVE_SCENE.dispose();
     }
 
     public static SceneRuntimeControlPanel getPanel() {
