@@ -8,8 +8,8 @@ in OUT_VARIABLES {
     vec2 texCoordsOut;
     float textureSlotOut;
     vec4 colorOut;
-    vec4 normalsOut;
-    vec3 lightModelNormal;
+    vec3 normalsOut;
+
     vec3 vertexPos;
 
     //NORMAL MAPPING
@@ -131,7 +131,7 @@ vec3 calcPBR(vec3 L, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec
 
      vec3 nominator    = NDF * G * F;
      float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
-     vec3 specular = nominator / denominator;
+     vec3 specular     = nominator / denominator;
 
      // kS is equal to Fresnel
      vec3 kS = F;
@@ -195,12 +195,11 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
        for(int i = 0; i < p_Light.length; i++){
            if(p_Light[i].diffuse == vec3(0.0f)) continue;
            vec3 lightPos = p_Light[i].position;
-           if(normalMapSlot != 0){
-              lightPos = inVar.TBN * p_Light[i].position;
-           }
+
            vec3 lightDir = normalize(lightPos - vertexPos);
            float distance = length(lightPos - vertexPos);
            float attenuation = 1.0 / (p_Light[i].constant + p_Light[i].linear * distance + p_Light[i].quadratic * (distance * distance));
+
            Lo += calcPBR(lightDir, p_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);
        }
 
@@ -227,6 +226,8 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
     return vec4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
+uniform mat4 model;
+
 void main(){
 
     o_IDBuffer = int(round(v_ObjectID));
@@ -234,21 +235,16 @@ void main(){
     vec3 vertexPos = inVar.vertexPos;
     vec3 cameraPosVec3 = cameraPos;
     vec2 texCoordsOut = inVar.texCoordsOut;
-    if(normalMapSlot != 0){
-        vertexPos = inVar.TBN * inVar.vertexPos;
-        cameraPosVec3 = inVar.TBN * cameraPos;
-    }
+
     vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
 
     vec3 norm;
     if(normalMapSlot != 0 && normalMapStrength != 0.0f){
-        vec3 normalMap = texture(tex[normalMapSlot], texCoordsOut).rgb;
-        normalMap = normalMap * 2.0 - 1.0;
+        vec3 normalMap = texture(tex[normalMapSlot], texCoordsOut).xyz * 2.0 - 1.0;
         normalMap.xy *= normalMapStrength;
-        normalMap = normalize(normalMap);
-        norm = normalMap;
+        norm = normalize(inVar.TBN * normalMap);
     } else {
-        norm = vec3(normalize(inVar.lightModelNormal));
+        norm = vec3(normalize(inVar.normalsOut));
     }
 
     vec4 result = startPBR(vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
@@ -258,13 +254,13 @@ void main(){
 //#type vertex
 #version 460 core
 
-layout(location = 0) in vec4 pos;
+layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 tcs;
 layout(location = 2) in float textureSlot;
 layout(location = 3) in vec4 color;
-layout(location = 4) in vec4 normals;
-layout(location = 5) in vec4 biTangent;
-layout(location = 6) in vec4 tangent;
+layout(location = 4) in vec3 normals;
+layout(location = 5) in vec3 biTangent;
+layout(location = 6) in vec3 tangent;
 layout(location = 7) in float objectID;
 
 uniform mat4 v_Matrix;
@@ -276,8 +272,7 @@ out OUT_VARIABLES {
     vec2 texCoordsOut;
     float textureSlotOut;
     vec4 colorOut;
-    vec4 normalsOut;
-    vec3 lightModelNormal;
+    vec3 normalsOut;
     vec3 vertexPos;
 
     //NORMAL MAPPING
@@ -291,17 +286,15 @@ void main(){
     outVar.texCoordsOut = tcs;
     outVar.colorOut = color;
 
-    outVar.vertexPos = pos.xyz;
-    outVar.normalsOut = mat4(transpose(inverse(model))) * normals;
-    outVar.lightModelNormal = normalize(model * vec4(normals.xyz, 0.0)).xyz;
+    outVar.vertexPos = pos.xyz; //dont need model bcs it is already translated
+    outVar.normalsOut = mat3(model) * normals;
 
-    mat4 normalMatrix = transpose(inverse(model));
-    vec3 T = normalize(vec3(model * vec4(tangent.xyz, 0.0)));
-    vec3 B = normalize(vec3(model * vec4(biTangent.xyz, 0.0)));
-    vec3 N = normalize(vec3(model * vec4(normals.xyz, 0.0)));
+    vec3 T = normalize(mat3(model) * tangent);
+    vec3 B = normalize(mat3(model) * biTangent);
+    vec3 N = normalize(mat3(model) * normals);
 
-    mat3 TBN = transpose(mat3(T, B, N));
+    mat3 TBN = mat3(T, B, N);
     outVar.TBN = TBN;
 
-    gl_Position = pos * v_Matrix;
+    gl_Position = vec4(pos, 1.0) * v_Matrix;
 }

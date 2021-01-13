@@ -2,10 +2,8 @@ package OxyEngine.Core.Renderer.Texture;
 
 import java.nio.ByteBuffer;
 
-import static OxyEngine.Core.Renderer.Texture.OxyTexture.allTextures;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
@@ -51,7 +49,7 @@ public class ImageTexture extends OxyTexture.AbstractTexture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.4f);
+//        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.4f);
 
         glTexImage2D(GL_TEXTURE_2D, 0, alFormat, width[0], height[0], 0, alFormat, GL_UNSIGNED_BYTE, buffer);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -59,7 +57,7 @@ public class ImageTexture extends OxyTexture.AbstractTexture {
         stbi_image_free(buffer);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        allTextures.add(this);
+
     }
 
     public float[] getTextureCoords() {

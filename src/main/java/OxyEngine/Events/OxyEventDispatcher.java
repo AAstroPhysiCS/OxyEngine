@@ -7,9 +7,6 @@ public class OxyEventDispatcher {
 
     private final List<OxyEvent> eventPool = new ArrayList<>();
 
-    public OxyEventDispatcher() {
-    }
-
     public <T extends OxyEvent> void dispatch(Class<T> eventClass) {
         if(eventPool.size() != OxyEvent.EventType.values().length) {
             addClass(eventClass);

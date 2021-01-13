@@ -2,7 +2,6 @@ package OxyEngineEditor;
 
 import OxyEngine.Components.PerspectiveCamera;
 import OxyEngine.Components.TagComponent;
-import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Layers.*;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
@@ -14,8 +13,6 @@ import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.OxyEngineSpecs;
 import OxyEngine.System.OxyEventSystem;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
@@ -52,15 +49,6 @@ public class EditorApplication extends OxyApplication {
         OxyNativeObject editorCameraEntity = scene.createNativeObjectEntity();
         PerspectiveCamera camera = new PerspectiveCamera(true, Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 1f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
         editorCameraEntity.addComponent(camera, new TagComponent("Editor Camera"));
-
-        OxyModel m = scene.createEmptyModel(oxyShader);
-        m.addComponent(new TransformComponent(new Vector3f(0, -20, 0), 0.5f), new TagComponent("Point Light"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
-
-        OxyModel m2 = scene.createEmptyModel(oxyShader);
-        m2.addComponent(new TransformComponent(new Vector3f(0, -30, 0), 0.5f), new TagComponent("Point Light 2"), new OxyMaterial(1.0f, 1.0f, 1.0f, 1.0f));
-
-        OxyModel directionalLightEntity = scene.createEmptyModel(oxyShader);
-        directionalLightEntity.addComponent(oxyShader, new TagComponent("Directional Light"), new TransformComponent(new Vector3f(-12.5f, -7.5f, 14.9f)));
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;

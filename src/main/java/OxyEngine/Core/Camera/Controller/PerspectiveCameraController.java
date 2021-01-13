@@ -36,7 +36,7 @@ public class PerspectiveCameraController extends OxyCameraController {
     }
 
     private void updateRotationSwipe() {
-        if ((ScenePanel.focusedWindowDragging || SceneHierarchyPanel.focusedWindowDragging)) {
+        if ((ScenePanel.hoveredWindow || SceneHierarchyPanel.focusedWindowDragging) && mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_MIDDLE]) {
             rotate();
         }
 

@@ -15,8 +15,7 @@ public class NativeObjectMeshOpenGL extends OpenGLMesh {
 
     public int indicesX, indicesY, indicesZ;
 
-    public NativeObjectMeshOpenGL(OxyShader shader, int mode, BufferLayoutProducer.Usage usage, BufferLayoutAttributes... attributes) {
-        this.shader = shader;
+    public NativeObjectMeshOpenGL(int mode, BufferLayoutProducer.Usage usage, BufferLayoutAttributes... attributes) {
         this.mode = mode;
 
         assert mode != -1 && usage != null : oxyAssert("Some arguments not defined!");

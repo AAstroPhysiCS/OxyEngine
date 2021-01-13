@@ -10,11 +10,11 @@ public interface GLFWEventDispatcher {
 
     final class KeyEvent extends GLFWKeyCallback implements GLFWEventDispatcher {
 
-        private final boolean[] keys = new boolean[1000];
+        private final boolean[] keys = new boolean[348];
 
         @Override
         public void invoke(long window, int key, int scancode, int action, int mods) {
-            keys[key] = action != GLFW.GLFW_RELEASE;
+            if(key != -1) keys[key] = action != GLFW.GLFW_RELEASE;
         }
 
         public boolean[] getKeys() {

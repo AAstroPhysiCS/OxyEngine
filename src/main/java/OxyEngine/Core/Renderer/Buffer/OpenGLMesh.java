@@ -3,7 +3,6 @@ package OxyEngine.Core.Renderer.Buffer;
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
@@ -23,7 +22,6 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
     protected OpenGLNormalsBuffer normalsBuffer;
     protected OpenGLTangentBuffer tangentBuffer;
 
-    protected OxyShader shader;
     protected String path;
 
     protected int mode, vao;
@@ -111,10 +109,6 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
 
     public void updateSingleEntityData(int offsetToUpdate, float[] dataToUpdate) {
         vertexBuffer.updateSingleEntityData(offsetToUpdate, dataToUpdate);
-    }
-
-    public OxyShader getShader() {
-        return shader;
     }
 
     @Override

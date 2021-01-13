@@ -1,5 +1,6 @@
 package OxyEngine.Events;
 
+import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
 
 import static OxyEngineEditor.Scene.Scene.*;
@@ -30,6 +31,11 @@ public class OxyKeyEvent extends OxyEvent {
         if (glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
                 glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_N) == GLFW_PRESS) {
             newScene();
+        }
+
+        if (glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
+                glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_G) == GLFW_PRESS) {
+            SceneLayer.getInstance().recompileShader();
         }
     }
 }

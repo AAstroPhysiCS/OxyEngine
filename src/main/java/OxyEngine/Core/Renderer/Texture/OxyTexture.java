@@ -4,8 +4,6 @@ import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Scene.Scene;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -14,8 +12,6 @@ import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class OxyTexture {
-
-    static final List<AbstractTexture> allTextures = new ArrayList<>();
 
     private OxyTexture() {
     }
@@ -45,7 +41,6 @@ public class OxyTexture {
         @Override
         public void dispose() {
             glDeleteTextures(textureId);
-            allTextures.remove(this);
         }
 
         public boolean empty() {
@@ -85,21 +80,6 @@ public class OxyTexture {
 
     public static HDRTexture loadHDRTexture(String path, Scene scene) {
         return new HDRTexture(6, path, scene);
-    }
-
-    public static AbstractTexture loadImageCached(int slot) {
-        for (AbstractTexture t : allTextures) {
-            if (t.getTextureSlot() == slot) {
-                return t;
-            }
-        }
-        return null;
-    }
-
-    public static void bindAllTextureSlots() {
-        for (AbstractTexture t : allTextures){
-            if(t.getTextureSlot() >= 0) glBindTextureUnit(t.getTextureSlot(), t.getTextureId());
-        }
     }
 
     public static void unbindAllTextureSlots() {

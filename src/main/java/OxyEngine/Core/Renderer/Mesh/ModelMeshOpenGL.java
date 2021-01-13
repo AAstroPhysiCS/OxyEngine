@@ -37,9 +37,8 @@ public class ModelMeshOpenGL extends OpenGLMesh {
 
     private final String path;
 
-    public ModelMeshOpenGL(String path, OxyShader shader, int mode, BufferLayoutProducer.Usage usage, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
+    public ModelMeshOpenGL(String path, int mode, BufferLayoutProducer.Usage usage, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
         this.path = path;
-        this.shader = shader;
         this.mode = mode;
 
         assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");

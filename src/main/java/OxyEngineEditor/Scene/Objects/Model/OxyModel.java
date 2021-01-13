@@ -3,6 +3,8 @@ package OxyEngineEditor.Scene.Objects.Model;
 import OxyEngine.Components.*;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scripting.OxyScript;
@@ -59,6 +61,9 @@ public class OxyModel extends OxyEntity {
                 new SelectedComponent(false)
         );
 
+        if(this.has(PointLight.class)) e.addComponent(this.get(PointLight.class));
+        if(this.has(DirectionalLight.class)) e.addComponent(this.get(DirectionalLight.class));
+
         //SCRIPTS (with GUINode-Script)
         for (OxyScript s : this.getScripts()) e.addScript(new OxyScript(s.getPath()));
 
@@ -87,7 +92,7 @@ public class OxyModel extends OxyEntity {
         assert factory != null : oxyAssert("Models should have a Model Template");
         translatePos();
         factory.constructData(this);
-        addComponent(new ModelMeshOpenGL(path, get(OxyShader.class), GL_TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
+        addComponent(new ModelMeshOpenGL(path, GL_TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
     }
 
     @Override

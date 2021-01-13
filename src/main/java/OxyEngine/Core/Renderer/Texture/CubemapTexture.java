@@ -12,7 +12,6 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-import static OxyEngine.Core.Renderer.Texture.OxyTexture.allTextures;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
@@ -112,7 +111,7 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-        allTextures.add(this);
+
     }
 
     public void init(Set<EntityComponent> allOtherShaders) {
@@ -131,7 +130,7 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
             shader.setUniform1i("skyBoxTexture", textureSlot);
             shader.disable();
 
-            NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL(shader, GL_TRIANGLES, BufferLayoutProducer.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));
+            NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL(GL_TRIANGLES, BufferLayoutProducer.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));
             OxyNativeObject cube = scene.createNativeObjectEntity();
             cube.vertices = skyboxVertices;
             int[] indices = new int[skyboxVertices.length];

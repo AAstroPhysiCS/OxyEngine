@@ -13,8 +13,6 @@ import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -32,7 +30,7 @@ public class OxyScript {
     private EntityInfoProvider provider;
 
     public static OxyProviderThread<EntityInfoProvider> scriptThread;
-    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+//    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
     static {
         scriptThread = new OxyProviderThread<>();
@@ -60,8 +58,8 @@ public class OxyScript {
     }
 
     private Object getObjectFromFile(String classBinName, Scene scene, OxyEntity entity) {
-        compiler.run(System.in, System.out, System.err, "--enable-preview", "--release", "15",
-                "-classpath", System.getProperty("java.class.path"), "-d", System.getProperty("user.dir") + "\\target\\classes", path);
+//        compiler.run(System.in, System.out, System.err, "--enable-preview", "--release", "15",
+//                "-classpath", System.getProperty("java.class.path"), "-d", System.getProperty("user.dir") + "\\target\\classes", path);
         try {
             return SceneRuntime.loadClass(classBinName, scene, entity);
         } catch (Exception e) {

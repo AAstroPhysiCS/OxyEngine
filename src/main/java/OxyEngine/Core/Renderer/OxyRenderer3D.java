@@ -22,11 +22,6 @@ public class OxyRenderer3D extends OxyRenderer {
         return INSTANCE;
     }
 
-    @Override
-    public void render(float ts, OpenGLMesh mesh, OxyCamera camera) {
-        render(ts, mesh, camera, mesh.getShader());
-    }
-
     public void render(float ts, OpenGLMesh mesh, OxyCamera camera, OxyShader shader){
         assert shader != null : oxyAssert("Shader is not instantiated.");
         shader.enable();
@@ -39,7 +34,7 @@ public class OxyRenderer3D extends OxyRenderer {
     }
 
     @Override
-    public void render(float ts, OpenGLMesh mesh) {
-        render(ts, mesh, currentBoundedCamera);
+    public void render(float ts, OpenGLMesh mesh, OxyShader shader) {
+        render(ts, mesh, currentBoundedCamera, shader);
     }
 }

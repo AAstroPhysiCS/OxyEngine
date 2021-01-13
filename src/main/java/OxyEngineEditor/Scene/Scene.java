@@ -361,8 +361,8 @@ public final class Scene implements OxyDisposable {
         OxySelectHandler.entityContext = null;
         Scene oldScene = SceneRuntime.ACTIVE_SCENE;
 
-        oldScene.dispose();
         Scene scene = new Scene("Test Scene 1", oldScene.getRenderer(), oldScene.getFrameBuffer());
+        oldScene.disposeAllModels();
         for (var n : oldScene.getNativeObjects()) {
             scene.put(n.getKey());
             scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));

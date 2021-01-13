@@ -27,7 +27,7 @@ public class OxySelectHandler {
     static boolean switchC = false;
 
     public static void controlRenderableStates() {
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_C] && (ScenePanel.focusedWindow || SceneHierarchyPanel.focusedWindow) && !switchC) {
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_C] && (ScenePanel.hoveredWindow || SceneHierarchyPanel.focusedWindow) && !switchC) {
             if (gizmo.mode == GizmoMode.Translation) {
                 gizmo.mode = GizmoMode.Scale;
                 gizmo.mode.gizmoComponent.switchRenderableState(RenderingMode.Normal);

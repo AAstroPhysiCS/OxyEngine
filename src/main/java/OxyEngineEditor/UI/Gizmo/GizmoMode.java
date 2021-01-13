@@ -146,8 +146,9 @@ enum GizmoMode {
                 if (r.mode != RenderingMode.Normal) continue;
                 ModelMeshOpenGL modelMesh = e.get(ModelMeshOpenGL.class);
                 OxyMaterial material = e.get(OxyMaterial.class);
-                material.push(modelMesh.getShader());
-                scene.getRenderer().render(ts, modelMesh, SceneRuntime.currentBoundedCamera);
+                OxyShader shader = e.get(OxyShader.class);
+                material.push(shader);
+                scene.getRenderer().render(ts, modelMesh, SceneRuntime.currentBoundedCamera, shader);
             }
         }
 
@@ -157,7 +158,7 @@ enum GizmoMode {
     static class Translation extends GizmoComponent {
 
         Translation(Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
-            super("/models/native/oxygizmo.obj", scene, shader, gizmo3D);
+            super("/models/oxygizmo.obj", scene, shader, gizmo3D);
         }
 
         @Override
@@ -183,7 +184,7 @@ enum GizmoMode {
     static class Scaling extends GizmoComponent {
 
         Scaling(Scene scene, OxyShader shader, OxyGizmo3D gizmo3D) {
-            super("/models/native/oxygizmoScale2.obj", scene, shader, gizmo3D);
+            super("/models/oxygizmoScale2.obj", scene, shader, gizmo3D);
         }
 
         @Override
