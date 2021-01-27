@@ -1,12 +1,11 @@
-package OxyEngineEditor.UI.Loader;
+package OxyEngineEditor.UI;
 
 import OxyEngine.System.OxySystem;
-import OxyEngine.Tools.Loader;
 import imgui.flag.ImGuiCol;
 
 import java.lang.reflect.Field;
 
-public class UIThemeLoader implements Loader<float[]> {
+public class UIThemeLoader {
 
     private UIThemeLoader() {}
 
@@ -17,7 +16,6 @@ public class UIThemeLoader implements Loader<float[]> {
         return INSTANCE;
     }
 
-    @Override
     public float[][] load() {
         return loadStyle(OxySystem.FileSystem.load(OxySystem.FileSystem.getResourceByPath("/theme/oxyTheme.txt")).split("\n"));
     }

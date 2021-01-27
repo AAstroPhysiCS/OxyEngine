@@ -2,6 +2,7 @@ package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -18,19 +19,13 @@ public class DirectionalLight extends Light {
         super(ambient, specular);
     }
 
-    private int index;
-    private OxyEntity e;
-
     @Override
     public void update(OxyEntity e, int i) {
-        this.e = e;
-        index = i;
         OxyShader shader = e.get(OxyShader.class);
-        OxyMaterial material = e.get(OxyMaterial.class);
+        OxyMaterial material = OxyMaterialPool.getMaterial(e);
+        if(material == null) return;
         shader.enable();
-        shader.setUniformVec3("d_Light[" + i + "].direction", dir);
-//        shader.setUniformVec3("d_Light.ambient", ambient);
-//        shader.setUniformVec3("d_Light.specular", specular);
+        shader.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
         shader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
         shader.disable();
     }
@@ -55,14 +50,5 @@ public class DirectionalLight extends Light {
             ImGui.columns(1);
         }
     };
-
-    @Override
-    public void dispose() {
-        OxyShader shader = e.get(OxyShader.class);
-        shader.enable();
-        shader.setUniformVec3("d_Light[" + index + "].direction", new Vector3f(0, 0, 0));
-        shader.setUniformVec3("d_Light[" + index + "].diffuse", new Vector3f(0, 0, 0));
-        shader.disable();
-    }
 }
 

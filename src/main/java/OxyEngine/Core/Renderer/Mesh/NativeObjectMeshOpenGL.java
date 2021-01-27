@@ -1,8 +1,7 @@
 package OxyEngine.Core.Renderer.Mesh;
 
 import OxyEngine.Core.Renderer.Buffer.*;
-import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLIndexBuffer;
-import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLVertexBuffer;
+import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -25,11 +24,21 @@ public class NativeObjectMeshOpenGL extends OpenGLMesh {
                     .setStrideSize(attributes[0].stride() / Float.BYTES)
                     .setUsage(usage)
                     .setAttribPointer(attributes)
-                    .create()
+                .create()
                 .createLayout(IndexBuffer.class).create()
-                .finalizeLayout();
+                .finalizeRecord();
 
         vertexBuffer = (OpenGLVertexBuffer) layout.vertexBuffer();
         indexBuffer = (OpenGLIndexBuffer) layout.indexBuffer();
+    }
+
+    public NativeObjectMeshOpenGL(int mode, BufferLayoutRecord record) {
+        this.mode = mode;
+        assert mode != -1 : oxyAssert("Some arguments not defined!");
+        vertexBuffer = (OpenGLVertexBuffer) record.vertexBuffer();
+        indexBuffer = (OpenGLIndexBuffer) record.indexBuffer();
+        normalsBuffer = (OpenGLNormalsBuffer) record.normalsBuffer();
+        tangentBuffer = (OpenGLTangentBuffer) record.tangentBuffer();
+        textureBuffer = (OpenGLTextureBuffer) record.textureBuffer();
     }
 }

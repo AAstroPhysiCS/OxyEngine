@@ -18,4 +18,8 @@ public abstract class TextureBuffer extends Buffer {
     public float[] getTextureCoords() {
         return textureCoords;
     }
+
+    public boolean emptyData() {
+        return textureCoords.length == 0;
+    }
 }

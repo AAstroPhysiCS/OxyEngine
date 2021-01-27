@@ -13,17 +13,12 @@ public class EnvironmentPanel extends Panel {
 
     private static EnvironmentPanel INSTANCE = null;
 
-    public static EnvironmentPanel getInstance(SceneLayer scene) {
-        if (INSTANCE == null) INSTANCE = new EnvironmentPanel(scene);
+    public static EnvironmentPanel getInstance() {
+        if (INSTANCE == null) INSTANCE = new EnvironmentPanel();
         return INSTANCE;
     }
 
     private static boolean initPanel = false;
-    private final SceneLayer sceneLayer;
-
-    private EnvironmentPanel(SceneLayer sceneLayer) {
-        this.sceneLayer = sceneLayer;
-    }
 
     @Override
     public void preload() {
@@ -36,7 +31,7 @@ public class EnvironmentPanel extends Panel {
 
         if (ImGui.button("Load environment map")) {
             String path = openDialog("hdr", null);
-            if (path != null) sceneLayer.loadHDRTextureToScene(path);
+            if (path != null) SceneLayer.getInstance().loadHDRTextureToScene(path);
         }
 
         ImGui.columns(2, "env column");

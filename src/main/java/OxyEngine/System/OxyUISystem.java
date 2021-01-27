@@ -7,7 +7,7 @@ import OxyEngine.Events.OxyEventDispatcher;
 import OxyEngine.Events.OxyKeyEvent;
 import OxyEngine.Events.OxyMouseEvent;
 import OxyEngine.OxyEngine;
-import OxyEngineEditor.UI.Font.FontLoader;
+import OxyEngineEditor.UI.FontLoader;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImGuiStyle;
@@ -86,7 +86,10 @@ public class OxyUISystem {
         });
 
         File[] file = FontLoader.getInstance().load();
-        for (File f : file) OxyFontSystem.load(io, f.getPath(), 15, f.getName().split("\\.")[0]);
+        for (File f : file) {
+            OxyFontSystem.load(io, f.getPath(), 15, f.getName().split("\\.")[0]);
+            OxyFontSystem.load(io, f.getPath(), 22, f.getName().split("\\.")[0]);
+        }
 
         imGuiRenderer.init(gl_Version);
         imGuiGlfw.init(windowHandle.getPointer(), true);

@@ -6,17 +6,18 @@ import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
-import OxyEngineEditor.Scene.Objects.Native.ObjectType;
 import OxyEngineEditor.UI.Panels.GUINode;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-import static OxyEngine.Tools.Globals.toPrimitiveFloat;
-import static OxyEngine.Tools.Globals.toPrimitiveInteger;
+import static OxyEngine.Globals.toPrimitiveFloat;
+import static OxyEngine.Globals.toPrimitiveInteger;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public abstract class OxyEntity {
@@ -27,10 +28,12 @@ public abstract class OxyEntity {
     public float[] vertices, tcs, normals, tangents, biTangents;
     public int[] indices;
 
+    protected boolean root;
+
     protected final Scene scene;
 
     protected boolean importedFromFile;
-    protected int object_id; //for selection
+    protected int objectID; //for selection
 
     public OxyEntity(Scene scene) {
         this.scene = scene;
@@ -44,6 +47,14 @@ public abstract class OxyEntity {
         this.vertices = other.vertices.clone();
         this.tcs = other.tcs.clone();
         this.indices = other.indices.clone();
+    }
+
+    public void setRoot(boolean root) {
+        this.root = root;
+    }
+
+    public boolean isRoot() {
+        return root;
     }
 
     public abstract OxyEntity copyMe();
@@ -75,6 +86,28 @@ public abstract class OxyEntity {
             if (c instanceof TransformComponent t && !importedFromFile) {
                 t.validate(this);
             }
+        }
+    }
+
+    public List<OxyEntity> getEntitiesRelatedTo(Class<? extends EntityComponent> familyComponentClass) {
+        if (!this.has(familyComponentClass)) return null;
+        List<OxyEntity> related = new ArrayList<>();
+        for (var ent : scene.getEntities()) {
+            if (ent.equals(this)) continue;
+            if (ent.has(familyComponentClass)) {
+                EntityComponent c = ent.get(familyComponentClass);
+                if (c == this.get(familyComponentClass)) {
+                    related.add(ent);
+                }
+            }
+        }
+        return related;
+    }
+
+    @SafeVarargs
+    public final void removeComponent(Class<? extends EntityComponent>... components) {
+        for (var classes : components) {
+            scene.removeComponent(this, this.get(classes));
         }
     }
 
@@ -118,26 +151,8 @@ public abstract class OxyEntity {
         return scene.get(this, destClass);
     }
 
-    public static float[] sumAllVertices(OxyEntity[] arr, ObjectType type) {
-        float[] allVertices = new float[arr.length * type.n_Vertices()];
-        int ptr = 0;
-        for (OxyEntity oxyObj : arr) {
-            for (int i = 0; i < oxyObj.vertices.length; i++) {
-                allVertices[ptr++] = oxyObj.vertices[i];
-            }
-        }
-        return allVertices;
-    }
-
-    public static int[] sumAllIndices(OxyEntity[] arr, ObjectType type) {
-        int[] allIndices = new int[arr.length * type.n_Indices()];
-        int ptr = 0;
-        for (OxyEntity oxyObj : arr) {
-            for (int i = 0; i < oxyObj.indices.length; i++) {
-                allIndices[ptr++] = oxyObj.indices[i];
-            }
-        }
-        return allIndices;
+    public <T extends EntityComponent> OxyEntity getRoot(Class<T> destClass){
+        return scene.getRoot(this, destClass);
     }
 
     public static float[] sumAllVertices(List<OxyEntity> arr) {
@@ -173,7 +188,7 @@ public abstract class OxyEntity {
     }
 
     public int getObjectId() {
-        return object_id;
+        return objectID;
     }
 
     public List<GUINode> getGUINodes() {
@@ -210,8 +225,8 @@ public abstract class OxyEntity {
         }
         if (has(TagComponent.class)) tag = get(TagComponent.class).tag();
         if (has(MeshPosition.class)) meshPos = get(MeshPosition.class).meshPos();
-        if (has(OxyMaterial.class)) {
-            OxyMaterial m = get(OxyMaterial.class);
+        if (has(OxyMaterialIndex.class)) {
+            OxyMaterial m = OxyMaterialPool.getMaterial(this);
             if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
             if (m.albedoTexture != null) albedoTexture = m.albedoTexture.getPath();
             if (m.normalTexture != null) normalTexture = m.normalTexture.getPath();
@@ -237,6 +252,7 @@ public abstract class OxyEntity {
                 .putField("Scale", transform.scale.toString())
                 .putField("Bounds Min", minBound.toString())
                 .putField("Bounds Max", maxBound.toString())
+                .putField("Material Name", Objects.requireNonNull(OxyMaterialPool.getMaterial(get(OxyMaterialIndex.class).index())).name)
                 .putField("Color", albedoColor)
                 .putField("Albedo Texture", albedoTexture)
                 .putField("Normal Map Texture", normalTexture)

@@ -1,6 +1,7 @@
 package OxyEngineEditor.Scene;
 
 import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.EntryPoint;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
@@ -31,7 +32,7 @@ public final class SceneRuntime {
     }
 
     public static void onCreate() {
-        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
+        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
                 c.invokeCreate();
@@ -42,7 +43,7 @@ public final class SceneRuntime {
     public static void onUpdate(float ts) {
         TS = ts;
         if (ACTIVE_SCENE.STATE != SceneState.RUNNING) return;
-        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
+        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
                 scriptThread.addProvider(c.getProvider());

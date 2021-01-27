@@ -5,7 +5,7 @@ import org.lwjgl.system.MemoryUtil;
 import java.nio.IntBuffer;
 
 import static OxyEngine.System.OxySystem.logger;
-import static OxyEngine.Tools.Globals.normalizeColor;
+import static OxyEngine.Globals.normalizeColor;
 import static org.lwjgl.opengl.GL43.*;
 import static org.lwjgl.system.MemoryUtil.memByteBuffer;
 

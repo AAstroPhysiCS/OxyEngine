@@ -10,7 +10,7 @@ import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.UI.Loader.UIThemeLoader;
+import OxyEngineEditor.UI.UIThemeLoader;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
 import java.util.Objects;

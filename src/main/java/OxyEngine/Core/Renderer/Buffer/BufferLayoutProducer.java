@@ -28,7 +28,7 @@ public class BufferLayoutProducer {
     public interface BufferLayoutBuilder {
         BufferLayout createLayout(Class<? extends Buffer> destClass);
 
-        BufferLayoutRecord finalizeLayout();
+        BufferLayoutRecord finalizeRecord();
     }
 
     public static class BufferLayoutImpl implements BufferLayout {
@@ -93,7 +93,7 @@ public class BufferLayoutProducer {
         }
 
         @Override
-        public BufferLayoutRecord finalizeLayout() {
+        public BufferLayoutRecord finalizeRecord() {
 
             BufferLayoutImpl vertexLayout = null, normalsLayout = null, tangentLayout = null, textureLayout = null, indexLayout = null;
             for (BufferLayoutImpl impl : implementations) {

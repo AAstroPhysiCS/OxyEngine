@@ -70,7 +70,7 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                         attributeBiTangent
                 )
                 .create()
-                .finalizeLayout();
+                .finalizeRecord();
 
         layout.vertexBuffer().setVertices(vertices);
         layout.indexBuffer().setIndices(indices);
@@ -123,9 +123,9 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                         if (entityContext != null) {
                             List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path, entityContext.get(OxyShader.class));
                             for (OxyModel e : eList) {
-                                e.addComponent(new SelectedComponent(true, false), entityContext.get(OxyMaterial.class));
+                                e.addComponent(new SelectedComponent(false));
                                 e.getGUINodes().add(ModelMeshOpenGL.guiNode);
-                                e.getGUINodes().add(OxyMaterial.guiNode);
+                                if(!e.getGUINodes().contains(OxyMaterial.guiNode)) e.getGUINodes().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
                             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);

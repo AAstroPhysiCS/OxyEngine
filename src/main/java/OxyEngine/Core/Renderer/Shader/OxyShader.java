@@ -65,15 +65,22 @@ public class OxyShader implements OxyDisposable, EntityComponent {
         glUniform1f((Integer) uniformLocations.get(name), value);
     }
 
-    public void setUniformVec4(String vecName, Vector4f vec) {
+    public void setUniformVec4(String vecName, float x, float y, float z, float w) {
         if (!uniformLocations.containsKey(vecName)) {
             uniformLocations.put(vecName, glGetUniformLocation(program, vecName));
         }
-        glUniform4f((Integer) uniformLocations.get(vecName), vec.x, vec.y, vec.z, vec.w);
+        glUniform4f((Integer) uniformLocations.get(vecName), x, y, z, w);
     }
 
     public void setUniformVec4(Vector4f vec, int location) {
         glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
+    }
+
+    public void setUniformVec3(String vecName, float x, float y, float z) {
+        if (!uniformLocations.containsKey(vecName)) {
+            uniformLocations.put(vecName, glGetUniformLocation(program, vecName));
+        }
+        glUniform3f((Integer) uniformLocations.get(vecName), x, y, z);
     }
 
     public void setUniformVec3(String vecName, Vector3f vec) {

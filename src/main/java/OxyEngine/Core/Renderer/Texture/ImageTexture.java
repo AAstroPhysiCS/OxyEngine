@@ -56,8 +56,6 @@ public class ImageTexture extends OxyTexture.AbstractTexture {
 
         stbi_image_free(buffer);
         glBindTexture(GL_TEXTURE_2D, 0);
-
-
     }
 
     public float[] getTextureCoords() {

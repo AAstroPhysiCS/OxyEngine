@@ -28,6 +28,7 @@ public class OpenGLTangentBuffer extends TangentBuffer {
         }
     }
 
+
     @Override
     public void dispose() {
         glDeleteBuffers(bufferId);

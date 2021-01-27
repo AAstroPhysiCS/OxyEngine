@@ -11,7 +11,7 @@ public record BoundingBoxComponent(Vector3f min, Vector3f max) implements Entity
     //1 = y
     //2 = z
 
-    public static void calcPos(OxyModelLoader.AssimpOxyMesh oxyMesh, float[][] sortedVertices) {
+    public static void calcPos(OxyModelLoader.AssimpMesh oxyMesh, float[][] sortedVertices) {
         oxyMesh.pos = new Vector3f(
                 (sortedVertices[0][0] + sortedVertices[0][sortedVertices[0].length - 1]) / 2,
                 (sortedVertices[1][0] + sortedVertices[1][sortedVertices[1].length - 1]) / 2,
@@ -19,7 +19,7 @@ public record BoundingBoxComponent(Vector3f min, Vector3f max) implements Entity
         );
     }
 
-    public static void calcMin(OxyModelLoader.AssimpOxyMesh oxyMesh, float[][] sortedVertices) {
+    public static void calcMin(OxyModelLoader.AssimpMesh oxyMesh, float[][] sortedVertices) {
         oxyMesh.min = new Vector3f(
                 oxyMesh.pos.x - sortedVertices[0][0],
                 oxyMesh.pos.y - sortedVertices[1][0],
@@ -27,7 +27,7 @@ public record BoundingBoxComponent(Vector3f min, Vector3f max) implements Entity
         );
     }
 
-    public static void calcMax(OxyModelLoader.AssimpOxyMesh oxyMesh, float[][] sortedVertices) {
+    public static void calcMax(OxyModelLoader.AssimpMesh oxyMesh, float[][] sortedVertices) {
         oxyMesh.max = new Vector3f(
                 sortedVertices[0][sortedVertices[0].length - 1] - oxyMesh.pos.x,
                 sortedVertices[1][sortedVertices[1].length - 1] - oxyMesh.pos.y,
@@ -35,7 +35,7 @@ public record BoundingBoxComponent(Vector3f min, Vector3f max) implements Entity
         );
     }
 
-    public static float[][] sort(OxyModelLoader.AssimpOxyMesh oxyMesh) {
+    public static float[][] sort(OxyModelLoader.AssimpMesh oxyMesh) {
         float[] allVerticesX = new float[oxyMesh.vertices.size()];
         int ptr = 0;
 

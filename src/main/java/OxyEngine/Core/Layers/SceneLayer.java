@@ -2,6 +2,7 @@ package OxyEngine.Core.Layers;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Light.Light;
@@ -12,11 +13,11 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;
-import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import OxyEngineEditor.UI.Panels.GUINode;
 
@@ -28,15 +29,16 @@ import java.util.Set;
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngineEditor.EditorApplication.oxyShader;
 import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 import static org.lwjgl.opengl.GL44.glClearTexImage;
 
 public class SceneLayer extends Layer {
 
-    private Set<OxyEntity> cachedLightEntities, cachedNativeMeshes;
+    public Set<OxyEntity> cachedLightEntities, cachedNativeMeshes;
     private Set<OxyCamera> cachedCameraComponents;
-    private Set<OxyEntity> allModelEntities;
+    public Set<OxyEntity> allModelEntities;
 
     static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
     public static HDRTexture hdrTexture;
@@ -57,12 +59,11 @@ public class SceneLayer extends Layer {
     public void build() {
         cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
         for (OxyEntity e : cachedNativeMeshes) {
-            e.get(NativeObjectMeshOpenGL.class).initList();
+            e.get(NativeObjectMeshOpenGL.class).addToQueue();
         }
 
         cachedCameraComponents = ACTIVE_SCENE.distinct(OxyCamera.class);
-        cachedLightEntities = ACTIVE_SCENE.view(Light.class);
-        allModelEntities = ACTIVE_SCENE.view(ModelMeshOpenGL.class);
+        updateAllEntities();
 
         fillPropertyEntries();
     }
@@ -70,19 +71,18 @@ public class SceneLayer extends Layer {
     @Override
     public void rebuild() {
         updateAllEntities();
-//        cachedNativeMeshes = scene.view(NativeObjectMesh.class);
 
         //Prep
         {
             List<OxyEntity> cachedConverted = new ArrayList<>(allModelEntities);
             if (cachedConverted.size() == 0) return;
             ModelMeshOpenGL mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMeshOpenGL.class);
-            mesh.initList();
+            mesh.addToQueue();
         }
     }
 
     private void fillPropertyEntries() {
-        for (OxyEntity entity : SceneRuntime.ACTIVE_SCENE.getEntities()) {
+        for (OxyEntity entity : SceneLayer.getInstance().allModelEntities) {
             if (entity instanceof OxyNativeObject) continue;
             if (((OxyModel) entity).factory == null) continue;
             for (Class<? extends EntityComponent> component : EntityComponent.allEntityComponentChildClasses) {
@@ -169,10 +169,12 @@ public class SceneLayer extends Layer {
             glDepthFunc(GL_LEQUAL);
             for (OxyEntity e : cachedNativeMeshes) {
                 OpenGLMesh mesh = e.get(OpenGLMesh.class);
-                if (e.has(OxyMaterial.class) && e.has(OxyShader.class)) {
-                    OxyMaterial m = e.get(OxyMaterial.class);
-                    m.push(e.get(OxyShader.class));
-                    render(ts, mesh, mainCamera, e.get(OxyShader.class));
+                if (e.has(OxyMaterialIndex.class) && e.has(OxyShader.class)) {
+                    OxyMaterial m = OxyMaterialPool.getMaterial(e);
+                    if(m != null) {
+                        m.push(e.get(OxyShader.class));
+                        render(ts, mesh, mainCamera, e.get(OxyShader.class));
+                    }
                 }
 
                 if (hdrTexture != null) {
@@ -180,8 +182,7 @@ public class SceneLayer extends Layer {
                     if (mesh.equals(hdrTexture.getMesh())) {
                         glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
                         cubemapShader.enable();
-                        if (EnvironmentPanel.mipLevelStrength[0] > 0)
-                            cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
+                        if (EnvironmentPanel.mipLevelStrength[0] > 0) cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
                         else cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
                         cubemapShader.setUniform1f("mipLevel", EnvironmentPanel.mipLevelStrength[0]);
                         cubemapShader.setUniform1f("exposure", EnvironmentPanel.exposure[0]);
@@ -199,7 +200,7 @@ public class SceneLayer extends Layer {
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
                 ModelMeshOpenGL modelMesh = e.get(ModelMeshOpenGL.class);
-                OxyMaterial material = e.get(OxyMaterial.class);
+                OxyMaterial material = OxyMaterialPool.getMaterial(e);
                 TransformComponent c = e.get(TransformComponent.class);
                 OxyShader shader = e.get(OxyShader.class);
                 shader.enable();
@@ -242,7 +243,7 @@ public class SceneLayer extends Layer {
                 } else {
                     render(ts, modelMeshglmainCamera);
                 }*/
-                material.push(shader);
+                if(material != null) material.push(shader);
                 render(ts, modelMesh, mainCamera, shader);
             }
         }
@@ -303,11 +304,13 @@ public class SceneLayer extends Layer {
                 render(0, e.get(ModelMeshOpenGL.class), mainCamera, e.get(OxyShader.class));
         }
         int id = frameBuffer.getEntityID();
-        if (id == -1) OxySelectHandler.entityContext = null;
+        if (id == -1) entityContext = null;
         else {
             for (OxyEntity e : allModelEntities) {
                 if (e.getObjectId() == id) {
-                    OxySelectHandler.entityContext = e;
+                    if(entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
+                    entityContext = e;
+                    entityContext.get(SelectedComponent.class).selected = true;
                     break;
                 }
             }

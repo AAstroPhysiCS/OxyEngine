@@ -1,7 +1,9 @@
 package Scripts;
 
+import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Scripting.ScriptableEntity;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
@@ -15,7 +17,7 @@ public class ColorIteratorScript extends ScriptableEntity {
 
     @Override
     public void onCreate() {
-        material = getComponent(OxyMaterial.class);
+        material = OxyMaterialPool.getMaterial(getComponent(OxyMaterialIndex.class).index());
     }
 
     @Override

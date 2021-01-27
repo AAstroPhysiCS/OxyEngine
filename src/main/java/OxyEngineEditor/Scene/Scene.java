@@ -5,7 +5,6 @@ import OxyEngine.Core.Layers.GizmoLayer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scripting.OxyScript;
@@ -16,14 +15,13 @@ import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
 
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
+import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.EditorApplication.oxyShader;
+import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngineEditor.Scene.SceneSerializer.extensionName;
 import static OxyEngineEditor.Scene.SceneSerializer.fileExtension;
 
@@ -39,6 +37,8 @@ public final class Scene implements OxyDisposable {
     public static int OBJECT_ID_COUNTER = 0;
 
     public SceneState STATE = SceneState.IDLE;
+
+    private OxyModelLoader modelLoader;
 
     public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer) {
         this.renderer = renderer;
@@ -71,16 +71,12 @@ public final class Scene implements OxyDisposable {
         return createModelEntities(type.getPath(), shader, importedFromFile);
     }
 
-    public final OxyModel createModelEntity(ModelType type, OxyShader shader, boolean importedFromFile) {
-        return createModelEntity(type.getPath(), shader, importedFromFile);
+    public final OxyModel createModelEntity(ModelType type, OxyShader shader) {
+        return createModelEntity(type.getPath(), shader);
     }
 
     public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
         return createModelEntities(type.getPath(), shader, false);
-    }
-
-    public final OxyModel createModelEntity(ModelType type, OxyShader shader) {
-        return createModelEntity(type.getPath(), shader, false);
     }
 
     public final OxyModel createEmptyModel(OxyShader shader) {
@@ -99,9 +95,8 @@ public final class Scene implements OxyDisposable {
         return e;
     }
 
-    public final OxyModel createEmptyModel(OxyShader shader, boolean importedFromFile, int i) {
+    public final OxyModel createEmptyModel(OxyShader shader, int i) {
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
-        e.importedFromFile = importedFromFile;
         put(e);
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
@@ -117,15 +112,18 @@ public final class Scene implements OxyDisposable {
 
     public final List<OxyModel> createModelEntities(String path, OxyShader shader, boolean importedFromFile) {
         List<OxyModel> models = new ArrayList<>();
-        OxyModelLoader loader = new OxyModelLoader(path);
+        modelLoader = new OxyModelLoader(path);
 
         int pos = 0;
-        for (OxyModelLoader.AssimpOxyMesh assimpMesh : loader.meshes) {
+        OxyMaterialPool.newBatch();
+        for (OxyModelLoader.AssimpMesh assimpMesh : modelLoader.meshes) {
+            int index = OxyMaterialPool.addMaterial(assimpMesh, modelLoader.materials.get(assimpMesh.materialIndex));
             OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
             e.importedFromFile = importedFromFile;
             put(e);
             e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
             e.addComponent(
+                    assimpMesh.rootEntity.get(FamilyComponent.class),
                     new UUIDComponent(UUID.randomUUID()),
                     shader,
                     new BoundingBoxComponent(
@@ -136,7 +134,7 @@ public final class Scene implements OxyDisposable {
                     new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                     new MeshPosition(pos),
                     new RenderableComponent(RenderingMode.Normal),
-                    assimpMesh.material
+                    new OxyMaterialIndex(index)
             );
             e.initData(path);
             models.add(e);
@@ -149,21 +147,16 @@ public final class Scene implements OxyDisposable {
         return createModelEntities(path, shader, false);
     }
 
-    //performance improvement by caching the models
-    static OxyModelLoader cachedLoader;
-    static String cachedPath = "";
-
-    public final OxyModel createModelEntity(String path, OxyShader shader, boolean importedFromFile, int i) {
-        if (!cachedPath.equals(path)) {
-            cachedLoader = new OxyModelLoader(path);
-            cachedPath = path;
-        }
-        OxyModelLoader.AssimpOxyMesh assimpMesh = cachedLoader.meshes.get(i);
+    public final OxyModel createModelEntity(String path, OxyShader shader, int i) {
+        modelLoader = new OxyModelLoader(path);
+        OxyMaterialPool.newBatch();
+        OxyModelLoader.AssimpMesh assimpMesh = modelLoader.meshes.get(i);
+        int index = OxyMaterialPool.addMaterial(assimpMesh, modelLoader.materials.get(assimpMesh.materialIndex));
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
-        e.importedFromFile = importedFromFile;
         put(e);
         e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
         e.addComponent(
+                assimpMesh.rootEntity.get(FamilyComponent.class),
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
                 new BoundingBoxComponent(
@@ -174,29 +167,72 @@ public final class Scene implements OxyDisposable {
                 new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
                 new MeshPosition(i),
                 new RenderableComponent(RenderingMode.Normal),
-                assimpMesh.material
+                new OxyMaterialIndex(index)
         );
         e.initData(path);
         return e;
     }
 
-    public final OxyModel createModelEntity(String path, OxyShader shader, boolean importedFromFile) {
-        return createModelEntity(path, shader, importedFromFile, 0);
+    public final OxyModel createModelEntity(String path, OxyShader shader, int i, int materialIndex) {
+        OxyModelLoader.AssimpMesh assimpMesh = modelLoader.meshes.get(i);
+        OxyMaterialPool.newBatch();
+        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
+        put(e);
+        e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
+        e.addComponent(
+                assimpMesh.rootEntity.get(FamilyComponent.class),
+                new UUIDComponent(UUID.randomUUID()),
+                shader,
+                new BoundingBoxComponent(
+                        assimpMesh.min,
+                        assimpMesh.max
+                ),
+                new TransformComponent(new Vector3f(assimpMesh.pos)),
+                new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
+                new MeshPosition(i),
+                new RenderableComponent(RenderingMode.Normal),
+                new OxyMaterialIndex(materialIndex)
+        );
+        e.initData(path);
+        return e;
     }
 
     public final OxyModel createModelEntity(String path, OxyShader shader) {
-        return createModelEntity(path, shader, false);
+        return createModelEntity(path, shader, 0);
     }
 
     public final void removeEntity(OxyEntity e) {
-        if (e.has(OxyMaterial.class)) e.get(OxyMaterial.class).dispose();
+
+        if(e.isRoot()){
+            List<OxyEntity> entitiesRelatedTo = e.getEntitiesRelatedTo(FamilyComponent.class);
+            if(entitiesRelatedTo != null) {
+                for (OxyEntity eRT : entitiesRelatedTo) {
+                    removeEntity(eRT);
+                }
+            }
+        }
+
+        int index = e.get(OxyMaterialIndex.class) != null ? e.get(OxyMaterialIndex.class).index() : -1;
+
         if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
-        if (e.has(Light.class)) e.get(Light.class).dispose();
+
         for (var scripts : e.getScripts()) {
             if (scripts.getProvider() != null) OxyScript.scriptThread.getProviders().remove(scripts.getProvider());
         }
         var value = registry.entityList.remove(e);
         assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");
+
+        if (ACTIVE_SCENE.getEntities()
+                .stream()
+                .filter(oxyEntity -> oxyEntity instanceof OxyModel)
+                .filter(oxyEntity -> oxyEntity.has(OxyMaterialIndex.class))
+                .map(entity -> entity.get(OxyMaterialIndex.class).index())
+                .noneMatch(integer -> index == integer) && index != -1) {
+            //if there's no entity that is using this material => dispose it
+            OxyMaterial m = OxyMaterialPool.getMaterial(index);
+            OxyMaterialPool.removeMaterial(m);
+            m.dispose();
+        }
     }
 
     public final OxyEntity getEntityByIndex(int index) {
@@ -215,6 +251,10 @@ public final class Scene implements OxyDisposable {
      */
     public final void addComponent(OxyEntity entity, EntityComponent... component) {
         registry.addComponent(entity, component);
+    }
+
+    public final void removeComponent(OxyEntity entity, EntityComponent components) {
+        registry.removeComponent(entity, components);
     }
 
     /*
@@ -240,62 +280,9 @@ public final class Scene implements OxyDisposable {
         return registry.view(destClass);
     }
 
-    /*
-     * gets all the entities associated with multiple classes
-     */
-
-    @SafeVarargs
-    public final Set<OxyEntity> group(Class<? extends EntityComponent>... destClasses) {
-        return registry.group(destClasses);
-    }
-
     @SafeVarargs
     public final <V extends EntityComponent> Set<V> distinct(Class<? super V>... destClasses) {
         return registry.distinct(destClasses);
-    }
-
-    @SafeVarargs
-    public final <U extends EntityComponent> Set<U> distinct(RegistryPredicate<Boolean, U> predicate, Class<U> type,
-                                                             Class<? extends EntityComponent>... destClasses) {
-        return registry.distinct(predicate, type, destClasses);
-    }
-
-    @SafeVarargs
-    public final <U extends EntityComponent, K extends U> void each(RegistryEach.Group<OxyEntity, K> registryEach, Class<? extends K>... destClasses) {
-        Set<OxyEntity> entities = group(destClasses);
-        Set<K> components = new LinkedHashSet<>();
-        entities.forEach(oxyEntity -> {
-            for (Class<? extends K> classes : destClasses) {
-                K c = oxyEntity.get(classes);
-                components.add(c);
-            }
-            registryEach.each(oxyEntity, components);
-        });
-    }
-
-    public final void each(RegistryEach.Single<OxyEntity> registryEach, Predicate<OxyEntity> predicate) {
-        Set<OxyEntity> entities = getEntities();
-        entities.forEach(oxyEntity -> {
-            if (predicate.test(oxyEntity)) {
-                registryEach.each(oxyEntity);
-            }
-        });
-    }
-
-    public final <U extends EntityComponent, K extends U> void each(RegistryEach.View<OxyEntity, K> registryEach, Class<K> destClass) {
-        Set<OxyEntity> entities = view(destClass);
-        entities.forEach(oxyEntity -> registryEach.each(oxyEntity, oxyEntity.get(destClass)));
-    }
-
-    @SafeVarargs
-    public final <U extends EntityComponent> void each(RegistryEach.Single<OxyEntity> registryEach, Class<? extends U>... destClass) {
-        Set<OxyEntity> entities = group(destClass);
-        entities.forEach(registryEach::each);
-    }
-
-    public final void each(RegistryEach.Single<OxyEntity> registryEach) {
-        Stream<OxyEntity> stream = registry.entityList.keySet().stream();
-        stream.forEach(registryEach::each);
     }
 
     public int getShapeCount() {
@@ -310,8 +297,8 @@ public final class Scene implements OxyDisposable {
         return registry.entityList.keySet();
     }
 
-    public Set<Map.Entry<OxyEntity, Set<EntityComponent>>> getNativeObjects() {
-        return registry.entityList.entrySet().stream().filter(oxyEntitySetEntry -> oxyEntitySetEntry.getKey() instanceof OxyNativeObject).collect(Collectors.toSet());
+    Set<Map.Entry<OxyEntity, Set<EntityComponent>>> getEntityEntrySet(){
+        return registry.entityList.entrySet();
     }
 
     public OpenGLFrameBuffer getFrameBuffer() {
@@ -328,17 +315,39 @@ public final class Scene implements OxyDisposable {
             OxyEntity e = it.next();
             if (e instanceof OxyModel) {
                 if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
-                if (e.has(OxyMaterial.class)) e.get(OxyMaterial.class).dispose();
+                if (e.has(OxyMaterialIndex.class)) {
+                    OxyMaterial m = OxyMaterialPool.getMaterial(e);
+                    if (m != null) {
+                        if (m.index != -1) {
+                            OxyMaterialPool.removeMaterial(m);
+                            m.dispose();
+                        }
+                    }
+                }
                 it.remove();
             }
+        }
+        for(int i = 0; i < LIGHT_SIZE; i++){
+            oxyShader.enable();
+            oxyShader.setUniformVec3("p_Light[" + i + "].position", 0, 0, 0);
+            oxyShader.setUniformVec3("p_Light[" + i + "].diffuse", 0, 0, 0);
+            oxyShader.setUniform1f("p_Light[" + i + "].constant", 0);
+            oxyShader.setUniform1f("p_Light[" + i + "].linear", 0);
+            oxyShader.setUniform1f("p_Light[" + i + "].quadratic", 0);
+
+            oxyShader.setUniformVec3("d_Light[" + i + "].direction", 0, 0, 0);
+            oxyShader.setUniformVec3("d_Light[" + i + "].diffuse", 0, 0, 0);
+
+            oxyShader.disable();
         }
     }
 
     @Override
     public void dispose() {
+        OxyMaterialPool.clear();
         Iterator<OxyEntity> it = registry.entityList.keySet().iterator();
         while (it.hasNext()) {
-            if(it.next() != null) it.remove();
+            if (it.next() != null) it.remove();
         }
         frameBuffer.dispose();
         assert !it.hasNext() : oxyAssert("Scene dispose failed");
@@ -347,29 +356,34 @@ public final class Scene implements OxyDisposable {
     public static void openScene() {
         String openScene = openDialog(extensionName, null);
         if (openScene != null) {
-            SceneRuntime.ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, SceneLayer.getInstance(), oxyShader);
+            ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, SceneLayer.getInstance(), oxyShader);
             GizmoLayer.getInstance().build();
             SceneLayer.getInstance().build();
         }
     }
 
     public static void saveScene() {
-        SceneSerializer.serializeScene(SceneRuntime.ACTIVE_SCENE.getSceneName() + fileExtension);
+        SceneSerializer.serializeScene(ACTIVE_SCENE.getSceneName() + fileExtension);
     }
 
     public static void newScene() {
         OxySelectHandler.entityContext = null;
-        Scene oldScene = SceneRuntime.ACTIVE_SCENE;
+        Scene oldScene = ACTIVE_SCENE;
+        oldScene.disposeAllModels();
 
         Scene scene = new Scene("Test Scene 1", oldScene.getRenderer(), oldScene.getFrameBuffer());
-        oldScene.disposeAllModels();
-        for (var n : oldScene.getNativeObjects()) {
+        for (var n : oldScene.getEntityEntrySet()) {
             scene.put(n.getKey());
             scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
         }
-        SceneRuntime.ACTIVE_SCENE = scene;
+        ACTIVE_SCENE = scene;
         if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
+        SceneLayer.hdrTexture = null;
         GizmoLayer.getInstance().build();
         SceneLayer.getInstance().build();
+    }
+
+    public <T extends EntityComponent> OxyEntity getRoot(OxyEntity entity, Class<T> destClass) {
+        return registry.getRoot(entity, destClass);
     }
 }

@@ -1,11 +1,10 @@
-package OxyEngineEditor.UI.Font;
+package OxyEngineEditor.UI;
 
 import OxyEngine.System.OxySystem;
-import OxyEngine.Tools.Loader;
 
 import java.io.File;
 
-public class FontLoader implements Loader<File> {
+public class FontLoader {
 
     private FontLoader(){}
 
@@ -16,7 +15,6 @@ public class FontLoader implements Loader<File> {
         return INSTANCE;
     }
 
-    @Override
     public File[] load() {
         return new File(OxySystem.FileSystem.getResourceByPath("/fonts/")).listFiles();
     }

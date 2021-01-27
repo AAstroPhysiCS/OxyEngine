@@ -6,12 +6,9 @@ public abstract class Buffer implements OxyDisposable {
 
     protected int bufferId;
 
-    public Buffer() {
-    }
-
     protected abstract void load();
 
-    public boolean empty() {
+    public boolean glBufferNull() {
         return bufferId == 0;
     }
 

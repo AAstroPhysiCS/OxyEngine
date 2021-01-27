@@ -161,7 +161,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             }
             cube.indices = indices;
             cube.addComponent(mesh, shader);
-            mesh.initList();
+            mesh.addToQueue();
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);

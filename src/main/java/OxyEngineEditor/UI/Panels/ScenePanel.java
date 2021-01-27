@@ -1,19 +1,13 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Components.PerspectiveCamera;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngineEditor.Scene.Objects.WorldGrid;
 import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
-
-import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
-import static org.lwjgl.glfw.GLFW.*;
 
 public class ScenePanel extends Panel {
 
@@ -24,19 +18,14 @@ public class ScenePanel extends Panel {
     public static final ImVec2 mousePos = new ImVec2();
     public static final ImVec2 offset = new ImVec2(); //Window position relative to the window... means that it subtracts the tab
 
-    private static boolean cPressed = false;
-
     private static ScenePanel INSTANCE = null;
 
-    private final SceneLayer sceneLayer;
-
-    public static ScenePanel getInstance(SceneLayer sceneLayer) {
-        if (INSTANCE == null) INSTANCE = new ScenePanel(sceneLayer);
+    public static ScenePanel getInstance() {
+        if (INSTANCE == null) INSTANCE = new ScenePanel();
         return INSTANCE;
     }
 
-    private ScenePanel(SceneLayer sceneLayer) {
-        this.sceneLayer = sceneLayer;
+    private ScenePanel() {
         new WorldGrid(SceneRuntime.ACTIVE_SCENE, 10);
     }
 
@@ -55,22 +44,6 @@ public class ScenePanel extends Panel {
         ImGui.getWindowPos(windowPos);
         ImGui.getMousePos(mousePos);
         ImGui.getCursorPos(offset);
-
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_DELETE] && entityContext != null) {
-            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
-            SceneRuntime.stop();
-            sceneLayer.updateAllEntities();
-            entityContext = null;
-        }
-
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && keyEventDispatcher.getKeys()[GLFW_KEY_C] &&
-                entityContext instanceof OxyModel m && !cPressed && focusedWindow) {
-            m.copyMe();
-            sceneLayer.updateAllEntities();
-            cPressed = true;
-        }
-        if (!keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && !keyEventDispatcher.getKeys()[GLFW_KEY_C])
-            cPressed = false;
 
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
         focusedWindow = ImGui.isWindowFocused();

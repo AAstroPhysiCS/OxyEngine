@@ -5,17 +5,15 @@ import OxyEngine.Scripting.ScriptableEntity;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 
-public class TestScript extends ScriptableEntity {
+public class LightScript extends ScriptableEntity {
 
-    public TestScript(Scene scene, OxyEntity entity) {
+    public LightScript(Scene scene, OxyEntity entity) {
         super(scene, entity);
     }
 
     TransformComponent t;
-    public boolean enableX;
-    public boolean enableY;
-    public boolean enableZ;
-    public float speed = 0.01f;
+    public float Speed;
+    int dir = 1;
 
     @Override
     public void onCreate() {
@@ -24,9 +22,10 @@ public class TestScript extends ScriptableEntity {
 
     @Override
     public void onUpdate(float ts) {
-        if(enableX) t.rotation.x += speed * ts;
-        if(enableY) t.rotation.y += speed * ts;
-        if(enableZ) t.rotation.z += speed * ts;
+        float finalSpeed = Speed * ts;
+        if((int) t.position.x == 100) dir *= -1;
+        if((int) t.position.x == -100) dir *= -1;
+        t.position.add(finalSpeed * dir, 0, 0);
         updateData();
     }
 }

@@ -6,9 +6,9 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
@@ -79,14 +79,14 @@ public final class SceneSerializer {
             String sceneName = sceneJSON.getField("Scene Name").value();
 
             Scene oldScene = SceneRuntime.ACTIVE_SCENE;
+            oldScene.disposeAllModels();
             Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer());
-            for (var n : oldScene.getNativeObjects()) {
+            for (var n : oldScene.getEntityEntrySet()) {
                 scene.put(n.getKey());
                 scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
             }
             OxySelectHandler.entityContext = null;
             layer.clear();
-            oldScene.disposeAllModels();
             SceneRuntime.ACTIVE_SCENE = scene;
 
             String envMapPath = envJSON.getField("Environment Map").value();
@@ -108,6 +108,7 @@ public final class SceneSerializer {
                 Vector3f minB = parseStringToVector3f(models.getField("Bounds Min").value());
                 Vector3f maxB = parseStringToVector3f(models.getField("Bounds Max").value());
                 float[] color = parseStringToFloatArray(models.getField("Color").value(), 4);
+                String nameMaterial = models.getField("Material Name").value();
                 String albedoTPath = models.getField("Albedo Texture").value();
                 String normalMapTPath = models.getField("Normal Map Texture").value();
                 float normalMapStrength = Float.parseFloat(models.getField("Normal Map Strength").value());
@@ -120,10 +121,14 @@ public final class SceneSerializer {
                 String meshPath = models.getField("Mesh").value();
 
                 OxyModel modelInstance;
+                int index = OxyMaterialPool.addMaterial(nameMaterial, albedoTPath,
+                        normalMapTPath, roughnessMapTPath, metallicMapTPath, aoMapTPath,
+                        new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength);
                 if (!meshPath.equals("null")) {
-                    modelInstance = scene.createModelEntity(meshPath, shader, true, meshPos);
+                    modelInstance = scene.createModelEntity(meshPath, shader, meshPos, index);
+                    modelInstance.getGUINodes().add(OxyMaterial.guiNode);
                 } else {
-                    modelInstance = scene.createEmptyModel(shader, true, meshPos);
+                    modelInstance = scene.createEmptyModel(shader, meshPos);
                 }
                 if (emitting) {
                     if (emittingType.equals(PointLight.class.getSimpleName())) {
@@ -133,11 +138,11 @@ public final class SceneSerializer {
                         modelInstance.addComponent(new DirectionalLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f)));
                         modelInstance.getGUINodes().add(DirectionalLight.guiNode);
                     }
+                    modelInstance.addComponent(new OxyMaterialIndex(index));
                 }
 
                 modelInstance.importedFromFile = true;
-                modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(position, rot, scale), new OxyMaterial(OxyTexture.loadImage(1, albedoTPath),
-                                OxyTexture.loadImage(2, normalMapTPath), OxyTexture.loadImage(3, roughnessMapTPath), OxyTexture.loadImage(4, metallicMapTPath), OxyTexture.loadImage(5, aoMapTPath), new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength),
+                modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), new TransformComponent(position, rot, scale),
                         new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new BoundingBoxComponent(minB, maxB));
                 modelInstance.constructData();
 

@@ -10,4 +10,5 @@ import java.util.List;
  */
 public interface EntityComponent {
     List<Class<? extends EntityComponent>> allEntityComponentChildClasses = new ArrayList<>(OxySystem.getSubClasses(EntityComponent.class));
+
 }

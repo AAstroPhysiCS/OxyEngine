@@ -1,11 +1,12 @@
 package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Components.EntityComponent;
-import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.Scene.OxyEntity;
 import org.joml.Vector3f;
 
-public abstract class Light implements EntityComponent, OxyDisposable {
+public abstract class Light implements EntityComponent {
+
+    public static final int LIGHT_SIZE = 4;
 
     protected final Vector3f ambient;
     protected final Vector3f specular;

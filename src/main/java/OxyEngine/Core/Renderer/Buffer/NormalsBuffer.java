@@ -13,4 +13,8 @@ public abstract class NormalsBuffer extends Buffer {
     public void setNormals(float[] normals) {
         this.normals = normals;
     }
+
+    public boolean emptyData() {
+        return normals.length == 0;
+    }
 }

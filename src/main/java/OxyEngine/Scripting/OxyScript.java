@@ -15,7 +15,7 @@ import imgui.type.ImString;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.util.Arrays;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
@@ -88,8 +88,8 @@ public class OxyScript {
         public EntityInfoProvider(ScriptableEntity obj) {
             this.obj = obj;
             this.allFields = obj.getClass().getDeclaredFields();
-            System.out.println(Arrays.toString(allFields));
-            for (Field f : allFields) f.setAccessible(true);
+//            System.out.println(Arrays.toString(allFields));
+//            for (Field f : allFields) f.setAccessible(true);
         }
 
         @Override
@@ -145,6 +145,7 @@ public class OxyScript {
             if (provider != null) {
                 Field[] allFields = provider.allFields;
                 for (var entry : allFields) {
+                    if(entry.getModifiers() != Modifier.PUBLIC) continue;
                     Object obj = null;
                     try {
                         obj = entry.get(provider.obj);

@@ -1,38 +1,17 @@
 package OxyEngineEditor.Scene.Objects.Native;
 
-import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
-import OxyEngine.Components.TransformComponent;
-import org.joml.Matrix4f;
-import org.joml.Vector4f;
 
-public abstract class NativeObjectFactory implements EntityComponent {
+public abstract class NativeObjectFactory{
 
-    public ObjectType type;
-    protected float[] vertexPos;
-    private int vertPtr = 0;
+    protected int vertexSize;
 
-    //Texture does not work in native objects, only colors
-    public void constructData(OxyNativeObject e, int size) {
-        TransformComponent c = e.get(TransformComponent.class);
-
-        c.transform = new Matrix4f()
-                .scale(c.scale)
-                .translate(c.position)
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z);
-
-        if (e.vertices == null) e.vertices = new float[e.type.n_Vertices() * size];
-        for (int i = 0; i < vertexPos.length; ) {
-            Vector4f transformed = new Vector4f(vertexPos[i++], vertexPos[i++], vertexPos[i++], 1.0f).mul(c.transform);
-            e.vertices[vertPtr++] = transformed.x;
-            e.vertices[vertPtr++] = transformed.y;
-            e.vertices[vertPtr++] = transformed.z;
-            e.vertices[vertPtr++] = 0;
-        }
-    }
+    public abstract void constructData(OxyNativeObject e, int size);
 
     public abstract void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh);
+
+    public int getVertexSize() {
+        return vertexSize;
+    }
 }
 

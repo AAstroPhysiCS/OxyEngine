@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer;
 
-import OxyEngine.Components.PerspectiveCamera;
+import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;

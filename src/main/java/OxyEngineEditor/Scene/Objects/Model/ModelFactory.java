@@ -1,7 +1,9 @@
 package OxyEngineEditor.Scene.Objects.Model;
 
+import OxyEngine.Components.FamilyComponent;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Components.TransformComponent;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -9,7 +11,7 @@ import org.joml.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.Tools.Globals.toPrimitiveInteger;
+import static OxyEngine.Globals.toPrimitiveInteger;
 
 public class ModelFactory {
 
@@ -38,12 +40,14 @@ public class ModelFactory {
         e.biTangents = new float[biTangents.size() * 3];
         List<Integer> indicesArr = new ArrayList<>();
 
-        OxyMaterial material = e.get(OxyMaterial.class);
-        ImageTexture texture = material.albedoTexture;
+        OxyMaterial material = OxyMaterialPool.getMaterial(e);
         TransformComponent c = e.get(TransformComponent.class);
 
         int slot = 0;
-        if (texture != null) slot = texture.getTextureSlot();
+        if(material != null){
+            ImageTexture texture = material.albedoTexture;
+            if (texture != null) slot = texture.getTextureSlot();
+        }
 
         int vertPtr = 0;
         for (Vector3f v : verticesNonTransformed) {
@@ -90,9 +94,12 @@ public class ModelFactory {
     }
 
     public void updateData(OxyModel e) {
-        OxyMaterial material = e.get(OxyMaterial.class);
+        OxyMaterial material = OxyMaterialPool.getMaterial(e);
         ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);
+
+        Matrix4f transform = new Matrix4f().identity();
+        if(!e.isRoot()) transform = e.getRoot(FamilyComponent.class).get(TransformComponent.class).transform;
 
         int slot = 0;
         if (texture != null)
@@ -100,7 +107,7 @@ public class ModelFactory {
 
         int vertPtr = 0;
         for (Vector3f v : verticesNonTransformed) {
-            Vector4f transformed = new Vector4f(v.x, v.y, v.z, 1.0f).mul(c.transform);
+            Vector4f transformed = new Vector4f(v.x, v.y, v.z, 1.0f).mul(new Matrix4f(c.transform).mulLocal(transform));
             e.vertices[vertPtr++] = transformed.x;
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;

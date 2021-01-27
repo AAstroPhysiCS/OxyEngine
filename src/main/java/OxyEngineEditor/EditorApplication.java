@@ -1,6 +1,6 @@
 package OxyEngineEditor;
 
-import OxyEngine.Components.PerspectiveCamera;
+import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Core.Layers.*;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
@@ -13,6 +13,7 @@ import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.OxyEngineSpecs;
 import OxyEngine.System.OxyEventSystem;
+import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
@@ -56,7 +57,6 @@ public class EditorApplication extends OxyApplication {
         oxyShader.setUniform1iv("tex", samplers);
         oxyShader.disable();
 
-        //order matters!
         SceneRuntime.ACTIVE_SCENE = scene;
         SceneLayer sceneLayer = SceneLayer.getInstance();
         GizmoLayer gizmoLayer = GizmoLayer.getInstance();
@@ -65,11 +65,12 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(StatsPanel.getInstance());
         uiLayer.addPanel(ToolbarPanel.getInstance());
         uiLayer.addPanel(ProjectPanel.getInstance());
-        uiLayer.addPanel(PropertiesPanel.getInstance(sceneLayer));
-        uiLayer.addPanel(ScenePanel.getInstance(sceneLayer));
-        uiLayer.addPanel(EnvironmentPanel.getInstance(sceneLayer));
-        uiLayer.addPanel(SceneHierarchyPanel.getInstance(sceneLayer, oxyShader));
+        uiLayer.addPanel(PropertiesPanel.getInstance());
+        uiLayer.addPanel(ScenePanel.getInstance());
+        uiLayer.addPanel(EnvironmentPanel.getInstance());
+        uiLayer.addPanel(SceneHierarchyPanel.getInstance(oxyShader));
         uiLayer.addPanel(SceneRuntime.getPanel());
+        uiLayer.addPanel(OxyMaterialPool.getPanelInstance());
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, uiLayer);
         for (Layer l : layerStack.getLayerStack())

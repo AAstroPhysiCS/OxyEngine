@@ -23,44 +23,43 @@ public class OxyModel extends OxyEntity {
 
     public OxyModel(Scene scene, int id) {
         super(scene);
-        this.object_id = id;
+        this.objectID = id;
     }
 
     public OxyModel(OxyModel other, int id) {
         super(other.scene);
-        this.tangents = other.tangents.clone();
-        this.biTangents = other.biTangents.clone();
-//        this.originPos = new Vector3f(other.originPos);
-        this.normals = other.normals.clone();
-        this.vertices = other.vertices.clone();
-        this.tcs = other.tcs.clone();
-        this.indices = other.indices.clone();
-        this.object_id = id;
+        if(other.tangents != null) this.tangents = other.tangents.clone();
+        if(other.biTangents != null) this.biTangents = other.biTangents.clone();
+        if(other.normals != null) this.normals = other.normals.clone();
+        if(other.vertices != null) this.vertices = other.vertices.clone();
+        if(other.tcs != null) this.tcs = other.tcs.clone();
+        if(other.indices != null) this.indices = other.indices.clone();
+        this.objectID = id;
     }
 
     @Override
     public OxyEntity copyMe() {
         OxyModel e = new OxyModel(this, ++Scene.OBJECT_ID_COUNTER);
         e.addToScene();
-        var boundingBox = get(BoundingBoxComponent.class);
         var transform = get(TransformComponent.class);
         e.importedFromFile = this.importedFromFile;
         e.factory = this.factory;
+        if(this.has(BoundingBoxComponent.class)){
+            var boundingBox = get(BoundingBoxComponent.class);
+            e.addComponent(new BoundingBoxComponent(boundingBox.min(), boundingBox.max()));
+        }
         e.addComponent(
                 get(UUIDComponent.class),
                 get(OxyShader.class),
-                new BoundingBoxComponent(
-                        boundingBox.min(),
-                        boundingBox.max()
-                ),
                 new TransformComponent(new TransformComponent(new Vector3f(0, 0, 0), transform.rotation, transform.scale)),
                 new MeshPosition(get(MeshPosition.class).meshPos()),
                 new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),
                 new RenderableComponent(RenderingMode.Normal),
-                new OxyMaterial(get(OxyMaterial.class)),
+                get(OxyMaterialIndex.class),
                 new SelectedComponent(false)
         );
 
+        if(this.has(FamilyComponent.class)) e.addComponent(this.get(FamilyComponent.class));
         if(this.has(PointLight.class)) e.addComponent(this.get(PointLight.class));
         if(this.has(DirectionalLight.class)) e.addComponent(this.get(DirectionalLight.class));
 
@@ -83,21 +82,29 @@ public class OxyModel extends OxyEntity {
         SceneRuntime.onCreate();
         SceneRuntime.stop();
 
-        e.initData(get(OpenGLMesh.class).getPath());
+        if(has(OpenGLMesh.class)){
+            e.initData(get(OpenGLMesh.class).getPath());
+        }
         return e;
     }
 
     @Override
     public void initData(String path) {
         assert factory != null : oxyAssert("Models should have a Model Template");
-        translatePos();
         factory.constructData(this);
         addComponent(new ModelMeshOpenGL(path, GL_TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
     }
 
     @Override
     public void constructData() {
-        translatePos();
+        TransformComponent c = get(TransformComponent.class);
+        Matrix4f matrix4f = new Matrix4f()
+                .scale(c.scale)
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z)
+                .translate(c.position);
+        translatePos(matrix4f);
         if (factory == null) return;
         factory.constructData(this);
         if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
@@ -105,19 +112,21 @@ public class OxyModel extends OxyEntity {
 
     @Override
     public void updateData() {
-        translatePos();
+        TransformComponent c = get(TransformComponent.class);
+        Matrix4f matrix4f = new Matrix4f()
+                .scale(c.scale)
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z)
+                .translate(c.position);
+        translatePos(matrix4f);
         if (factory == null) return;
         factory.updateData(this);
         if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 
-    private void translatePos() {
+    private void translatePos(Matrix4f transform) {
         TransformComponent c = get(TransformComponent.class);
-        c.transform = new Matrix4f()
-                .translate(c.position)
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z)
-                .scale(c.scale);
+        c.transform = transform;
     }
 }

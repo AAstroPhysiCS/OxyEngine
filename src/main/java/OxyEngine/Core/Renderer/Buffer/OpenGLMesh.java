@@ -4,9 +4,7 @@ import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +25,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
     protected int mode, vao;
 
     public boolean empty() {
-        return indexBuffer.empty() && vertexBuffer.empty();
+        return indexBuffer.glBufferNull() && vertexBuffer.glBufferNull();
     }
 
     public String getPath() {
@@ -42,9 +40,9 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         vertexBuffer.load();
         indexBuffer.load();
 
-        if (normalsBuffer != null) if (normalsBuffer.empty()) normalsBuffer.load();
-        if (tangentBuffer != null) if (tangentBuffer.empty()) tangentBuffer.load();
-        if (textureBuffer != null) if (textureBuffer.empty()) textureBuffer.load();
+        if (normalsBuffer != null) if (normalsBuffer.glBufferNull() && !normalsBuffer.emptyData()) normalsBuffer.load();
+        if (tangentBuffer != null) if (tangentBuffer.glBufferNull() && !tangentBuffer.emptyData()) tangentBuffer.load();
+        if (textureBuffer != null) if (textureBuffer.glBufferNull() && !textureBuffer.emptyData()) textureBuffer.load();
 
         if (vertexBuffer.getImplementation().getUsage() == BufferLayoutProducer.Usage.DYNAMIC) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.getBufferId());
@@ -82,7 +80,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         entities.add(e);
     }
 
-    public void initList() {
+    public void addToQueue() {
         vertexBuffer.addToBuffer(OxyEntity.sumAllVertices(entities));
         indexBuffer.addToBuffer(OxyEntity.sumAllIndices(entities));
 
@@ -94,17 +92,6 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         bind();
         draw();
         unbind();
-    }
-
-    public void updateSingleEntityData(Scene scene, OxyNativeObject e) {
-        int i = 0;
-        for (OxyEntity entity : scene.getEntities()) {
-            if (entity.equals(e)) {
-                vertexBuffer.updateSingleEntityData(i * e.getType().n_Vertices(), e.getVertices());
-                break;
-            }
-            i++;
-        }
     }
 
     public void updateSingleEntityData(int offsetToUpdate, float[] dataToUpdate) {

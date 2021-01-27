@@ -10,6 +10,10 @@ public abstract class TangentBuffer extends Buffer {
         this.implementation = template;
     }
 
+    public boolean emptyData(){
+        return biAndTangent.length == 0;
+    }
+
     public void setBiAndTangent(float[] biAndTangent) {
         this.biAndTangent = biAndTangent;
     }

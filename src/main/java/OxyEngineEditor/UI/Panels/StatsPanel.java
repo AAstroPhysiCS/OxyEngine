@@ -4,7 +4,7 @@ import OxyEngine.Core.Renderer.OxyRenderer;
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
 
-import static OxyEngine.Tools.Globals.normalizeColor;
+import static OxyEngine.Globals.normalizeColor;
 
 public class StatsPanel extends Panel {
 
