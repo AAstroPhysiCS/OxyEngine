@@ -98,15 +98,13 @@ public class ModelFactory {
         ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);
 
-        Matrix4f transform = e.getRoot(FamilyComponent.class).get(TransformComponent.class).transform;
-
         int slot = 0;
         if (texture != null)
             slot = texture.getTextureSlot();
 
         int vertPtr = 0;
         for (Vector3f v : verticesNonTransformed) {
-            Vector4f transformed = new Vector4f(v.x, v.y, v.z, 1.0f).mul(new Matrix4f(c.transform).mulLocal(transform));
+            Vector4f transformed = new Vector4f(v.x, v.y, v.z, 1.0f).mul(c.transform);
             e.vertices[vertPtr++] = transformed.x;
             e.vertices[vertPtr++] = transformed.y;
             e.vertices[vertPtr++] = transformed.z;
