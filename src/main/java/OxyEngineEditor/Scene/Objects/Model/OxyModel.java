@@ -97,36 +97,36 @@ public class OxyModel extends OxyEntity {
 
     @Override
     public void constructData() {
-        TransformComponent c = get(TransformComponent.class);
-        Matrix4f matrix4f = new Matrix4f()
-                .scale(c.scale)
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z)
-                .translate(c.position);
-        translatePos(matrix4f);
+        transformLocally();
         if (factory == null) return;
         factory.constructData(this);
         if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 
-    @Override
-    public void updateData() {
+    public void transformLocally(){
         TransformComponent c = get(TransformComponent.class);
-        Matrix4f matrix4f = new Matrix4f()
-                .scale(c.scale)
+        c.transform = new Matrix4f()
+                .translate(c.position)
                 .rotateX(c.rotation.x)
                 .rotateY(c.rotation.y)
                 .rotateZ(c.rotation.z)
-                .translate(c.position);
-        translatePos(matrix4f);
+                .scale(c.scale);
+    }
+
+    public void transformRelativeToRoot(){
+        TransformComponent c = get(TransformComponent.class);
+        c.transform = new Matrix4f()
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z)
+                .translate(c.position)
+                .scale(c.scale);
+    }
+
+    @Override
+    public void updateData() {
         if (factory == null) return;
         factory.updateData(this);
         if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
-    }
-
-    private void translatePos(Matrix4f transform) {
-        TransformComponent c = get(TransformComponent.class);
-        c.transform = transform;
     }
 }

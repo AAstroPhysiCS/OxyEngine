@@ -9,6 +9,7 @@ import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.ImGui;
@@ -100,21 +101,17 @@ public class PropertiesPanel extends Panel {
                 if (entityContext.isRoot()) {
                     OxyEntity root = entityContext;
                     List<OxyEntity> relatedEntities = root.getEntitiesRelatedTo(FamilyComponent.class);
-
-                    Vector3f subT = new Vector3f(t.position).sub(translationArr[0], translationArr[1], translationArr[2]).negate();
-                    Vector3f subR = new Vector3f(t.rotation).sub(rotationArr[0], rotationArr[1], rotationArr[2]).negate();
-                    Vector3f subS = new Vector3f(t.scale).sub(scaleArr[0], scaleArr[1], scaleArr[2]).negate();
                     t.position.set(translationArr);
                     t.rotation.set(rotationArr);
                     t.scale.set(scaleArr);
+                    ((OxyModel) entityContext).transformRelativeToRoot();
                     entityContext.updateData();
                     if (relatedEntities != null) {
                         //translating models relative to root
                         for (OxyEntity m : relatedEntities) {
                             TransformComponent tChildiren = m.get(TransformComponent.class);
-                            tChildiren.position.add(subT);
-                            tChildiren.rotation.add(subR);
-                            tChildiren.scale.add(subS);
+                            ((OxyModel) m).transformRelativeToRoot();
+                            tChildiren.transform.mulLocal(t.transform);
                             m.updateData();
                         }
                     }
@@ -122,10 +119,12 @@ public class PropertiesPanel extends Panel {
                     t.position.set(translationArr);
                     t.rotation.set(rotationArr);
                     t.scale.set(scaleArr);
+                    ((OxyModel) entityContext).transformLocally();
+                    var root = entityContext.getRoot(FamilyComponent.class);
+                    entityContext.get(TransformComponent.class).transform.mulLocal(root.get(TransformComponent.class).transform);
                     entityContext.updateData();
                 }
             }
-
 
             ImGui.popItemWidth();
             ImGui.columns(1);

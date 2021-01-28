@@ -98,8 +98,7 @@ public class ModelFactory {
         ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);
 
-        Matrix4f transform = new Matrix4f().identity();
-        if(!e.isRoot()) transform = e.getRoot(FamilyComponent.class).get(TransformComponent.class).transform;
+        Matrix4f transform = e.getRoot(FamilyComponent.class).get(TransformComponent.class).transform;
 
         int slot = 0;
         if (texture != null)
