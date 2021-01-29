@@ -9,7 +9,6 @@ import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;
 import imgui.ImGui;
@@ -18,7 +17,6 @@ import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiPopupFlags;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -45,9 +43,6 @@ public class PropertiesPanel extends Panel {
     @Override
     public void preload() {
     }
-
-    private TransformComponent oldRootTransformComponent;
-    private Matrix4f oldMatrix = new Matrix4f();
 
     @Override
     public void renderPanel() {
@@ -104,13 +99,13 @@ public class PropertiesPanel extends Panel {
                     t.position.set(translationArr);
                     t.rotation.set(rotationArr);
                     t.scale.set(scaleArr);
-                    ((OxyModel) entityContext).transformRelativeToRoot();
+                    entityContext.transformLocally();
                     entityContext.updateData();
                     if (relatedEntities != null) {
                         //translating models relative to root
                         for (OxyEntity m : relatedEntities) {
                             TransformComponent tChildiren = m.get(TransformComponent.class);
-                            ((OxyModel) m).transformRelativeToRoot();
+                            m.transformLocally();
                             tChildiren.transform.mulLocal(t.transform);
                             m.updateData();
                         }
@@ -119,8 +114,8 @@ public class PropertiesPanel extends Panel {
                     t.position.set(translationArr);
                     t.rotation.set(rotationArr);
                     t.scale.set(scaleArr);
-                    ((OxyModel) entityContext).transformLocally();
                     var root = entityContext.getRoot(FamilyComponent.class);
+                    entityContext.transformLocally();
                     entityContext.get(TransformComponent.class).transform.mulLocal(root.get(TransformComponent.class).transform);
                     entityContext.updateData();
                 }

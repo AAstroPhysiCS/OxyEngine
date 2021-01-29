@@ -11,8 +11,6 @@ import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -41,7 +39,6 @@ public class OxyModel extends OxyEntity {
     public OxyEntity copyMe() {
         OxyModel e = new OxyModel(this, ++Scene.OBJECT_ID_COUNTER);
         e.addToScene();
-        var transform = get(TransformComponent.class);
         e.importedFromFile = this.importedFromFile;
         e.factory = this.factory;
         if(this.has(BoundingBoxComponent.class)){
@@ -51,7 +48,7 @@ public class OxyModel extends OxyEntity {
         e.addComponent(
                 get(UUIDComponent.class),
                 get(OxyShader.class),
-                new TransformComponent(new TransformComponent(new Vector3f(0, 0, 0), transform.rotation, transform.scale)),
+                new TransformComponent(new TransformComponent(this.get(TransformComponent.class))),
                 new MeshPosition(get(MeshPosition.class).meshPos()),
                 new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),
                 new RenderableComponent(RenderingMode.Normal),
@@ -83,6 +80,7 @@ public class OxyModel extends OxyEntity {
         SceneRuntime.stop();
 
         if(has(OpenGLMesh.class)){
+            e.transformLocally();
             e.initData(get(OpenGLMesh.class).getPath());
         }
         return e;
@@ -101,26 +99,6 @@ public class OxyModel extends OxyEntity {
         if (factory == null) return;
         factory.constructData(this);
         if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
-    }
-
-    public void transformLocally(){
-        TransformComponent c = get(TransformComponent.class);
-        c.transform = new Matrix4f()
-                .translate(c.position)
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z)
-                .scale(c.scale);
-    }
-
-    public void transformRelativeToRoot(){
-        TransformComponent c = get(TransformComponent.class);
-        c.transform = new Matrix4f()
-                .rotateX(c.rotation.x)
-                .rotateY(c.rotation.y)
-                .rotateZ(c.rotation.z)
-                .translate(c.position)
-                .scale(c.scale);
     }
 
     @Override

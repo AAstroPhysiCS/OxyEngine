@@ -9,6 +9,7 @@ import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.GUINode;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -74,6 +75,16 @@ public abstract class OxyEntity {
     public abstract void constructData();
 
     public abstract void updateData();
+
+    public void transformLocally(){
+        TransformComponent c = get(TransformComponent.class);
+        c.transform = new Matrix4f()
+                .translate(c.position)
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z)
+                .scale(c.scale);
+    }
 
     public void addComponent(EntityComponent... component) {
         scene.addComponent(this, component);
