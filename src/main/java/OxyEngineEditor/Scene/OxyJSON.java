@@ -105,17 +105,21 @@ public class OxyJSON {
             return null;
         }
 
+        public String getName() {
+            return name;
+        }
+
         public List<OxyJSONField> getFieldList() {
             return fieldList;
         }
 
-        public List<OxyJSONObject> getInnerObject() {
+        public List<OxyJSONObject> getInnerObjects() {
             return innerObject;
         }
 
-        public OxyJSONObject getInnerObjectByName(String name){
-            for(OxyJSONObject obj : innerObject){
-                if(obj.name.equals(name)){
+        public OxyJSONObject getInnerObjectByName(String name) {
+            for (OxyJSONObject obj : innerObject) {
+                if (obj.name.equals(name)) {
                     return obj;
                 }
             }
@@ -257,10 +261,12 @@ public class OxyJSON {
     static class OxyJSONReader implements OxyJSONReaderBuilder {
 
         private String loadedS;
+        private String[] lineSplitted;
 
         @Override
         public OxyJSONReaderBuilder read(String s) {
             loadedS = OxySystem.FileSystem.load(s);
+            lineSplitted = loadedS.split("\n");
             return this;
         }
 
@@ -272,7 +278,6 @@ public class OxyJSON {
 
         @Override
         public OxyJSONReaderBuilder getOxyJSONObject(String name, OxyJSONObject ref) {
-            String[] lineSplitted = loadedS.split("\n");
             for (int i = 0; i < lineSplitted.length; i++) {
                 String line = lineSplitted[i];
                 if (line.endsWith(": {")) {
@@ -293,7 +298,7 @@ public class OxyJSON {
                                     do {
                                         ptr++; //check if the inner object fields are still focused, if yes... increment the ptr
                                         String[] field = lineSplitted[ptr].split(": "); // take the field
-                                        if(field.length > 1) innerRef.putField(field[0], field[1]);
+                                        if (field.length > 1) innerRef.putField(field[0], field[1]);
                                     } while (!lineSplitted[ptr].endsWith("}"));
                                 } else { // it's a field
                                     String[] tagValue = lineSplitted[ptr].split(": ");
@@ -301,7 +306,6 @@ public class OxyJSON {
                                         ref.fieldList.add(new OxyJSONField(tagValue[0].trim().strip(), tagValue[1].trim().strip()));
                                     }
                                 }
-
                             } while (!lineSplitted[ptr].endsWith("}"));
                         }
                     }
@@ -310,9 +314,30 @@ public class OxyJSON {
             return this;
         }
 
+        private int getInnerObjects(OxyJSONObject parent, int ptr) {
+            ptr++;
+            if (lineSplitted[ptr].endsWith(": {")) { //inner object
+                String innerName = lineSplitted[ptr].split(": *")[0].trim().strip();
+                OxyJSONObject innerObject = new OxyJSONObject();
+                innerObject.name = innerName;
+                parent.innerObject.add(innerObject);
+                innerObject.fatherObjects.add(parent);
+                while (!lineSplitted[ptr].endsWith("}")) {
+                    ptr++;
+                    String[] tagValue = lineSplitted[ptr].split(": ");
+                    if (tagValue.length == 2) {
+                        innerObject.putField(tagValue[0].trim().strip(), tagValue[1].trim().strip());
+                    }
+                    if (lineSplitted[ptr].endsWith(": {"))
+                        ptr = getInnerObjects(innerObject, --ptr); // so that inner inner inner objects also work (for example Script)
+                }
+                ptr = getInnerObjects(parent, ptr);
+            }
+            return ptr;
+        }
+
         @Override
         public OxyJSONReaderBuilder getOxyJSONArray(String name, OxyJSONArray ref) {
-            String[] lineSplitted = loadedS.split("\n");
             for (int i = 0; i < lineSplitted.length; i++) {
                 String line = lineSplitted[i];
                 if (line.endsWith("[")) {
@@ -322,20 +347,25 @@ public class OxyJSON {
                         if (name.equals(nameS)) {
                             ref.name = nameS;
                             int ptr = i;
-                            do {
+                            while (!lineSplitted[ptr].endsWith("]")) {
                                 ptr++;
                                 if (lineSplitted[ptr].endsWith(": {")) { //inner object
                                     String innerName = lineSplitted[ptr].split(": *")[0].trim().strip();
-                                    OxyJSONObject innerRef = new OxyJSONObject();
-                                    innerRef.name = innerName;
-                                    ref.objectList.add(innerRef);
-                                    innerRef.src = ref;
-                                    getOxyJSONObject(innerRef.name, innerRef);
-                                    do {
-                                        ptr++; //check if the inner object fields are still focused, if yes... increment the ptr
-                                    } while (!lineSplitted[ptr].endsWith("}"));
+                                    OxyJSONObject innerObject = new OxyJSONObject();
+                                    innerObject.name = innerName;
+                                    ref.objectList.add(innerObject);
+                                    innerObject.src = ref;
+                                    ptr++;
+                                    while (!lineSplitted[ptr].endsWith(": {")) {
+                                        ptr++;
+                                        String[] tagValue = lineSplitted[ptr].split(": ");
+                                        if (tagValue.length == 2) {
+                                            innerObject.putField(tagValue[0].trim().strip(), tagValue[1].trim().strip());
+                                        }
+                                    }
+                                    ptr = getInnerObjects(innerObject, --ptr);
                                 }
-                            } while (!lineSplitted[ptr].endsWith("]"));
+                            }
                         }
                     }
                 }

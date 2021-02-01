@@ -15,7 +15,6 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static OxyEngine.Globals.toPrimitiveFloat;
 import static OxyEngine.Globals.toPrimitiveInteger;
@@ -215,8 +214,9 @@ public abstract class OxyEntity {
         return null;
     }
 
-    public void dump(int i, OxyJSON.OxyJSONArray arr) {
+    public void dump(int i, OxyJSON.OxyJSONObject arr) {
         int meshPos = -1;
+
         String tag = "null";
         TransformComponent transform = get(TransformComponent.class);
         Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
@@ -229,6 +229,7 @@ public abstract class OxyEntity {
         String mesh = "null";
         String id = get(UUIDComponent.class).getUUIDString();
         boolean emitting = false;
+        String materialName = "null";
 
         if (has(BoundingBoxComponent.class)) {
             minBound = get(BoundingBoxComponent.class).min();
@@ -238,6 +239,7 @@ public abstract class OxyEntity {
         if (has(MeshPosition.class)) meshPos = get(MeshPosition.class).meshPos();
         if (has(OxyMaterialIndex.class)) {
             OxyMaterial m = OxyMaterialPool.getMaterial(this);
+            materialName = m.name;
             if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
             if (m.albedoTexture != null) albedoTexture = m.albedoTexture.getPath();
             if (m.normalTexture != null) normalTexture = m.normalTexture.getPath();
@@ -252,7 +254,7 @@ public abstract class OxyEntity {
         if (has(ModelMeshOpenGL.class)) mesh = get(ModelMeshOpenGL.class).getPath();
         if (has(Light.class)) emitting = true;
 
-        var obj = arr.createOxyJSONObject("OxyModel " + i)
+        var obj = arr.createInnerObject("OxyModel " + i)
                 .putField("ID", id)
                 .putField("Mesh Position", String.valueOf(meshPos))
                 .putField("Name", tag)
@@ -263,7 +265,7 @@ public abstract class OxyEntity {
                 .putField("Scale", transform.scale.toString())
                 .putField("Bounds Min", minBound.toString())
                 .putField("Bounds Max", maxBound.toString())
-                .putField("Material Name", Objects.requireNonNull(OxyMaterialPool.getMaterial(get(OxyMaterialIndex.class).index())).name)
+                .putField("Material Name", materialName)
                 .putField("Color", albedoColor)
                 .putField("Albedo Texture", albedoTexture)
                 .putField("Normal Map Texture", normalTexture)

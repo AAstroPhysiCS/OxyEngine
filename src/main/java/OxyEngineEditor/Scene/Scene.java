@@ -173,7 +173,13 @@ public final class Scene implements OxyDisposable {
         return e;
     }
 
-    public final OxyModel createModelEntity(String path, OxyShader shader, int i, int materialIndex) {
+    private static String path = ""; //optimization for the scene serialization import
+
+    public final OxyModel createModelEntity(String path, OxyShader shader, int i, int materialIndex, OxyEntity root) {
+        if(!Scene.path.equals(path)){
+            modelLoader = new OxyModelLoader(path, root);
+            Scene.path = path;
+        }
         OxyModelLoader.AssimpMesh assimpMesh = modelLoader.meshes.get(i);
         OxyMaterialPool.newBatch();
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);

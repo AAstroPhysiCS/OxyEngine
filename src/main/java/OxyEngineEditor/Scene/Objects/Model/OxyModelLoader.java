@@ -56,10 +56,17 @@ public class OxyModelLoader {
 
     final String objPath;
     AIScene aiScene;
-    private String root;
+    private String rootName;
+    private OxyEntity rootEnt;
 
     public OxyModelLoader(String objPath) {
         this.objPath = objPath;
+        processData();
+    }
+
+    public OxyModelLoader(String objPath, OxyEntity root) {
+        this.objPath = objPath;
+        this.rootEnt = root;
         processData();
     }
 
@@ -82,14 +89,16 @@ public class OxyModelLoader {
             return;
         }
 
-        root = aiScene.mRootNode().mName().dataString();
-        OxyEntity rootEntity = ACTIVE_SCENE.createEmptyModel(oxyShader);
-        rootEntity.setRoot(true);
-        rootEntity.addComponent(new TagComponent(root), new FamilyComponent());
+        rootName = aiScene.mRootNode().mName().dataString();
+        if(rootEnt == null) {
+            rootEnt = ACTIVE_SCENE.createEmptyModel(oxyShader);
+            rootEnt.setRoot(true);
+            rootEnt.addComponent(new TagComponent(rootName), new FamilyComponent());
+        }
 
         for (int i = 0; i < aiScene.mNumMeshes(); i++) {
             AIMesh mesh = AIMesh.create(Objects.requireNonNull(aiScene.mMeshes()).get(i));
-            AssimpMesh oxyMesh = new AssimpMesh(rootEntity, mesh.mName().dataString());
+            AssimpMesh oxyMesh = new AssimpMesh(rootEnt, mesh.mName().dataString());
             oxyMesh.materialIndex = mesh.mMaterialIndex();
             processMesh(mesh, oxyMesh);
             AIAABB aiaabb = mesh.mAABB();
@@ -138,7 +147,7 @@ public class OxyModelLoader {
                 AIVector3D normals = bufferNor.get();
                 oxyMesh.normals.add(new Vector3f(normals.x(), normals.y(), normals.z()));
             }
-        } else logger.info("Model: " + root + " has no normals");
+        } else logger.info("Model: " + rootName + " has no normals");
 
         AIVector3D.Buffer textCoords = mesh.mTextureCoords(0);
         if(textCoords != null) {
@@ -146,7 +155,7 @@ public class OxyModelLoader {
                 AIVector3D textCoord = textCoords.get();
                 oxyMesh.textureCoords.add(new Vector2f(textCoord.x(), 1 - textCoord.y()));
             }
-        } else logger.info("Model: " + root + " has no texture coordinates");
+        } else logger.info("Model: " + rootName + " has no texture coordinates");
 
         AIVector3D.Buffer tangent = mesh.mTangents();
         if(tangent != null) {
@@ -154,7 +163,7 @@ public class OxyModelLoader {
                 AIVector3D tangentC = tangent.get();
                 oxyMesh.tangents.add(new Vector3f(tangentC.x(), tangentC.y(), tangentC.z()));
             }
-        } else logger.info("Model: " + root + " has no tangent");
+        } else logger.info("Model: " + rootName + " has no tangent");
 
         AIVector3D.Buffer bitangent = mesh.mBitangents();
         if(bitangent != null) {
@@ -162,7 +171,7 @@ public class OxyModelLoader {
                 AIVector3D biTangentC = bitangent.get();
                 oxyMesh.biTangents.add(new Vector3f(biTangentC.x(), biTangentC.y(), biTangentC.z()));
             }
-        } else logger.info("Model: " + root + " has no bitangent");
+        } else logger.info("Model: " + rootName + " has no bitangent");
     }
 
     private void addMaterial(AIMaterial aiMaterial) {
