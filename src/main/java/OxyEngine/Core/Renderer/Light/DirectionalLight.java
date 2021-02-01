@@ -49,8 +49,11 @@ public class DirectionalLight extends Light {
             ImGui.text("Color intensity:");
             ImGui.text("Light Direction:");
             ImGui.nextColumn();
-            ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
+            ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
             dL.colorIntensityArr[0] = dL.colorIntensity;
+            dL.dirArr[0] = dL.dir.x;
+            dL.dirArr[1] = dL.dir.y;
+            dL.dirArr[2] = dL.dir.z;
             ImGui.dragFloat("###hidelabel intensity d", dL.colorIntensityArr, 0.1f, 0f, 1000f);
             ImGui.dragFloat3("##hidelabel direction d", dL.dirArr);
             dL.colorIntensity = dL.colorIntensityArr[0];

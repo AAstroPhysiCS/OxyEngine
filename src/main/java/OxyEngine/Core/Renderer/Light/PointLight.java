@@ -70,7 +70,7 @@ public class PointLight extends Light {
             ImGui.alignTextToFramePadding();
             ImGui.text("Quadratic value:");
             ImGui.nextColumn();
-            ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
+            ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
             constantArr[0] = entityContext.get(PointLight.class).constant;
             linearArr[0] = entityContext.get(PointLight.class).linear;
             quadraticArr[0] = entityContext.get(PointLight.class).quadratic;

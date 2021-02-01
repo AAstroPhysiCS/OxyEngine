@@ -21,10 +21,10 @@ public class UIThemeLoader {
     }
 
     private float[][] loadStyle(String[] splittedContent){
-        Field[] allFields = ImGuiCol.class.getDeclaredFields();
-        float[][] allThemeColors = new float[splittedContent.length][4];
+        float[][] allThemeColors = new float[ImGuiCol.COUNT][4];
         for(int i = 0; i < splittedContent.length; i++){
             String s = splittedContent[i];
+//            if(s.equals("ImVec4* colors = ImGui::GetStyle().Colors;")) continue;
 //            int id = loadId(s, allFields);
             float[] value = loadColorValue(s);
             allThemeColors[i] = value;

@@ -110,7 +110,10 @@ public class OxyScript {
     }
 
     public void loadAssembly() {
-        if (provider != null) scriptThread.removeProvider(provider);
+        if (provider != null) {
+            scriptThread.removeProvider(provider);
+            provider = null;
+        }
         if (path == null) return;
         if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
             provider = new EntityInfoProvider(obj);
@@ -133,11 +136,9 @@ public class OxyScript {
             if (ImGui.button("...")) {
                 String pathDialog = openDialog("java", null);
                 if (pathDialog != null) {
-                    if (this.path == null) {
-                        this.path = pathDialog;
-                        loadAssembly();
-                        SceneRuntime.stop();
-                    }
+                    this.path = pathDialog;
+                    loadAssembly();
+                    SceneRuntime.stop();
                     bufferPath.set(pathDialog);
                 }
             }
@@ -156,7 +157,7 @@ public class OxyScript {
                     ImGui.alignTextToFramePadding();
                     ImGui.text(entry.getName());
                     ImGui.nextColumn();
-                    ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
+                    ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                     try {
                         if (obj instanceof Number n) {
                             double convertedD = Double.parseDouble(n.toString());
@@ -195,7 +196,7 @@ public class OxyScript {
             if (ImGui.button("Run Script")) {
                 //TODO: run just the specific script
             }
-            ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 100);
+            ImGui.sameLine(ImGui.getContentRegionAvailX() - 100);
             /*if (ImGui.button("Reload Assembly")) {
                 SceneRuntime.stop();
                 loadAssembly();

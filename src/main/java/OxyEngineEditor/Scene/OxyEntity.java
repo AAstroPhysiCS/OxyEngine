@@ -276,7 +276,7 @@ public abstract class OxyEntity {
             obj = obj.backToObject();
         }
 
-        obj.putField("Emitting Type", emitting ? get(Light.class).getClass().getSimpleName() : "null")
+        obj = obj.putField("Emitting Type", emitting ? get(Light.class).getClass().getSimpleName() : "null")
                 .putField("Position", transform.position.toString())
                 .putField("Rotation", transform.rotation.toString())
                 .putField("Scale", transform.scale.toString())

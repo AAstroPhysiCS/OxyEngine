@@ -49,9 +49,9 @@ public class OxyUISystem {
         ImGui.createContext();
 
         io = ImGui.getIO();
-        io.setIniFilename("D:\\programming\\Java\\OxyEngine\\src\\main\\resources\\ini\\imgui.ini");
-        io.setWantSaveIniSettings(true);
         ImGui.getStyle().setColors(OxyEngine.getLoadedTheme());
+        io.setIniFilename(new File(System.getProperty("user.dir") + "\\src\\main\\resources\\ini\\imgui.ini").toPath().toAbsolutePath().toString());
+        io.setWantSaveIniSettings(true);
         io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard);
         io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
         io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
@@ -62,7 +62,6 @@ public class OxyUISystem {
         mouseCursorPosDispatcher = (GLFWEventDispatcher.MouseCursorPosEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseCursorPosEvent, io);
         keyEventDispatcher = (GLFWEventDispatcher.KeyEvent) GLFWEventDispatcher.getInstance(GLFWEventType.KeyEvent, io);
         mouseScrollDispatcher = (GLFWEventDispatcher.MouseScrollEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseScrollEvent, io);
-
 
         final long winPtr = windowHandle.getPointer();
         glfwSetMouseButtonCallback(winPtr, mouseButtonDispatcher);

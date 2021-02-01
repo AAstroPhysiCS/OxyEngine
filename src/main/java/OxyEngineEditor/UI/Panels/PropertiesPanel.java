@@ -80,7 +80,7 @@ public class PropertiesPanel extends Panel {
             ImGui.alignTextToFramePadding();
             ImGui.text("Scale:");
             ImGui.nextColumn();
-            ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
+            ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
 
             TransformComponent t = entityContext.get(TransformComponent.class);
             float[] translationArr = new float[]{t.position.x, t.position.y, t.position.z};

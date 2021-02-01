@@ -10,7 +10,6 @@ import imgui.flag.ImGuiStyleVar;
 import static OxyEngine.System.OxySystem.FileSystem.saveDialog;
 import static OxyEngineEditor.Scene.Scene.*;
 import static OxyEngineEditor.Scene.SceneSerializer.extensionName;
-import static OxyEngineEditor.Scene.SceneSerializer.fileExtension;
 
 public class ToolbarPanel extends Panel {
 
@@ -41,7 +40,7 @@ public class ToolbarPanel extends Panel {
                 if (ImGui.menuItem("Save the scene", "Ctrl+S")) saveScene();
                 if (ImGui.menuItem("Save As...")) {
                     String saveAs = saveDialog(extensionName, null);
-                    if (saveAs != null) SceneSerializer.serializeScene(saveAs + fileExtension);
+                    if (saveAs != null) SceneSerializer.serializeScene(saveAs);
                 }
                 ImGui.endMenu();
             }

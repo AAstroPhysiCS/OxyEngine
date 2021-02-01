@@ -23,7 +23,7 @@
 
     <properties>
         <lwjgl.version>3.2.3</lwjgl.version>
-        <imgui.java.version>1.79-1.4.0</imgui.java.version>
+        <imgui.java.version>1.80-1.5.0</imgui.java.version>
         <maven.compiler.source>1.15</maven.compiler.source>
         <maven.compiler.target>1.15</maven.compiler.target>
     </properties>
@@ -34,63 +34,6 @@
             <url>https://jcenter.bintray.com/</url>
         </repository>
     </repositories>
-
-    <!-- Resolve OS version for native libraries -->
-    <!-- imgui-java uses the same naming convention as LWJGL3 -->
-    <profiles>
-        <profile>
-            <id>natives-linux-amd64</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-            <properties>
-                <imguiNatives>imgui-java-natives-linux</imguiNatives>
-                <lwjglNatives>natives-linux</lwjglNatives>
-            </properties>
-        </profile>
-        <profile>
-            <id>natives-macos-amd64</id>
-            <activation>
-                <os>
-                    <family>mac</family>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-            <properties>
-                <imguiNatives>imgui-java-natives-macos</imguiNatives>
-                <lwjglNatives>natives-macos</lwjglNatives>
-            </properties>
-        </profile>
-        <profile>
-            <id>natives-windows-amd64</id>
-            <activation>
-                <os>
-                    <family>windows</family>
-                    <arch>amd64</arch>
-                </os>
-            </activation>
-            <properties>
-                <imguiNatives>imgui-java-natives-windows</imguiNatives>
-                <lwjglNatives>natives-windows</lwjglNatives>
-            </properties>
-        </profile>
-        <profile>
-            <id>natives-windows-x86</id>
-            <activation>
-                <os>
-                    <family>windows</family>
-                    <arch>x86</arch>
-                </os>
-            </activation>
-            <properties>
-                <imguiNatives>imgui-java-natives-windows-x86</imguiNatives>
-                <lwjglNatives>natives-windows-x86</lwjglNatives>
-            </properties>
-        </profile>
-    </profiles>
 
     <dependencyManagement>
         <dependencies>
@@ -107,6 +50,34 @@
     <dependencies>
         <!-- imgui-java -->
         <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-glfw</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-opengl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl</artifactId>
+            <classifier>natives-windows</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-glfw</artifactId>
+            <classifier>natives-windows</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.lwjgl</groupId>
+            <artifactId>lwjgl-opengl</artifactId>
+            <classifier>natives-windows</classifier>
+        </dependency>
+
+        <dependency>
             <groupId>io.imgui.java</groupId>
             <artifactId>imgui-java-binding</artifactId>
             <version>${imgui.java.version}</version>
@@ -118,7 +89,7 @@
         </dependency>
         <dependency>
             <groupId>io.imgui.java</groupId>
-            <artifactId>${imguiNatives}</artifactId>
+            <artifactId>imgui-java-natives-windows</artifactId>
             <version>${imgui.java.version}</version>
         </dependency>
         <dependency>

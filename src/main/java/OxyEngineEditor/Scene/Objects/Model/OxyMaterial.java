@@ -182,7 +182,7 @@ public class OxyMaterial implements OxyDisposable {
                 ImGui.spacing();
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Albedo: (Base Texture): ");
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 130);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
                 boolean nullT = m.albedoTexture == null;
                 if (ImGui.imageButton(nullT ? -1 : m.albedoTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
@@ -192,7 +192,7 @@ public class OxyMaterial implements OxyDisposable {
                         entityContext.updateData();
                     }
                 }
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
                 if (ImGui.button("Remove A")) {
                     m.albedoTexture.dispose();
                     m.albedoTexture = null;
@@ -200,7 +200,7 @@ public class OxyMaterial implements OxyDisposable {
 
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Normal Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 130);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
                 boolean nullN = m.normalTexture == null;
                 if (ImGui.imageButton(nullN ? -2 : m.normalTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
@@ -210,7 +210,7 @@ public class OxyMaterial implements OxyDisposable {
                         entityContext.updateData();
                     }
                 }
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
                 if (ImGui.button("Remove N")) {
                     m.normalTexture.dispose();
                     m.normalTexture = null;
@@ -222,7 +222,7 @@ public class OxyMaterial implements OxyDisposable {
 
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Roughness Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 130);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
                 boolean nullR = m.roughnessTexture == null;
                 if (ImGui.imageButton(nullR ? -3 : m.roughnessTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
@@ -232,7 +232,7 @@ public class OxyMaterial implements OxyDisposable {
                         entityContext.updateData();
                     }
                 }
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
                 if (ImGui.button("Remove R")) {
                     m.roughnessTexture.dispose();
                     m.roughnessTexture = null;
@@ -244,7 +244,7 @@ public class OxyMaterial implements OxyDisposable {
 
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Metallic Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 130);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
                 boolean nullM = m.metallicTexture == null;
                 if (ImGui.imageButton(nullM ? -4 : m.metallicTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
@@ -254,7 +254,7 @@ public class OxyMaterial implements OxyDisposable {
                         entityContext.updateData();
                     }
                 }
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
                 if (ImGui.button("Remove M")) {
                     m.metallicTexture.dispose();
                     m.metallicTexture = null;
@@ -266,7 +266,7 @@ public class OxyMaterial implements OxyDisposable {
 
                 ImGui.alignTextToFramePadding();
                 ImGui.text("AO Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 130);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
                 boolean nullAO = m.aoTexture == null;
                 if (ImGui.imageButton(nullAO ? -5 : m.aoTexture.getTextureId(), 80, 60)) {
                     String path = openDialog("", null);
@@ -276,7 +276,7 @@ public class OxyMaterial implements OxyDisposable {
                         entityContext.updateData();
                     }
                 }
-                ImGui.sameLine(ImGui.getContentRegionAvailWidth() - 30);
+                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
                 if (ImGui.button("Remove AO")) {
                     m.aoTexture.dispose();
                     m.aoTexture = null;

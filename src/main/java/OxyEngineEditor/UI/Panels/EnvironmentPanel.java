@@ -44,7 +44,7 @@ public class EnvironmentPanel extends Panel {
         ImGui.alignTextToFramePadding();
         ImGui.text("Exposure: ");
         ImGui.nextColumn();
-        ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth());
+        ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
         ImGui.sliderFloat("###hidelabel g", gammaStrength, 0, 10);
         ImGui.sliderFloat("###hidelabel lod", mipLevelStrength, 0, 5);
         ImGui.sliderFloat("###hidelabel exposure", exposure, 0, 10);

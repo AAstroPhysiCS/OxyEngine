@@ -113,7 +113,7 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Mesh:");
                 ImGui.nextColumn();
-                ImGui.pushItemWidth(ImGui.getContentRegionAvailWidth() - 30f);
+                ImGui.pushItemWidth(ImGui.getContentRegionAvailX() - 30f);
                 ImGui.inputText("##hidelabel", meshPath, ImGuiInputTextFlags.ReadOnly);
                 ImGui.popItemWidth();
                 ImGui.sameLine();

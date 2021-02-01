@@ -196,7 +196,7 @@ public class OxyMaterialPool {
             {
                 ImGui.setCursorPosX(25);
                 ImGui.pushStyleColor(ImGuiCol.ChildBg, 30, 30, 30, 255);
-                ImGui.beginChild("ChildM", ImGui.getContentRegionAvailWidth() * 0.9f, 80, false, ImGuiWindowFlags.HorizontalScrollbar);
+                ImGui.beginChild("ChildM", ImGui.getContentRegionAvailX() * 0.9f, 80, false, ImGuiWindowFlags.HorizontalScrollbar);
                 for (var mIndex : materialPool) {
                     OxyMaterial m = OxyMaterialPool.getMaterial(mIndex.index);
                     if (m != null) ImGui.selectable(m.name);

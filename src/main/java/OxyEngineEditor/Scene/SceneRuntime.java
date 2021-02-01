@@ -32,7 +32,7 @@ public final class SceneRuntime {
     }
 
     public static void onCreate() {
-        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) {
+        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
             if (!(e instanceof OxyModel)) continue;
             for (OxyScript c : e.getScripts()) {
                 c.invokeCreate();

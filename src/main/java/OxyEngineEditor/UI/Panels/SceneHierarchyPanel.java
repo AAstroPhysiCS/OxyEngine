@@ -1,6 +1,7 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.FamilyComponent;
+import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Components.SelectedComponent;
@@ -40,6 +41,7 @@ public class SceneHierarchyPanel extends Panel {
         for (var root : ACTIVE_SCENE.getEntities()) {
             if (root.isRoot()) {
                 TagComponent tagComponentRoot = root.get(TagComponent.class);
+                ImGui.pushID(root.get(UUIDComponent.class).toString());
                 if (ImGui.treeNodeEx(tagComponentRoot.tag(), ImGuiTreeNodeFlags.OpenOnArrow)) {
                     if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
                         if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
@@ -66,6 +68,7 @@ public class SceneHierarchyPanel extends Panel {
                         entityContext.get(SelectedComponent.class).selected = true;
                     }
                 }
+                ImGui.popID();
             }
         }
     }
