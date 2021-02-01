@@ -17,7 +17,6 @@ import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiPopupFlags;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.List;
@@ -62,8 +61,10 @@ public class PropertiesPanel extends Panel {
             if (name.get().length() == 0) name.set("Unnamed");
             entityContext.get(TagComponent.class).setTag(name.get());
         }
-        ImGui.sameLine();
-        if (ImGui.button("Add Component", 100, 25)) ImGui.openPopup("comp_popup", ImGuiPopupFlags.AnyPopup);
+        if(!entityContext.isRoot())  {
+            ImGui.sameLine();
+            if (ImGui.button("Add Component", 100, 25)) ImGui.openPopup("popupAddComponent", ImGuiPopupFlags.AnyPopup);
+        }
         ImGui.textDisabled("ID: " + entityContext.get(UUIDComponent.class).getUUIDString());
 
         focusedWindow = ImGui.isWindowFocused();
@@ -134,7 +135,7 @@ public class PropertiesPanel extends Panel {
         for (GUINode guiNode : entityContext.getGUINodes()) guiNode.runEntry();
 
         ImGui.pushStyleColor(ImGuiCol.PopupBg, 36, 36, 36, 255);
-        if (ImGui.beginPopup("comp_popup")) {
+        if (ImGui.beginPopup("popupAddComponent")) {
             ImGui.alignTextToFramePadding();
             ImGui.text("Search:");
             ImGui.sameLine();
@@ -171,7 +172,7 @@ public class PropertiesPanel extends Panel {
             if (ImGui.beginMenu("Light")) {
                 if (ImGui.menuItem("Point Light")) {
                     if (!entityContext.has(Light.class)) {
-                        PointLight pointLight = new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f);
+                        PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
                         int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
                         entityContext.addComponent(pointLight, new OxyMaterialIndex(index));
                         if (!entityContext.getGUINodes().contains(OxyMaterial.guiNode))
@@ -183,7 +184,7 @@ public class PropertiesPanel extends Panel {
                 }
                 if (ImGui.menuItem("Directional Light")) {
                     if (!entityContext.has(Light.class)) {
-                        DirectionalLight directionalLight = new DirectionalLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f));
+                        DirectionalLight directionalLight = new DirectionalLight();
                         int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
                         entityContext.addComponent(directionalLight, new OxyMaterialIndex(index));
                         entityContext.getGUINodes().add(DirectionalLight.guiNode);

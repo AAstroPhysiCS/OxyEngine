@@ -18,8 +18,14 @@ public class PointLight extends Light {
     private float linear;
     private float quadratic;
 
-    public PointLight(Vector3f ambient, Vector3f specular, float constant, float linear, float quadratic) {
-        super(ambient, specular);
+    public PointLight(float constant, float linear, float quadratic) {
+        this.constant = constant;
+        this.linear = linear;
+        this.quadratic = quadratic;
+    }
+
+    public PointLight(float colorIntensity, float constant, float linear, float quadratic) {
+        this.colorIntensity = colorIntensity;
         this.constant = constant;
         this.linear = linear;
         this.quadratic = quadratic;
@@ -36,6 +42,18 @@ public class PointLight extends Light {
         shader.setUniform1f("p_Light[" + i + "].linear", linear);
         shader.setUniform1f("p_Light[" + i + "].quadratic", quadratic);
         shader.disable();
+    }
+
+    public float getConstantValue() {
+        return constant;
+    }
+
+    public float getLinearValue() {
+        return linear;
+    }
+
+    public float getQuadraticValue() {
+        return quadratic;
     }
 
     private static final float[] constantArr = new float[1], linearArr = new float[1], quadraticArr = new float[1], colorIntensityArr = new float[1];

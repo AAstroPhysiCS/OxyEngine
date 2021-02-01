@@ -70,8 +70,11 @@ public final class SceneSerializer {
                 if(allRelatedEntities.size() == 0) continue;
                 int ptr = 0;
                 TransformComponent t = root.get(TransformComponent.class);
+                String meshPath = "null";
+                OpenGLMesh mesh = allRelatedEntities.get(0).get(OpenGLMesh.class);
+                if(mesh != null) meshPath = mesh.getPath();
                 var obj = array.createOxyJSONObject(root.get(TagComponent.class).tag())
-                        .putField("Mesh", allRelatedEntities.get(0).get(OpenGLMesh.class).getPath())
+                        .putField("Mesh", meshPath)
                         .putField("Position", t.position.toString())
                         .putField("Rotation", t.rotation.toString())
                         .putField("Scale", t.scale.toString());
@@ -161,11 +164,20 @@ public final class SceneSerializer {
                         modelInstance = scene.createEmptyModel(shader, meshPos);
                     }
                     if (emitting) {
+                        var lightAttributes = ent.getInnerObjectByName("Light Attributes");
+                        float colorIntensity = Float.parseFloat(lightAttributes.getField("Intensity").value());
+
                         if (emittingType.equals(PointLight.class.getSimpleName())) {
-                            modelInstance.addComponent(new PointLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f), 1.0f, 0.027f, 0.0028f));
+                            float constant = Float.parseFloat(lightAttributes.getField("Constant").value());
+                            float linear = Float.parseFloat(lightAttributes.getField("Linear").value());
+                            float quadratic = Float.parseFloat(lightAttributes.getField("Quadratic").value());
+
+                            modelInstance.addComponent(new PointLight(colorIntensity, constant, linear, quadratic));
                             modelInstance.getGUINodes().add(PointLight.guiNode);
                         } else if (emittingType.equals(DirectionalLight.class.getSimpleName())) {
-                            modelInstance.addComponent(new DirectionalLight(new Vector3f(2f, 2f, 2f), new Vector3f(1f, 1f, 1f)));
+                            Vector3f dir = parseStringToVector3f(lightAttributes.getField("Direction").value());
+
+                            modelInstance.addComponent(new DirectionalLight(colorIntensity, dir));
                             modelInstance.getGUINodes().add(DirectionalLight.guiNode);
                         }
                         modelInstance.addComponent(new OxyMaterialIndex(index));

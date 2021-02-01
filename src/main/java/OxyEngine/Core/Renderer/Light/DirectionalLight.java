@@ -13,10 +13,15 @@ import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class DirectionalLight extends Light {
 
-    private final Vector3f dir = new Vector3f(0, 0, 0);
+    private final Vector3f dir;
 
-    public DirectionalLight(Vector3f ambient, Vector3f specular) {
-        super(ambient, specular);
+    public DirectionalLight(float colorIntensity, Vector3f dir) {
+        this.dir = dir;
+        this.colorIntensity = colorIntensity;
+    }
+
+    public DirectionalLight(){
+        this(1, new Vector3f());
     }
 
     @Override
@@ -28,6 +33,10 @@ public class DirectionalLight extends Light {
         shader.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
         shader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
         shader.disable();
+    }
+
+    public Vector3f getDirection() {
+        return dir;
     }
 
     final float[] colorIntensityArr = new float[1];

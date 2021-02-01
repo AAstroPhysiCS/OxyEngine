@@ -2,7 +2,9 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
+import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
@@ -258,8 +260,23 @@ public abstract class OxyEntity {
                 .putField("ID", id)
                 .putField("Mesh Position", String.valueOf(meshPos))
                 .putField("Name", tag)
-                .putField("Emitting", String.valueOf(emitting))
-                .putField("Emitting Type", emitting ? get(Light.class).getClass().getSimpleName() : "null")
+                .putField("Emitting", String.valueOf(emitting));
+
+        if(emitting){
+            Light l = get(Light.class);
+            obj = obj.createInnerObject("Light Attributes")
+                    .putField("Intensity", String.valueOf(l.getColorIntensity()));
+            if(l instanceof PointLight p){
+                obj.putField("Constant", String.valueOf(p.getConstantValue()));
+                obj.putField("Linear", String.valueOf(p.getLinearValue()));
+                obj.putField("Quadratic", String.valueOf(p.getQuadraticValue()));
+            } else if(l instanceof DirectionalLight d){
+                obj.putField("Direction", d.getDirection().toString());
+            }
+            obj = obj.backToObject();
+        }
+
+        obj.putField("Emitting Type", emitting ? get(Light.class).getClass().getSimpleName() : "null")
                 .putField("Position", transform.position.toString())
                 .putField("Rotation", transform.rotation.toString())
                 .putField("Scale", transform.scale.toString())

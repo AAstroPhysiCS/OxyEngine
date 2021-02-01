@@ -48,7 +48,7 @@ public class OxyModel extends OxyEntity {
         e.addComponent(
                 get(UUIDComponent.class),
                 get(OxyShader.class),
-                new TransformComponent(new TransformComponent(this.get(TransformComponent.class))),
+                new TransformComponent(this.get(TransformComponent.class)),
                 new MeshPosition(get(MeshPosition.class).meshPos()),
                 new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),
                 new RenderableComponent(RenderingMode.Normal),
@@ -79,10 +79,7 @@ public class OxyModel extends OxyEntity {
         SceneRuntime.onCreate();
         SceneRuntime.stop();
 
-        if(has(OpenGLMesh.class)){
-            e.transformLocally();
-            e.initData(get(OpenGLMesh.class).getPath());
-        }
+        if(has(OpenGLMesh.class)) e.initData(get(OpenGLMesh.class).getPath());
         return e;
     }
 
