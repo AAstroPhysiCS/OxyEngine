@@ -4,6 +4,7 @@ import OxyEngine.Core.Layers.SceneLayer;
 import imgui.ImGui;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
+import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
 
 public class EnvironmentPanel extends Panel {
 
@@ -31,7 +32,7 @@ public class EnvironmentPanel extends Panel {
 
         if (ImGui.button("Load environment map")) {
             String path = openDialog("hdr", null);
-            if (path != null) SceneLayer.getInstance().loadHDRTextureToScene(path);
+            if (path != null) SceneLayer.getInstance().loadHDRTextureToScene(path, ACTIVE_SCENE);
         }
 
         ImGui.columns(2, "env column");

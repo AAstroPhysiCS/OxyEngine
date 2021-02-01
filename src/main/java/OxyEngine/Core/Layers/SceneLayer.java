@@ -17,6 +17,7 @@ import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngineEditor.Scene.Scene;
 import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import OxyEngineEditor.UI.Panels.GUINode;
@@ -269,10 +270,10 @@ public class SceneLayer extends Layer {
         for (OxyEntity m : cachedLightEntities) m.addComponent(oxyShader);
     }
 
-    public void loadHDRTextureToScene(String path) {
+    public void loadHDRTextureToScene(String path, Scene s) {
         if (path == null) return;
         if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
-        SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, ACTIVE_SCENE);
+        SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, s);
         SceneLayer.hdrTexture.captureFaces(SceneRuntime.TS);
     }
 

@@ -111,7 +111,7 @@ public final class SceneSerializer {
             layer.clear();
 
             String envMapPath = envJSON.getField("Environment Map").value();
-            layer.loadHDRTextureToScene(!envMapPath.equals("null") ? envMapPath : null);
+            layer.loadHDRTextureToScene(!envMapPath.equals("null") ? envMapPath : null, scene);
 
             EnvironmentPanel.gammaStrength = new float[]{Float.parseFloat(envJSON.getField("Environment Gamma Strength").value())};
             EnvironmentPanel.mipLevelStrength = new float[]{Float.parseFloat(envJSON.getField("Environment LOD").value())};

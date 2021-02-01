@@ -7,6 +7,7 @@ import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TagComponent;
 import OxyEngineEditor.Scene.OxyEntity;
 import imgui.ImGui;
+import imgui.flag.ImGuiMouseButton;
 import imgui.flag.ImGuiTreeNodeFlags;
 
 import java.util.List;
@@ -39,7 +40,13 @@ public class SceneHierarchyPanel extends Panel {
         for (var root : ACTIVE_SCENE.getEntities()) {
             if (root.isRoot()) {
                 TagComponent tagComponentRoot = root.get(TagComponent.class);
-                if (ImGui.treeNodeEx(String.valueOf(root.hashCode()), ImGuiTreeNodeFlags.OpenOnArrow | (entityContext == root ? ImGuiTreeNodeFlags.Selected : 0), tagComponentRoot.tag())) {
+                ImGui.pushID(root.hashCode());
+                if (ImGui.treeNodeEx(tagComponentRoot.tag(), ImGuiTreeNodeFlags.OpenOnArrow)) {
+                    if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
+                        if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
+                        entityContext = root;
+                        entityContext.get(SelectedComponent.class).selected = true;
+                    }
                     List<OxyEntity> relatedEntities = root.getEntitiesRelatedTo(FamilyComponent.class);
                     if(relatedEntities != null) {
                         for (int i = 0; i < relatedEntities.size(); i++) {
@@ -48,7 +55,7 @@ public class SceneHierarchyPanel extends Panel {
                                 m.get(SelectedComponent.class).selected = false;
                             }
                             ImGui.selectable(i + ": " + m.get(TagComponent.class).tag(), m.get(SelectedComponent.class).selected);
-                            if (ImGui.isItemClicked()) {
+                            if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
                                 if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                                 entityContext = m;
                                 entityContext.get(SelectedComponent.class).selected = true;
@@ -57,11 +64,12 @@ public class SceneHierarchyPanel extends Panel {
                     }
                     ImGui.treePop();
                 }
-                if (ImGui.isItemClicked()) {
+                if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
                     if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                     entityContext = root;
                     entityContext.get(SelectedComponent.class).selected = true;
                 }
+                ImGui.popID();
             }
         }
     }
