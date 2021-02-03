@@ -5,7 +5,6 @@ import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
-import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
@@ -77,7 +76,7 @@ public abstract class OxyEntity {
 
     public abstract void updateData();
 
-    public void transformLocally(){
+    public void transformLocally() {
         TransformComponent c = get(TransformComponent.class);
         c.transform = new Matrix4f()
                 .translate(c.position)
@@ -163,7 +162,7 @@ public abstract class OxyEntity {
         return scene.get(this, destClass);
     }
 
-    public <T extends EntityComponent> OxyEntity getRoot(Class<T> destClass){
+    public <T extends EntityComponent> OxyEntity getRoot(Class<T> destClass) {
         return scene.getRoot(this, destClass);
     }
 
@@ -216,11 +215,47 @@ public abstract class OxyEntity {
         return null;
     }
 
-    public void dump(int i, OxyJSON.OxyJSONObject arr) {
-        int meshPos = -1;
+    public void dump(OxyJSON.OxyJSONObject arr) {
+        if (!isRoot()) throw new IllegalStateException("Only roots can be dumped");
 
-        String tag = "null";
-        TransformComponent transform = get(TransformComponent.class);
+        int meshPosRoot = -1;
+        String idRoot = get(UUIDComponent.class).getUUIDString();
+        String tagRoot = "null";
+        if (has(MeshPosition.class)) meshPosRoot = get(MeshPosition.class).meshPos();
+        if (has(TagComponent.class)) tagRoot = get(TagComponent.class).tag();
+        boolean emittingRoot = false;
+        if (has(Light.class)) emittingRoot = true;
+
+        arr.putField("ID", idRoot)
+                .putField("Mesh Position", String.valueOf(meshPosRoot))
+                .putField("Name", tagRoot)
+                .putField("Emitting", String.valueOf(emittingRoot));
+        addCommonFields(arr, emittingRoot, this);
+
+        int i = 0;
+        for (OxyEntity e : getEntitiesRelatedTo(FamilyComponent.class)) {
+            if (!(e instanceof OxyModel)) continue;
+            int meshPos = -1;
+            String id = e.get(UUIDComponent.class).getUUIDString();
+            String tag = "null";
+            if (e.has(MeshPosition.class)) meshPos = e.get(MeshPosition.class).meshPos();
+            if (e.has(TagComponent.class)) tag = e.get(TagComponent.class).tag();
+            boolean emitting = false;
+            if (e.has(Light.class)) emitting = true;
+
+            var obj = arr.createInnerObject("OxyModel " + (i++))
+                    .putField("ID", id)
+                    .putField("Mesh Position", String.valueOf(meshPos))
+                    .putField("Name", tag)
+                    .putField("Emitting", String.valueOf(emitting));
+
+            addCommonFields(obj, emitting, e);
+        }
+    }
+
+    private void addCommonFields(OxyJSON.OxyJSONObject obj, boolean emitting, OxyEntity e) {
+
+        TransformComponent transform = e.get(TransformComponent.class);
         Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
         String albedoColor = "null";
         String albedoTexture = "null";
@@ -229,18 +264,14 @@ public abstract class OxyEntity {
         String metallicTexture = "null", metalnessTextureStrength = "0";
         String aoTexture = "null", aoTextureStrength = "0";
         String mesh = "null";
-        String id = get(UUIDComponent.class).getUUIDString();
-        boolean emitting = false;
         String materialName = "null";
 
-        if (has(BoundingBoxComponent.class)) {
-            minBound = get(BoundingBoxComponent.class).min();
-            maxBound = get(BoundingBoxComponent.class).max();
+        if (e.has(BoundingBoxComponent.class)) {
+            minBound = e.get(BoundingBoxComponent.class).min();
+            maxBound = e.get(BoundingBoxComponent.class).max();
         }
-        if (has(TagComponent.class)) tag = get(TagComponent.class).tag();
-        if (has(MeshPosition.class)) meshPos = get(MeshPosition.class).meshPos();
-        if (has(OxyMaterialIndex.class)) {
-            OxyMaterial m = OxyMaterialPool.getMaterial(this);
+        if (e.has(OxyMaterialIndex.class)) {
+            OxyMaterial m = OxyMaterialPool.getMaterial(e);
             materialName = m.name;
             if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
             if (m.albedoTexture != null) albedoTexture = m.albedoTexture.getPath();
@@ -253,30 +284,24 @@ public abstract class OxyEntity {
             if (m.aoTexture != null) aoTexture = m.aoTexture.getPath();
             aoTextureStrength = String.valueOf(m.aoStrength[0]);
         }
-        if (has(ModelMeshOpenGL.class)) mesh = get(ModelMeshOpenGL.class).getPath();
-        if (has(Light.class)) emitting = true;
+        if (e.has(OpenGLMesh.class)) mesh = e.get(OpenGLMesh.class).getPath();
+        if (e.has(Light.class)) emitting = true;
 
-        var obj = arr.createInnerObject("OxyModel " + i)
-                .putField("ID", id)
-                .putField("Mesh Position", String.valueOf(meshPos))
-                .putField("Name", tag)
-                .putField("Emitting", String.valueOf(emitting));
-
-        if(emitting){
-            Light l = get(Light.class);
+        if (emitting) {
+            Light l = e.get(Light.class);
             obj = obj.createInnerObject("Light Attributes")
                     .putField("Intensity", String.valueOf(l.getColorIntensity()));
-            if(l instanceof PointLight p){
+            if (l instanceof PointLight p) {
                 obj.putField("Constant", String.valueOf(p.getConstantValue()));
                 obj.putField("Linear", String.valueOf(p.getLinearValue()));
                 obj.putField("Quadratic", String.valueOf(p.getQuadraticValue()));
-            } else if(l instanceof DirectionalLight d){
+            } else if (l instanceof DirectionalLight d) {
                 obj.putField("Direction", d.getDirection().toString());
             }
             obj = obj.backToObject();
         }
 
-        obj = obj.putField("Emitting Type", emitting ? get(Light.class).getClass().getSimpleName() : "null")
+        obj = obj.putField("Emitting Type", emitting ? e.get(Light.class).getClass().getSimpleName() : "null")
                 .putField("Position", transform.position.toString())
                 .putField("Rotation", transform.rotation.toString())
                 .putField("Scale", transform.scale.toString())

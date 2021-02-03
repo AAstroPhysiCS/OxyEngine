@@ -41,6 +41,7 @@ public class PointLight extends Light {
         shader.setUniform1f("p_Light[" + i + "].constant", constant);
         shader.setUniform1f("p_Light[" + i + "].linear", linear);
         shader.setUniform1f("p_Light[" + i + "].quadratic", quadratic);
+        shader.setUniform1i("p_Light[" + i + "].activeState", 1);
         shader.disable();
     }
 

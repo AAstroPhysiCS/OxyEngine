@@ -173,12 +173,12 @@ public final class Scene implements OxyDisposable {
         return e;
     }
 
-    private static String path = ""; //optimization for the scene serialization import
+    static String optimization_Path = ""; //optimization for the scene serialization import
 
     public final OxyModel createModelEntity(String path, OxyShader shader, int i, int materialIndex, OxyEntity root) {
-        if(!Scene.path.equals(path)){
+        if (!Scene.optimization_Path.equals(path)) {
             modelLoader = new OxyModelLoader(path, root);
-            Scene.path = path;
+            Scene.optimization_Path = path;
         }
         OxyModelLoader.AssimpMesh assimpMesh = modelLoader.meshes.get(i);
         OxyMaterialPool.newBatch();
@@ -209,9 +209,9 @@ public final class Scene implements OxyDisposable {
 
     public final void removeEntity(OxyEntity e) {
 
-        if(e.isRoot()){
+        if (e.isRoot()) {
             List<OxyEntity> entitiesRelatedTo = e.getEntitiesRelatedTo(FamilyComponent.class);
-            if(entitiesRelatedTo != null) {
+            if (entitiesRelatedTo != null) {
                 for (OxyEntity eRT : entitiesRelatedTo) {
                     removeEntity(eRT);
                 }
@@ -303,7 +303,7 @@ public final class Scene implements OxyDisposable {
         return registry.entityList.keySet();
     }
 
-    Set<Map.Entry<OxyEntity, Set<EntityComponent>>> getEntityEntrySet(){
+    Set<Map.Entry<OxyEntity, Set<EntityComponent>>> getEntityEntrySet() {
         return registry.entityList.entrySet();
     }
 
@@ -333,7 +333,7 @@ public final class Scene implements OxyDisposable {
                 it.remove();
             }
         }
-        for(int i = 0; i < LIGHT_SIZE; i++){
+        for (int i = 0; i < LIGHT_SIZE; i++) {
             oxyShader.enable();
             oxyShader.setUniformVec3("p_Light[" + i + "].position", 0, 0, 0);
             oxyShader.setUniformVec3("p_Light[" + i + "].diffuse", 0, 0, 0);

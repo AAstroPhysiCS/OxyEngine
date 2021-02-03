@@ -2,7 +2,6 @@ package OxyEngineEditor.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -20,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import static OxyEngineEditor.EditorApplication.oxyShader;
 
 public final class SceneSerializer {
 
@@ -60,27 +57,14 @@ public final class SceneSerializer {
             var array = builder.createOxyJSONArray("Registry");
             List<OxyEntity> rootPooled = new ArrayList<>();
             for (OxyEntity e : scene.getEntities()) {
-                OxyEntity root = e.getRoot(FamilyComponent.class);
-                if(root == null) continue;
-                if(!rootPooled.contains(root)) rootPooled.add(root);
+                if(e.isRoot()){
+                    if(!rootPooled.contains(e)) rootPooled.add(e);
+                }
             }
             for(OxyEntity root : rootPooled){
                 if (!(root instanceof OxyModel)) continue;
-                List<OxyEntity> allRelatedEntities = root.getEntitiesRelatedTo(FamilyComponent.class);
-                if(allRelatedEntities.size() == 0) continue;
-                int ptr = 0;
-                TransformComponent t = root.get(TransformComponent.class);
-                String meshPath = "null";
-                OpenGLMesh mesh = allRelatedEntities.get(0).get(OpenGLMesh.class);
-                if(mesh != null) meshPath = mesh.getPath();
-                var obj = array.createOxyJSONObject(root.get(TagComponent.class).tag())
-                        .putField("Mesh", meshPath)
-                        .putField("Position", t.position.toString())
-                        .putField("Rotation", t.rotation.toString())
-                        .putField("Scale", t.scale.toString());
-                for(OxyEntity e : allRelatedEntities){
-                    e.dump(ptr++, obj);
-                }
+                var obj = array.createOxyJSONObject(root.get(TagComponent.class).tag());
+                root.dump(obj);
             }
             builder.build().writeAndCloseStream();
         }
@@ -119,80 +103,22 @@ public final class SceneSerializer {
             EnvironmentPanel.gammaStrength = new float[]{Float.parseFloat(envJSON.getField("Environment Gamma Strength").value())};
             EnvironmentPanel.mipLevelStrength = new float[]{Float.parseFloat(envJSON.getField("Environment LOD").value())};
             EnvironmentPanel.exposure = new float[]{Float.parseFloat(envJSON.getField("Environment Exposure").value())};
+
+            Scene.optimization_Path = "";
+
             for (var root : modelsJSON.getObjectList()) {
                 var familyComponent = new FamilyComponent();
                 Vector3f positionRoot = parseStringToVector3f(root.getField("Position").value());
                 Vector3f rotRoot = parseStringToVector3f(root.getField("Rotation").value());
                 Vector3f scaleRoot = parseStringToVector3f(root.getField("Scale").value());
-                OxyEntity rootEntity = scene.createEmptyModel(oxyShader);
+                OxyEntity rootEntity = readFields(root, scene, shader, null);
                 rootEntity.addComponent(new TagComponent(root.getName()), new TransformComponent(positionRoot, rotRoot, scaleRoot), familyComponent);
                 rootEntity.setRoot(true);
                 rootEntity.transformLocally();
 
                 for (var ent : root.getInnerObjects()) {
-                    String name = ent.getField("Name").value();
-                    String id = ent.getField("ID").value();
-                    int meshPos = Integer.parseInt(ent.getField("Mesh Position").value());
-                    boolean emitting = Boolean.parseBoolean(ent.getField("Emitting").value());
-                    String emittingType = ent.getField("Emitting Type").value();
-                    Vector3f position = parseStringToVector3f(ent.getField("Position").value());
-                    Vector3f rot = parseStringToVector3f(ent.getField("Rotation").value());
-                    Vector3f scale = parseStringToVector3f(ent.getField("Scale").value());
-                    Vector3f minB = parseStringToVector3f(ent.getField("Bounds Min").value());
-                    Vector3f maxB = parseStringToVector3f(ent.getField("Bounds Max").value());
-                    float[] color = parseStringToFloatArray(ent.getField("Color").value(), 4);
-                    String nameMaterial = ent.getField("Material Name").value();
-                    String albedoTPath = ent.getField("Albedo Texture").value();
-                    String normalMapTPath = ent.getField("Normal Map Texture").value();
-                    float normalMapStrength = Float.parseFloat(ent.getField("Normal Map Strength").value());
-                    String roughnessMapTPath = ent.getField("Roughness Map Texture").value();
-                    float roughnessMapStrength = Float.parseFloat(ent.getField("Roughness Map Strength").value());
-                    String aoMapTPath = ent.getField("AO Map Texture").value();
-                    float aoMapStrength = Float.parseFloat(ent.getField("AO Map Strength").value());
-                    String metallicMapTPath = ent.getField("Metallic Map Texture").value();
-                    float metallicMapStrength = Float.parseFloat(ent.getField("Metallic Map Strength").value());
-                    String meshPath = ent.getField("Mesh").value();
-
-                    OxyModel modelInstance;
-                    int index = OxyMaterialPool.addMaterial(nameMaterial, albedoTPath,
-                            normalMapTPath, roughnessMapTPath, metallicMapTPath, aoMapTPath,
-                            new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength);
-                    if (!meshPath.equals("null")) {
-                        modelInstance = scene.createModelEntity(meshPath, shader, meshPos, index, rootEntity);
-                        modelInstance.getGUINodes().add(OxyMaterial.guiNode);
-                    } else {
-                        modelInstance = scene.createEmptyModel(shader, meshPos);
-                    }
-                    if (emitting) {
-                        var lightAttributes = ent.getInnerObjectByName("Light Attributes");
-                        float colorIntensity = Float.parseFloat(lightAttributes.getField("Intensity").value());
-
-                        if (emittingType.equals(PointLight.class.getSimpleName())) {
-                            float constant = Float.parseFloat(lightAttributes.getField("Constant").value());
-                            float linear = Float.parseFloat(lightAttributes.getField("Linear").value());
-                            float quadratic = Float.parseFloat(lightAttributes.getField("Quadratic").value());
-
-                            modelInstance.addComponent(new PointLight(colorIntensity, constant, linear, quadratic));
-                            modelInstance.getGUINodes().add(PointLight.guiNode);
-                        } else if (emittingType.equals(DirectionalLight.class.getSimpleName())) {
-                            Vector3f dir = parseStringToVector3f(lightAttributes.getField("Direction").value());
-
-                            modelInstance.addComponent(new DirectionalLight(colorIntensity, dir));
-                            modelInstance.getGUINodes().add(DirectionalLight.guiNode);
-                        }
-                        modelInstance.addComponent(new OxyMaterialIndex(index));
-                    }
-
-                    TransformComponent t = new TransformComponent(position, rot, scale);
-                    modelInstance.importedFromFile = true;
-                    modelInstance.addComponent(familyComponent, new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), t,
-                            new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new BoundingBoxComponent(minB, maxB));
-                    modelInstance.constructData();
-                    t.transform.mulLocal(rootEntity.get(TransformComponent.class).transform);
-                    modelInstance.updateData();
-
-                    var scripts = ent.getInnerObjectByName("Script");
-                    for (var f : scripts.getFieldList()) modelInstance.addScript(new OxyScript(f.value()));
+                    if(!ent.getName().startsWith("OxyModel")) continue;
+                    readFields(ent, scene, shader, rootEntity);
                 }
             }
             SceneRuntime.onCreate();
@@ -200,6 +126,81 @@ public final class SceneSerializer {
             System.gc();
             return scene;
         }
+
+
+        private OxyModel readFields(OxyJSON.OxyJSONObject ent, Scene scene, OxyShader shader, OxyEntity rootEntity){
+            String name = ent.getField("Name").value();
+            String id = ent.getField("ID").value();
+            int meshPos = Integer.parseInt(ent.getField("Mesh Position").value());
+            boolean emitting = Boolean.parseBoolean(ent.getField("Emitting").value());
+            String emittingType = ent.getField("Emitting Type").value();
+            Vector3f position = parseStringToVector3f(ent.getField("Position").value());
+            Vector3f rot = parseStringToVector3f(ent.getField("Rotation").value());
+            Vector3f scale = parseStringToVector3f(ent.getField("Scale").value());
+            Vector3f minB = parseStringToVector3f(ent.getField("Bounds Min").value());
+            Vector3f maxB = parseStringToVector3f(ent.getField("Bounds Max").value());
+            float[] color = parseStringToFloatArray(ent.getField("Color").value(), 4);
+            String nameMaterial = ent.getField("Material Name").value();
+            String albedoTPath = ent.getField("Albedo Texture").value();
+            String normalMapTPath = ent.getField("Normal Map Texture").value();
+            float normalMapStrength = Float.parseFloat(ent.getField("Normal Map Strength").value());
+            String roughnessMapTPath = ent.getField("Roughness Map Texture").value();
+            float roughnessMapStrength = Float.parseFloat(ent.getField("Roughness Map Strength").value());
+            String aoMapTPath = ent.getField("AO Map Texture").value();
+            float aoMapStrength = Float.parseFloat(ent.getField("AO Map Strength").value());
+            String metallicMapTPath = ent.getField("Metallic Map Texture").value();
+            float metallicMapStrength = Float.parseFloat(ent.getField("Metallic Map Strength").value());
+            String meshPath = ent.getField("Mesh").value();
+
+            OxyModel modelInstance;
+            int index = OxyMaterialPool.addMaterial(nameMaterial, albedoTPath,
+                    normalMapTPath, roughnessMapTPath, metallicMapTPath, aoMapTPath,
+                    new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength);
+            if (!meshPath.equals("null") && rootEntity != null) {
+                modelInstance = scene.createModelEntity(meshPath, shader, meshPos, index, rootEntity);
+                modelInstance.getGUINodes().add(OxyMaterial.guiNode);
+            } else {
+                modelInstance = scene.createEmptyModel(shader, meshPos);
+            }
+            if (emitting) {
+                var lightAttributes = ent.getInnerObjectByName("Light Attributes");
+                float colorIntensity = Float.parseFloat(lightAttributes.getField("Intensity").value());
+
+                if (emittingType.equals(PointLight.class.getSimpleName())) {
+                    float constant = Float.parseFloat(lightAttributes.getField("Constant").value());
+                    float linear = Float.parseFloat(lightAttributes.getField("Linear").value());
+                    float quadratic = Float.parseFloat(lightAttributes.getField("Quadratic").value());
+
+                    modelInstance.addComponent(new PointLight(colorIntensity, constant, linear, quadratic));
+                    modelInstance.getGUINodes().add(PointLight.guiNode);
+                } else if (emittingType.equals(DirectionalLight.class.getSimpleName())) {
+                    Vector3f dir = parseStringToVector3f(lightAttributes.getField("Direction").value());
+
+                    modelInstance.addComponent(new DirectionalLight(colorIntensity, dir));
+                    modelInstance.getGUINodes().add(DirectionalLight.guiNode);
+                }
+                modelInstance.addComponent(new OxyMaterialIndex(index));
+                modelInstance.getGUINodes().add(OxyMaterial.guiNode);
+            }
+
+            TransformComponent t = new TransformComponent(position, rot, scale);
+            modelInstance.importedFromFile = true;
+            modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), t,
+                    new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new BoundingBoxComponent(minB, maxB));
+            modelInstance.constructData();
+            if(rootEntity != null){
+                modelInstance.addComponent(rootEntity.get(FamilyComponent.class));
+                t.transform.mulLocal(rootEntity.get(TransformComponent.class).transform);
+            } else {
+                modelInstance.setRoot(true);
+            }
+            modelInstance.updateData();
+
+            var scripts = ent.getInnerObjectByName("Script");
+            for (var f : scripts.getFieldList()) modelInstance.addScript(new OxyScript(f.value()));
+            return modelInstance;
+        }
+
     }
 
     private static Vector3f parseStringToVector3f(String sValue) {

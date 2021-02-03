@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
+import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngineEditor.EditorApplication.oxyShader;
 import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
@@ -136,12 +137,19 @@ public class SceneLayer extends Layer {
 
         if (mainCamera != null) mainCamera.finalizeCamera(ts);
 
+        //RESET ALL THE LIGHT STATES
+        for (int i = 0; i < LIGHT_SIZE; i++) {
+            oxyShader.enable();
+            oxyShader.setUniform1i("p_Light[" + i + "].activeState", 0);
+            oxyShader.setUniform1i("d_Light[" + i + "].activeState", 0);
+            oxyShader.disable();
+        }
+
         //Lights
         int i = 0;
         for (OxyEntity e : cachedLightEntities) {
             Light l = e.get(Light.class);
-            l.update(e, i);
-            i++;
+            l.update(e, i++);
         }
     }
 
@@ -305,7 +313,10 @@ public class SceneLayer extends Layer {
                 render(0, e.get(ModelMeshOpenGL.class), mainCamera, e.get(OxyShader.class));
         }
         int id = frameBuffer.getEntityID();
-        if (id == -1) entityContext = null;
+        if (id == -1){
+            if(entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
+            entityContext = null;
+        }
         else {
             for (OxyEntity e : allModelEntities) {
                 if (e.getObjectId() == id) {

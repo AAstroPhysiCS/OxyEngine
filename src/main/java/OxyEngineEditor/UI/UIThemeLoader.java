@@ -24,7 +24,7 @@ public class UIThemeLoader {
         float[][] allThemeColors = new float[ImGuiCol.COUNT][4];
         for(int i = 0; i < splittedContent.length; i++){
             String s = splittedContent[i];
-//            if(s.equals("ImVec4* colors = ImGui::GetStyle().Colors;")) continue;
+            if(s.equals("ImVec4* colors = ImGui::GetStyle().Colors;")) continue;
 //            int id = loadId(s, allFields);
             float[] value = loadColorValue(s);
             allThemeColors[i] = value;

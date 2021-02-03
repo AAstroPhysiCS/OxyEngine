@@ -61,10 +61,8 @@ public class PropertiesPanel extends Panel {
             if (name.get().length() == 0) name.set("Unnamed");
             entityContext.get(TagComponent.class).setTag(name.get());
         }
-        if(!entityContext.isRoot())  {
-            ImGui.sameLine();
-            if (ImGui.button("Add Component", 100, 25)) ImGui.openPopup("popupAddComponent", ImGuiPopupFlags.AnyPopup);
-        }
+        ImGui.sameLine();
+        if (ImGui.button("Add Component", 100, 25)) ImGui.openPopup("popupAddComponent", ImGuiPopupFlags.AnyPopup);
         ImGui.textDisabled("ID: " + entityContext.get(UUIDComponent.class).getUUIDString());
 
         focusedWindow = ImGui.isWindowFocused();
@@ -117,7 +115,8 @@ public class PropertiesPanel extends Panel {
                     t.scale.set(scaleArr);
                     var root = entityContext.getRoot(FamilyComponent.class);
                     entityContext.transformLocally();
-                    entityContext.get(TransformComponent.class).transform.mulLocal(root.get(TransformComponent.class).transform);
+                    if (entityContext.getRoot(FamilyComponent.class) != null)
+                        entityContext.get(TransformComponent.class).transform.mulLocal(root.get(TransformComponent.class).transform);
                     entityContext.updateData();
                 }
             }

@@ -38,6 +38,8 @@ struct PointLight {
     float constant;
     float linear;
     float quadratic;
+
+    int activeState;
 };
 
 struct DirectionalLight{
@@ -45,6 +47,8 @@ struct DirectionalLight{
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    int activeState;
 };
 
 uniform Material material;
@@ -186,14 +190,14 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
        vec3 F0 = vec3(0.04);
        F0 = mix(F0, albedo, metallicMap);
        for(int i = 0; i < d_Light.length; i++){
-           if(d_Light[i].diffuse == vec3(0.0f)) continue;
+           if(d_Light[i].activeState == 0) continue;
            vec3 lightDir = normalize(-d_Light[i].direction);
 
            Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0);
        }
 
        for(int i = 0; i < p_Light.length; i++){
-           if(p_Light[i].diffuse == vec3(0.0f)) continue;
+           if(p_Light[i].activeState == 0) continue;
            vec3 lightPos = p_Light[i].position;
 
            vec3 lightDir = normalize(lightPos - vertexPos);

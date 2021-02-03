@@ -29,7 +29,7 @@ public class OxyMaterial implements OxyDisposable {
     public int assimpIndex, index;
 
     public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture;
-    public final OxyColor albedoColor;
+    public OxyColor albedoColor;
 
     public String name = "Unnamed Material";
 

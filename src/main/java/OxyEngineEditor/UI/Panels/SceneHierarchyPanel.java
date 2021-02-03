@@ -38,17 +38,17 @@ public class SceneHierarchyPanel extends Panel {
     }
 
     public void updateEntityPanel() {
-        for (var root : ACTIVE_SCENE.getEntities()) {
-            if (root.isRoot()) {
-                TagComponent tagComponentRoot = root.get(TagComponent.class);
-                ImGui.pushID(root.get(UUIDComponent.class).toString());
-                if (ImGui.treeNodeEx(tagComponentRoot.tag(), ImGuiTreeNodeFlags.OpenOnArrow)) {
+        for (var e : ACTIVE_SCENE.getEntities()) {
+            if (e.isRoot()) {
+                TagComponent tagComponent = e.get(TagComponent.class);
+                ImGui.pushID(e.get(UUIDComponent.class).toString());
+                if (ImGui.treeNodeEx(tagComponent.tag(), ImGuiTreeNodeFlags.OpenOnArrow)) {
                     if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
                         if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
-                        entityContext = root;
+                        entityContext = e;
                         entityContext.get(SelectedComponent.class).selected = true;
                     }
-                    List<OxyEntity> relatedEntities = root.getEntitiesRelatedTo(FamilyComponent.class);
+                    List<OxyEntity> relatedEntities = e.getEntitiesRelatedTo(FamilyComponent.class);
                     if(relatedEntities != null) {
                         for (int i = 0; i < relatedEntities.size(); i++) {
                             OxyEntity m = relatedEntities.get(i);
@@ -64,7 +64,7 @@ public class SceneHierarchyPanel extends Panel {
                 } else {
                     if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
                         if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
-                        entityContext = root;
+                        entityContext = e;
                         entityContext.get(SelectedComponent.class).selected = true;
                     }
                 }
@@ -92,14 +92,10 @@ public class SceneHierarchyPanel extends Panel {
     }
 
     private void addEntity(OxyShader shader) {
-        var familyComponent = new FamilyComponent();
         OxyEntity model = ACTIVE_SCENE.createEmptyModel(shader);
         model.setRoot(true);
-        model.addComponent(new TagComponent("Empty Root"), new SelectedComponent(false), familyComponent);
+        model.addComponent(new TagComponent("Empty Entity"), new SelectedComponent(false), new FamilyComponent());
         model.constructData();
-        OxyEntity child = ACTIVE_SCENE.createEmptyModel(shader);
-        child.addComponent(new TagComponent("Empty Child"), new SelectedComponent(false), familyComponent);
-        child.constructData();
         SceneLayer.getInstance().rebuild();
     }
 }

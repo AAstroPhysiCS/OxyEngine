@@ -357,8 +357,8 @@ public class OxyJSON {
                                     innerObject.src = ref;
                                     ptr++;
                                     while (!lineSplitted[ptr].endsWith(": {")) {
-                                        ptr++;
                                         String[] tagValue = lineSplitted[ptr].split(": ");
+                                        ptr++;
                                         if (tagValue.length == 2) {
                                             innerObject.putField(tagValue[0].trim().strip(), tagValue[1].trim().strip());
                                         }

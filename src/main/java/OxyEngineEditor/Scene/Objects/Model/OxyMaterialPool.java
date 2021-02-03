@@ -142,7 +142,7 @@ public class OxyMaterialPool {
 
     public static OxyMaterial getMaterial(OxyEntity e) {
         if (materialPool.size() == 0) return null;
-        if (!e.has(OxyMaterialIndex.class)) throw new NullPointerException("OxyMaterialIndex is null");
+        if (!e.has(OxyMaterialIndex.class)) throw new NullPointerException("Entity does not have any OxyMaterialIndex component (no Material)");
         int index = e.get(OxyMaterialIndex.class).index();
         for(OxyMaterial m : materialPool){
             if(m.index == index){

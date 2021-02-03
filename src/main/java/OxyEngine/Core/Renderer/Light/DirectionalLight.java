@@ -20,7 +20,7 @@ public class DirectionalLight extends Light {
         this.colorIntensity = colorIntensity;
     }
 
-    public DirectionalLight(){
+    public DirectionalLight() {
         this(1, new Vector3f());
     }
 
@@ -28,7 +28,7 @@ public class DirectionalLight extends Light {
     public void update(OxyEntity e, int i) {
         OxyShader shader = e.get(OxyShader.class);
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
-        if(material == null) return;
+        if (material == null) return;
         shader.enable();
         shader.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
         shader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
