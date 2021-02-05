@@ -6,7 +6,6 @@ import OxyEngine.Core.Layers.*;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererPlatform;
-import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
@@ -33,7 +32,7 @@ public class EditorApplication extends OxyApplication {
 
     public EditorApplication() {
         windowHandle = new WindowHandle("OxyEngine - Editor", 1366, 768, WindowHandle.WindowMode.WINDOWEDFULLSCREEN);
-        oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, true, new OxyEngineSpecs(OxyRendererPlatform.OpenGL, OxyRendererType.Oxy3D));
+        oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, true, new OxyEngineSpecs(OxyRendererPlatform.OpenGL));
         oxyEngine.start();
     }
 
@@ -47,6 +46,7 @@ public class EditorApplication extends OxyApplication {
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
         scene = new Scene("Test Scene 1", oxyRenderer, BufferProducer.createFrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
+        //Editor Camera should be native.
         OxyNativeObject editorCameraEntity = scene.createNativeObjectEntity();
         PerspectiveCamera camera = new PerspectiveCamera(true, Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 1f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
         editorCameraEntity.addComponent(camera, new TagComponent("Editor Camera"));

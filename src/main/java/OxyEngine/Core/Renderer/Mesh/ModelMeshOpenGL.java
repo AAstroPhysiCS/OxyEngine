@@ -1,12 +1,15 @@
 package OxyEngine.Core.Renderer.Mesh;
 
+import OxyEngine.Components.FamilyComponent;
 import OxyEngine.Components.SelectedComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
 import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngineEditor.Scene.OxyEntity;
 import OxyEngineEditor.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -100,7 +103,7 @@ public class ModelMeshOpenGL extends OpenGLMesh {
     private static ImString meshPath = new ImString(0);
     public static final GUINode guiNode = () -> {
         {
-            if (ImGui.collapsingHeader("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
+            if (ImGui.treeNodeEx("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
                 if (entityContext.has(OpenGLMesh.class))
                     meshPath = new ImString(entityContext.get(OpenGLMesh.class).getPath());
                 else meshPath = new ImString("");
@@ -121,21 +124,36 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                     String path = openDialog("", null);
                     if (path != null) {
                         if (entityContext != null) {
+                            //removing the added entity with the new model entities and carrying the transform of the old entity to the new models.
+                            TransformComponent c = entityContext.get(TransformComponent.class);
                             List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path, entityContext.get(OxyShader.class));
+                            OxyEntity root = eList.get(0).getRoot(FamilyComponent.class);
+                            TransformComponent cRoot = root.get(TransformComponent.class);
+                            cRoot.position.set(c.position);
+                            cRoot.rotation.set(c.rotation);
+                            cRoot.scale.set(c.scale);
                             for (OxyModel e : eList) {
                                 e.addComponent(new SelectedComponent(false));
                                 e.getGUINodes().add(ModelMeshOpenGL.guiNode);
                                 if(!e.getGUINodes().contains(OxyMaterial.guiNode)) e.getGUINodes().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
+                            cRoot.transform.mulLocal(c.transform);
+                            for(OxyModel e : eList){
+                                e.transformLocally();
+                                e.get(TransformComponent.class).transform.mulLocal(cRoot.transform);
+                                e.updateData();
+                            }
                             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
                             SceneLayer.getInstance().updateAllEntities();
                             meshPath = new ImString(path);
-                            entityContext = null;
+                            entityContext = eList.get(0).getRoot(FamilyComponent.class);
                         }
                     }
                 }
                 ImGui.columns(1);
+                ImGui.separator();
+                ImGui.treePop();
             }
         }
     };

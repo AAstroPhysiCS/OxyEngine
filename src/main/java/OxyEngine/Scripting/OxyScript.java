@@ -126,7 +126,7 @@ public class OxyScript {
         bufferPath.set(Objects.requireNonNullElse(path, ""));
         final int hashCode = entityContext.hashCode();
 
-        if (ImGui.collapsingHeader("Scripts", ImGuiTreeNodeFlags.DefaultOpen)) {
+        if (ImGui.treeNodeEx("Scripts", ImGuiTreeNodeFlags.DefaultOpen)) {
             ImGui.alignTextToFramePadding();
             ImGui.text("Script Path:");
             ImGui.sameLine();
@@ -197,6 +197,8 @@ public class OxyScript {
                 //TODO: run just the specific script
             }
             ImGui.sameLine(ImGui.getContentRegionAvailX() - 100);
+            ImGui.separator();
+            ImGui.treePop();
             /*if (ImGui.button("Reload Assembly")) {
                 SceneRuntime.stop();
                 loadAssembly();

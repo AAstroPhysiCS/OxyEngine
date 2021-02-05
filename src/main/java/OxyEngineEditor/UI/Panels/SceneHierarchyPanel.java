@@ -52,7 +52,9 @@ public class SceneHierarchyPanel extends Panel {
                     if(relatedEntities != null) {
                         for (int i = 0; i < relatedEntities.size(); i++) {
                             OxyEntity m = relatedEntities.get(i);
-                            ImGui.selectable(i + ": " + m.get(TagComponent.class).tag(), m.get(SelectedComponent.class).selected);
+                            if(ImGui.treeNodeEx(m.get(TagComponent.class).tag(), ImGuiTreeNodeFlags.OpenOnArrow)){
+                                ImGui.treePop();
+                            }
                             if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
                                 if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                                 entityContext = m;
@@ -95,7 +97,7 @@ public class SceneHierarchyPanel extends Panel {
         OxyEntity model = ACTIVE_SCENE.createEmptyModel(shader);
         model.setRoot(true);
         model.addComponent(new TagComponent("Empty Entity"), new SelectedComponent(false), new FamilyComponent());
-        model.constructData();
+        model.transformLocally();
         SceneLayer.getInstance().rebuild();
     }
 }

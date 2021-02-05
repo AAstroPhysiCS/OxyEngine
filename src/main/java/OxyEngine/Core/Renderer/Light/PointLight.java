@@ -59,7 +59,7 @@ public class PointLight extends Light {
 
     private static final float[] constantArr = new float[1], linearArr = new float[1], quadraticArr = new float[1], colorIntensityArr = new float[1];
     public static final GUINode guiNode = () -> {
-        if (ImGui.collapsingHeader("Point Light", ImGuiTreeNodeFlags.DefaultOpen)) {
+        if (ImGui.treeNodeEx("Point Light", ImGuiTreeNodeFlags.DefaultOpen)) {
 
             ImGui.columns(2, "env column");
             ImGui.alignTextToFramePadding();
@@ -86,6 +86,8 @@ public class PointLight extends Light {
             entityContext.get(PointLight.class).colorIntensity = colorIntensityArr[0];
             ImGui.popItemWidth();
             ImGui.columns(1);
+            ImGui.separator();
+            ImGui.treePop();
         }
     };
 }

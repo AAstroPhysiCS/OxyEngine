@@ -1,7 +1,10 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.*;
+import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Layers.UILayer;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
@@ -15,7 +18,6 @@ import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiPopupFlags;
-import imgui.type.ImBoolean;
 import imgui.type.ImString;
 import org.joml.Vector4f;
 
@@ -34,7 +36,6 @@ public class PropertiesPanel extends Panel {
 
     private static boolean initPanel = false;
     public static boolean focusedWindow = false;
-    private static final ImBoolean helpWindowBool = new ImBoolean();
 
     ImString name = new ImString(0);
     final ImString searchAddComponent = new ImString(100);
@@ -68,7 +69,7 @@ public class PropertiesPanel extends Panel {
         focusedWindow = ImGui.isWindowFocused();
 
         if (!initPanel) ImGui.setNextItemOpen(true);
-        if (ImGui.collapsingHeader("Transform")) {
+        if (ImGui.treeNodeEx("Transform")) {
             ImGui.columns(2, "myColumns");
             if (!initPanel) ImGui.setColumnOffset(0, -90f);
             ImGui.alignTextToFramePadding();
@@ -124,6 +125,7 @@ public class PropertiesPanel extends Panel {
             ImGui.popItemWidth();
             ImGui.columns(1);
             ImGui.separator();
+            ImGui.treePop();
         }
 
         if (entityContext == null) {
@@ -168,6 +170,23 @@ public class PropertiesPanel extends Panel {
             if (ImGui.beginMenu("Audio")) {
                 ImGui.endMenu();
             }
+            if (ImGui.beginMenu("Camera")) {
+                if (ImGui.menuItem("Perspective Camera")) {
+                    if (!entityContext.has(OxyCamera.class)) {
+                        PerspectiveCamera camera = new PerspectiveCamera(UILayer.getWindowHandle().getWidth(), UILayer.getWindowHandle().getHeight());
+                        entityContext.addComponent(camera);
+                        if (!entityContext.getGUINodes().contains(OxyCamera.guiNode))
+                            entityContext.getGUINodes().add(OxyCamera.guiNode);
+                        SceneLayer.getInstance().updateCameraEntities();
+                    }
+                }
+
+                if (ImGui.menuItem("Orthographic Camera")) {
+                    //Later
+                }
+                //error or hint that lights are single instanced. TODO
+                ImGui.endMenu();
+            }
             if (ImGui.beginMenu("Light")) {
                 if (ImGui.menuItem("Point Light")) {
                     if (!entityContext.has(Light.class)) {
@@ -197,8 +216,6 @@ public class PropertiesPanel extends Panel {
         }
         ImGui.popStyleColor();
 
-        ImGui.checkbox("Demo", helpWindowBool);
-        if (helpWindowBool.get()) ImGui.showDemoWindow();
         initPanel = true;
 
         ImGui.end();

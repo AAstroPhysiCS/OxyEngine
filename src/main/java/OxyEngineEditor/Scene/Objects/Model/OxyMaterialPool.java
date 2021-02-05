@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
-
 public class OxyMaterialPool {
 
     private static boolean[] MATERIAL_SLOT = new boolean[0];
@@ -189,7 +187,6 @@ public class OxyMaterialPool {
 
         @Override
         public void renderPanel() {
-            if (entityContext == null) return;
             ImGui.begin("Materials");
 
             ImGui.dummy(0, 10);

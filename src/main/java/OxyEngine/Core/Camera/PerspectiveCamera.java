@@ -6,12 +6,13 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import imgui.ImGui;
 import imgui.ImGuiIO;
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class PerspectiveCamera extends OxyCamera {
 
-    protected final float fovY, zNear, zFar;
+    protected float fovY, zNear, zFar;
     protected float aspect;
 
     public static float zoom = 800 * 0.06f;
@@ -19,6 +20,10 @@ public class PerspectiveCamera extends OxyCamera {
 
     public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
         this(primary, fovY, aspect, zNear, zFar, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0), transpose);
+    }
+
+    public PerspectiveCamera(float windowWidth, float windowHeight){
+        this(true, Math.toRadians(50), windowWidth / windowHeight, 1f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(0, 0, 0));
     }
 
     public PerspectiveCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, Vector3f translation, Vector3f rotation, boolean transpose) {

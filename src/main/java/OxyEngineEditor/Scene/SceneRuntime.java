@@ -18,8 +18,7 @@ public final class SceneRuntime {
 
     public static float TS = 0;
 
-    public SceneRuntime(Scene scene) {
-        ACTIVE_SCENE = scene;
+    private SceneRuntime() {
     }
 
     public static Object loadClass(String classBinName, Scene scene, OxyEntity entity){

@@ -6,7 +6,6 @@ import OxyEngine.Core.Renderer.Context.RendererContext;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.OxyRendererPlatform;
-import OxyEngine.Core.Renderer.OxyRendererType;
 import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxyDisposable;
@@ -30,7 +29,7 @@ public class OxyEngine implements OxyDisposable {
 
     private final Thread thread;
 
-    private OxyRenderer renderer;
+    private final OxyRenderer renderer;
 
     private static final float[][] LOADED_THEME = UIThemeLoader.getInstance().load();
 
@@ -41,14 +40,11 @@ public class OxyEngine implements OxyDisposable {
         this.debug = debug;
         OxyEngine.antialiasing = antialiasing;
 
-        OxyRendererType type = specs.type();
         OxyRendererPlatform platform = specs.platform();
 
         OxyRenderCommand.getInstance(RendererContext.getContext(platform), RendererAPI.getContext(platform));
 
-        if (type == OxyRendererType.Oxy3D)
-            renderer = OxyRenderer3D.getInstance(windowHandle);
-        //OxyRenderer2D is not a thing... but will be a thing (hopefully)
+        renderer = OxyRenderer3D.getInstance(windowHandle);
     }
 
     public enum Antialiasing {

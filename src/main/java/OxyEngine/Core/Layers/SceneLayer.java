@@ -117,6 +117,10 @@ public class SceneLayer extends Layer {
         cachedLightEntities = ACTIVE_SCENE.view(Light.class);
     }
 
+    public void updateCameraEntities(){
+        cachedCameraComponents = ACTIVE_SCENE.distinct(OxyCamera.class);
+    }
+
     @Override
     public void update(float ts) {
         if (ACTIVE_SCENE == null) return;

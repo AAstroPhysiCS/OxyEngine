@@ -44,7 +44,7 @@ public final class SceneSerializer {
             INSTANCE.openWritingStream()
                     .file(f)
                     .createOxyJSONObject("Scene")
-                    .putField("Scene Name", scene.getSceneName())
+                    .putField("Scene Name", scene.getSceneName().split("\\.")[0])
                     .separate()
                     .createOxyJSONObject("Environment")
                     .putField("Environment Map", SceneLayer.hdrTexture != null ? SceneLayer.hdrTexture.getPath() : "null")

@@ -28,10 +28,10 @@ public class DirectionalLight extends Light {
     public void update(OxyEntity e, int i) {
         OxyShader shader = e.get(OxyShader.class);
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
-        if (material == null) return;
         shader.enable();
         shader.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
         shader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
+        shader.setUniform1i("d_Light[" + i + "].activeState", 1);
         shader.disable();
     }
 
@@ -42,7 +42,7 @@ public class DirectionalLight extends Light {
     final float[] colorIntensityArr = new float[1];
     final float[] dirArr = new float[3];
     public static final GUINode guiNode = () -> {
-        if (ImGui.collapsingHeader("Directional Light", ImGuiTreeNodeFlags.DefaultOpen)) {
+        if (ImGui.treeNodeEx("Directional Light", ImGuiTreeNodeFlags.DefaultOpen)) {
             DirectionalLight dL = entityContext.get(DirectionalLight.class);
             ImGui.columns(2, "env column");
             ImGui.alignTextToFramePadding();
@@ -60,6 +60,8 @@ public class DirectionalLight extends Light {
             dL.dir.set(dL.dirArr[0], dL.dirArr[1], dL.dirArr[2]);
             ImGui.popItemWidth();
             ImGui.columns(1);
+            ImGui.separator();
+            ImGui.treePop();
         }
     };
 }

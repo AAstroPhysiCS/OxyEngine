@@ -84,4 +84,8 @@ public class UILayer extends Layer {
         ImGui.render();
         uiSystem.renderDrawData();
     }
+
+    public static WindowHandle getWindowHandle() {
+        return windowHandle;
+    }
 }

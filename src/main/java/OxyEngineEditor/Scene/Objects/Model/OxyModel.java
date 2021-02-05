@@ -86,6 +86,7 @@ public class OxyModel extends OxyEntity {
     @Override
     public void initData(String path) {
         assert factory != null : oxyAssert("Models should have a Model Template");
+        transformLocally();
         factory.constructData(this);
         addComponent(new ModelMeshOpenGL(path, GL_TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
     }

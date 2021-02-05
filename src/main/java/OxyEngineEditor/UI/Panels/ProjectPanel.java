@@ -19,12 +19,12 @@ public class ProjectPanel extends Panel {
         return INSTANCE;
     }
 
-    private static File[] allCurrentProjectFiles = OxySystem.getCurrentProjectFiles(true);
+    private static final File[] allCurrentProjectFiles = OxySystem.getCurrentProjectFiles(true);
 
     private static ImageTexture fileAsset;
     private static ImageTexture dirAsset;
 
-    private static boolean init = false;
+    private static final boolean init = false;
 
     private ProjectPanel() {
 
@@ -38,7 +38,7 @@ public class ProjectPanel extends Panel {
 
     @Override
     public void renderPanel() {
-        ImGui.begin("Project");
+        /*ImGui.begin("Project");
 
         if (ImGui.button("Create")) {
         }
@@ -64,7 +64,7 @@ public class ProjectPanel extends Panel {
         ImGui.endChild();
         ImGui.columns(1);
         ImGui.end();
-        lastDir = null;
+        lastDir = null;*/
     }
 
     private static File lastDir;

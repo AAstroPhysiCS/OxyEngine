@@ -40,8 +40,8 @@ public class ToolbarPanel extends Panel {
                 if (ImGui.menuItem("Open a scene", "Ctrl+O")) openScene();
                 if (ImGui.menuItem("Save the scene", "Ctrl+S")) saveScene();
                 if (ImGui.menuItem("Save As...")) {
-                    String saveAs = saveDialog(extensionName + fileExtension, null);
-                    if (saveAs != null) SceneSerializer.serializeScene(saveAs);
+                    String saveAs = saveDialog(extensionName, null);
+                    if (saveAs != null) SceneSerializer.serializeScene(saveAs + fileExtension);
                 }
                 ImGui.endMenu();
             }

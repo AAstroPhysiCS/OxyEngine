@@ -29,7 +29,7 @@ public class OxyMaterial implements OxyDisposable {
     public int assimpIndex, index;
 
     public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture;
-    public OxyColor albedoColor;
+    public final OxyColor albedoColor;
 
     public String name = "Unnamed Material";
 
@@ -152,7 +152,7 @@ public class OxyMaterial implements OxyDisposable {
 
         if (entityContext == null) return;
 
-        if (ImGui.collapsingHeader("Material", ImGuiTreeNodeFlags.DefaultOpen)) {
+        if (ImGui.treeNodeEx("Material", ImGuiTreeNodeFlags.DefaultOpen)) {
 
             assert entityContext != null;
             OxyMaterial m = OxyMaterialPool.getMaterial(entityContext);
@@ -285,6 +285,8 @@ public class OxyMaterial implements OxyDisposable {
                 ImGui.text("AO strength:");
                 ImGui.sameLine();
                 ImGui.sliderFloat("###hidelabel ao", m.aoStrength, 0, 1);
+                ImGui.separator();
+                ImGui.treePop();
             }
         }
     };
