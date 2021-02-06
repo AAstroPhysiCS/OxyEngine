@@ -2,11 +2,11 @@ package OxyEngine.Events;
 
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
-import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngine.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.SceneRuntime;
 
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
-import static OxyEngineEditor.Scene.Scene.*;
+import static OxyEngine.Scene.Scene.*;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.glfw.GLFW.*;
 

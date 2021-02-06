@@ -3,7 +3,7 @@ package OxyEngine.Core.Renderer.Buffer.Platform;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
-import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.glVertexAttribIPointer;

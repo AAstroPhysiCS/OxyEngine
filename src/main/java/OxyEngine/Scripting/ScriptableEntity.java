@@ -1,8 +1,10 @@
 package OxyEngine.Scripting;
 
 import OxyEngine.Components.EntityComponent;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
+import OxyEngine.Components.FamilyComponent;
+import OxyEngine.Components.TransformComponent;
+import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.Scene;
 
 public abstract class ScriptableEntity {
 
@@ -24,6 +26,8 @@ public abstract class ScriptableEntity {
 
     protected void updateData() {
         if (entity == null) return;
+        entity.transformLocally();
+        entity.get(TransformComponent.class).transform.mulLocal(entity.getRoot(FamilyComponent.class).get(TransformComponent.class).transform);
         entity.updateData();
     }
 

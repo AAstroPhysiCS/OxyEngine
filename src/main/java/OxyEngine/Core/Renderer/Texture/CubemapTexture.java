@@ -5,8 +5,8 @@ import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
-import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
-import OxyEngineEditor.Scene.Scene;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Scene;
 
 import java.io.File;
 import java.nio.ByteBuffer;

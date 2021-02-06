@@ -1,10 +1,10 @@
-package OxyEngineEditor.Scene.Objects.Model;
+package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyFontSystem;
-import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngine.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;

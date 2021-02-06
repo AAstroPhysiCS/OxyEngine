@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 

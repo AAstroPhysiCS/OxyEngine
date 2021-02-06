@@ -1,15 +1,15 @@
-package OxyEngineEditor.Scene.Objects;
+package OxyEngine.Scene.Objects;
 
 import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngineEditor.Scene.Objects.Native.NativeObjectFactory;
-import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
-import OxyEngineEditor.Scene.Scene;
+import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.Objects.Native.NativeObjectFactory;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Scene;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;

@@ -2,8 +2,8 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Camera.PerspectiveCamera;
-import OxyEngineEditor.Scene.Objects.WorldGrid;
-import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngine.Scene.Objects.WorldGrid;
+import OxyEngine.Scene.SceneRuntime;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiStyleVar;
@@ -38,7 +38,7 @@ public class ScenePanel extends Panel {
 
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0, 0);
 
-        ImGui.begin("Scene", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoTitleBar);
+        ImGui.begin("Viewport", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoTitleBar);
 
         ImGui.getWindowSize(windowSize);
         ImGui.getWindowPos(windowPos);

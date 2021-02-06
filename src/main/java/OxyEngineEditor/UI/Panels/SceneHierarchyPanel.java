@@ -6,14 +6,14 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TagComponent;
-import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngine.Scene.OxyEntity;
 import imgui.ImGui;
 import imgui.flag.ImGuiMouseButton;
 import imgui.flag.ImGuiTreeNodeFlags;
 
 import java.util.List;
 
-import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class SceneHierarchyPanel extends Panel {

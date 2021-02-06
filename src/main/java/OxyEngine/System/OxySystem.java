@@ -1,6 +1,7 @@
 package OxyEngine.System;
 
 import OxyEngineEditor.EntryPoint;
+import OxyEngine.Scene.SceneRuntime;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NativeFileDialog;
 import org.reflections.Reflections;
@@ -75,6 +76,7 @@ public interface OxySystem {
         }
 
         static String openDialog(String filterList, String defaultPath) {
+            SceneRuntime.stop();
             String path = null;
             PointerBuffer buffer = PointerBuffer.allocateDirect(16);
             int result = NativeFileDialog.NFD_OpenDialog(filterList, defaultPath, buffer);
@@ -86,6 +88,7 @@ public interface OxySystem {
         }
 
         static String saveDialog(String filterList, String defaultPath){
+            SceneRuntime.stop();
             String path = null;
             PointerBuffer buffer = PointerBuffer.allocateDirect(16);
             int result = NativeFileDialog.NFD_SaveDialog(filterList, defaultPath, buffer);

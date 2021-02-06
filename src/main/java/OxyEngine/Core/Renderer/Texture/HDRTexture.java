@@ -4,9 +4,9 @@ import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
-import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Scene;
+import OxyEngine.Scene.SceneRuntime;
 import org.joml.Matrix4f;
 
 import java.nio.FloatBuffer;

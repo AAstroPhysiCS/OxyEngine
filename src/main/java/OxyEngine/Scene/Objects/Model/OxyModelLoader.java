@@ -1,8 +1,8 @@
-package OxyEngineEditor.Scene.Objects.Model;
+package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.FamilyComponent;
 import OxyEngine.Components.TagComponent;
-import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngine.Scene.OxyEntity;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -20,7 +20,7 @@ import static OxyEngine.Components.BoundingBoxComponent.calcPos;
 import static OxyEngine.Components.BoundingBoxComponent.sort;
 import static OxyEngine.System.OxySystem.logger;
 import static OxyEngineEditor.EditorApplication.oxyShader;
-import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.assimp.Assimp.*;
 
 public class OxyModelLoader {

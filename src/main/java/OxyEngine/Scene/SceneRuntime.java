@@ -1,13 +1,11 @@
-package OxyEngineEditor.Scene;
+package OxyEngine.Scene;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Threading.OxyProviderThread;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.EntryPoint;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.SceneRuntimeControlPanel;
-
-import static OxyEngine.Scripting.OxyScript.scriptThread;
 
 public final class SceneRuntime {
 
@@ -16,7 +14,19 @@ public final class SceneRuntime {
     public static OxyCamera currentBoundedCamera;
     public static Scene ACTIVE_SCENE;
 
+    public static OxyProviderThread<OxyScript.EntityInfoProvider> scriptThread = new OxyProviderThread<>();
+
     public static float TS = 0;
+
+    static {
+        scriptThread.setTarget(() -> {
+            //noinspection InfiniteLoopStatement
+            while (true) {
+                for (var providerF : scriptThread.getProviders()) providerF.invokeUpdate(TS);
+            }
+        });
+        scriptThread.start();
+    }
 
     private SceneRuntime() {
     }
@@ -31,33 +41,30 @@ public final class SceneRuntime {
     }
 
     public static void onCreate() {
-        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
-            if (!(e instanceof OxyModel)) continue;
+        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) {
             for (OxyScript c : e.getScripts()) {
                 c.invokeCreate();
+                if(!scriptThread.getProviders().contains(c.getProvider())) scriptThread.addProvider(c.getProvider());
             }
         }
+        System.gc();
     }
 
     public static void onUpdate(float ts) {
         TS = ts;
-        if (ACTIVE_SCENE.STATE != SceneState.RUNNING) return;
-        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) {
-            if (!(e instanceof OxyModel)) continue;
-            for (OxyScript c : e.getScripts()) {
-                scriptThread.addProvider(c.getProvider());
-            }
-        }
+        if(!scriptThread.isWorking()) throw new IllegalStateException("Unexpected Thread State");
     }
 
     public static void stop() {
         ACTIVE_SCENE.STATE = SceneState.STOPPED;
         scriptThread.stop();
+        System.gc();
     }
 
     public static void resume() {
         ACTIVE_SCENE.STATE = SceneState.RUNNING;
         scriptThread.restart();
+        System.gc();
     }
 
     public static void dispose() {

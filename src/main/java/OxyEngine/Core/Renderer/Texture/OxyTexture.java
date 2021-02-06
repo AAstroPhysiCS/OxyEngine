@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Scene.Scene;
+import OxyEngine.Scene.Scene;
 
 import java.nio.ByteBuffer;
 

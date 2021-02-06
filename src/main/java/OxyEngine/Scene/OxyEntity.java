@@ -1,14 +1,15 @@
-package OxyEngineEditor.Scene;
+package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
+import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.GUINode;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -96,6 +97,13 @@ public abstract class OxyEntity {
             //if the entity was imported from a oxy scene file, then do not validate it, because it has been already validated.
             if (c instanceof TransformComponent t && !importedFromFile) {
                 t.validate(this);
+            }
+
+            //Camera position and rotation from the entity to the camera component
+            if(c instanceof OxyCamera m){
+                TransformComponent t = this.get(TransformComponent.class);
+                m.setPosition(t.position);
+                m.setRotation(t.rotation);
             }
         }
     }

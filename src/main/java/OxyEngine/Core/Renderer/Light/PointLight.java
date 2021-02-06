@@ -2,9 +2,9 @@ package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Components.TransformComponent;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;

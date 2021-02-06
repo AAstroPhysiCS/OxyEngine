@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene.Objects.Native;
+package OxyEngine.Scene.Objects.Native;
 
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 

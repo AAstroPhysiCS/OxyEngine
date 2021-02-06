@@ -1,6 +1,6 @@
 package OxyEngine.Components;
 
-import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngine.Scene.OxyEntity;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

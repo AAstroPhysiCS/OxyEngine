@@ -2,8 +2,8 @@ package Scripts;
 
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Scripting.ScriptableEntity;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
+import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.Scene;
 
 public class PositionIteratorScript extends ScriptableEntity {
 

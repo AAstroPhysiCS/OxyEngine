@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene;
+package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.GizmoLayer;
@@ -7,10 +7,9 @@ import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Scene.Objects.Model.*;
-import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.*;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
 
@@ -21,9 +20,9 @@ import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.EditorApplication.oxyShader;
-import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngineEditor.Scene.SceneSerializer.extensionName;
-import static OxyEngineEditor.Scene.SceneSerializer.fileExtension;
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneSerializer.extensionName;
+import static OxyEngine.Scene.SceneSerializer.fileExtension;
 
 public final class Scene implements OxyDisposable {
 
@@ -223,7 +222,7 @@ public final class Scene implements OxyDisposable {
         if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
 
         for (var scripts : e.getScripts()) {
-            if (scripts.getProvider() != null) OxyScript.scriptThread.getProviders().remove(scripts.getProvider());
+            if (scripts.getProvider() != null) SceneRuntime.scriptThread.getProviders().remove(scripts.getProvider());
         }
         var value = registry.entityList.remove(e);
         assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");

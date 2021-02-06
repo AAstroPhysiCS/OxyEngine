@@ -1,16 +1,14 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngineEditor.Scene.SceneSerializer;
+import OxyEngine.Scene.SceneSerializer;
 import imgui.ImGui;
-import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiConfigFlags;
 import imgui.flag.ImGuiStyleVar;
 
 import static OxyEngine.System.OxySystem.FileSystem.saveDialog;
-import static OxyEngineEditor.Scene.Scene.*;
-import static OxyEngineEditor.Scene.SceneSerializer.extensionName;
-import static OxyEngineEditor.Scene.SceneSerializer.fileExtension;
+import static OxyEngine.Scene.Scene.*;
+import static OxyEngine.Scene.SceneSerializer.extensionName;
+import static OxyEngine.Scene.SceneSerializer.fileExtension;
 
 public class ToolbarPanel extends Panel {
 
@@ -30,11 +28,7 @@ public class ToolbarPanel extends Panel {
         ImGui.pushStyleColor(ImGuiCol.MenuBarBg, bgC[0], bgC[1], bgC[2], bgC[3]);
         ImGui.pushStyleVar(ImGuiStyleVar.FramePadding, 0f, 10);
 
-
         if (ImGui.beginMainMenuBar()) {
-            ImVec2 pos = new ImVec2();
-            ImGui.getWindowPos(pos);
-            ImGui.setCursorPosY(ImGui.getIO().hasConfigFlags(ImGuiConfigFlags.ViewportsEnable) ? pos.y - 20f : pos.y + 3);
             if (ImGui.beginMenu("File")) {
                 if (ImGui.menuItem("New Scene")) newScene();
                 if (ImGui.menuItem("Open a scene", "Ctrl+O")) openScene();

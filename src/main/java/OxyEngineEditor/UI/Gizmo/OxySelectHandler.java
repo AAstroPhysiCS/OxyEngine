@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI.Gizmo;
 
-import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngine.Scene.OxyEntity;
 
 public class OxySelectHandler {
 

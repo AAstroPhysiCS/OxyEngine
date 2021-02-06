@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene;
+package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.SceneLayer;
@@ -7,9 +7,9 @@ import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import org.joml.Vector3f;
@@ -186,7 +186,7 @@ public final class SceneSerializer {
             TransformComponent t = new TransformComponent(position, rot, scale);
             modelInstance.importedFromFile = true;
             modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), t,
-                    new SelectedComponent(false), SceneRuntime.currentBoundedCamera, new BoundingBoxComponent(minB, maxB));
+                    new SelectedComponent(false), new BoundingBoxComponent(minB, maxB));
             modelInstance.constructData();
             if(rootEntity != null){
                 modelInstance.addComponent(rootEntity.get(FamilyComponent.class));

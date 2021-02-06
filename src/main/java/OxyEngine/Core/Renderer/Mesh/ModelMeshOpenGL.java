@@ -7,10 +7,10 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -135,11 +135,12 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                             for (OxyModel e : eList) {
                                 e.addComponent(new SelectedComponent(false));
                                 e.getGUINodes().add(ModelMeshOpenGL.guiNode);
-                                if(!e.getGUINodes().contains(OxyMaterial.guiNode)) e.getGUINodes().add(OxyMaterial.guiNode);
+                                if (!e.getGUINodes().contains(OxyMaterial.guiNode))
+                                    e.getGUINodes().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
                             cRoot.transform.mulLocal(c.transform);
-                            for(OxyModel e : eList){
+                            for (OxyModel e : eList) {
                                 e.transformLocally();
                                 e.get(TransformComponent.class).transform.mulLocal(cRoot.transform);
                                 e.updateData();

@@ -1,24 +1,33 @@
 package OxyEngine.Core.Camera;
 
-import OxyEngine.Core.Camera.Controller.OxyCameraController;
 import OxyEngine.Components.EntityComponent;
-import OxyEngineEditor.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public abstract class OxyCamera implements EntityComponent {
 
     protected final boolean transpose;
+    protected boolean primary;
     protected Matrix4f viewMatrix, modelMatrix, projectionMatrix, viewMatrixNoTranslation;
 
-    protected OxyCameraController cameraController;
+    protected Vector3f rotationRef;
+    protected Vector3f positionRef;
+    public final Vector3f origin = new Vector3f();
 
-    public OxyCamera(boolean transpose) {
+    protected double oldMouseX, oldMouseY;
+    protected final float mouseSpeed, horizontalSpeed, verticalSpeed;
+
+    public OxyCamera(float mouseSpeed, float horizontalSpeed, float verticalSpeed, boolean transpose) {
         this.transpose = transpose;
+        this.mouseSpeed = mouseSpeed;
+        this.horizontalSpeed = horizontalSpeed;
+        this.verticalSpeed = verticalSpeed;
     }
 
     public abstract Matrix4f setProjectionMatrix();
@@ -29,6 +38,10 @@ public abstract class OxyCamera implements EntityComponent {
 
     public boolean isTranspose() {
         return transpose;
+    }
+
+    public boolean isPrimary() {
+        return primary;
     }
 
     public Matrix4f getViewMatrix() {
@@ -47,46 +60,64 @@ public abstract class OxyCamera implements EntityComponent {
         return modelMatrix;
     }
 
-    public OxyCameraController getCameraController() {
-        return cameraController;
+    public void setPosition(Vector3f position){
+        this.positionRef = position;
+    }
+
+    public void setRotation(Vector3f rotationRef) {
+        this.rotationRef = rotationRef;
+    }
+
+    public Vector3f getRotation() {
+        return rotationRef;
+    }
+
+    public Vector3f getPosition() {
+        return positionRef;
+    }
+
+    public float getMouseSpeed() {
+        return mouseSpeed;
     }
 
     private static final String[] selection = {"Perspective Camera", "Orthographic Camera"};
     private static String currentItem = selection[0];
 
-    private static float[] verticalFovDragArr;
-    private static float[] nearClipDragArr;
-    private static float[] farClipDragArr;
+    public void setPrimary(boolean primary){
+        this.primary = primary;
+    }
 
     public static final GUINode guiNode = () -> {
         if (ImGui.treeNodeEx("Camera", ImGuiTreeNodeFlags.DefaultOpen)) {
 
-            if (ImGui.beginCombo("Projection", currentItem)) {
+            ImGui.alignTextToFramePadding();
+            ImGui.text("Projection:");
+            ImGui.sameLine();
+            if (ImGui.beginCombo("##hideLabelProjection", currentItem)) {
                 for (String s : selection) {
-                    boolean is_selected = (currentItem.equals(s));
-                    if (ImGui.selectable(s, is_selected)) currentItem = s;
-                    if (is_selected) ImGui.setItemDefaultFocus();
+                    boolean isSelected = (currentItem.equals(s));
+                    if (ImGui.selectable(s, isSelected)) currentItem = s;
+                    if (isSelected) ImGui.setItemDefaultFocus();
                 }
                 ImGui.endCombo();
             }
 
             if (entityContext.get(OxyCamera.class) instanceof PerspectiveCamera c
                     && entityContext instanceof OxyModel
-                    && c.isPrimary()
                     && currentItem.equals(selection[0])) {
                 ImGui.columns(2, "CameraColumns");
                 ImGui.alignTextToFramePadding();
-                ImGui.text("Vertical FOV");
+                ImGui.text("Vertical FOV:");
                 ImGui.alignTextToFramePadding();
-                ImGui.text("Near Clip");
+                ImGui.text("Near Clip:");
                 ImGui.alignTextToFramePadding();
-                ImGui.text("Far Clip");
+                ImGui.text("Far Clip:");
 
                 ImGui.nextColumn();
 
-                verticalFovDragArr = new float[]{c.fovY};
-                nearClipDragArr = new float[]{c.zNear};
-                farClipDragArr = new float[]{c.zFar};
+                float[] verticalFovDragArr = new float[]{c.fovY};
+                float[] nearClipDragArr = new float[]{c.zNear};
+                float[] farClipDragArr = new float[]{c.zFar};
 
                 ImGui.dragFloat("##hideLabelVerticalFovDrag", verticalFovDragArr);
                 ImGui.dragFloat("##hideLabelNearClipDrag", nearClipDragArr);

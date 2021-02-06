@@ -1,6 +1,7 @@
 package OxyEngineEditor;
 
-import OxyEngine.Core.Camera.PerspectiveCamera;
+import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Camera.EditorCamera;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Core.Layers.*;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
@@ -12,12 +13,11 @@ import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.OxyEngineSpecs;
 import OxyEngine.System.OxyEventSystem;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngineEditor.Scene.Objects.Native.OxyNativeObject;
-import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Scene;
+import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.*;
-import org.joml.Math;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
@@ -37,6 +37,7 @@ public class EditorApplication extends OxyApplication {
     }
 
     public static OxyShader oxyShader;
+    public static OxyNativeObject editorCameraEntity;
 
     @Override
     public void init() {
@@ -47,9 +48,9 @@ public class EditorApplication extends OxyApplication {
         scene = new Scene("Test Scene 1", oxyRenderer, BufferProducer.createFrameBuffer(windowHandle.getWidth(), windowHandle.getHeight()));
 
         //Editor Camera should be native.
-        OxyNativeObject editorCameraEntity = scene.createNativeObjectEntity();
-        PerspectiveCamera camera = new PerspectiveCamera(true, Math.toRadians(50), (float) windowHandle.getWidth() / windowHandle.getHeight(), 1f, 10000f, true, new Vector3f(0, 0, 0), new Vector3f(3.7f, 5.4f, 0));
-        editorCameraEntity.addComponent(camera, new TagComponent("Editor Camera"));
+        editorCameraEntity = scene.createNativeObjectEntity();
+        EditorCamera editorCamera = new EditorCamera(true, 50, (float) windowHandle.getWidth() / windowHandle.getHeight(), 1f, 10000f, true);
+        editorCameraEntity.addComponent(new TransformComponent(new Vector3f(0), new Vector3f(-0.42f, 0.80f, 0.0f)), editorCamera, new TagComponent("Editor Camera"));
 
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;
@@ -65,12 +66,12 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(StatsPanel.getInstance());
         uiLayer.addPanel(ToolbarPanel.getInstance());
         uiLayer.addPanel(ProjectPanel.getInstance());
-        uiLayer.addPanel(PropertiesPanel.getInstance());
         uiLayer.addPanel(ScenePanel.getInstance());
         uiLayer.addPanel(EnvironmentPanel.getInstance());
-        uiLayer.addPanel(SceneHierarchyPanel.getInstance(oxyShader));
         uiLayer.addPanel(SceneRuntime.getPanel());
         uiLayer.addPanel(OxyMaterialPool.getPanelInstance());
+        uiLayer.addPanel(PropertiesPanel.getInstance());
+        uiLayer.addPanel(SceneHierarchyPanel.getInstance(oxyShader));
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, uiLayer);
         for (Layer l : layerStack.getLayerStack())

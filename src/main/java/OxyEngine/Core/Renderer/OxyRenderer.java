@@ -7,7 +7,7 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 
-import static OxyEngineEditor.Scene.SceneRuntime.currentBoundedCamera;
+import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
 import static org.lwjgl.opengl.GL11.*;
 
 public abstract class OxyRenderer {
@@ -48,6 +48,10 @@ public abstract class OxyRenderer {
                     OpenGL version: %s
                     Graphics Card Vendor: %s
                     OpenGL Context running on %s Thread
+                    Current Position:
+                        X: %s,
+                        Y: %s,
+                        Z: %s
                     Current Origin: 
                         X: %s, 
                         Y: %s, 
@@ -68,12 +72,15 @@ public abstract class OxyRenderer {
                     glGetString(GL_VERSION),
                     glGetString(GL_VENDOR),
                     Thread.currentThread().getName(),
-                    currentBoundedCamera.getCameraController().origin.x,
-                    currentBoundedCamera.getCameraController().origin.y,
-                    currentBoundedCamera.getCameraController().origin.z,
-                    currentBoundedCamera.getCameraController().getRotation().x,
-                    currentBoundedCamera.getCameraController().getRotation().y,
-                    currentBoundedCamera.getCameraController().getRotation().z,
+                    currentBoundedCamera.getPosition().x,
+                    currentBoundedCamera.getPosition().y,
+                    currentBoundedCamera.getPosition().z,
+                    currentBoundedCamera.origin.x,
+                    currentBoundedCamera.origin.y,
+                    currentBoundedCamera.origin.z,
+                    currentBoundedCamera.getRotation().x,
+                    currentBoundedCamera.getRotation().y,
+                    currentBoundedCamera.getRotation().z,
                     PerspectiveCamera.zoom
             );
             reset();

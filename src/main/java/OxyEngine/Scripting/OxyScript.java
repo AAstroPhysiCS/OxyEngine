@@ -2,11 +2,10 @@ package OxyEngine.Scripting;
 
 import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Threading.OxyProvider;
-import OxyEngine.Core.Threading.OxyProviderThread;
 import OxyEngine.System.OxySystem;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.Scene;
+import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -20,7 +19,7 @@ import java.util.Objects;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.Scene.SceneRuntime.TS;
+import static OxyEngine.Scene.SceneRuntime.scriptThread;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class OxyScript {
@@ -28,20 +27,6 @@ public class OxyScript {
     private Scene scene;
     private OxyEntity entity;
     private EntityInfoProvider provider;
-
-    public static OxyProviderThread<EntityInfoProvider> scriptThread;
-//    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-
-    static {
-        scriptThread = new OxyProviderThread<>();
-        scriptThread.setTarget(() -> {
-            //noinspection InfiniteLoopStatement
-            while (true) {
-                for (var providerF : scriptThread.getProviders()) providerF.invokeUpdate(TS);
-            }
-        });
-        scriptThread.start();
-    }
 
     private String path;
 
@@ -79,7 +64,7 @@ public class OxyScript {
         return null;
     }
 
-    private static class EntityInfoProvider implements OxyProvider {
+    public static class EntityInfoProvider implements OxyProvider {
 
         private final ScriptableEntity obj;
 
@@ -104,7 +89,6 @@ public class OxyScript {
     }
 
     public void invokeCreate() {
-        EntityInfoProvider provider = getProvider();
         if (provider == null) return;
         provider.invokeCreate();
     }
@@ -196,9 +180,8 @@ public class OxyScript {
             if (ImGui.button("Run Script")) {
                 //TODO: run just the specific script
             }
-            ImGui.sameLine(ImGui.getContentRegionAvailX() - 100);
-            ImGui.separator();
             ImGui.treePop();
+            ImGui.separator();
             /*if (ImGui.button("Reload Assembly")) {
                 SceneRuntime.stop();
                 loadAssembly();

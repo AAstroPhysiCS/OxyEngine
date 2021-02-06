@@ -9,7 +9,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.opengl.GL45.*;
 
 public class OpenGLFrameBuffer extends FrameBuffer {

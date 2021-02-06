@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene.Objects.Model;
+package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
@@ -8,9 +8,9 @@ import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
-import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.Scene;
+import OxyEngine.Scene.SceneRuntime;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;

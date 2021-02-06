@@ -1,9 +1,10 @@
 package OxyEngine.Core.Camera;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-public class OrthographicCamera extends OxyCamera {
+//TODO: Write this class
+@SuppressWarnings("ALL")
+public abstract class OrthographicCamera extends OxyCamera {
 
     //if i happen to code the engine to 2D too, this class will be helpful.
     //But for now, it is left to die... (although i might use for something else ;) )
@@ -17,7 +18,7 @@ public class OrthographicCamera extends OxyCamera {
     }
 
     public OrthographicCamera(int left, int right, int bottom, int top, int zNear, int zFar, boolean transpose, Vector3f translation) {
-        super(transpose);
+        super(0.05f, 7f, 7f, transpose);
         this.left = left;
         this.right = right;
         this.bottom = bottom;
@@ -27,7 +28,7 @@ public class OrthographicCamera extends OxyCamera {
         this.translation = translation;
     }
 
-    @Override
+    /*@Override
     public Matrix4f setProjectionMatrix() {
         Matrix4f m = new Matrix4f();
         m.identity();
@@ -49,7 +50,7 @@ public class OrthographicCamera extends OxyCamera {
         modelMatrix = setModelMatrix();
         viewMatrix.set(projectionMatrix);
         viewMatrix.mul(modelMatrix);
-    }
+    }*/
 
     public Vector3f getTranslation() {
         return translation;

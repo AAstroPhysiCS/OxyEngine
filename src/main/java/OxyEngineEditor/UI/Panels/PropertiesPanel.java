@@ -2,18 +2,17 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Camera.PerspectiveCamera;
+import OxyEngine.Core.Camera.SceneCamera;
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Layers.UILayer;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterial;
-import OxyEngineEditor.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.SceneRuntime;
+import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.SceneRuntime;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiInputTextFlags;
@@ -173,8 +172,7 @@ public class PropertiesPanel extends Panel {
             if (ImGui.beginMenu("Camera")) {
                 if (ImGui.menuItem("Perspective Camera")) {
                     if (!entityContext.has(OxyCamera.class)) {
-                        PerspectiveCamera camera = new PerspectiveCamera(UILayer.getWindowHandle().getWidth(), UILayer.getWindowHandle().getHeight());
-                        entityContext.addComponent(camera);
+                        entityContext.addComponent(new SceneCamera());
                         if (!entityContext.getGUINodes().contains(OxyCamera.guiNode))
                             entityContext.getGUINodes().add(OxyCamera.guiNode);
                         SceneLayer.getInstance().updateCameraEntities();

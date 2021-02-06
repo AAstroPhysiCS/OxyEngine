@@ -2,9 +2,10 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Layers.SceneLayer;
 import imgui.ImGui;
+import imgui.type.ImBoolean;
 
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
-import static OxyEngineEditor.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 
 public class EnvironmentPanel extends Panel {
 
@@ -20,6 +21,7 @@ public class EnvironmentPanel extends Panel {
     }
 
     private static boolean initPanel = false;
+    private static final ImBoolean open = new ImBoolean(false);
 
     @Override
     public void preload() {
@@ -50,6 +52,11 @@ public class EnvironmentPanel extends Panel {
         ImGui.sliderFloat("###hidelabel exposure", exposure, 0, 10);
         ImGui.popItemWidth();
         ImGui.columns(1);
+
+        ImGui.checkbox("Demo", open);
+
+        if(open.get()) ImGui.showDemoWindow();
+
         initPanel = true;
 
         ImGui.end();

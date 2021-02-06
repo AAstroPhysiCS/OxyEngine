@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene.Objects.Native;
+package OxyEngine.Scene.Objects.Native;
 
 import OxyEngine.Components.RenderableComponent;
 import OxyEngine.Components.RenderingMode;
@@ -6,8 +6,8 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
-import OxyEngineEditor.Scene.OxyEntity;
-import OxyEngineEditor.Scene.Scene;
+import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.Scene;
 
 import java.util.UUID;
 

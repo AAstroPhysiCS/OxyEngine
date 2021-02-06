@@ -60,4 +60,8 @@ public class OxyProviderThread<T extends OxyProvider> {
     public void removeProvider(T provider){
         providers.remove(provider);
     }
+
+    public boolean isWorking() {
+        return worker.isAlive();
+    }
 }

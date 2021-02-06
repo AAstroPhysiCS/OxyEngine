@@ -1,20 +1,62 @@
-package OxyEngine.Core.Camera.Controller;
+package OxyEngine.Core.Camera;
 
+import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
-import org.joml.Vector3f;
+import imgui.ImGui;
+import imgui.ImGuiIO;
+import org.joml.Matrix4f;
 
 import static OxyEngine.System.OxyEventSystem.*;
 import static org.lwjgl.glfw.GLFW.*;
 
-public class PerspectiveCameraController extends OxyCameraController {
+public class EditorCamera extends PerspectiveCamera {
 
-    public PerspectiveCameraController(Vector3f translationRef, Vector3f rotationRef, float mouseSpeed, float horizontalSpeed, float verticalSpeed) {
-        super(translationRef, rotationRef, mouseSpeed, horizontalSpeed, verticalSpeed);
+    public EditorCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
+        super(0.05f, 7f, 7f, primary, fovY, aspect, zNear, zFar, transpose);
     }
 
-    public PerspectiveCameraController(Vector3f translationRef, Vector3f rotationRef) {
-        super(translationRef, rotationRef, 0.05f, 7f, 7f);
+    @Override
+    public Matrix4f setModelMatrix() {
+        Matrix4f m = new Matrix4f();
+        m.translate(0, 0, -zoom);
+        m.rotateX(this.getRotation().x);
+        m.rotateY(this.getRotation().y);
+        m.translate(-this.getPosition().x, -this.getPosition().y, -this.getPosition().z);
+        return m;
+    }
+
+    @Override
+    public Matrix4f setProjectionMatrix() {
+        Matrix4f m = new Matrix4f();
+        m.perspective((float) Math.toRadians(-fovY), aspect, zNear, zFar);
+        return m;
+    }
+
+    @Override
+    public void finalizeCamera(float ts) {
+        ImGuiIO io = ImGui.getIO();
+        if (ScenePanel.hoveredWindow) {
+            if (io.getMouseWheel() > 0) {
+                zoom += zoomSpeed * ts;
+            } else if (io.getMouseWheel() < 0) {
+                zoom += -zoomSpeed * ts;
+            }
+            if (zoom >= 500) zoom = 500;
+            if (zoom <= -500) zoom = -500;
+        }
+
+        update(Mode.SWIPE);
+        modelMatrix = setModelMatrix();
+        projectionMatrix = setProjectionMatrix();
+        viewMatrix = new Matrix4f();
+        viewMatrix.set(projectionMatrix);
+        viewMatrix.mul(modelMatrix);
+        viewMatrix.origin(this.origin);
+    }
+
+    public enum Mode {
+        SWIPE(), FREE()
     }
 
     private void rotate() {
@@ -46,8 +88,8 @@ public class PerspectiveCameraController extends OxyCameraController {
             float dx = (float) (mouseCursorPosDispatcher.getXPos() - oldMouseX);
             float dy = (float) (mouseCursorPosDispatcher.getYPos() - oldMouseY);
             float angle90 = rotationRef.y;
-            positionRef.x += Math.cos(angle90) * (-dx * mouseSpeed);
-            positionRef.z += Math.sin(angle90) * (-dx * mouseSpeed);
+            positionRef.x -= Math.cos(angle90) * (-dx * mouseSpeed);
+            positionRef.z -= Math.sin(angle90) * (-dx * mouseSpeed);
             positionRef.y += (-dy * mouseSpeed);
         }
 
@@ -83,10 +125,9 @@ public class PerspectiveCameraController extends OxyCameraController {
         }
     }
 
-    @Override
-    public void update(float ts, Mode mode) {
-        OxyCameraController.ts = ts;
+    private void update(Mode mode) {
         if (mode == Mode.SWIPE) updateRotationSwipe();
-        else updateRotationFree(ts);
+        else updateRotationFree(SceneRuntime.TS);
     }
+
 }

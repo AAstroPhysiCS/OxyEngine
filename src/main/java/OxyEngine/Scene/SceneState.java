@@ -1,4 +1,4 @@
-package OxyEngineEditor.Scene;
+package OxyEngine.Scene;
 
 /*
  * IDLE = in the editor camera

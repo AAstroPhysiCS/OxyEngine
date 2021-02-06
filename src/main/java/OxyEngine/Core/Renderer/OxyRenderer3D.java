@@ -6,7 +6,7 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.Scene.SceneRuntime.currentBoundedCamera;
+import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
 
 public class OxyRenderer3D extends OxyRenderer {
 
@@ -25,7 +25,7 @@ public class OxyRenderer3D extends OxyRenderer {
     public void render(float ts, OpenGLMesh mesh, OxyCamera camera, OxyShader shader){
         assert shader != null : oxyAssert("Shader is not instantiated.");
         shader.enable();
-        shader.setUniformVec3("cameraPos", camera.getCameraController().origin);
+        shader.setUniformVec3("cameraPos", camera.origin);
         shader.setCamera(camera);
         if (mesh.empty())
             mesh.load();

@@ -3,7 +3,7 @@ package OxyEngine;
 import OxyEngine.Core.Layers.LayerStack;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Scene.Scene;
+import OxyEngine.Scene.Scene;
 
 public abstract class OxyApplication implements OxyDisposable {
 

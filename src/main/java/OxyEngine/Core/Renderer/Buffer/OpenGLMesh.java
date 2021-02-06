@@ -4,7 +4,7 @@ import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.Scene.OxyEntity;
+import OxyEngine.Scene.OxyEntity;
 
 import java.util.ArrayList;
 import java.util.List;
