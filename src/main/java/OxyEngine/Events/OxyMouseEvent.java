@@ -1,10 +1,14 @@
 package OxyEngine.Events;
 
+import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Layers.UILayer;
+import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static OxyEngine.System.OxyEventSystem.mouseButtonDispatcher;
+import static OxyEngineEditor.EditorApplication.editorCameraEntity;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
 public class OxyMouseEvent extends OxyEvent {
 
@@ -17,8 +21,9 @@ public class OxyMouseEvent extends OxyEvent {
         return EventType.MouseEvent;
     }
 
-    public void onMousePressed(){
-        if(glfwGetMouseButton(UILayer.windowHandle.getPointer(), GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && ScenePanel.hoveredWindow)
+    public void onMousePressed() {
+        if (mouseButtonDispatcher.getButtonState(GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && ScenePanel.hoveredWindow
+                && SceneRuntime.currentBoundedCamera.equals(editorCameraEntity.get(OxyCamera.class)))
             SceneLayer.getInstance().startPicking();
     }
 }

@@ -22,7 +22,7 @@ public abstract class OxyRenderer {
 
     public abstract void render(float ts, OpenGLMesh mesh, OxyCamera camera, OxyShader shader);
 
-    public abstract void render(float ts, OpenGLMesh mesh, OxyShader shader);
+    public abstract void renderWithCurrentBoundedCamera(float ts, OpenGLMesh mesh, OxyShader shader);
 
     public static record Stats() {
 

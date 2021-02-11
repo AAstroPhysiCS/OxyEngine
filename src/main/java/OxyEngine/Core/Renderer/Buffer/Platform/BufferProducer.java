@@ -28,9 +28,9 @@ public class BufferProducer {
         return (T) new OpenGLIndexBuffer(impl);
     }
 
-    public static <T extends FrameBuffer> T createFrameBuffer(int width, int height){
+    public static <T extends FrameBuffer> T createFrameBuffer(int width, int height, OpenGLFrameBuffer.FrameBufferSpec... specBuilders){
         contextCheck();
-        return (T) new OpenGLFrameBuffer(width, height);
+        return (T) new OpenGLFrameBuffer(width, height, specBuilders);
     }
 
     public static <T extends NormalsBuffer> T createNormalsBuffer(BufferLayoutProducer.BufferLayoutImpl impl){

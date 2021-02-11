@@ -2,11 +2,11 @@ package OxyEngine.Core.Renderer.Texture;
 
 import java.nio.ByteBuffer;
 
+import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
-import static org.lwjgl.stb.STBImage.stbi_image_free;
-import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
+import static org.lwjgl.stb.STBImage.*;
 
 public class ImageTexture extends OxyTexture.AbstractTexture {
 
@@ -30,8 +30,12 @@ public class ImageTexture extends OxyTexture.AbstractTexture {
         int[] height = new int[1];
         int[] channels = new int[1];
         stbi_set_flip_vertically_on_load(true);
-        ByteBuffer buffer = loadTextureFile(path, width, height, channels);
-        if (buffer == null || !buffer.hasRemaining()) return;
+        ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
+        if (buffer == null){
+            logger.warning("Texture: " + path + " could not be loaded!");
+            return;
+        }
+        if (!buffer.hasRemaining()) return;
 
         if(channels[0] == 1)
             alFormat = GL_RED;
@@ -44,14 +48,13 @@ public class ImageTexture extends OxyTexture.AbstractTexture {
 
         textureId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, textureId);
+        glTexImage2D(GL_TEXTURE_2D, 0, alFormat, width[0], height[0], 0, alFormat, GL_UNSIGNED_BYTE, buffer);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 //        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -0.4f);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, alFormat, width[0], height[0], 0, alFormat, GL_UNSIGNED_BYTE, buffer);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         stbi_image_free(buffer);

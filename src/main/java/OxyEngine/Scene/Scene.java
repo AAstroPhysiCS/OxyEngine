@@ -3,6 +3,7 @@ package OxyEngine.Scene;
 import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.GizmoLayer;
 import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
@@ -23,6 +24,8 @@ import static OxyEngineEditor.EditorApplication.oxyShader;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Scene.SceneSerializer.fileExtension;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
 
 public final class Scene implements OxyDisposable {
 
@@ -30,7 +33,8 @@ public final class Scene implements OxyDisposable {
 
     private final OxyRenderer3D renderer;
 
-    private final OpenGLFrameBuffer frameBuffer;
+    private final OpenGLFrameBuffer frameBuffer, blittedFrameBuffer, pickingBuffer;
+
     private final String sceneName;
 
     public static int OBJECT_ID_COUNTER = 0;
@@ -39,10 +43,34 @@ public final class Scene implements OxyDisposable {
 
     private OxyModelLoader modelLoader;
 
+
     public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer) {
+        this(sceneName, renderer, frameBuffer,
+        BufferProducer.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
+                OpenGLFrameBuffer.createNewSpec(OpenGLFrameBuffer.FrameBufferSpec.class)
+                        .setAttachmentIndex(0)
+                        .setFormats(OpenGLFrameBuffer.FrameBufferTextureFormat.RGBA8)
+                        .setFilter(GL_LINEAR, GL_LINEAR)),
+        BufferProducer.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
+                OpenGLFrameBuffer.createNewSpec(OpenGLFrameBuffer.FrameBufferSpec.class)
+                        .setAttachmentIndex(0)
+                        .setFormats(OpenGLFrameBuffer.FrameBufferTextureFormat.RGBA8)
+                        .setFilter(GL_LINEAR, GL_LINEAR),
+                OpenGLFrameBuffer.createNewSpec(OpenGLFrameBuffer.FrameBufferSpec.class)
+                        .setAttachmentIndex(1)
+                        .setFormats(OpenGLFrameBuffer.FrameBufferTextureFormat.R32I)
+                        .setFilter(GL_NEAREST, GL_NEAREST),
+                OpenGLFrameBuffer.createNewSpec(OpenGLFrameBuffer.FrameBufferSpec.class)
+                        .setStorage(true, 1)));
+    }
+
+    public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer, OpenGLFrameBuffer blittedFrameBuffer, OpenGLFrameBuffer pickingBuffer) {
         this.renderer = renderer;
         this.frameBuffer = frameBuffer;
         this.sceneName = sceneName;
+        this.blittedFrameBuffer = blittedFrameBuffer;
+        this.pickingBuffer = pickingBuffer;
+        this.pickingBuffer.drawBuffers(0, 1);
     }
 
     public final void put(OxyEntity e) {
@@ -310,6 +338,14 @@ public final class Scene implements OxyDisposable {
         return frameBuffer;
     }
 
+    public OpenGLFrameBuffer getBlittedFrameBuffer() {
+        return blittedFrameBuffer;
+    }
+
+    public OpenGLFrameBuffer getPickingBuffer() {
+        return pickingBuffer;
+    }
+
     public String getSceneName() {
         return sceneName;
     }
@@ -355,6 +391,7 @@ public final class Scene implements OxyDisposable {
             if (it.next() != null) it.remove();
         }
         frameBuffer.dispose();
+        blittedFrameBuffer.dispose();
         assert !it.hasNext() : oxyAssert("Scene dispose failed");
     }
 
@@ -376,7 +413,7 @@ public final class Scene implements OxyDisposable {
         Scene oldScene = ACTIVE_SCENE;
         oldScene.disposeAllModels();
 
-        Scene scene = new Scene("Test Scene 1", oldScene.getRenderer(), oldScene.getFrameBuffer());
+        Scene scene = new Scene("Test Scene 1", oldScene.getRenderer(), oldScene.getFrameBuffer(), oldScene.getBlittedFrameBuffer(), oldScene.getPickingBuffer());
         for (var n : oldScene.getEntityEntrySet()) {
             scene.put(n.getKey());
             scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));

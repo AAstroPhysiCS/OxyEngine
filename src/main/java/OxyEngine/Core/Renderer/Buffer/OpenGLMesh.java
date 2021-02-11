@@ -38,8 +38,8 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         glBindVertexArray(vao);
 
         vertexBuffer.load();
-        indexBuffer.load();
 
+        if (indexBuffer != null) if (indexBuffer.glBufferNull() && !indexBuffer.emptyData()) indexBuffer.load();
         if (normalsBuffer != null) if (normalsBuffer.glBufferNull() && !normalsBuffer.emptyData()) normalsBuffer.load();
         if (tangentBuffer != null) if (tangentBuffer.glBufferNull() && !tangentBuffer.emptyData()) tangentBuffer.load();
         if (textureBuffer != null) if (textureBuffer.glBufferNull() && !textureBuffer.emptyData()) textureBuffer.load();

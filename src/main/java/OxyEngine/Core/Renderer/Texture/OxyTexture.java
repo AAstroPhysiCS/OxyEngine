@@ -3,13 +3,9 @@ package OxyEngine.Core.Renderer.Texture;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.Scene.Scene;
 
-import java.nio.ByteBuffer;
-
-import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
-import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class OxyTexture {
 
@@ -29,13 +25,6 @@ public class OxyTexture {
         public AbstractTexture(int slot, String path) {
             this.path = path;
             this.textureSlot = slot;
-        }
-
-        protected ByteBuffer loadTextureFile(String path, int[] width, int[] height, int[] channels) {
-            ByteBuffer buffer = stbi_load(path, width, height, channels, 0);
-            if (buffer == null)
-                logger.warning("Texture: " + path + " could not be loaded!");
-            return buffer;
         }
 
         @Override
@@ -84,9 +73,5 @@ public class OxyTexture {
 
     public static HDRTexture loadHDRTexture(String path, Scene scene) {
         return new HDRTexture(6, path, scene);
-    }
-
-    public static void unbindAllTextureSlots() {
-        for (int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
     }
 }

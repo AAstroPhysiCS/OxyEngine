@@ -30,4 +30,8 @@ public abstract class IndexBuffer extends Buffer {
     public abstract void addToBuffer(OxyNativeObject oxyEntity);
 
     public abstract void addToBuffer(int[] m_indices);
+
+    public boolean emptyData() {
+        return indices == null;
+    }
 }

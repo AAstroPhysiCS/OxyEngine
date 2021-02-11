@@ -89,7 +89,7 @@ public final class SceneSerializer {
 
             Scene oldScene = SceneRuntime.ACTIVE_SCENE;
             oldScene.disposeAllModels();
-            Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer());
+            Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer(), oldScene.getBlittedFrameBuffer(), oldScene.getPickingBuffer());
             for (var n : oldScene.getEntityEntrySet()) {
                 scene.put(n.getKey());
                 scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));

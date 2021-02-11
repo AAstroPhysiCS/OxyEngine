@@ -52,7 +52,10 @@ public final class SceneRuntime {
 
     public static void onUpdate(float ts) {
         TS = ts;
-        if(!scriptThread.isWorking()) throw new IllegalStateException("Unexpected Thread State");
+        if(!scriptThread.isWorking()){
+            Thread.dumpStack();
+            throw new IllegalStateException("Unexpected Thread State");
+        }
     }
 
     public static void stop() {

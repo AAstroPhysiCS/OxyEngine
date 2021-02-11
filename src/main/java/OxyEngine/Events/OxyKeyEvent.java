@@ -1,7 +1,6 @@
 package OxyEngine.Events;
 
 import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Layers.UILayer;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.SceneRuntime;
 
@@ -26,8 +25,8 @@ public class OxyKeyEvent extends OxyEvent {
     public void onKeyPressed() {
 
         if (keyEventDispatcher.getKeys()[GLFW_KEY_DELETE] && entityContext != null) {
-            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
             SceneRuntime.stop();
+            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
             SceneLayer.getInstance().updateAllEntities();
             entityContext = null;
             System.gc();
@@ -42,26 +41,26 @@ public class OxyKeyEvent extends OxyEvent {
         }
         if (!keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && !keyEventDispatcher.getKeys()[GLFW_KEY_C])
             cPressed = false;
-
-        if (glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
-                glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_O) == GLFW_PRESS) {
+        
+        if (keyEventDispatcher.getKeyState(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
+                keyEventDispatcher.getKeyState(GLFW_KEY_O) == GLFW_PRESS) {
             openScene();
             System.gc();
         }
 
-        if (glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
-                glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_S) == GLFW_PRESS) {
+        if (keyEventDispatcher.getKeyState(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
+                keyEventDispatcher.getKeyState(GLFW_KEY_S) == GLFW_PRESS) {
             saveScene();
         }
 
-        if (glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
-                glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_N) == GLFW_PRESS) {
+        if (keyEventDispatcher.getKeyState(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
+                keyEventDispatcher.getKeyState(GLFW_KEY_N) == GLFW_PRESS) {
             newScene();
             System.gc();
         }
 
-        if (glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
-                glfwGetKey(UILayer.windowHandle.getPointer(), GLFW_KEY_G) == GLFW_PRESS) {
+        if (keyEventDispatcher.getKeyState(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
+                keyEventDispatcher.getKeyState(GLFW_KEY_G) == GLFW_PRESS) {
             SceneLayer.getInstance().recompileShader();
         }
     }

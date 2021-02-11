@@ -16,6 +16,7 @@ public class OpenGLContext extends RendererContext {
     public void init() {
         createCapabilities();
         glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LEQUAL); //for skybox
         logger.info("Renderer: " + glGetString(GL_RENDERER));
         logger.info("OpenGL version: " + glGetString(GL_VERSION));
         logger.info("Graphics Card Vendor: " + glGetString(GL_VENDOR));

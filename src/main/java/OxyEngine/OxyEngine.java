@@ -21,7 +21,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class OxyEngine implements OxyDisposable {
 
-    private final WindowHandle windowHandle;
+    private static WindowHandle windowHandle;
     private static Antialiasing antialiasing;
 
     private final boolean vSync;
@@ -35,7 +35,7 @@ public class OxyEngine implements OxyDisposable {
 
     public OxyEngine(Supplier<Runnable> supplier, WindowHandle windowHandle, Antialiasing antialiasing, boolean vSync, boolean debug, OxyEngineSpecs specs) {
         thread = new Thread(supplier.get(), "OxyEngine - 1");
-        this.windowHandle = windowHandle;
+        OxyEngine.windowHandle = windowHandle;
         this.vSync = vSync;
         this.debug = debug;
         OxyEngine.antialiasing = antialiasing;
@@ -75,6 +75,7 @@ public class OxyEngine implements OxyDisposable {
         builder.createHints()
                 .resizable(specs.resizable())
                 .doubleBuffered(specs.doubleBuffered())
+                .colorBitsSetDefault()
                 .create();
         windowHandle.setPointer(switch (windowHandle.getMode()) {
             case WINDOWED -> builder.createOpenGLWindow(windowHandle.getWidth(), windowHandle.getHeight(), windowHandle.getTitle());
@@ -109,5 +110,9 @@ public class OxyEngine implements OxyDisposable {
 
     public static float[][] getLoadedTheme() {
         return LOADED_THEME;
+    }
+
+    public static WindowHandle getWindowHandle() {
+        return windowHandle;
     }
 }

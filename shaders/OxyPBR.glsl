@@ -230,8 +230,6 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
     return vec4(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-uniform mat4 model;
-
 void main(){
 
     o_IDBuffer = int(round(v_ObjectID));

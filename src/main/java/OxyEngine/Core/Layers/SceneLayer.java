@@ -22,6 +22,8 @@ import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scene.SceneState;
 import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import OxyEngineEditor.UI.Panels.GUINode;
+import OxyEngineEditor.UI.Panels.ScenePanel;
+import org.joml.Vector2f;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -44,7 +46,8 @@ public class SceneLayer extends Layer {
     public Set<OxyEntity> cachedCameraComponents;
     public Set<OxyEntity> allModelEntities;
 
-    static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
+    private static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
+    private static final OxyShader cubemapShader = new OxyShader("shaders/OxySkybox.glsl");
     public static HDRTexture hdrTexture;
 
     private OxyCamera mainCamera;
@@ -168,58 +171,21 @@ public class SceneLayer extends Layer {
         }
     }
 
-    public static boolean initHdrTexture = false;
-    public static final OxyShader cubemapShader = new OxyShader("shaders/OxySkybox.glsl");
 
     @Override
     public void render(float ts) {
         if (ACTIVE_SCENE == null) return;
 
         OpenGLFrameBuffer frameBuffer = ACTIVE_SCENE.getFrameBuffer();
+        OpenGLFrameBuffer destFrameBuffer = ACTIVE_SCENE.getBlittedFrameBuffer();
 
-        frameBuffer.blit();
-        if (!initHdrTexture && hdrTexture != null && SceneRuntime.currentBoundedCamera != null) {
-            hdrTexture.captureFaces(ts);
-            cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
-            initHdrTexture = true;
-        }
-
+        OpenGLFrameBuffer.blit(frameBuffer, destFrameBuffer);
         frameBuffer.bind();
         rendererAPI.clearBuffer();
         rendererAPI.clearColor(32, 32, 32, 1.0f);
 
         //Rendering
         {
-            glDepthFunc(GL_LEQUAL);
-            for (OxyEntity e : cachedNativeMeshes) {
-                OpenGLMesh mesh = e.get(OpenGLMesh.class);
-                if (e.has(OxyMaterialIndex.class) && e.has(OxyShader.class)) {
-                    OxyMaterial m = OxyMaterialPool.getMaterial(e);
-                    if (m != null) {
-                        m.push(e.get(OxyShader.class));
-                        render(ts, mesh, mainCamera, e.get(OxyShader.class));
-                    }
-                }
-
-                if (hdrTexture != null) {
-                    hdrTexture.bindAll();
-                    if (mesh.equals(hdrTexture.getMesh())) {
-                        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-                        cubemapShader.enable();
-                        if (EnvironmentPanel.mipLevelStrength[0] > 0)
-                            cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
-                        else cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
-                        cubemapShader.setUniform1f("mipLevel", EnvironmentPanel.mipLevelStrength[0]);
-                        cubemapShader.setUniform1f("exposure", EnvironmentPanel.exposure[0]);
-                        cubemapShader.setUniform1f("gamma", EnvironmentPanel.gammaStrength[0]);
-                        cubemapShader.disable();
-                        render(ts, mesh, mainCamera, cubemapShader);
-                        glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-                    } else {
-                        render(ts, mesh, mainCamera, cubemapShader);
-                    }
-                }
-            }
             for (OxyEntity e : allModelEntities) {
                 if (!e.has(SelectedComponent.class)) continue;
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
@@ -271,12 +237,40 @@ public class SceneLayer extends Layer {
                 if (material != null) material.push(shader);
                 render(ts, modelMesh, mainCamera, shader);
             }
+
+            for (OxyEntity e : cachedNativeMeshes) {
+                OpenGLMesh mesh = e.get(OpenGLMesh.class);
+                if (e.has(OxyMaterialIndex.class) && e.has(OxyShader.class)) {
+                    OxyMaterial m = OxyMaterialPool.getMaterial(e);
+                    if (m != null) {
+                        m.push(e.get(OxyShader.class));
+                        render(ts, mesh, mainCamera, e.get(OxyShader.class));
+                    }
+                }
+
+                if (hdrTexture != null) {
+                    if (mesh.equals(hdrTexture.getMesh())) {
+                        hdrTexture.bindAll();
+                        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+                        cubemapShader.enable();
+                        if (EnvironmentPanel.mipLevelStrength[0] > 0)
+                            cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
+                        else cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
+                        cubemapShader.setUniform1f("mipLevel", EnvironmentPanel.mipLevelStrength[0]);
+                        cubemapShader.setUniform1f("exposure", EnvironmentPanel.exposure[0]);
+                        cubemapShader.setUniform1f("gamma", EnvironmentPanel.gammaStrength[0]);
+                        cubemapShader.disable();
+                        render(ts, mesh, mainCamera, cubemapShader);
+                        glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+                    }
+                }
+            }
         }
 
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        ACTIVE_SCENE.getFrameBuffer().unbind();
+        frameBuffer.unbind();
         OxyTexture.unbindAllTextures();
 
         UILayer.uiSystem.dispatchNativeEvents();
@@ -298,7 +292,7 @@ public class SceneLayer extends Layer {
         if (path == null) return;
         if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
         SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, s);
-        SceneLayer.hdrTexture.captureFaces(SceneRuntime.TS);
+        cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
     }
 
     private void render(float ts, OpenGLMesh mesh, OxyCamera camera, OxyShader shader) {
@@ -317,18 +311,18 @@ public class SceneLayer extends Layer {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        OpenGLFrameBuffer frameBuffer = ACTIVE_SCENE.getFrameBuffer();
+        OpenGLFrameBuffer pickingBuffer = ACTIVE_SCENE.getPickingBuffer();
         //ID RENDER PASS
-        if (frameBuffer.getIdAttachmentFBO() != 0) {
+        if (pickingBuffer.getBufferId() != 0) {
             int[] clearValue = {-1};
-            frameBuffer.bindPicking();
+            pickingBuffer.bind();
             rendererAPI.clearBuffer();
             rendererAPI.clearColor(32, 32, 32, 1.0f);
-            glClearTexImage(frameBuffer.getIdAttachment(), 0, GL_RED_INTEGER, GL_INT, clearValue);
+            glClearTexImage(pickingBuffer.getColorAttachmentTexture(1), 0, GL_RED_INTEGER, GL_INT, clearValue);
             for (OxyEntity e : allModelEntities)
                 render(0, e.get(ModelMeshOpenGL.class), mainCamera, e.get(OxyShader.class));
         }
-        int id = frameBuffer.getEntityID();
+        int id = getEntityID();
         if (id == -1) {
             if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
             entityContext = null;
@@ -342,6 +336,18 @@ public class SceneLayer extends Layer {
                 }
             }
         }
-        frameBuffer.unbind();
+        pickingBuffer.unbind();
     }
+
+    private int getEntityID() {
+        Vector2f mousePos = new Vector2f(
+                ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x,
+                ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y);
+        mousePos.y = ACTIVE_SCENE.getFrameBuffer().getHeight() - mousePos.y;
+        glReadBuffer(GL_COLOR_ATTACHMENT1);
+        int[] entityID = new int[1];
+        glReadPixels((int) mousePos.x, (int) mousePos.y, 1, 1, GL_RED_INTEGER, GL_INT, entityID);
+        return entityID[0];
+    }
+
 }

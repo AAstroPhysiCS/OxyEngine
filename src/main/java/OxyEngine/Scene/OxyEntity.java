@@ -187,6 +187,7 @@ public abstract class OxyEntity {
     public static int[] sumAllIndices(List<OxyEntity> arr) {
         List<Integer> allIndices = new ArrayList<>();
         for (OxyEntity oxyObj : arr) {
+            if(oxyObj.indices == null) continue;
             for (int i = 0; i < oxyObj.indices.length; i++) {
                 allIndices.add(oxyObj.indices[i]);
             }

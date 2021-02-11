@@ -12,59 +12,59 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-import static org.lwjgl.stb.STBImage.stbi_image_free;
-import static org.lwjgl.stb.STBImage.stbi_set_flip_vertically_on_load;
+import static org.lwjgl.stb.STBImage.*;
 
 public class CubemapTexture extends OxyTexture.AbstractTexture {
 
     private static final float[] skyboxVertices = {
-            -1, 1, -1,
-            -1, -1, -1,
-            1, -1, -1,
-            1, -1, -1,
-            1, 1, -1,
-            -1, 1, -1,
-
-            -1, -1, 1,
-            -1, -1, -1,
-            -1, 1, -1,
-            -1, 1, -1,
-            -1, 1, 1,
-            -1, -1, 1,
-
-            1, -1, -1,
-            1, -1, 1,
-            1, 1, 1,
-            1, 1, 1,
-            1, 1, -1,
-            1, -1, -1,
-
-            -1, -1, 1,
-            -1, 1, 1,
-            1, 1, 1,
-            1, 1, 1,
-            1, -1, 1,
-            -1, -1, 1,
-
-            -1, 1, -1,
-            1, 1, -1,
-            1, 1, 1,
-            1, 1, 1,
-            -1, 1, 1,
-            -1, 1, -1,
-
-            -1, -1, -1,
-            -1, -1, 1,
-            1, -1, -1,
-            1, -1, -1,
-            -1, -1, 1,
-            1, -1, 1
+            -1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
+            // front face
+            -1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
+            // left face
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            // right face
+            1.0f, 1.0f, 1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            // bottom face
+            -1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
+            -1.0f, -1.0f, -1.0f,
+            // top face
+            -1.0f, 1.0f, -1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, 1.0f,
     };
 
     private final Scene scene;
@@ -97,7 +97,11 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
             int[] width = new int[1];
             int[] height = new int[1];
             int[] channels = new int[1];
-            ByteBuffer buffer = loadTextureFile(totalFiles.get(i), width, height, channels);
+            ByteBuffer buffer = stbi_load(totalFiles.get(i), width, height, channels, 0);
+            if (buffer == null){
+                logger.warning("Texture: " + path + " could not be loaded!");
+                return;
+            }
             int alFormat = GL_RGBA;
             if (channels[0] == 3)
                 alFormat = GL_RGB;
@@ -110,8 +114,6 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-
     }
 
     public void init(Set<EntityComponent> allOtherShaders) {

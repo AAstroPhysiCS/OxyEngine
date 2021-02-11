@@ -1,9 +1,9 @@
 package OxyEngine.Core.Layers;
 
-import OxyEngine.Core.Window.WindowHandle;
+import OxyEngine.OxyEngine;
 import OxyEngine.System.OxyFontSystem;
 import OxyEngine.System.OxyUISystem;
-import OxyEngineEditor.UI.Panels.*;
+import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
 import imgui.flag.ImGuiCond;
@@ -20,13 +20,17 @@ public class UILayer extends Layer {
 
     private final List<Panel> panelList = new ArrayList<>();
 
-    public static WindowHandle windowHandle;
-
     public static OxyUISystem uiSystem;
 
-    public UILayer(WindowHandle windowHandle) {
-        UILayer.windowHandle = windowHandle;
-        uiSystem = new OxyUISystem(windowHandle);
+    private static UILayer INSTANCE = null;
+
+    public static UILayer getInstance(){
+        if(INSTANCE == null) INSTANCE = new UILayer();
+        return INSTANCE;
+    }
+
+    private UILayer(){
+        uiSystem = new OxyUISystem(OxyEngine.getWindowHandle());
     }
 
     public void addPanel(Panel panel) {
@@ -47,7 +51,7 @@ public class UILayer extends Layer {
 
     @Override
     public void update(float ts) {
-        windowHandle.update();
+        OxyEngine.getWindowHandle().update();
     }
 
     @Override
@@ -83,9 +87,5 @@ public class UILayer extends Layer {
         uiSystem.updateImGuiContext(ts);
         ImGui.render();
         uiSystem.renderDrawData();
-    }
-
-    public static WindowHandle getWindowHandle() {
-        return windowHandle;
     }
 }

@@ -14,16 +14,16 @@ public class SceneCamera extends PerspectiveCamera {
     @Override
     public Matrix4f setProjectionMatrix() {
         Matrix4f m = new Matrix4f();
-        m.perspective((float) Math.toRadians(-fovY), aspect, zNear, zFar);
+        m.perspective((float) Math.toRadians(fovY), aspect, zNear, zFar);
         return m;
     }
 
     @Override
     public Matrix4f setModelMatrix() {
         Matrix4f m = new Matrix4f();
+        m.rotateX(-this.getRotation().x);
+        m.rotateY(-this.getRotation().y);
         m.translate(-this.getPosition().x, -this.getPosition().y, -this.getPosition().z);
-        m.rotateX(this.getRotation().x);
-        m.rotateY(this.getRotation().y);
         return m;
     }
 

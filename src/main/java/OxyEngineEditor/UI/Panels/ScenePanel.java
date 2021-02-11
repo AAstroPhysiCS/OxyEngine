@@ -9,6 +9,8 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+
 public class ScenePanel extends Panel {
 
     public static boolean focusedWindowDragging, focusedWindow, hoveredWindow;
@@ -26,7 +28,7 @@ public class ScenePanel extends Panel {
     }
 
     private ScenePanel() {
-        new WorldGrid(SceneRuntime.ACTIVE_SCENE, 10);
+        new WorldGrid(ACTIVE_SCENE, 10);
     }
 
     @Override
@@ -52,14 +54,19 @@ public class ScenePanel extends Panel {
         ImVec2 availContentRegionSize = new ImVec2();
         ImGui.getContentRegionAvail(availContentRegionSize);
 
-        OpenGLFrameBuffer frameBuffer = SceneRuntime.ACTIVE_SCENE.getFrameBuffer();
-        if (frameBuffer != null) {
-            ImGui.image(frameBuffer.getColorAttachmentTexture(), frameBuffer.getWidth(), frameBuffer.getHeight(), 0, 1, 1, 0);
+        OpenGLFrameBuffer blittedFrameBuffer = ACTIVE_SCENE.getBlittedFrameBuffer();
 
-            if (availContentRegionSize.x != frameBuffer.getWidth() || availContentRegionSize.y != frameBuffer.getHeight()) {
-                frameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
+        if (blittedFrameBuffer != null) {
+            ImGui.image(blittedFrameBuffer.getColorAttachmentTexture(0), blittedFrameBuffer.getWidth(), blittedFrameBuffer.getHeight(), 0, 1, 1, 0);
+
+            if (availContentRegionSize.x != blittedFrameBuffer.getWidth() || availContentRegionSize.y != blittedFrameBuffer.getHeight()) {
+                OpenGLFrameBuffer pickingBuffer = ACTIVE_SCENE.getPickingBuffer();
+                OpenGLFrameBuffer srcFrameBuffer = ACTIVE_SCENE.getFrameBuffer();
+                blittedFrameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
+                srcFrameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
+                pickingBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
                 if (SceneRuntime.currentBoundedCamera instanceof PerspectiveCamera p)
-                    p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
+                    p.setAspect((float) blittedFrameBuffer.getWidth() / blittedFrameBuffer.getHeight());
             }
         }
 

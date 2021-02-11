@@ -2,27 +2,162 @@ package OxyEngine.Core.Renderer.Buffer.Platform;
 
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
 import OxyEngine.OxyEngine;
-import OxyEngineEditor.UI.Panels.ScenePanel;
-import org.joml.Vector2f;
 
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.opengl.GL45.*;
 
 public class OpenGLFrameBuffer extends FrameBuffer {
 
-    private int idAttachment, idAttachmentFBO;
+    public enum FrameBufferTextureFormat {
 
-    OpenGLFrameBuffer(int width, int height) {
-        super(width, height);
+        NONE(0, 0),
+
+        DEPTH24STENCIL8(GL_DEPTH24_STENCIL8, 0),
+
+        RGBA8(GL_RGBA8, GL_RGBA),
+
+        R32I(GL_R32I, GL_RED_INTEGER),
+
+        RGBA16(GL_RGBA16, GL_RGBA),
+
+        RGB16F(GL_RGB16F, GL_RGB),
+
+        RGB32F(GL_RGB32F, GL_RGB);
+
+        final int storageFormat;
+        final int internalFormatInteger;
+
+        FrameBufferTextureFormat(int internalFormatInteger, int storageFormat) {
+            this.storageFormat = storageFormat;
+            this.internalFormatInteger = internalFormatInteger;
+        }
     }
+
+    public static final class FrameBufferSpec {
+
+        private int attachmentIndex = -1;
+        private boolean multiSampled, renderBuffered;
+        private FrameBufferTextureFormat textureFormat, renderBufferFormat;
+        private int paramMinFilter = -1, paramMagFilter = -1;
+
+        private int colorAttachmentTexture = -1;
+
+        private boolean isStorage;
+        private int level = -1;
+
+        public FrameBufferSpec setAttachmentIndex(int attachmentIndex) {
+            this.attachmentIndex = attachmentIndex;
+            return this;
+        }
+
+        public FrameBufferSpec setFormats(FrameBufferTextureFormat textureFormat, FrameBufferTextureFormat renderBufferFormat) {
+            this.textureFormat = textureFormat;
+            this.renderBufferFormat = renderBufferFormat;
+            return this;
+        }
+
+        public FrameBufferSpec setFormats(FrameBufferTextureFormat textureFormat) {
+            this.textureFormat = textureFormat;
+            return this;
+        }
+
+        public FrameBufferSpec setMultiSampled(boolean multiSampled) {
+            this.multiSampled = multiSampled;
+            return this;
+        }
+
+        public FrameBufferSpec useRenderBuffer(boolean renderBuffered) {
+            this.renderBuffered = renderBuffered;
+            return this;
+        }
+
+        public FrameBufferSpec setFilter(int paramMinFilter, int paramMagFilter) {
+            this.paramMagFilter = paramMagFilter;
+            this.paramMinFilter = paramMinFilter;
+            return this;
+        }
+
+        public FrameBufferSpec setStorage(boolean storage, int level) {
+            this.isStorage = storage;
+            this.level = level;
+            return this;
+        }
+    }
+
+    public static <T> T createNewSpec(Class<T> tClass) {
+        try {
+            return tClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        throw new IllegalStateException("Spec Builder should not be empty!");
+    }
+
+    private final FrameBufferSpec[] specs;
+
+    OpenGLFrameBuffer(int width, int height, FrameBufferSpec... specs) {
+        super(width, height);
+        this.specs = specs;
+    }
+
+    private int getTargetTexture(FrameBufferSpec spec) {
+        return spec.multiSampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
+    }
+
+    private void texImage2D(FrameBufferSpec spec, int targetTexture) {
+        if(spec.textureFormat == null) return;
+        if (spec.multiSampled) {
+            int samples = OxyEngine.getAntialiasing().getLevel();
+            glTexImage2DMultisample(targetTexture, samples, spec.textureFormat.internalFormatInteger, width, height, true);
+        } else {
+            glTexImage2D(targetTexture, 0, spec.textureFormat.internalFormatInteger, width, height, 0, spec.textureFormat.storageFormat, GL_UNSIGNED_BYTE, (FloatBuffer) null); //GL_RGBA8 for standard
+        }
+    }
+
+    private void renderBufferStorage(FrameBufferSpec spec) {
+        if (spec.multiSampled) {
+            int samples = OxyEngine.getAntialiasing().getLevel();
+            glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, spec.renderBufferFormat.internalFormatInteger, width, height);
+        } else {
+            glRenderbufferStorage(GL_RENDERBUFFER, spec.renderBufferFormat.internalFormatInteger, width, height);
+        }
+    }
+
+    private void storage(FrameBufferSpec spec, int targetTexture) {
+        if (spec.isStorage) {
+            glTexStorage2D(targetTexture, spec.level, GL_DEPTH24_STENCIL8, width, height);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, targetTexture, spec.colorAttachmentTexture, 0);
+        }
+    }
+
+    private int[] drawIndices = null;
+
+    public void drawBuffers(int... buffers){
+        this.drawIndices = buffers;
+    }
+
+    private void drawBuffers() {
+        //copying bcs i dont want to increment the srcBuffer every time i am loading the framebuffer again.
+        int[] copiedDrawIndices = new int[drawIndices.length];
+        System.arraycopy(drawIndices, 0, copiedDrawIndices, 0, copiedDrawIndices.length);
+        for (int i = 0; i < drawIndices.length; i++) copiedDrawIndices[i] += GL_COLOR_ATTACHMENT0;
+        glDrawBuffers(copiedDrawIndices);
+
+    }
+
+    private void textureParameters(FrameBufferSpec spec) {
+        if (spec.paramMinFilter != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, spec.paramMinFilter);
+        if (spec.paramMagFilter != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, spec.paramMagFilter);
+    }
+
+    private final List<Integer> colorAttachments = new ArrayList<>();
 
     @Override
     public void load() {
-
         if (width <= 10 || height <= 10) {
             windowMinized = true;
             return;
@@ -30,66 +165,26 @@ public class OpenGLFrameBuffer extends FrameBuffer {
 
         if (bufferId == 0) bufferId = glCreateFramebuffers();
         glBindFramebuffer(GL_FRAMEBUFFER, bufferId);
-
-        int samples = OxyEngine.getAntialiasing().getLevel();
-
-        colorAttachmentId = glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, colorAttachmentId);
-        glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, GL_RGBA8, width, height, true);
-        glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, colorAttachmentId, 0);
-
-        int rbo = glCreateRenderbuffers();
-        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-        glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, width, height);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-        assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
-
-        intermediateFBO = glCreateFramebuffers();
-        glBindFramebuffer(GL_FRAMEBUFFER, intermediateFBO);
-
-        colorAttachmentTexture = glCreateTextures(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, colorAttachmentTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (FloatBuffer) null); //GL_RGBA8 for standard
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachmentTexture, 0);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-        assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        picking();
-    }
-
-    private void picking() {
-        if (idAttachmentFBO == 0) idAttachmentFBO = glCreateFramebuffers();
-        glBindFramebuffer(GL_FRAMEBUFFER, idAttachmentFBO);
-
-        int colorAttachmentTexture = glCreateTextures(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, colorAttachmentTexture);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (FloatBuffer) null);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachmentTexture, 0);
-
-        //ID Buffer
-        idAttachment = glCreateTextures(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, idAttachment);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_R32I, width, height, 0, GL_RED_INTEGER, GL_UNSIGNED_BYTE, (IntBuffer) null);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, idAttachment, 0);
-
-        var drawBuffers = new int[]{GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-        glDrawBuffers(drawBuffers);
-
-        int depth = glCreateTextures(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, depth);
-        glTexStorage2D(GL_TEXTURE_2D, 1, GL_DEPTH24_STENCIL8, width, height);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depth, 0);
+        for (int i = 0; i < specs.length; i++) {
+            FrameBufferSpec fbS = specs[i];
+            int targetTexture = getTargetTexture(fbS);
+            fbS.colorAttachmentTexture = glCreateTextures(targetTexture);
+            glBindTexture(targetTexture, fbS.colorAttachmentTexture);
+            texImage2D(fbS, targetTexture);
+            textureParameters(fbS);
+            if(!fbS.isStorage) glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + fbS.attachmentIndex, targetTexture, fbS.colorAttachmentTexture, 0);
+            if (fbS.renderBuffered) {
+                int rbo = glCreateRenderbuffers();
+                glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+                renderBufferStorage(fbS);
+                glBindRenderbuffer(GL_RENDERBUFFER, 0);
+                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+            }
+            storage(fbS, targetTexture);
+            glBindTexture(targetTexture, 0);
+            if(fbS.attachmentIndex != -1) colorAttachments.add(fbS.attachmentIndex, fbS.colorAttachmentTexture);
+        }
+        if(drawIndices != null) drawBuffers();
 
         assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -103,41 +198,10 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         }
     }
 
-    public void bindPicking() {
-        if (!windowMinized) {
-            glBindFramebuffer(GL_FRAMEBUFFER, idAttachmentFBO);
-            glViewport(0, 0, width, height);
-        }
-    }
-
-    public int getEntityID() {
-        Vector2f mousePos = new Vector2f(
-                ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x,
-                ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y);
-        mousePos.y = ACTIVE_SCENE.getFrameBuffer().getHeight() - mousePos.y;
-        glReadBuffer(GL_COLOR_ATTACHMENT1);
-        int[] entityID = new int[1];
-        glReadPixels((int) mousePos.x, (int) mousePos.y, 1, 1, GL_RED_INTEGER, GL_INT, entityID);
-        return entityID[0];
-    }
-
-    @Override
-    public void blit() {
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, bufferId);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, intermediateFBO);
-        glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    }
-
-    public int getColorAttachmentTexture() {
-        return colorAttachmentTexture;
-    }
-
-    public int getIdAttachmentFBO() {
-        return idAttachmentFBO;
-    }
-
-    public int getIdAttachment() {
-        return idAttachment;
+    public static void blit(OpenGLFrameBuffer srcBuffer, OpenGLFrameBuffer destBuffer) {
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, srcBuffer.getBufferId());
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destBuffer.getBufferId());
+        glBlitFramebuffer(0, 0, srcBuffer.getWidth(), srcBuffer.getHeight(), 0, 0, destBuffer.getWidth(), destBuffer.getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
     @Override
@@ -156,7 +220,10 @@ public class OpenGLFrameBuffer extends FrameBuffer {
     @Override
     public void dispose() {
         glDeleteFramebuffers(bufferId);
-        glDeleteTextures(colorAttachmentId);
-        glDeleteTextures(colorAttachmentTexture);
+    }
+
+    public int getColorAttachmentTexture(int index) {
+        if(colorAttachments.size() == 0) return -1;
+        return colorAttachments.get(index);
     }
 }

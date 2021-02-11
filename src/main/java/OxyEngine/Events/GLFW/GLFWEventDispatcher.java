@@ -1,5 +1,6 @@
 package OxyEngine.Events.GLFW;
 
+import OxyEngine.OxyEngine;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import org.lwjgl.glfw.*;
@@ -15,6 +16,10 @@ public interface GLFWEventDispatcher {
         @Override
         public void invoke(long window, int key, int scancode, int action, int mods) {
             if(key != -1) keys[key] = action != GLFW.GLFW_RELEASE;
+        }
+
+        public int getKeyState(int key){
+            return glfwGetKey(OxyEngine.getWindowHandle().getPointer(), key);
         }
 
         public boolean[] getKeys() {
@@ -45,6 +50,10 @@ public interface GLFWEventDispatcher {
             if (!io.getWantCaptureMouse() && io.getMouseDown(1)) {
                 ImGui.setWindowFocus(null);
             }
+        }
+
+        public int getButtonState(int key){
+            return glfwGetMouseButton(OxyEngine.getWindowHandle().getPointer(), key);
         }
 
         public boolean[] getButtons() {

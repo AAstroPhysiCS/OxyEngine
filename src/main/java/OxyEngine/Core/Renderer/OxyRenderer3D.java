@@ -33,8 +33,17 @@ public class OxyRenderer3D extends OxyRenderer {
         shader.disable();
     }
 
+    public void render(OpenGLMesh mesh, OxyShader shader){
+        assert shader != null : oxyAssert("Shader is not instantiated.");
+        shader.enable();
+        if (mesh.empty())
+            mesh.load();
+        mesh.render();
+        shader.disable();
+    }
+
     @Override
-    public void render(float ts, OpenGLMesh mesh, OxyShader shader) {
+    public void renderWithCurrentBoundedCamera(float ts, OpenGLMesh mesh, OxyShader shader) {
         render(ts, mesh, currentBoundedCamera, shader);
     }
 }
