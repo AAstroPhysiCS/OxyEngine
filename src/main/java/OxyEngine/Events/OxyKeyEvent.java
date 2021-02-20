@@ -28,6 +28,7 @@ public class OxyKeyEvent extends OxyEvent {
             SceneRuntime.stop();
             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
             SceneLayer.getInstance().updateAllEntities();
+            SceneLayer.getInstance().updateCameraEntities();
             entityContext = null;
             System.gc();
         }

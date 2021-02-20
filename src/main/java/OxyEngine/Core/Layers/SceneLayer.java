@@ -318,7 +318,7 @@ public class SceneLayer extends Layer {
             pickingBuffer.bind();
             rendererAPI.clearBuffer();
             rendererAPI.clearColor(32, 32, 32, 1.0f);
-            glClearTexImage(pickingBuffer.getColorAttachmentTexture(1), 0, GL_RED_INTEGER, GL_INT, clearValue);
+            glClearTexImage(pickingBuffer.getColorAttachmentTexture(1), 0, pickingBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
             for (OxyEntity e : allModelEntities)
                 render(0, e.get(ModelMeshOpenGL.class), mainCamera, e.get(OxyShader.class));
         }

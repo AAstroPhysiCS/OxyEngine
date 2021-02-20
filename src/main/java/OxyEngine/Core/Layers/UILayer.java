@@ -6,10 +6,7 @@ import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
-import imgui.flag.ImGuiCond;
-import imgui.flag.ImGuiDockNodeFlags;
-import imgui.flag.ImGuiStyleVar;
-import imgui.flag.ImGuiWindowFlags;
+import imgui.flag.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,6 +64,8 @@ public class UILayer extends Layer {
         ImGui.setNextWindowSize(viewport.getWorkSizeX(), viewport.getWorkSizeY(), ImGuiCond.Always);
 
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 4, 8);
+        ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 3);
+        ImGui.pushStyleColor(ImGuiCol.TableHeaderBg, 28f/255f, 28f/255f, 28f/255f, 1f);
         ImGui.pushFont(OxyFontSystem.getAllFonts().get(0));
 
         ImGui.begin("Main", ImGuiWindowFlags.NoResize |
@@ -81,8 +80,10 @@ public class UILayer extends Layer {
 
         for (Panel panel : panelList)
             panel.renderPanel();
+
         ImGui.popFont();
-        ImGui.popStyleVar();
+        ImGui.popStyleVar(2);
+        ImGui.popStyleColor();
 
         uiSystem.updateImGuiContext(ts);
         ImGui.render();

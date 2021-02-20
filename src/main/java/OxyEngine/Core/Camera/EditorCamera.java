@@ -13,7 +13,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class EditorCamera extends PerspectiveCamera {
 
     public EditorCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
-        super(0.05f, 7f, 7f, primary, fovY, aspect, zNear, zFar, transpose);
+        super(0.05f, 20f, 20f, primary, fovY, aspect, zNear, zFar, transpose);
     }
 
     @Override
@@ -22,7 +22,7 @@ public class EditorCamera extends PerspectiveCamera {
         m.translate(0, 0, -zoom);
         m.rotateX(-this.getRotation().x);
         m.rotateY(-this.getRotation().y);
-        m.translate(-this.getPosition().x, -this.getPosition().y, -this.getPosition().z);
+        m.translate(this.getPosition().x, this.getPosition().y, this.getPosition().z);
         return m;
     }
 
@@ -88,9 +88,9 @@ public class EditorCamera extends PerspectiveCamera {
             float dx = (float) (mouseCursorPosDispatcher.getXPos() - oldMouseX);
             float dy = (float) (mouseCursorPosDispatcher.getYPos() - oldMouseY);
             float angle90 = rotationRef.y;
-            positionRef.x += Math.cos(angle90) * (-dx * mouseSpeed);
-            positionRef.z -= Math.sin(angle90) * (-dx * mouseSpeed);
-            positionRef.y -= (-dy * mouseSpeed);
+            positionRef.x -= Math.cos(angle90) * (-dx * mouseSpeed);
+            positionRef.z += Math.sin(angle90) * (-dx * mouseSpeed);
+            positionRef.y += (-dy * mouseSpeed);
         }
 
         oldMouseX = mouseCursorPosDispatcher.getXPos();
@@ -98,9 +98,9 @@ public class EditorCamera extends PerspectiveCamera {
     }
 
     private void updatePosition(float ts) {
-        if (!ScenePanel.hoveredWindow) return;
-        float angle90 = (float) (rotationRef.y + (Math.PI / 2));
-        float angle = rotationRef.y;
+        float angle90 = (float) (-rotationRef.y + (Math.PI / 2));
+        float angle = -rotationRef.y;
+        zoom = 0;
         if (keyEventDispatcher.getKeys()[GLFW_KEY_W]) {
             positionRef.x += Math.cos(angle90) * horizontalSpeed * ts;
             positionRef.z += Math.sin(angle90) * horizontalSpeed * ts;
@@ -110,12 +110,12 @@ public class EditorCamera extends PerspectiveCamera {
             positionRef.z -= Math.sin(angle90) * horizontalSpeed * ts;
         }
         if (keyEventDispatcher.getKeys()[GLFW_KEY_D]) {
-            positionRef.x += Math.cos(angle) * horizontalSpeed * ts;
-            positionRef.z += Math.sin(angle) * horizontalSpeed * ts;
-        }
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_A]) {
             positionRef.x -= Math.cos(angle) * horizontalSpeed * ts;
             positionRef.z -= Math.sin(angle) * horizontalSpeed * ts;
+        }
+        if (keyEventDispatcher.getKeys()[GLFW_KEY_A]) {
+            positionRef.x += Math.cos(angle) * horizontalSpeed * ts;
+            positionRef.z += Math.sin(angle) * horizontalSpeed * ts;
         }
         if (keyEventDispatcher.getKeys()[GLFW_KEY_SPACE]) {
             positionRef.y -= verticalSpeed * ts;

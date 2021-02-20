@@ -36,7 +36,7 @@ public class PointLight extends Light {
         OxyShader shader = e.get(OxyShader.class);
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
         shader.enable();
-        shader.setUniformVec3("p_Light[" + i + "].position", e.get(TransformComponent.class).position);
+        shader.setUniformVec3("p_Light[" + i + "].position", e.get(TransformComponent.class).worldSpacePosition);
         shader.setUniformVec3("p_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
         shader.setUniform1f("p_Light[" + i + "].constant", constant);
         shader.setUniform1f("p_Light[" + i + "].linear", linear);
@@ -88,6 +88,7 @@ public class PointLight extends Light {
             ImGui.columns(1);
             ImGui.separator();
             ImGui.treePop();
+            ImGui.spacing();
         }
     };
 }

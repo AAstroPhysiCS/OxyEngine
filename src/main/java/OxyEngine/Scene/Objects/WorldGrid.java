@@ -43,9 +43,10 @@ public class WorldGrid {
         }
     }
 
-    private static class GridFactory extends NativeObjectFactory {
+    private static class GridFactory implements NativeObjectFactory {
 
         protected final float[] vertexPos;
+        protected final int vertexSize = 32;
 
         public GridFactory() {
             vertexPos = new float[]{
@@ -54,7 +55,6 @@ public class WorldGrid {
                     -0.5f, 0.5f, -0.5f,
                     0.5f, 0.5f, -0.5f,
             };
-            this.vertexSize = 32;
         }
         int vertPtr = 0;
 
@@ -68,7 +68,7 @@ public class WorldGrid {
                     .rotateY(c.rotation.y)
                     .rotateZ(c.rotation.z);
 
-            if (e.vertices == null) e.vertices = new float[vertexSize * size];
+            if (e.vertices == null) e.vertices = new float[size * vertexSize];
             for (int i = 0; i < vertexPos.length; ) {
                 Vector4f transformed = new Vector4f(vertexPos[i++], vertexPos[i++], vertexPos[i++], 1.0f).mul(c.transform);
                 e.vertices[vertPtr++] = transformed.x;

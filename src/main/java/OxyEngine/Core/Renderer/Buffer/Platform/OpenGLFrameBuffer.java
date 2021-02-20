@@ -7,86 +7,11 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL45.*;
 
 public class OpenGLFrameBuffer extends FrameBuffer {
-
-    public enum FrameBufferTextureFormat {
-
-        NONE(0, 0),
-
-        DEPTH24STENCIL8(GL_DEPTH24_STENCIL8, 0),
-
-        RGBA8(GL_RGBA8, GL_RGBA),
-
-        R32I(GL_R32I, GL_RED_INTEGER),
-
-        RGBA16(GL_RGBA16, GL_RGBA),
-
-        RGB16F(GL_RGB16F, GL_RGB),
-
-        RGB32F(GL_RGB32F, GL_RGB);
-
-        final int storageFormat;
-        final int internalFormatInteger;
-
-        FrameBufferTextureFormat(int internalFormatInteger, int storageFormat) {
-            this.storageFormat = storageFormat;
-            this.internalFormatInteger = internalFormatInteger;
-        }
-    }
-
-    public static final class FrameBufferSpec {
-
-        private int attachmentIndex = -1;
-        private boolean multiSampled, renderBuffered;
-        private FrameBufferTextureFormat textureFormat, renderBufferFormat;
-        private int paramMinFilter = -1, paramMagFilter = -1;
-
-        private int colorAttachmentTexture = -1;
-
-        private boolean isStorage;
-        private int level = -1;
-
-        public FrameBufferSpec setAttachmentIndex(int attachmentIndex) {
-            this.attachmentIndex = attachmentIndex;
-            return this;
-        }
-
-        public FrameBufferSpec setFormats(FrameBufferTextureFormat textureFormat, FrameBufferTextureFormat renderBufferFormat) {
-            this.textureFormat = textureFormat;
-            this.renderBufferFormat = renderBufferFormat;
-            return this;
-        }
-
-        public FrameBufferSpec setFormats(FrameBufferTextureFormat textureFormat) {
-            this.textureFormat = textureFormat;
-            return this;
-        }
-
-        public FrameBufferSpec setMultiSampled(boolean multiSampled) {
-            this.multiSampled = multiSampled;
-            return this;
-        }
-
-        public FrameBufferSpec useRenderBuffer(boolean renderBuffered) {
-            this.renderBuffered = renderBuffered;
-            return this;
-        }
-
-        public FrameBufferSpec setFilter(int paramMinFilter, int paramMagFilter) {
-            this.paramMagFilter = paramMagFilter;
-            this.paramMinFilter = paramMinFilter;
-            return this;
-        }
-
-        public FrameBufferSpec setStorage(boolean storage, int level) {
-            this.isStorage = storage;
-            this.level = level;
-            return this;
-        }
-    }
 
     public static <T> T createNewSpec(Class<T> tClass) {
         try {
@@ -97,18 +22,19 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         throw new IllegalStateException("Spec Builder should not be empty!");
     }
 
-    private final FrameBufferSpec[] specs;
+    private final FrameBufferSpecification[] specs;
 
-    OpenGLFrameBuffer(int width, int height, FrameBufferSpec... specs) {
+    OpenGLFrameBuffer(int width, int height, FrameBufferSpecification... specs) {
         super(width, height);
         this.specs = specs;
+        load();
     }
 
-    private int getTargetTexture(FrameBufferSpec spec) {
+    private int getTargetTexture(FrameBufferSpecification spec) {
         return spec.multiSampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
     }
 
-    private void texImage2D(FrameBufferSpec spec, int targetTexture) {
+    private void texImage2D(FrameBufferSpecification spec, int targetTexture) {
         if(spec.textureFormat == null) return;
         if (spec.multiSampled) {
             int samples = OxyEngine.getAntialiasing().getLevel();
@@ -118,7 +44,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         }
     }
 
-    private void renderBufferStorage(FrameBufferSpec spec) {
+    private void renderBufferStorage(FrameBufferSpecification spec) {
         if (spec.multiSampled) {
             int samples = OxyEngine.getAntialiasing().getLevel();
             glRenderbufferStorageMultisample(GL_RENDERBUFFER, samples, spec.renderBufferFormat.internalFormatInteger, width, height);
@@ -127,7 +53,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         }
     }
 
-    private void storage(FrameBufferSpec spec, int targetTexture) {
+    private void storage(FrameBufferSpecification spec, int targetTexture) {
         if (spec.isStorage) {
             glTexStorage2D(targetTexture, spec.level, GL_DEPTH24_STENCIL8, width, height);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, targetTexture, spec.colorAttachmentTexture, 0);
@@ -149,7 +75,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
 
     }
 
-    private void textureParameters(FrameBufferSpec spec) {
+    private void textureParameters(FrameBufferSpecification spec) {
         if (spec.paramMinFilter != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, spec.paramMinFilter);
         if (spec.paramMagFilter != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, spec.paramMagFilter);
     }
@@ -166,7 +92,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         if (bufferId == 0) bufferId = glCreateFramebuffers();
         glBindFramebuffer(GL_FRAMEBUFFER, bufferId);
         for (int i = 0; i < specs.length; i++) {
-            FrameBufferSpec fbS = specs[i];
+            FrameBufferSpecification fbS = specs[i];
             int targetTexture = getTargetTexture(fbS);
             fbS.colorAttachmentTexture = glCreateTextures(targetTexture);
             glBindTexture(targetTexture, fbS.colorAttachmentTexture);
@@ -225,5 +151,21 @@ public class OpenGLFrameBuffer extends FrameBuffer {
     public int getColorAttachmentTexture(int index) {
         if(colorAttachments.size() == 0) return -1;
         return colorAttachments.get(index);
+    }
+
+    public FrameBufferTextureFormat getTextureFormat(int index) {
+        if(specs[index].textureFormat == null){
+            logger.warning("Accessing a buffer which is null");
+            return null;
+        }
+        return specs[index].textureFormat;
+    }
+
+    public FrameBufferTextureFormat getRenderBufferFormat(int index) {
+        if(specs[index].renderBufferFormat == null){
+            logger.warning("Accessing a buffer which is null");
+            return null;
+        }
+        return specs[index].renderBufferFormat;
     }
 }

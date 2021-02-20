@@ -11,17 +11,15 @@ import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.System.OxyFontSystem;
+import imgui.ImFont;
 import imgui.ImGui;
-import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiInputTextFlags;
-import imgui.flag.ImGuiPopupFlags;
+import imgui.flag.*;
 import imgui.type.ImString;
 import org.joml.Vector4f;
 
-import java.util.List;
-
+import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class PropertiesPanel extends Panel {
@@ -33,7 +31,6 @@ public class PropertiesPanel extends Panel {
         return INSTANCE;
     }
 
-    private static boolean initPanel = false;
     public static boolean focusedWindow = false;
 
     ImString name = new ImString(0);
@@ -41,6 +38,62 @@ public class PropertiesPanel extends Panel {
 
     @Override
     public void preload() {
+    }
+
+    private void renderTransformControl(String label, float[] x, float[] y, float[] z, float defaultValue, float speed) {
+        ImGui.pushID(label);
+        ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 4);
+
+        ImFont font = OxyFontSystem.getAllFonts().get(0);
+        float lineHeight = font.getFontSize() + ImGui.getStyle().getFramePaddingY() * 2.0f;
+        float buttonWidth = lineHeight + 3.0f;
+
+        ImGui.pushStyleColor(ImGuiCol.Button, 0.64f, 0.4f, 0.38f, 1.0f);
+        ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 0.74f, 0.4f, 0.38f, 1.0f);
+        ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.64f, 0.4f, 0.38f, 1.0f);
+        if (ImGui.button("X", buttonWidth, lineHeight))
+            x[0] = defaultValue;
+        ImGui.popStyleColor(3);
+
+        ImGui.sameLine();
+
+        ImGui.pushItemWidth(ImGui.calcItemWidth() / 3 + 15);
+        ImGui.alignTextToFramePadding();
+        ImGui.dragFloat("##hidelabel X", x, speed);
+        ImGui.popItemWidth();
+
+        ImGui.sameLine();
+
+        ImGui.pushStyleColor(ImGuiCol.Button, 0.46f, 0.59f, 0.5f, 1.0f);
+        ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 0.46f, 0.69f, 0.5f, 1.0f);
+        ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.46f, 0.59f, 0.5f, 1.0f);
+        if (ImGui.button("Y", buttonWidth, lineHeight))
+            y[0] = defaultValue;
+        ImGui.popStyleColor(3);
+
+        ImGui.sameLine();
+
+        ImGui.pushItemWidth(ImGui.calcItemWidth() / 3 + 15);
+        ImGui.dragFloat("##hidelabel Y", y, speed);
+        ImGui.popItemWidth();
+
+        ImGui.sameLine();
+
+        ImGui.pushStyleColor(ImGuiCol.Button, 0.33f, 0.48f, 0.6f, 1.0f);
+        ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 0.33f, 0.48f, 0.7f, 1.0f);
+        ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.33f, 0.48f, 0.6f, 1.0f);
+        if (ImGui.button("Z", buttonWidth, lineHeight))
+            z[0] = defaultValue;
+        ImGui.popStyleColor(3);
+
+        ImGui.sameLine();
+
+        ImGui.pushItemWidth(ImGui.calcItemWidth() / 3 + 15);
+        ImGui.dragFloat("##hidelabel Z", z, speed);
+        ImGui.popItemWidth();
+
+        ImGui.popStyleVar();
+        ImGui.popID();
     }
 
     @Override
@@ -67,10 +120,10 @@ public class PropertiesPanel extends Panel {
 
         focusedWindow = ImGui.isWindowFocused();
 
-        if (!initPanel) ImGui.setNextItemOpen(true);
+        ImGui.setNextItemOpen(true, ImGuiCond.Once);
         if (ImGui.treeNodeEx("Transform")) {
             ImGui.columns(2, "myColumns");
-            if (!initPanel) ImGui.setColumnOffset(0, -90f);
+            ImGui.setColumnWidth(0, 90);
             ImGui.alignTextToFramePadding();
             ImGui.text("Translation:");
             ImGui.alignTextToFramePadding();
@@ -78,50 +131,36 @@ public class PropertiesPanel extends Panel {
             ImGui.alignTextToFramePadding();
             ImGui.text("Scale:");
             ImGui.nextColumn();
-            ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
 
             TransformComponent t = entityContext.get(TransformComponent.class);
-            float[] translationArr = new float[]{t.position.x, t.position.y, t.position.z};
-            float[] rotationArr = new float[]{t.rotation.x, t.rotation.y, t.rotation.z};
-            float[] scaleArr = new float[]{t.scale.x, t.scale.y, t.scale.z};
-            ImGui.dragFloat3("##hidelabel T", translationArr, 0.1f);
-            ImGui.dragFloat3("##hidelabel R", rotationArr, 0.1f);
-            ImGui.dragFloat3("##hidelabel S", scaleArr, 0.1f, 0, Float.MAX_VALUE);
-            if (!t.position.equals(translationArr[0], translationArr[1], translationArr[2]) ||
-                    !t.rotation.equals(rotationArr[0], rotationArr[1], rotationArr[2]) ||
-                    !t.scale.equals(scaleArr[0], scaleArr[1], scaleArr[2])) {
+            float[] translationX = new float[]{t.position.x};
+            float[] translationY = new float[]{t.position.y};
+            float[] translationZ = new float[]{t.position.z};
 
-                //Root transformation
-                if (entityContext.isRoot()) {
-                    OxyEntity root = entityContext;
-                    List<OxyEntity> relatedEntities = root.getEntitiesRelatedTo(FamilyComponent.class);
-                    t.position.set(translationArr);
-                    t.rotation.set(rotationArr);
-                    t.scale.set(scaleArr);
-                    entityContext.transformLocally();
-                    entityContext.updateData();
-                    if (relatedEntities != null) {
-                        //translating models relative to root
-                        for (OxyEntity m : relatedEntities) {
-                            TransformComponent tChildiren = m.get(TransformComponent.class);
-                            m.transformLocally();
-                            tChildiren.transform.mulLocal(t.transform);
-                            m.updateData();
-                        }
-                    }
-                } else {
-                    t.position.set(translationArr);
-                    t.rotation.set(rotationArr);
-                    t.scale.set(scaleArr);
-                    var root = entityContext.getRoot(FamilyComponent.class);
-                    entityContext.transformLocally();
-                    if (entityContext.getRoot(FamilyComponent.class) != null)
-                        entityContext.get(TransformComponent.class).transform.mulLocal(root.get(TransformComponent.class).transform);
-                    entityContext.updateData();
-                }
+            float[] rotationX = new float[]{t.rotation.x};
+            float[] rotationY = new float[]{t.rotation.y};
+            float[] rotationZ = new float[]{t.rotation.z};
+
+            float[] scaleX = new float[]{t.scale.x};
+            float[] scaleY = new float[]{t.scale.y};
+            float[] scaleZ = new float[]{t.scale.z};
+
+            renderTransformControl("Translation Control", translationX, translationY, translationZ, 0.0f, 0.1f);
+            renderTransformControl("Rotation Control", rotationX, rotationY, rotationZ, 0.0f, 0.1f);
+            renderTransformControl("Scale Control", scaleX, scaleY, scaleZ, 1.0f, 0.1f);
+
+            if (!t.position.equals(translationX[0], translationY[0], translationZ[0]) ||
+                    !t.rotation.equals(rotationX[0], rotationY[0], rotationZ[0]) ||
+                    !t.scale.equals(scaleX[0], scaleY[0], scaleZ[0])) {
+
+                t.position.set(translationX[0], translationY[0], translationZ[0]);
+                t.rotation.set(rotationX[0], rotationY[0], rotationZ[0]);
+                t.scale.set(scaleX[0], scaleY[0], scaleZ[0]);
+                entityContext.transformLocally();
+                entityContext.updateVertexData();
+                addParentTransformToChildren(entityContext);
             }
 
-            ImGui.popItemWidth();
             ImGui.columns(1);
             ImGui.separator();
             ImGui.treePop();
@@ -131,8 +170,6 @@ public class PropertiesPanel extends Panel {
             ImGui.end();
             return;
         }
-
-        for (GUINode guiNode : entityContext.getGUINodes()) guiNode.runEntry();
 
         ImGui.pushStyleColor(ImGuiCol.PopupBg, 36, 36, 36, 255);
         if (ImGui.beginPopup("popupAddComponent")) {
@@ -212,10 +249,8 @@ public class PropertiesPanel extends Panel {
             }
             ImGui.endPopup();
         }
+        for (GUINode guiNode : entityContext.getGUINodes()) guiNode.runEntry();
         ImGui.popStyleColor();
-
-        initPanel = true;
-
         ImGui.end();
     }
 }

@@ -119,7 +119,7 @@ public abstract class OxyCamera implements EntityComponent {
                 float[] nearClipDragArr = new float[]{c.zNear};
                 float[] farClipDragArr = new float[]{c.zFar};
 
-                ImGui.dragFloat("##hideLabelVerticalFovDrag", verticalFovDragArr);
+                ImGui.dragFloat("##hideLabelVerticalFovDrag", verticalFovDragArr, 1f, 1f, 180f);
                 ImGui.dragFloat("##hideLabelNearClipDrag", nearClipDragArr);
                 ImGui.dragFloat("##hideLabelFarClipDrag", farClipDragArr);
 
@@ -134,6 +134,7 @@ public abstract class OxyCamera implements EntityComponent {
                 //Later
             }
             ImGui.treePop();
+            ImGui.spacing();
         }
     };
 }

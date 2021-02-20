@@ -20,7 +20,6 @@ public class EnvironmentPanel extends Panel {
         return INSTANCE;
     }
 
-    private static boolean initPanel = false;
     private static final ImBoolean open = new ImBoolean(false);
 
     @Override
@@ -38,7 +37,7 @@ public class EnvironmentPanel extends Panel {
         }
 
         ImGui.columns(2, "env column");
-        if (!initPanel) ImGui.setColumnOffset(0, -90f);
+        ImGui.setColumnOffset(0, -90f);
         ImGui.alignTextToFramePadding();
         ImGui.text("Gamma strength:");
         ImGui.alignTextToFramePadding();
@@ -56,8 +55,6 @@ public class EnvironmentPanel extends Panel {
         ImGui.checkbox("Demo", open);
 
         if(open.get()) ImGui.showDemoWindow();
-
-        initPanel = true;
 
         ImGui.end();
     }

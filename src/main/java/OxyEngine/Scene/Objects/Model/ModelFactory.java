@@ -91,7 +91,7 @@ public class ModelFactory {
         }
     }
 
-    public void updateData(OxyModel e) {
+    public void updateVertexData(OxyModel e) {
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
         ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);

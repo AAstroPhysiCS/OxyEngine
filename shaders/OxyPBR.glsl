@@ -181,7 +181,9 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
     if(int(round(inVar.textureSlotOut)) == 0){
        albedo = pow(vec3(material.diffuse), vec3(gamma));
     } else {
-       albedo = pow(texture(tex[int(round(inVar.textureSlotOut))], texCoordsOut).rgb, vec3(gamma));
+       vec4 texture = texture(tex[int(round(inVar.textureSlotOut))], texCoordsOut).rgba;
+       if(texture.w < 0.1f) discard;
+       albedo = pow(texture.rgb, vec3(gamma));
     }
 
     vec3 irradiance = texture(irradianceMap, norm).rgb;

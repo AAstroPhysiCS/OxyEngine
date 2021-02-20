@@ -62,6 +62,7 @@ public class DirectionalLight extends Light {
             ImGui.columns(1);
             ImGui.separator();
             ImGui.treePop();
+            ImGui.spacing();
         }
     };
 }

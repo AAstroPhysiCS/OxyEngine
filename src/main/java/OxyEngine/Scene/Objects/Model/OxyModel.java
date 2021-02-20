@@ -56,7 +56,7 @@ public class OxyModel extends OxyEntity {
                 new SelectedComponent(false)
         );
 
-        if(this.has(FamilyComponent.class)) e.addComponent(this.get(FamilyComponent.class));
+        e.setFamily(this.getFamily());
         if(this.has(PointLight.class)) e.addComponent(this.get(PointLight.class));
         if(this.has(DirectionalLight.class)) e.addComponent(this.get(DirectionalLight.class));
 
@@ -100,9 +100,9 @@ public class OxyModel extends OxyEntity {
     }
 
     @Override
-    public void updateData() {
+    public void updateVertexData() {
         if (factory == null) return;
-        factory.updateData(this);
+        factory.updateVertexData(this);
         if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 }

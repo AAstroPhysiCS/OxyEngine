@@ -7,6 +7,8 @@ in vec3 localPosOut;
 uniform samplerCube skyBoxTexture;
 uniform float roughness;
 
+uniform float faceSize;
+
 #define PI 3.14159265358979323
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
@@ -86,7 +88,7 @@ void main(){
             float HdotV = max(dot(H, V), 0.0);
             float pdf = D * NdotH / (4.0 * HdotV) + 0.0001;
 
-            float resolution = 1920.0; // resolution of source cubemap (per face)
+            float resolution = faceSize; // resolution of source cubemap (per face)
             float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
             float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
 

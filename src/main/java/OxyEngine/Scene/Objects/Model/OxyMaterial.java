@@ -1,5 +1,6 @@
 package OxyEngine.Scene.Objects.Model;
 
+import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
@@ -7,11 +8,11 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
-import imgui.flag.ImGuiColorEditFlags;
+import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
+import imgui.type.ImString;
 import org.joml.Vector4f;
 
-import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
@@ -40,7 +41,7 @@ public class OxyMaterial implements OxyDisposable {
 
     public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
                        OxyColor albedoColor) {
-        this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, albedoColor, 1.0f, 0.1f, 1.0f, 0.0f);
+        this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, albedoColor, 1.0f, 1f, 1.0f, 0.0f);
     }
 
     public OxyMaterial(OxyModelLoader.AssimpMaterial assimpMaterial) {
@@ -53,7 +54,7 @@ public class OxyMaterial implements OxyDisposable {
                        OxyColor albedoColor) {
         this(name, OxyTexture.loadImage(1, albedoTexture), OxyTexture.loadImage(2, normalTexture),
                 OxyTexture.loadImage(3, roughnessTexture), OxyTexture.loadImage(4, metallicTexture),
-                OxyTexture.loadImage(5, aoTexture), albedoColor, 1.0f, 0.1f, 1.0f, 0.0f);
+                OxyTexture.loadImage(5, aoTexture), albedoColor, 1.0f, 1.0f, 1.0f, 0.0f);
     }
 
     public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
@@ -148,18 +149,79 @@ public class OxyMaterial implements OxyDisposable {
         shader.disable();
     }
 
+    private static String currentItem = "No Material";
+    private static final ImString inputTextBuffer = new ImString(100);
+
     public static final GUINode guiNode = () -> {
 
         if (entityContext == null) return;
 
-        if (ImGui.treeNodeEx("Material", ImGuiTreeNodeFlags.DefaultOpen)) {
+        if (ImGui.treeNodeEx("Materials", ImGuiTreeNodeFlags.DefaultOpen)) {
 
             assert entityContext != null;
             OxyMaterial m = OxyMaterialPool.getMaterial(entityContext);
+            if(m != null){
+                final int imageButtonWidth = 85;
+                ImGui.columns(2);
+                ImGui.setColumnWidth(0, imageButtonWidth + 15);
+                ImGui.setColumnWidth(1, ImGui.getWindowWidth());
+                if (ImGui.imageButton(-1, imageButtonWidth, 70, 0, 1, 1, 0, 0)) {}
+                ImGui.nextColumn();
+                inputTextBuffer.set(m.name);
+                ImGui.alignTextToFramePadding();
+                ImGui.text("Name:");
+                ImGui.sameLine();
+                ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
+                if(ImGui.inputText("##hideLabelMaterialsInputText", inputTextBuffer, ImGuiInputTextFlags.EnterReturnsTrue)){
+                    m.name = inputTextBuffer.get();
+                }
+                ImGui.popItemWidth();
+//                ImGui.alignTextToFramePadding();
+//                ImGui.text("Materials:");
+//                ImGui.sameLine();
+                ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
+                if (ImGui.beginCombo("##hideLabelMaterials", m.name)) {
+                    for(OxyMaterial allMaterials : OxyMaterialPool.getMaterialPool()){
+                        String s = allMaterials.name;
+                        boolean isSelected = (currentItem.equals(s));
+                        if (ImGui.selectable(s, isSelected)){
+                            currentItem = s;
+                            entityContext.addComponent(new OxyMaterialIndex(allMaterials.index));
+                        }
+                    }
+                    ImGui.endCombo();
+                }
+                ImGui.popItemWidth();
+            }
+            ImGui.columns(1);
+            ImGui.treePop();
+            ImGui.spacing();
+            ImGui.separator();
 
-            ImGui.text("Name: " + m.name);
+            /*previewBuffer.bind();
+            rendererAPI.clearBuffer();
+            oxyShader.enable();
+            oxyShader.setUniformMatrix4fv("model", previewSphereEntity.get(TransformComponent.class).transform, false);
+            int irradianceSlot = 0, prefilterSlot = 0, brdfLUTSlot = 0;
+            if (hdrTexture != null) {
+                irradianceSlot = hdrTexture.getIrradianceSlot();
+                prefilterSlot = hdrTexture.getPrefilterSlot();
+                brdfLUTSlot = hdrTexture.getBDRFSlot();
+                hdrTexture.bindAll();
+            }
+            oxyShader.setUniform1i("irradianceMap", irradianceSlot);
+            oxyShader.setUniform1i("prefilterMap", prefilterSlot);
+            oxyShader.setUniform1i("brdfLUT", brdfLUTSlot);
+            oxyShader.setUniform1f("gamma", EnvironmentPanel.gammaStrength[0]);
+            oxyShader.setUniform1f("exposure", EnvironmentPanel.exposure[0]);
+            oxyShader.disable();
+            m.push(entityContext.get(OxyShader.class));
+            ACTIVE_SCENE.getRenderer().render(SceneRuntime.TS, previewSphereEntity.get(OpenGLMesh.class), editorCameraEntity.get(OxyCamera.class), oxyShader);
 
-            float[] albedo = m.albedoColor.getNumbers();
+            previewBuffer.unbind();
+            if (ImGui.imageButton(previewBuffer.getColorAttachmentTexture(0), 80, 60)) {}
+            */
+            /*float[] albedo = m.albedoColor.getNumbers();
 
             ImGui.alignTextToFramePadding();
             { // BASE COLOR
@@ -174,7 +236,7 @@ public class OxyMaterial implements OxyDisposable {
                                 ImGuiColorEditFlags.NoLabel
                 ) && entityContext != null) {
                     m.albedoColor.setColorRGBA(albedo);
-                    entityContext.updateData();
+                    entityContext.updateVertexData();
                 }
             }
 
@@ -189,7 +251,7 @@ public class OxyMaterial implements OxyDisposable {
                     if (path != null) {
                         if (!nullT) m.albedoTexture.dispose();
                         m.albedoTexture = OxyTexture.loadImage(1, path);
-                        entityContext.updateData();
+                        entityContext.updateVertexData();
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
@@ -207,7 +269,7 @@ public class OxyMaterial implements OxyDisposable {
                     if (path != null) {
                         if (!nullN) m.normalTexture.dispose();
                         m.normalTexture = OxyTexture.loadImage(2, path);
-                        entityContext.updateData();
+                        entityContext.updateVertexData();
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
@@ -229,7 +291,7 @@ public class OxyMaterial implements OxyDisposable {
                     if (path != null) {
                         if (!nullR) m.roughnessTexture.dispose();
                         m.roughnessTexture = OxyTexture.loadImage(3, path);
-                        entityContext.updateData();
+                        entityContext.updateVertexData();
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
@@ -251,7 +313,7 @@ public class OxyMaterial implements OxyDisposable {
                     if (path != null) {
                         if (!nullM) m.metallicTexture.dispose();
                         m.metallicTexture = OxyTexture.loadImage(4, path);
-                        entityContext.updateData();
+                        entityContext.updateVertexData();
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
@@ -273,7 +335,7 @@ public class OxyMaterial implements OxyDisposable {
                     if (path != null) {
                         if (!nullAO) m.aoTexture.dispose();
                         m.aoTexture = OxyTexture.loadImage(5, path);
-                        entityContext.updateData();
+                        entityContext.updateVertexData();
                     }
                 }
                 ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
@@ -285,9 +347,7 @@ public class OxyMaterial implements OxyDisposable {
                 ImGui.text("AO strength:");
                 ImGui.sameLine();
                 ImGui.sliderFloat("###hidelabel ao", m.aoStrength, 0, 1);
-                ImGui.separator();
-                ImGui.treePop();
-            }
+                ImGui.separator();*/
         }
     };
 

@@ -273,6 +273,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             shader.enable();
             shader.setUniform1i("skyBoxTexture", 0);
             shader.setUniformMatrix4fv("projection", captureProjection, true);
+            shader.setUniform1f("faceSize", 1920);
             shader.disable();
 
             glActiveTexture(GL_TEXTURE0);

@@ -2,16 +2,10 @@ package OxyEngine.Scene.Objects.Native;
 
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 
-public abstract class NativeObjectFactory{
+public interface NativeObjectFactory {
 
-    protected int vertexSize;
+    void constructData(OxyNativeObject e, int size);
 
-    public abstract void constructData(OxyNativeObject e, int size);
-
-    public abstract void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh);
-
-    public int getVertexSize() {
-        return vertexSize;
-    }
+    void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh);
 }
 

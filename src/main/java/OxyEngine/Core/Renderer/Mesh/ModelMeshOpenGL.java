@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Mesh;
 
-import OxyEngine.Components.FamilyComponent;
+import OxyEngine.Components.EntityFamily;
 import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Layers.SceneLayer;
@@ -99,7 +99,6 @@ public class ModelMeshOpenGL extends OpenGLMesh {
         textureBuffer = (OpenGLTextureBuffer) layout.textureBuffer();
     }
 
-    private static final boolean initPanel = false;
     private static ImString meshPath = new ImString(0);
     public static final GUINode guiNode = () -> {
         {
@@ -110,9 +109,9 @@ public class ModelMeshOpenGL extends OpenGLMesh {
 
                 ImGui.checkbox("Cast Shadows", false);
 
-                if (!initPanel) ImGui.setNextItemOpen(true);
+                ImGui.setNextItemOpen(true);
                 ImGui.columns(2, "myColumns");
-                if (!initPanel) ImGui.setColumnOffset(0, -120f);
+                ImGui.setColumnOffset(0, -120f);
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Mesh:");
                 ImGui.nextColumn();
@@ -127,34 +126,42 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                             //removing the added entity with the new model entities and carrying the transform of the old entity to the new models.
                             TransformComponent c = entityContext.get(TransformComponent.class);
                             List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path, entityContext.get(OxyShader.class));
-                            OxyEntity root = eList.get(0).getRoot(FamilyComponent.class);
+                            OxyEntity root = eList.get(0).getRoot();
+                            EntityFamily family = entityContext.getFamily();
+                            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
+                            root.setFamily(family);
+
                             TransformComponent cRoot = root.get(TransformComponent.class);
                             cRoot.position.set(c.position);
                             cRoot.rotation.set(c.rotation);
                             cRoot.scale.set(c.scale);
+
                             for (OxyModel e : eList) {
                                 e.addComponent(new SelectedComponent(false));
+                                e.setFamily(new EntityFamily(root.getFamily()));
                                 e.getGUINodes().add(ModelMeshOpenGL.guiNode);
                                 if (!e.getGUINodes().contains(OxyMaterial.guiNode))
                                     e.getGUINodes().add(OxyMaterial.guiNode);
                                 e.constructData();
                             }
+
                             cRoot.transform.mulLocal(c.transform);
+
                             for (OxyModel e : eList) {
                                 e.transformLocally();
-                                e.get(TransformComponent.class).transform.mulLocal(cRoot.transform);
-                                e.updateData();
+                                e.updateVertexData();
                             }
-                            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
+
                             SceneLayer.getInstance().updateAllEntities();
                             meshPath = new ImString(path);
-                            entityContext = eList.get(0).getRoot(FamilyComponent.class);
+                            entityContext = root;
                         }
                     }
                 }
                 ImGui.columns(1);
                 ImGui.separator();
                 ImGui.treePop();
+                ImGui.spacing();
             }
         }
     };

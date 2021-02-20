@@ -130,7 +130,7 @@ public class OxyScript {
             if (provider != null) {
                 Field[] allFields = provider.allFields;
                 for (var entry : allFields) {
-                    if(entry.getModifiers() != Modifier.PUBLIC) continue;
+                    if (entry.getModifiers() != Modifier.PUBLIC) continue;
                     Object obj = null;
                     try {
                         obj = entry.get(provider.obj);
@@ -149,7 +149,8 @@ public class OxyScript {
                             ImGui.dragFloat("##hidelabel entrySlider" + entityContext.hashCode() + entry.getName(), buffer);
                             if (obj instanceof Integer) entry.set(provider.obj, Float.valueOf(buffer[0]).intValue());
                             else if (obj instanceof Long) entry.set(provider.obj, Float.valueOf(buffer[0]).longValue());
-                            else if (obj instanceof Short) entry.set(provider.obj, Float.valueOf(buffer[0]).shortValue());
+                            else if (obj instanceof Short)
+                                entry.set(provider.obj, Float.valueOf(buffer[0]).shortValue());
                             else if (obj instanceof Byte) entry.set(provider.obj, Float.valueOf(buffer[0]).byteValue());
                             else entry.set(provider.obj, buffer[0]);
                         }
@@ -182,6 +183,7 @@ public class OxyScript {
             }
             ImGui.treePop();
             ImGui.separator();
+            ImGui.spacing();
             /*if (ImGui.button("Reload Assembly")) {
                 SceneRuntime.stop();
                 loadAssembly();

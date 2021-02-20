@@ -22,9 +22,8 @@ public class ProjectPanel extends Panel {
     private static final File[] allCurrentProjectFiles = OxySystem.getCurrentProjectFiles(true);
 
     private static ImageTexture fileAsset;
-    private static ImageTexture dirAsset;
-
-    private static final boolean init = false;
+    public static ImageTexture dirAsset;
+    public static ImageTexture dirAssetGrey;
 
     private ProjectPanel() {
 
@@ -34,6 +33,7 @@ public class ProjectPanel extends Panel {
     public void preload() {
         fileAsset = OxyTexture.loadImage(-1, "src/main/resources/assets/fileAsset.png");
         dirAsset = OxyTexture.loadImage(-1, "src/main/resources/assets/dirAsset.png");
+        dirAssetGrey = OxyTexture.loadImage(-1, "src/main/resources/assets/dirAsset-grey.png");
     }
 
     @Override
@@ -50,10 +50,7 @@ public class ProjectPanel extends Panel {
         ImGui.spacing();
 
         ImGui.columns(2, "ProjectPanelCol");
-        if (!init) {
-            ImGui.setColumnOffset(0, (-ImGui.getWindowWidth() / 2f) + 400f);
-            init = true;
-        }
+        ImGui.setColumnOffset(0, (-ImGui.getWindowWidth() / 2f) + 400f, Once);
         // 0 is automatic, i guess
         ImGui.beginChild("FilePanel", 0, 0, false);
         allFileListing(allCurrentProjectFiles);

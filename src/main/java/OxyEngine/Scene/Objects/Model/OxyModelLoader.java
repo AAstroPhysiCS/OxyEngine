@@ -1,6 +1,5 @@
 package OxyEngine.Scene.Objects.Model;
 
-import OxyEngine.Components.FamilyComponent;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Scene.OxyEntity;
 import org.joml.Matrix4f;
@@ -92,8 +91,8 @@ public class OxyModelLoader {
         rootName = aiScene.mRootNode().mName().dataString();
         if(rootEnt == null) {
             rootEnt = ACTIVE_SCENE.createEmptyModel(oxyShader);
-            rootEnt.setRoot(true);
-            rootEnt.addComponent(new TagComponent(rootName), new FamilyComponent());
+            // rootEnt.setFamily(new EntityFamily()); default behaviour from a entity, once it is created!
+            rootEnt.addComponent(new TagComponent(rootName));
         }
 
         for (int i = 0; i < aiScene.mNumMeshes(); i++) {

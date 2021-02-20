@@ -11,6 +11,8 @@ public class TransformComponent implements EntityComponent {
     public Vector3f rotation;
     public Vector3f scale;
 
+    public Vector3f worldSpacePosition = new Vector3f();
+
     public Matrix4f transform;
 
     public TransformComponent(TransformComponent t) {
@@ -18,6 +20,7 @@ public class TransformComponent implements EntityComponent {
         this.position = new Vector3f(t.position);
         this.rotation = new Vector3f(t.rotation);
         this.transform = new Matrix4f(t.transform);
+        this.worldSpacePosition = new Vector3f(t.position);
     }
 
     public void set(TransformComponent t) {
@@ -32,6 +35,7 @@ public class TransformComponent implements EntityComponent {
         this.position = position;
         this.rotation = rotation;
         this.transform = new Matrix4f();
+        this.worldSpacePosition = new Vector3f(position);
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation, Vector3f scale, Matrix4f transform) {
@@ -39,6 +43,7 @@ public class TransformComponent implements EntityComponent {
         this.position = position;
         this.rotation = rotation;
         this.transform = transform;
+        this.worldSpacePosition = new Vector3f(position);
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation, float scale) {
@@ -60,7 +65,7 @@ public class TransformComponent implements EntityComponent {
 
     public void validate(OxyEntity entity) {
         if (entity != null && entity.has(BoundingBoxComponent.class) && entity.has(TransformComponent.class)) { // safety
-            entity.get(TransformComponent.class).position/*.add(entity.originPos)*/.mul(new Vector3f(entity.get(TransformComponent.class).scale));
+            entity.get(TransformComponent.class).position.mul(new Vector3f(entity.get(TransformComponent.class).scale));
         }
     }
 

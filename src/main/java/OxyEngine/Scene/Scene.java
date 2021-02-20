@@ -4,6 +4,8 @@ import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.GizmoLayer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
+import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
+import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
@@ -43,25 +45,24 @@ public final class Scene implements OxyDisposable {
 
     private OxyModelLoader modelLoader;
 
-
     public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer) {
         this(sceneName, renderer, frameBuffer,
-        BufferProducer.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
-                OpenGLFrameBuffer.createNewSpec(OpenGLFrameBuffer.FrameBufferSpec.class)
-                        .setAttachmentIndex(0)
-                        .setFormats(OpenGLFrameBuffer.FrameBufferTextureFormat.RGBA8)
-                        .setFilter(GL_LINEAR, GL_LINEAR)),
-        BufferProducer.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
-                OpenGLFrameBuffer.createNewSpec(OpenGLFrameBuffer.FrameBufferSpec.class)
-                        .setAttachmentIndex(0)
-                        .setFormats(OpenGLFrameBuffer.FrameBufferTextureFormat.RGBA8)
-                        .setFilter(GL_LINEAR, GL_LINEAR),
-                OpenGLFrameBuffer.createNewSpec(OpenGLFrameBuffer.FrameBufferSpec.class)
-                        .setAttachmentIndex(1)
-                        .setFormats(OpenGLFrameBuffer.FrameBufferTextureFormat.R32I)
-                        .setFilter(GL_NEAREST, GL_NEAREST),
-                OpenGLFrameBuffer.createNewSpec(OpenGLFrameBuffer.FrameBufferSpec.class)
-                        .setStorage(true, 1)));
+                BufferProducer.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
+                        OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setAttachmentIndex(0)
+                                .setFormats(FrameBufferTextureFormat.RGBA8)
+                                .setFilter(GL_LINEAR, GL_LINEAR)),
+                BufferProducer.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
+                        OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setAttachmentIndex(0)
+                                .setFormats(FrameBufferTextureFormat.RGBA8)
+                                .setFilter(GL_LINEAR, GL_LINEAR),
+                        OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setAttachmentIndex(1)
+                                .setFormats(FrameBufferTextureFormat.R32I)
+                                .setFilter(GL_NEAREST, GL_NEAREST),
+                        OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setStorage(true, 1)));
     }
 
     public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer, OpenGLFrameBuffer blittedFrameBuffer, OpenGLFrameBuffer pickingBuffer) {
@@ -149,8 +150,8 @@ public final class Scene implements OxyDisposable {
             e.importedFromFile = importedFromFile;
             put(e);
             e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
+            e.setFamily(new EntityFamily(assimpMesh.rootEntity.getFamily()));
             e.addComponent(
-                    assimpMesh.rootEntity.get(FamilyComponent.class),
                     new UUIDComponent(UUID.randomUUID()),
                     shader,
                     new BoundingBoxComponent(
@@ -182,8 +183,8 @@ public final class Scene implements OxyDisposable {
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         put(e);
         e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
+        e.setFamily(new EntityFamily(assimpMesh.rootEntity.getFamily()));
         e.addComponent(
-                assimpMesh.rootEntity.get(FamilyComponent.class),
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
                 new BoundingBoxComponent(
@@ -202,9 +203,9 @@ public final class Scene implements OxyDisposable {
 
     static String optimization_Path = ""; //optimization for the scene serialization import
 
-    public final OxyModel createModelEntity(String path, OxyShader shader, int i, int materialIndex, OxyEntity root) {
+    public final OxyModel createModelEntity(String path, OxyShader shader, int i, int materialIndex) {
         if (!Scene.optimization_Path.equals(path)) {
-            modelLoader = new OxyModelLoader(path, root);
+            modelLoader = new OxyModelLoader(path);
             Scene.optimization_Path = path;
         }
         OxyModelLoader.AssimpMesh assimpMesh = modelLoader.meshes.get(i);
@@ -213,7 +214,6 @@ public final class Scene implements OxyDisposable {
         put(e);
         e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
         e.addComponent(
-                assimpMesh.rootEntity.get(FamilyComponent.class),
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
                 new BoundingBoxComponent(
@@ -236,12 +236,11 @@ public final class Scene implements OxyDisposable {
 
     public final void removeEntity(OxyEntity e) {
 
-        if (e.isRoot()) {
-            List<OxyEntity> entitiesRelatedTo = e.getEntitiesRelatedTo(FamilyComponent.class);
-            if (entitiesRelatedTo != null) {
-                for (OxyEntity eRT : entitiesRelatedTo) {
-                    removeEntity(eRT);
-                }
+        List<OxyEntity> entitiesRelatedTo = e.getEntitiesRelatedTo();
+        if (entitiesRelatedTo.size() != 0) {
+            for (OxyEntity eRT : entitiesRelatedTo) {
+                System.out.println(eRT.get(TagComponent.class).tag());
+                removeEntity(eRT);
             }
         }
 
@@ -425,7 +424,7 @@ public final class Scene implements OxyDisposable {
         SceneLayer.getInstance().build();
     }
 
-    public <T extends EntityComponent> OxyEntity getRoot(OxyEntity entity, Class<T> destClass) {
-        return registry.getRoot(entity, destClass);
+    public OxyEntity getRoot(OxyEntity entity) {
+        return registry.getRoot(entity);
     }
 }

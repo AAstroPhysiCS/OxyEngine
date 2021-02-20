@@ -1,6 +1,7 @@
 package OxyEngine.Scene;
 
 import OxyEngine.Components.EntityComponent;
+import OxyEngine.Components.EntityFamily;
 
 import java.util.*;
 
@@ -97,12 +98,11 @@ public class Registry {
         entityList.get(entity).remove(c);
     }
 
-    public <T extends EntityComponent> OxyEntity getRoot(OxyEntity entity, Class<T> destClass) {
-        EntityComponent familyComponent = entity.get(destClass);
+    public OxyEntity getRoot(OxyEntity entity) {
+        EntityFamily familyComponent = entity.getFamily();
+        EntityFamily rootFamilyComponent = familyComponent.root();
         for (OxyEntity eList : entityList.keySet()) {
-            if (!eList.isRoot()) continue;
-            if (!eList.has(destClass)) continue;
-            if (eList.get(destClass) == familyComponent) return eList;
+            if (eList.getFamily() == rootFamilyComponent) return eList;
         }
         return null;
     }
