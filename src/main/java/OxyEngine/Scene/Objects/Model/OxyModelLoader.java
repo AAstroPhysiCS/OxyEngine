@@ -89,7 +89,7 @@ public class OxyModelLoader {
         }
 
         rootName = aiScene.mRootNode().mName().dataString();
-        if(rootEnt == null) {
+        if (rootEnt == null) {
             rootEnt = ACTIVE_SCENE.createEmptyModel(oxyShader);
             // rootEnt.setFamily(new EntityFamily()); default behaviour from a entity, once it is created!
             rootEnt.addComponent(new TagComponent(rootName));
@@ -141,7 +141,7 @@ public class OxyModelLoader {
         }
 
         AIVector3D.Buffer bufferNor = mesh.mNormals();
-        if(bufferNor != null){
+        if (bufferNor != null) {
             while (Objects.requireNonNull(bufferNor).hasRemaining()) {
                 AIVector3D normals = bufferNor.get();
                 oxyMesh.normals.add(new Vector3f(normals.x(), normals.y(), normals.z()));
@@ -149,7 +149,7 @@ public class OxyModelLoader {
         } else logger.info("Model: " + rootName + " has no normals");
 
         AIVector3D.Buffer textCoords = mesh.mTextureCoords(0);
-        if(textCoords != null) {
+        if (textCoords != null) {
             while (Objects.requireNonNull(textCoords).hasRemaining()) {
                 AIVector3D textCoord = textCoords.get();
                 oxyMesh.textureCoords.add(new Vector2f(textCoord.x(), 1 - textCoord.y()));
@@ -157,7 +157,7 @@ public class OxyModelLoader {
         } else logger.info("Model: " + rootName + " has no texture coordinates");
 
         AIVector3D.Buffer tangent = mesh.mTangents();
-        if(tangent != null) {
+        if (tangent != null) {
             while (Objects.requireNonNull(tangent).hasRemaining()) {
                 AIVector3D tangentC = tangent.get();
                 oxyMesh.tangents.add(new Vector3f(tangentC.x(), tangentC.y(), tangentC.z()));
@@ -165,7 +165,7 @@ public class OxyModelLoader {
         } else logger.info("Model: " + rootName + " has no tangent");
 
         AIVector3D.Buffer bitangent = mesh.mBitangents();
-        if(bitangent != null) {
+        if (bitangent != null) {
             while (Objects.requireNonNull(bitangent).hasRemaining()) {
                 AIVector3D biTangentC = bitangent.get();
                 oxyMesh.biTangents.add(new Vector3f(biTangentC.x(), biTangentC.y(), biTangentC.z()));
@@ -226,15 +226,15 @@ public class OxyModelLoader {
 //            System.out.println(Arrays.toString(roughness));
         }
 
-        if(textPath.isBlank() || textPath.isEmpty()) textPath = null;
+        if (textPath.isBlank() || textPath.isEmpty()) textPath = null;
         else textPath = parentPath + "\\" + textPath;
-        if(textPathNormals.isBlank() || textPathNormals.isEmpty()) textPathNormals = null;
+        if (textPathNormals.isBlank() || textPathNormals.isEmpty()) textPathNormals = null;
         else textPathNormals = parentPath + "\\" + textPathNormals;
-        if(textPathRoughness.isBlank() || textPathRoughness.isEmpty()) textPathRoughness = null;
+        if (textPathRoughness.isBlank() || textPathRoughness.isEmpty()) textPathRoughness = null;
         else textPathRoughness = parentPath + "\\" + textPathRoughness;
-        if(textPathMetallic.isBlank() || textPathMetallic.isEmpty()) textPathMetallic = null;
+        if (textPathMetallic.isBlank() || textPathMetallic.isEmpty()) textPathMetallic = null;
         else textPathMetallic = parentPath + "\\" + textPathMetallic;
-        if(textPathAO.isBlank() || textPathAO.isEmpty()) textPathAO = null;
+        if (textPathAO.isBlank() || textPathAO.isEmpty()) textPathAO = null;
         else textPathAO = parentPath + "\\" + textPathAO;
 
         materials.add(new AssimpMaterial(matName, textPath, textPathMetallic, textPathRoughness, textPathNormals, textPathAO, diffuse));

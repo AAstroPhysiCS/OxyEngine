@@ -115,7 +115,7 @@ public final class Scene implements OxyDisposable {
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
                 new TransformComponent(new Vector3f(0, 0, 0)),
-                new TagComponent("Empty Entity"),
+                new TagComponent("Empty Group"),
                 new MeshPosition(0),
                 new RenderableComponent(RenderingMode.Normal),
                 new SelectedComponent(false)
@@ -130,7 +130,7 @@ public final class Scene implements OxyDisposable {
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
                 new TransformComponent(new Vector3f(0, 0, 0)),
-                new TagComponent("Empty Entity"),
+                new TagComponent("Empty Group"),
                 new MeshPosition(i),
                 new RenderableComponent(RenderingMode.Normal),
                 new SelectedComponent(false)

@@ -1,8 +1,8 @@
 package OxyEngine.Events;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Scene.SceneRuntime;
+import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 
 import static OxyEngine.System.OxyEventSystem.mouseButtonDispatcher;
@@ -24,6 +24,6 @@ public class OxyMouseEvent extends OxyEvent {
     public void onMousePressed() {
         if (mouseButtonDispatcher.getButtonState(GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && ScenePanel.hoveredWindow
                 && SceneRuntime.currentBoundedCamera.equals(editorCameraEntity.get(OxyCamera.class)))
-            SceneLayer.getInstance().startPicking();
+            OxySelectHandler.startPicking();
     }
 }

@@ -160,6 +160,7 @@ public class OxyMaterial implements OxyDisposable {
 
             assert entityContext != null;
             OxyMaterial m = OxyMaterialPool.getMaterial(entityContext);
+
             if(m != null){
                 final int imageButtonWidth = 85;
                 ImGui.columns(2);
@@ -221,133 +222,7 @@ public class OxyMaterial implements OxyDisposable {
             previewBuffer.unbind();
             if (ImGui.imageButton(previewBuffer.getColorAttachmentTexture(0), 80, 60)) {}
             */
-            /*float[] albedo = m.albedoColor.getNumbers();
 
-            ImGui.alignTextToFramePadding();
-            { // BASE COLOR
-                ImGui.text("Base color: ");
-                ImGui.sameLine();
-                if (ImGui.colorEdit4("Base color", albedo,
-                        ImGuiColorEditFlags.AlphaBar |
-                                ImGuiColorEditFlags.AlphaPreview |
-                                ImGuiColorEditFlags.NoBorder |
-                                ImGuiColorEditFlags.NoDragDrop |
-                                ImGuiColorEditFlags.DisplayRGB |
-                                ImGuiColorEditFlags.NoLabel
-                ) && entityContext != null) {
-                    m.albedoColor.setColorRGBA(albedo);
-                    entityContext.updateVertexData();
-                }
-            }
-
-            {
-                ImGui.spacing();
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Albedo: (Base Texture): ");
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
-                boolean nullT = m.albedoTexture == null;
-                if (ImGui.imageButton(nullT ? -1 : m.albedoTexture.getTextureId(), 80, 60)) {
-                    String path = openDialog("", null);
-                    if (path != null) {
-                        if (!nullT) m.albedoTexture.dispose();
-                        m.albedoTexture = OxyTexture.loadImage(1, path);
-                        entityContext.updateVertexData();
-                    }
-                }
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
-                if (ImGui.button("Remove A")) {
-                    m.albedoTexture.dispose();
-                    m.albedoTexture = null;
-                }
-
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Normal Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
-                boolean nullN = m.normalTexture == null;
-                if (ImGui.imageButton(nullN ? -2 : m.normalTexture.getTextureId(), 80, 60)) {
-                    String path = openDialog("", null);
-                    if (path != null) {
-                        if (!nullN) m.normalTexture.dispose();
-                        m.normalTexture = OxyTexture.loadImage(2, path);
-                        entityContext.updateVertexData();
-                    }
-                }
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
-                if (ImGui.button("Remove N")) {
-                    m.normalTexture.dispose();
-                    m.normalTexture = null;
-                }
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Normal map strength:");
-                ImGui.sameLine();
-                ImGui.sliderFloat("###hidelabel n", m.normalStrength, 0, 5);
-
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Roughness Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
-                boolean nullR = m.roughnessTexture == null;
-                if (ImGui.imageButton(nullR ? -3 : m.roughnessTexture.getTextureId(), 80, 60)) {
-                    String path = openDialog("", null);
-                    if (path != null) {
-                        if (!nullR) m.roughnessTexture.dispose();
-                        m.roughnessTexture = OxyTexture.loadImage(3, path);
-                        entityContext.updateVertexData();
-                    }
-                }
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
-                if (ImGui.button("Remove R")) {
-                    m.roughnessTexture.dispose();
-                    m.roughnessTexture = null;
-                }
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Roughness strength:");
-                ImGui.sameLine();
-                ImGui.sliderFloat("###hidelabel roughness", m.roughness, 0, 1);
-
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Metallic Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
-                boolean nullM = m.metallicTexture == null;
-                if (ImGui.imageButton(nullM ? -4 : m.metallicTexture.getTextureId(), 80, 60)) {
-                    String path = openDialog("", null);
-                    if (path != null) {
-                        if (!nullM) m.metallicTexture.dispose();
-                        m.metallicTexture = OxyTexture.loadImage(4, path);
-                        entityContext.updateVertexData();
-                    }
-                }
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
-                if (ImGui.button("Remove M")) {
-                    m.metallicTexture.dispose();
-                    m.metallicTexture = null;
-                }
-                ImGui.alignTextToFramePadding();
-                ImGui.text("Metallic Strength:");
-                ImGui.sameLine();
-                ImGui.sliderFloat("###hidelabel metallic", m.metalness, 0, 1);
-
-                ImGui.alignTextToFramePadding();
-                ImGui.text("AO Map: ");
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 130);
-                boolean nullAO = m.aoTexture == null;
-                if (ImGui.imageButton(nullAO ? -5 : m.aoTexture.getTextureId(), 80, 60)) {
-                    String path = openDialog("", null);
-                    if (path != null) {
-                        if (!nullAO) m.aoTexture.dispose();
-                        m.aoTexture = OxyTexture.loadImage(5, path);
-                        entityContext.updateVertexData();
-                    }
-                }
-                ImGui.sameLine(ImGui.getContentRegionAvailX() - 30);
-                if (ImGui.button("Remove AO")) {
-                    m.aoTexture.dispose();
-                    m.aoTexture = null;
-                }
-                ImGui.alignTextToFramePadding();
-                ImGui.text("AO strength:");
-                ImGui.sameLine();
-                ImGui.sliderFloat("###hidelabel ao", m.aoStrength, 0, 1);
-                ImGui.separator();*/
         }
     };
 

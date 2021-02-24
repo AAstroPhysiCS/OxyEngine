@@ -23,17 +23,10 @@
 
     <properties>
         <lwjgl.version>3.2.3</lwjgl.version>
-        <imgui.java.version>1.80-1.5.0</imgui.java.version>
+        <imgui.java.version>1.81.0</imgui.java.version>
         <maven.compiler.source>1.15</maven.compiler.source>
         <maven.compiler.target>1.15</maven.compiler.target>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>jcenter</id>
-            <url>https://jcenter.bintray.com/</url>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -48,59 +41,32 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- imgui-java -->
-        <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl-glfw</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl-opengl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl</artifactId>
-            <classifier>natives-windows</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl-glfw</artifactId>
-            <classifier>natives-windows</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.lwjgl</groupId>
-            <artifactId>lwjgl-opengl</artifactId>
-            <classifier>natives-windows</classifier>
-        </dependency>
-
-        <dependency>
-            <groupId>io.imgui.java</groupId>
-            <artifactId>imgui-java-binding</artifactId>
-            <version>${imgui.java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.imgui.java</groupId>
-            <artifactId>imgui-java-lwjgl3</artifactId>
-            <version>${imgui.java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.imgui.java</groupId>
-            <artifactId>imgui-java-natives-windows</artifactId>
-            <version>${imgui.java.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.joml</groupId>
             <artifactId>joml</artifactId>
-            <version>1.9.25</version>
+            <version>1.10.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
             <version>0.9.12</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.spair</groupId>
+            <artifactId>imgui-java-binding</artifactId>
+            <version>${imgui.java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.spair</groupId>
+            <artifactId>imgui-java-lwjgl3</artifactId>
+            <version>${imgui.java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.spair</groupId>
+            <artifactId>imgui-java-natives-windows</artifactId>
+            <version>${imgui.java.version}</version>
         </dependency>
     </dependencies>
 </project>

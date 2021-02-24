@@ -115,7 +115,7 @@ public class PropertiesPanel extends Panel {
             entityContext.get(TagComponent.class).setTag(name.get());
         }
         ImGui.sameLine();
-        if (ImGui.button("Add Component", 100, 25)) ImGui.openPopup("popupAddComponent", ImGuiPopupFlags.AnyPopup);
+        if (ImGui.button("Add Component", ImGui.getContentRegionAvailX(), 25)) ImGui.openPopup("popupAddComponent", ImGuiPopupFlags.AnyPopup);
         ImGui.textDisabled("ID: " + entityContext.get(UUIDComponent.class).getUUIDString());
 
         focusedWindow = ImGui.isWindowFocused();
@@ -123,7 +123,7 @@ public class PropertiesPanel extends Panel {
         ImGui.setNextItemOpen(true, ImGuiCond.Once);
         if (ImGui.treeNodeEx("Transform")) {
             ImGui.columns(2, "myColumns");
-            ImGui.setColumnWidth(0, 90);
+            ImGui.setColumnWidth(0, 95);
             ImGui.alignTextToFramePadding();
             ImGui.text("Translation:");
             ImGui.alignTextToFramePadding();
@@ -171,7 +171,7 @@ public class PropertiesPanel extends Panel {
             return;
         }
 
-        ImGui.pushStyleColor(ImGuiCol.PopupBg, 36, 36, 36, 255);
+        ImGui.pushStyleColor(ImGuiCol.PopupBg, Panel.bgC[0], Panel.bgC[1], Panel.bgC[2], 1f);
         if (ImGui.beginPopup("popupAddComponent")) {
             ImGui.alignTextToFramePadding();
             ImGui.text("Search:");

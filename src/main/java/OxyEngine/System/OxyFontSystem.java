@@ -24,7 +24,6 @@ public class OxyFontSystem {
         config.setName(name + ", " + size);
         config.destroy();
 
-        ImGuiFreeType.buildFontAtlas(atlas, ImGuiFreeType.RasterizerFlags.LightHinting);
         allFonts.add(font);
     }
 

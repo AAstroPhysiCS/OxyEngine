@@ -56,7 +56,7 @@ public class OxyModel extends OxyEntity {
                 new SelectedComponent(false)
         );
 
-        e.setFamily(this.getFamily());
+        e.setFamily(new EntityFamily(this.getFamily().root()));
         if(this.has(PointLight.class)) e.addComponent(this.get(PointLight.class));
         if(this.has(DirectionalLight.class)) e.addComponent(this.get(DirectionalLight.class));
 
