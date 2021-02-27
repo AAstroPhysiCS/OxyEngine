@@ -53,6 +53,10 @@ public interface OxySystem {
         return f;
     }
 
+    static boolean isValidPath(String path) {
+        return new File(path).exists();
+    }
+
     interface FileSystem {
         static String load(String path) {
             final StringBuilder builder = new StringBuilder();

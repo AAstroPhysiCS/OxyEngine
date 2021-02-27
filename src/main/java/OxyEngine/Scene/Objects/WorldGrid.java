@@ -1,12 +1,9 @@
 package OxyEngine.Scene.Objects;
 
-import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Scene.Objects.Model.OxyMaterial;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Native.NativeObjectFactory;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Scene;
@@ -21,7 +18,7 @@ public class WorldGrid {
     private final Scene scene;
     private final NativeObjectMeshOpenGL worldGridMesh;
 
-    private static final OxyShader shader = new OxyShader("shaders/OxyGrid.glsl");
+    public static final OxyShader shader = new OxyShader("shaders/OxyGrid.glsl");
 
     public WorldGrid(Scene scene, int size) {
         this.scene = scene;
@@ -34,8 +31,7 @@ public class WorldGrid {
     private void add(int size) {
         OxyNativeObject mainObj = scene.createNativeObjectEntity(size * size * 4);
         mainObj.setFactory(new GridFactory());
-        int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 0.2f)));
-        mainObj.addComponent(shader, worldGridMesh, new OxyMaterialIndex(index));
+        mainObj.addComponent(shader, worldGridMesh);
         for (int x = -size; x < size; x++) {
             for (int z = -size; z < size; z++) {
                 mainObj.pushVertexData(new TransformComponent(new Vector3f(x, 0, z), 2f));
@@ -93,5 +89,4 @@ public class WorldGrid {
             mesh.indicesZ += 4;
         }
     }
-
 }

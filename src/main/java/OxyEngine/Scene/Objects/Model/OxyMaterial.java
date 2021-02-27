@@ -5,6 +5,8 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -13,7 +15,12 @@ import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 import org.joml.Vector4f;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.materialContext;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public class OxyMaterial implements OxyDisposable {
@@ -104,6 +111,18 @@ public class OxyMaterial implements OxyDisposable {
         this.assimpIndex = other.assimpIndex;
     }
 
+    public static List<OxyEntity> updateAllEntities(OxyMaterial m) {
+        List<OxyEntity> list = new ArrayList<>();
+        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
+            if (!(e instanceof OxyNativeObject)) continue;
+            if (!e.has(OxyMaterialIndex.class)) continue;
+            if (e.get(OxyMaterialIndex.class).index() == m.index) {
+                list.add(e);
+            }
+        }
+        return list;
+    }
+
     private void bindTextures() {
         if (roughnessTexture != null)
             glBindTextureUnit(roughnessTexture.getTextureSlot(), roughnessTexture.getTextureId());
@@ -161,19 +180,25 @@ public class OxyMaterial implements OxyDisposable {
             assert entityContext != null;
             OxyMaterial m = OxyMaterialPool.getMaterial(entityContext);
 
-            if(m != null){
+            if (m != null) {
                 final int imageButtonWidth = 85;
                 ImGui.columns(2);
                 ImGui.setColumnWidth(0, imageButtonWidth + 15);
                 ImGui.setColumnWidth(1, ImGui.getWindowWidth());
-                if (ImGui.imageButton(-1, imageButtonWidth, 70, 0, 1, 1, 0, 0)) {}
+                if (ImGui.imageButton(-1, imageButtonWidth, 70, 0, 1, 1, 0, 1)) {
+                    entityContext = null;
+                    materialContext = m;
+                    //terminate
+                    ImGui.treePop();
+                    return;
+                }
                 ImGui.nextColumn();
                 inputTextBuffer.set(m.name);
                 ImGui.alignTextToFramePadding();
                 ImGui.text("Name:");
                 ImGui.sameLine();
                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
-                if(ImGui.inputText("##hideLabelMaterialsInputText", inputTextBuffer, ImGuiInputTextFlags.EnterReturnsTrue)){
+                if (ImGui.inputText("##hideLabelMaterialsInputText", inputTextBuffer, ImGuiInputTextFlags.EnterReturnsTrue)) {
                     m.name = inputTextBuffer.get();
                 }
                 ImGui.popItemWidth();
@@ -182,10 +207,10 @@ public class OxyMaterial implements OxyDisposable {
 //                ImGui.sameLine();
                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                 if (ImGui.beginCombo("##hideLabelMaterials", m.name)) {
-                    for(OxyMaterial allMaterials : OxyMaterialPool.getMaterialPool()){
+                    for (OxyMaterial allMaterials : OxyMaterialPool.getMaterialPool()) {
                         String s = allMaterials.name;
                         boolean isSelected = (currentItem.equals(s));
-                        if (ImGui.selectable(s, isSelected)){
+                        if (ImGui.selectable(s, isSelected)) {
                             currentItem = s;
                             entityContext.addComponent(new OxyMaterialIndex(allMaterials.index));
                         }

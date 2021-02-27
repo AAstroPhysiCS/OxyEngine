@@ -65,8 +65,9 @@ public class UILayer extends Layer {
 
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 4, 8);
         ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 3);
-        ImGui.pushStyleColor(ImGuiCol.TableHeaderBg, 52f/255f, 52f/255f, 53f/255f, 1f);
-        ImGui.pushStyleColor(ImGuiCol.TableBorderLight, 52f/255f, 52f/255f, 53/255f, 1f);
+        ImGui.pushStyleColor(ImGuiCol.TableHeaderBg, Panel.childCardBgC[0], Panel.childCardBgC[1], Panel.childCardBgC[2], Panel.childCardBgC[3]);
+        ImGui.pushStyleColor(ImGuiCol.TableBorderLight, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
+        ImGui.pushStyleColor(ImGuiCol.FrameBg, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
         ImGui.pushFont(OxyFontSystem.getAllFonts().get(0));
 
         ImGui.begin("Main", ImGuiWindowFlags.NoResize |
@@ -84,7 +85,7 @@ public class UILayer extends Layer {
 
         ImGui.popFont();
         ImGui.popStyleVar(2);
-        ImGui.popStyleColor(2);
+        ImGui.popStyleColor(3);
 
         uiSystem.updateImGuiContext(ts);
         ImGui.render();

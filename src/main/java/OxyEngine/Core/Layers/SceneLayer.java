@@ -16,6 +16,7 @@ import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.WorldGrid;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
@@ -214,12 +215,18 @@ public class SceneLayer extends Layer {
 
             for (OxyEntity e : cachedNativeMeshes) {
                 OpenGLMesh mesh = e.get(OpenGLMesh.class);
-                if (e.has(OxyMaterialIndex.class) && e.has(OxyShader.class)) {
+                if (!e.has(OxyShader.class)) continue;
+
+                if (e.has(OxyMaterialIndex.class)) {
                     OxyMaterial m = OxyMaterialPool.getMaterial(e);
                     if (m != null) {
                         m.push(e.get(OxyShader.class));
                         render(ts, mesh, mainCamera, e.get(OxyShader.class));
                     }
+                }
+
+                if(e.get(OxyShader.class).equals(WorldGrid.shader)){
+                    render(ts, mesh, mainCamera, WorldGrid.shader);
                 }
 
                 if (hdrTexture != null) {

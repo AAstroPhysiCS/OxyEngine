@@ -1,6 +1,7 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.*;
+import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.Light;
@@ -11,6 +12,7 @@ import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.OxyEntity;
+import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import imgui.ImGui;
 import imgui.flag.*;
 
@@ -28,13 +30,15 @@ public class SceneHierarchyPanel extends Panel {
     private final OxyShader shader;
 
     private static ImageTexture eyeViewTexture;
-    private static ImageTexture materialPinkSphere;
     private static ImageTexture materialGreyMesh;
     private static ImageTexture materialGroupGizmo;
+    private static ImageTexture materialLightBulb;
+    private static ImageTexture materialCamera;
+    static ImageTexture materialPinkSphere;
 
     public static boolean focusedWindow, focusedWindowDragging;
 
-    private static final int TABLE_COLORS = ImGui.getColorU32(bgC[0], bgC[1], bgC[2], 1f);
+    private static final int TABLE_COLORS = ImGui.getColorU32(bgC[0], bgC[1], bgC[2], bgC[3]);
 
     public static SceneHierarchyPanel getInstance(OxyShader shader) {
         if (INSTANCE == null) INSTANCE = new SceneHierarchyPanel(shader);
@@ -51,6 +55,8 @@ public class SceneHierarchyPanel extends Panel {
         materialPinkSphere = OxyTexture.loadImage(-1, "src/main/resources/assets/materialPinkSphere.png");
         materialGreyMesh = OxyTexture.loadImage(-1, "src/main/resources/assets/materialGreyMesh.png");
         materialGroupGizmo = OxyTexture.loadImage(-1, "src/main/resources/assets/materialGroupGizmo.png");
+        materialLightBulb = OxyTexture.loadImage(-1, "src/main/resources/assets/materialLightBulb.png");
+        materialCamera = OxyTexture.loadImage(-1, "src/main/resources/assets/materialCamera.png");
     }
 
     private void updateEntityPanel(Set<OxyEntity> entities) {
@@ -59,6 +65,7 @@ public class SceneHierarchyPanel extends Panel {
             if (!e.familyHasRoot()) { //means that it is the top root
                 boolean hasMesh = e.has(OpenGLMesh.class);
                 boolean isLight = e.has(Light.class);
+                boolean isCamera = e.has(OxyCamera.class);
 
                 ImGui.tableNextRow();
 
@@ -67,7 +74,7 @@ public class SceneHierarchyPanel extends Panel {
 
                 renderView(e);
                 if (hasMesh) renderType(e, "Mesh");
-                else if(isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+                else if (isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
                 else renderType(e, "Group");
 
                 ImGui.tableSetColumnIndex(0);
@@ -77,8 +84,10 @@ public class SceneHierarchyPanel extends Panel {
 
                 if (hasMesh) {
                     name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 22.4f, 20f);
-                } else if(isLight){
-                    name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 0f, 0f);
+                } else if (isLight) {
+                    name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 22f, 20f);
+                } else if (isCamera) {
+                    name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 22f, 20f);
                 } else { //its a group
                     name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(), 22, 20);
                 }
@@ -86,6 +95,7 @@ public class SceneHierarchyPanel extends Panel {
                 if (ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth)) {
 
                     if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
+                        OxySelectHandler.materialContext = null;
                         if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                         entityContext = e;
                         entityContext.get(SelectedComponent.class).selected = true;
@@ -96,6 +106,7 @@ public class SceneHierarchyPanel extends Panel {
                     ImGui.treePop();
                 } else {
                     if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
+                        OxySelectHandler.materialContext = null;
                         if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                         entityContext = e;
                         entityContext.get(SelectedComponent.class).selected = true;
@@ -153,7 +164,7 @@ public class SceneHierarchyPanel extends Panel {
         ImGui.text(type);
     }
 
-    private String renderImageBesideTreeNode(String name, int textureId, final float sizeX, final float sizeY){
+    private String renderImageBesideTreeNode(String name, int textureId, final float sizeX, final float sizeY) {
         name = "\t " + name;
         float cursorPosX = ImGui.getCursorPosX();
         ImGui.setCursorPosX(cursorPosX + 19);
@@ -170,11 +181,13 @@ public class SceneHierarchyPanel extends Panel {
             OxyEntity e = relatedEntities.get(i);
             boolean hasMesh = e.has(OpenGLMesh.class);
             boolean isLight = e.has(Light.class);
+            boolean isCamera = e.has(OxyCamera.class);
 
             ImGui.pushID(relatedEntities.get(i).hashCode());
             renderView(e);
             if (hasMesh) renderType(e, "Mesh");
-            else if(isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+            else if (isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+            else if (isCamera) renderType(e, e.get(OxyCamera.class).getClass().getSimpleName());
             else renderType(e, "Group");
             ImGui.tableSetColumnIndex(0);
             ImGui.tableSetBgColor(ImGuiTableBgTarget.CellBg, TABLE_COLORS);
@@ -183,14 +196,17 @@ public class SceneHierarchyPanel extends Panel {
 
             if (hasMesh) {
                 name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 22.4f, 20f);
-            } else if(isLight){
-                name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 0f, 0f);
+            } else if (isLight) {
+                name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 22f, 20f);
+            } else if (isCamera) {
+                name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 22f, 20f);
             } else { //its a group
                 name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(), 22, 20);
             }
 
             if (ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth)) {
                 if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
+                    OxySelectHandler.materialContext = null;
                     if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                     entityContext = e;
                     entityContext.get(SelectedComponent.class).selected = true;
@@ -200,8 +216,8 @@ public class SceneHierarchyPanel extends Panel {
                 ImGui.treePop();
             } else {
                 if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
-                    if (entityContext != null)
-                        entityContext.get(SelectedComponent.class).selected = false;
+                    OxySelectHandler.materialContext = null;
+                    if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                     entityContext = e;
                     entityContext.get(SelectedComponent.class).selected = true;
                 }
@@ -218,7 +234,10 @@ public class SceneHierarchyPanel extends Panel {
             ImGui.setCursorPosY(ImGui.getCursorPosY() - 1);
             ImGui.image(materialPinkSphere.getTextureId(), 20, 20, 0, 1, 1, 0);
             ImGui.sameLine();
-            ImGui.selectable(m.name, false);
+            if (ImGui.selectable(m.name, false)) {
+                OxySelectHandler.materialContext = m;
+                entityContext = null;
+            }
         }
     }
 
@@ -226,15 +245,17 @@ public class SceneHierarchyPanel extends Panel {
     public void renderPanel() {
 
         ImGui.begin("Scene Hierarchy");
-        ImGui.pushStyleColor(ImGuiCol.WindowBg, 32 / 255f, 33 / 255f, 35 / 255f, 1f);
+
         focusedWindow = ImGui.isWindowFocused();
         focusedWindowDragging = focusedWindow && ImGui.isMouseDragging(2);
 
         if (ImGui.isAnyMouseDown() && !ImGui.isAnyItemHovered() && ImGui.isWindowHovered()) {
             entityContext = null;
+            OxySelectHandler.materialContext = null;
         }
 
         ImGui.pushStyleVar(ImGuiStyleVar.CellPadding, 0, 2);
+        ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
         if (ImGui.beginTable("HierarchyTable", 3, ImGuiTableFlags.BordersInnerV)) {
             ImGui.tableSetupColumn("\tName", ImGuiTableColumnFlags.WidthFixed, ImGui.getWindowWidth() / 1.55f);
             ImGui.tableSetupColumn("View", ImGuiTableColumnFlags.WidthFixed, 30f);
@@ -244,9 +265,9 @@ public class SceneHierarchyPanel extends Panel {
             updateEntityPanel(ACTIVE_SCENE.getEntities());
 
             ImGui.tableNextRow();
-            renderView(null);
             renderType(null, "Scope");
             ImGui.tableSetColumnIndex(0);
+            ImGui.tableSetBgColor(ImGuiTableBgTarget.CellBg, TABLE_COLORS);
             String name = "Looks";
             name = renderImageBesideTreeNode(name, dirAssetGrey.getTextureId(), 20, 20);
             if (ImGui.treeNodeEx(name)) {
@@ -256,6 +277,8 @@ public class SceneHierarchyPanel extends Panel {
 
             ImGui.endTable();
         }
+        ImGui.popItemWidth();
+        ImGui.popStyleVar();
 
         if (ImGui.beginPopupContextWindow("Entity menu")) {
             if (ImGui.button("Create Entity"))
@@ -263,8 +286,6 @@ public class SceneHierarchyPanel extends Panel {
             ImGui.endPopup();
         }
 
-        ImGui.popStyleVar();
-        ImGui.popStyleColor();
         ImGui.end();
     }
 

@@ -15,7 +15,6 @@ import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.OxyEngineSpecs;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
@@ -78,9 +77,8 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(ScenePanel.getInstance());
         uiLayer.addPanel(EnvironmentPanel.getInstance());
         uiLayer.addPanel(SceneRuntime.getPanel());
-        uiLayer.addPanel(OxyMaterialPool.getPanelInstance());
-        uiLayer.addPanel(PropertiesPanel.getInstance());
         uiLayer.addPanel(SceneHierarchyPanel.getInstance(oxyShader));
+        uiLayer.addPanel(PropertiesPanel.getInstance());
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, uiLayer);
         for (Layer l : layerStack.getLayerStack())

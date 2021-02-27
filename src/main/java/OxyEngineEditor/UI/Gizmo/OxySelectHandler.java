@@ -7,6 +7,7 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Vector2f;
@@ -22,6 +23,7 @@ import static org.lwjgl.opengl.GL44.glClearTexImage;
 public class OxySelectHandler {
 
     public static OxyEntity entityContext;
+    public static OxyMaterial materialContext;
 
     public static void startPicking() {
         Set<OxyEntity> allModelEntities = SceneLayer.getInstance().allModelEntities;
@@ -47,8 +49,9 @@ public class OxySelectHandler {
         }
         int id = getEntityID();
         if (id == -1) {
-            if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
-            entityContext = null;
+//            if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
+//            entityContext = null;
+//            OxySelectHandler.materialContext = null;
         } else {
             for (OxyEntity e : allModelEntities) {
                 if (e.getObjectId() == id) {

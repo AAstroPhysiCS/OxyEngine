@@ -101,6 +101,8 @@ public class ModelMeshOpenGL extends OpenGLMesh {
 
     private static ImString meshPath = new ImString(0);
     public static final GUINode guiNode = () -> {
+        if(entityContext == null) return;
+
         {
             if (ImGui.treeNodeEx("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
                 if (entityContext.has(OpenGLMesh.class))

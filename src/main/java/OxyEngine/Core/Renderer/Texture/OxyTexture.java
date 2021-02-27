@@ -3,7 +3,7 @@ package OxyEngine.Core.Renderer.Texture;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.Scene.Scene;
 
-import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngine.System.OxySystem.*;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
@@ -53,6 +53,10 @@ public class OxyTexture {
         if (path == null) return null;
         if (path.equals("null")) return null;
         if (path.isEmpty() || path.isBlank()) return null;
+        if (!isValidPath(path)) {
+            logger.warning("Path not valid!");
+            return null;
+        }
         return new ImageTexture(slot, path, null);
     }
 
@@ -61,6 +65,10 @@ public class OxyTexture {
         if (path.equals("null")) return null;
         if (path.isEmpty()) return null;
         assert slot > 0 : oxyAssert("Texture Slot already being used");
+        if (!isValidPath(path)) {
+            logger.warning("Path not valid!");
+            return null;
+        }
         return new ImageTexture(slot, path, tcs);
     }
 
@@ -68,10 +76,18 @@ public class OxyTexture {
         if (path == null) return null;
         if (path.equals("null")) return null;
         if (path.isEmpty()) return null;
+        if (!isValidPath(path)) {
+            logger.warning("Path not valid!");
+            return null;
+        }
         return new CubemapTexture(slot, path, scene);
     }
 
     public static HDRTexture loadHDRTexture(String path, Scene scene) {
+        if (!isValidPath(path)) {
+            logger.warning("Path not valid!");
+            return null;
+        }
         return new HDRTexture(6, path, scene);
     }
 }

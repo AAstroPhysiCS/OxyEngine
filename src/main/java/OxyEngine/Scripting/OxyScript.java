@@ -107,6 +107,8 @@ public class OxyScript {
 
     private final ImString bufferPath = new ImString(100);
     public final GUINode guiNode = () -> {
+        if(entityContext == null) return;
+
         bufferPath.set(Objects.requireNonNullElse(path, ""));
         final int hashCode = entityContext.hashCode();
 
