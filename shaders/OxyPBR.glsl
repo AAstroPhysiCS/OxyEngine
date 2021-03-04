@@ -72,9 +72,10 @@ uniform float aoFloat;
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
 //irradiance
-uniform samplerCube irradianceMap;
+uniform samplerCube iblMap;
 //hdr
 uniform float exposure;
+uniform float hdrIntensity;
 
 #define PI 3.14159265358979323
 
@@ -186,50 +187,48 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
        albedo = pow(texture.rgb, vec3(gamma));
     }
 
-    vec3 irradiance = texture(irradianceMap, norm).rgb;
-    if(irradiance.rgb != vec3(0.0f, 0.0f, 0.0f)){ //the scene has env map
-       vec3 Lo;
-       vec3 F0 = vec3(0.04);
-       F0 = mix(F0, albedo, metallicMap);
-       for(int i = 0; i < d_Light.length; i++){
-           if(d_Light[i].activeState == 0) continue;
-           vec3 lightDir = normalize(-d_Light[i].direction);
+    vec3 IBL = texture(iblMap, norm).rgb;
+    if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL.rgb = vec3(0.1f, 0.1f, 0.1f);
+    vec3 Lo;
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, albedo, metallicMap);
+    for(int i = 0; i < d_Light.length; i++){
+        if(d_Light[i].activeState == 0) continue;
+        vec3 lightDir = normalize(-d_Light[i].direction);
 
-           Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0);
-       }
-
-       for(int i = 0; i < p_Light.length; i++){
-           if(p_Light[i].activeState == 0) continue;
-           vec3 lightPos = p_Light[i].position;
-
-           vec3 lightDir = normalize(lightPos - vertexPos);
-           float distance = length(lightPos - vertexPos);
-           float attenuation = 1.0 / (p_Light[i].constant + p_Light[i].linear * distance + p_Light[i].quadratic * (distance * distance));
-
-           Lo += calcPBR(lightDir, p_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);
-       }
-
-       vec3 F = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
-
-       vec3 kS = F;
-       vec3 kD = 1.0 - kS;
-       kD *= 1.0 - metallicMap;
-
-       vec3 diffuseMap = irradiance * albedo;
-
-       vec3 R = reflect(-viewDir, norm);
-       vec3 prefilteredColor = textureLod(prefilterMap, R, roughnessMap * MAX_REFLECTION_LOD).rgb;
-       vec2 envBRDF  = texture(brdfLUT, vec2(max(dot(norm, viewDir), 0.0), roughnessMap)).rg;
-       vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
-       vec3 ambient = (kD * diffuseMap + specular) * aoMap;
-
-       vec3 result = ambient + Lo;
-       //result = result / (result + vec3(1.0));
-       result = vec3(1.0) - exp(-result * exposure);
-       result = pow(result, vec3(1f / gamma));
-       return vec4(result, 1.0f);
+        Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0);
     }
-    return vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    for(int i = 0; i < p_Light.length; i++){
+        if(p_Light[i].activeState == 0) continue;
+        vec3 lightPos = p_Light[i].position;
+
+        vec3 lightDir = normalize(lightPos - vertexPos);
+        float distance = length(lightPos - vertexPos);
+        float attenuation = 1.0 / (p_Light[i].constant + p_Light[i].linear * distance + p_Light[i].quadratic * (distance * distance));
+
+        Lo += calcPBR(lightDir, p_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);
+    }
+
+    vec3 F = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
+
+    vec3 kS = F;
+    vec3 kD = 1.0 - kS;
+    kD *= 1.0 - metallicMap;
+
+    vec3 diffuseMap = IBL * albedo;
+
+    vec3 R = reflect(-viewDir, norm);
+    vec3 prefilteredColor = textureLod(prefilterMap, R, roughnessMap * MAX_REFLECTION_LOD).rgb;
+    vec2 envBRDF  = texture(brdfLUT, vec2(max(dot(norm, viewDir), 0.0), roughnessMap)).rg;
+    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+    vec3 ambient = (kD * diffuseMap + specular) * aoMap * hdrIntensity;
+
+    vec3 result = ambient + Lo;
+    result = result / (result + vec3(1.0));
+    result = vec3(1.0) - exp(-result * exposure);
+    result = pow(result, vec3(1f / gamma));
+    return vec4(result, 1.0f);
 }
 
 void main(){

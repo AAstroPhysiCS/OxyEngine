@@ -5,6 +5,7 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.Light;
+import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
@@ -12,6 +13,7 @@ import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.OxyEntity;
+import OxyEngine.TextureSlot;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import imgui.ImGui;
 import imgui.flag.*;
@@ -51,17 +53,17 @@ public class SceneHierarchyPanel extends Panel {
 
     @Override
     public void preload() {
-        eyeViewTexture = OxyTexture.loadImage(-1, "src/main/resources/assets/view.png");
-        materialPinkSphere = OxyTexture.loadImage(-1, "src/main/resources/assets/materialPinkSphere.png");
-        materialGreyMesh = OxyTexture.loadImage(-1, "src/main/resources/assets/materialGreyMesh.png");
-        materialGroupGizmo = OxyTexture.loadImage(-1, "src/main/resources/assets/materialGroupGizmo.png");
-        materialLightBulb = OxyTexture.loadImage(-1, "src/main/resources/assets/materialLightBulb.png");
-        materialCamera = OxyTexture.loadImage(-1, "src/main/resources/assets/materialCamera.png");
+        eyeViewTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/view.png");
+        materialPinkSphere = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialPinkSphere.png");
+        materialGreyMesh = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialGreyMesh.png");
+        materialGroupGizmo = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialGroupGizmo.png");
+        materialLightBulb = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialLightBulb.png");
+        materialCamera = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialCamera.png");
     }
 
     private void updateEntityPanel(Set<OxyEntity> entities) {
         for (OxyEntity e : entities) {
-            if (!(e instanceof OxyModel)) continue;
+            if (!e.has(SkyLight.class) & !(e instanceof OxyModel)) continue;
             if (!e.familyHasRoot()) { //means that it is the top root
                 boolean hasMesh = e.has(OpenGLMesh.class);
                 boolean isLight = e.has(Light.class);
@@ -73,8 +75,9 @@ public class SceneHierarchyPanel extends Panel {
                 ImGui.pushID(e.get(UUIDComponent.class).toString());
 
                 renderView(e);
-                if (hasMesh) renderType(e, "Mesh");
-                else if (isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+                if (isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+                else if (hasMesh) renderType(e, "Mesh");
+                else if (isCamera) renderType(e, e.get(OxyCamera.class).getClass().getSimpleName());
                 else renderType(e, "Group");
 
                 ImGui.tableSetColumnIndex(0);
@@ -82,10 +85,10 @@ public class SceneHierarchyPanel extends Panel {
 
                 String name = tagComponent.tag();
 
-                if (hasMesh) {
-                    name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 22.4f, 20f);
-                } else if (isLight) {
+                if (isLight) {
                     name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 22f, 20f);
+                } else if (hasMesh) {
+                    name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 22.4f, 20f);
                 } else if (isCamera) {
                     name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 22f, 20f);
                 } else { //its a group
@@ -185,8 +188,8 @@ public class SceneHierarchyPanel extends Panel {
 
             ImGui.pushID(relatedEntities.get(i).hashCode());
             renderView(e);
-            if (hasMesh) renderType(e, "Mesh");
-            else if (isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+            if (isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+            else if (hasMesh) renderType(e, "Mesh");
             else if (isCamera) renderType(e, e.get(OxyCamera.class).getClass().getSimpleName());
             else renderType(e, "Group");
             ImGui.tableSetColumnIndex(0);
@@ -194,10 +197,10 @@ public class SceneHierarchyPanel extends Panel {
 
             String name = e.get(TagComponent.class).tag();
 
-            if (hasMesh) {
-                name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 22.4f, 20f);
-            } else if (isLight) {
+            if (isLight) {
                 name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 22f, 20f);
+            } else if (hasMesh) {
+                name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 22.4f, 20f);
             } else if (isCamera) {
                 name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 22f, 20f);
             } else { //its a group
@@ -283,6 +286,9 @@ public class SceneHierarchyPanel extends Panel {
         if (ImGui.beginPopupContextWindow("Entity menu")) {
             if (ImGui.button("Create Entity"))
                 addEntity(shader);
+            ImGui.separator();
+            if (ImGui.button("Sky Light"))
+                addSkyLight();
             ImGui.endPopup();
         }
 
@@ -301,5 +307,9 @@ public class SceneHierarchyPanel extends Panel {
             model.transformLocally();
         }
         SceneLayer.getInstance().rebuild();
+    }
+
+    private void addSkyLight() {
+        ACTIVE_SCENE.createSkyLight();
     }
 }

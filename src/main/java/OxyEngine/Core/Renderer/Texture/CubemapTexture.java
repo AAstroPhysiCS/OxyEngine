@@ -7,6 +7,7 @@ import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Scene;
+import OxyEngine.TextureSlot;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -72,11 +73,11 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
     private static final List<String> fileStructure = Arrays.asList("right", "left", "bottom", "top", "front", "back");
     private static final List<String> totalFiles = new ArrayList<>();
 
-    CubemapTexture(int slot, String path, Scene scene) {
+    CubemapTexture(TextureSlot slot, String path, Scene scene) {
         super(slot, path);
         this.scene = scene;
 
-        assert slot != 0 : oxyAssert("Slot can not be 0");
+        assert slot.getValue() != 0 : oxyAssert("Slot can not be 0");
 
         textureId = glGenTextures();
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
@@ -121,7 +122,7 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
         for (EntityComponent s : allOtherShaders) {
             OxyShader ss = (OxyShader) s;
             ss.enable();
-            ss.setUniform1i("skyBoxTexture", textureSlot);
+            ss.setUniform1i("skyBoxTexture", textureSlot.getValue());
             ss.disable();
         }
 
@@ -129,7 +130,7 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
 
             shader = new OxyShader("shaders/OxySkybox.glsl");
             shader.enable();
-            shader.setUniform1i("skyBoxTexture", textureSlot);
+            shader.setUniform1i("skyBoxTexture", textureSlot.getValue());
             shader.disable();
 
             NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL(GL_TRIANGLES, BufferLayoutProducer.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));

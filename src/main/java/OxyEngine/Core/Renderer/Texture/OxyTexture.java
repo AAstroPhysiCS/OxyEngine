@@ -2,6 +2,7 @@ package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.Scene.Scene;
+import OxyEngine.TextureSlot;
 
 import static OxyEngine.System.OxySystem.*;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
@@ -19,10 +20,10 @@ public class OxyTexture {
     public static abstract class AbstractTexture implements OxyDisposable {
 
         protected int textureId;
-        protected final int textureSlot;
+        protected final TextureSlot textureSlot;
         protected final String path;
 
-        public AbstractTexture(int slot, String path) {
+        public AbstractTexture(TextureSlot slot, String path) {
             this.path = path;
             this.textureSlot = slot;
         }
@@ -45,11 +46,11 @@ public class OxyTexture {
         }
 
         public int getTextureSlot() {
-            return textureSlot;
+            return textureSlot.getValue();
         }
     }
 
-    public static ImageTexture loadImage(int slot, String path) {
+    public static ImageTexture loadImage(TextureSlot slot, String path) {
         if (path == null) return null;
         if (path.equals("null")) return null;
         if (path.isEmpty() || path.isBlank()) return null;
@@ -60,11 +61,11 @@ public class OxyTexture {
         return new ImageTexture(slot, path, null);
     }
 
-    public static ImageTexture loadImage(int slot, String path, float[] tcs) {
+    public static ImageTexture loadImage(TextureSlot slot, String path, float[] tcs) {
         if (path == null) return null;
         if (path.equals("null")) return null;
         if (path.isEmpty()) return null;
-        assert slot > 0 : oxyAssert("Texture Slot already being used");
+        assert slot.getValue() > 0 : oxyAssert("Texture Slot already being used");
         if (!isValidPath(path)) {
             logger.warning("Path not valid!");
             return null;
@@ -72,10 +73,11 @@ public class OxyTexture {
         return new ImageTexture(slot, path, tcs);
     }
 
-    public static CubemapTexture loadCubemap(int slot, String path, Scene scene) {
+    public static CubemapTexture loadCubemap(TextureSlot slot, String path, Scene scene) {
         if (path == null) return null;
         if (path.equals("null")) return null;
         if (path.isEmpty()) return null;
+        assert slot.getValue() > 0 : oxyAssert("Texture Slot already being used");
         if (!isValidPath(path)) {
             logger.warning("Path not valid!");
             return null;
@@ -88,6 +90,6 @@ public class OxyTexture {
             logger.warning("Path not valid!");
             return null;
         }
-        return new HDRTexture(6, path, scene);
+        return new HDRTexture(TextureSlot.HDR, path, scene);
     }
 }

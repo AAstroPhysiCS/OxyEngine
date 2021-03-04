@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Panels;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxySystem;
+import OxyEngine.TextureSlot;
 import imgui.ImGui;
 import imgui.ImGuiStyle;
 import imgui.ImVec2;
@@ -31,9 +32,9 @@ public class ProjectPanel extends Panel {
 
     @Override
     public void preload() {
-        fileAsset = OxyTexture.loadImage(-1, "src/main/resources/assets/fileAsset.png");
-        dirAsset = OxyTexture.loadImage(-1, "src/main/resources/assets/dirAsset.png");
-        dirAssetGrey = OxyTexture.loadImage(-1, "src/main/resources/assets/dirAsset-grey.png");
+        fileAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/fileAsset.png");
+        dirAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/dirAsset.png");
+        dirAssetGrey = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/dirAsset-grey.png");
     }
 
     @Override

@@ -1,18 +1,21 @@
 package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Layers.GizmoLayer;
 import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Renderer.Light.SkyLight;
+import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.System.OxyDisposable;
+import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Scene.Objects.Model.*;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.SkyLightFactory;
+import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
 
@@ -20,12 +23,14 @@ import java.util.*;
 
 import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
 import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
-import static OxyEngine.System.OxySystem.FileSystem.openDialog;
-import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.EditorApplication.oxyShader;
+import static OxyEngine.Scene.Objects.SkyLightFactory.skyLightMesh;
+import static OxyEngine.Scene.Objects.SkyLightFactory.skyLightShader;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Scene.SceneSerializer.fileExtension;
+import static OxyEngine.System.OxySystem.FileSystem.openDialog;
+import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngineEditor.EditorApplication.oxyShader;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 
@@ -72,6 +77,7 @@ public final class Scene implements OxyDisposable {
         this.blittedFrameBuffer = blittedFrameBuffer;
         this.pickingBuffer = pickingBuffer;
         this.pickingBuffer.drawBuffers(0, 1);
+
     }
 
     public final void put(OxyEntity e) {
@@ -105,6 +111,19 @@ public final class Scene implements OxyDisposable {
 
     public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
         return createModelEntities(type.getPath(), shader, false);
+    }
+
+    public final OxyNativeObject createSkyLight() {
+        OxyNativeObject skyLightEnt = createNativeObjectEntity();
+        skyLightEnt.setFactory(new SkyLightFactory());
+        skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight(this));
+        skyLightEnt.addComponent(skyLightMesh, skyLightShader);
+        if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
+            skyLightEnt.getGUINodes().add(SkyLight.guiNode);
+        skyLightEnt.initData();
+        SceneLayer.getInstance().updateLightEntities();
+        SceneLayer.getInstance().updateNativeEntities();
+        return skyLightEnt;
     }
 
     public final OxyModel createEmptyModel(OxyShader shader) {
@@ -239,14 +258,14 @@ public final class Scene implements OxyDisposable {
         List<OxyEntity> entitiesRelatedTo = e.getEntitiesRelatedTo();
         if (entitiesRelatedTo.size() != 0) {
             for (OxyEntity eRT : entitiesRelatedTo) {
-                System.out.println(eRT.get(TagComponent.class).tag());
                 removeEntity(eRT);
             }
         }
 
         int index = e.get(OxyMaterialIndex.class) != null ? e.get(OxyMaterialIndex.class).index() : -1;
 
-        if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
+        if (e.has(ModelMeshOpenGL.class)) e.get(ModelMeshOpenGL.class).dispose();
+        if (e.has(SkyLight.class)) e.get(SkyLight.class).getHDRTexture().dispose();
 
         for (var scripts : e.getScripts()) {
             if (scripts.getProvider() != null) SceneRuntime.scriptThread.getProviders().remove(scripts.getProvider());
@@ -276,6 +295,10 @@ public final class Scene implements OxyDisposable {
             i++;
         }
         return null;
+    }
+
+    public final boolean isValid(OxyEntity entity) {
+        return registry.entityList.containsKey(entity);
     }
 
     /*
@@ -366,6 +389,13 @@ public final class Scene implements OxyDisposable {
                 }
                 it.remove();
             }
+
+            //REMOVING ENV MAP BCS WE ARE GONNA REPLACE IT WITH THE NEW ENV MAP FROM THE NEW SCENE
+            if (e instanceof OxyNativeObject && e.has(SkyLight.class)) {
+                HDRTexture texture = e.get(SkyLight.class).getHDRTexture();
+                if (texture != null) texture.dispose();
+                it.remove();
+            }
         }
         for (int i = 0; i < LIGHT_SIZE; i++) {
             oxyShader.enable();
@@ -397,17 +427,21 @@ public final class Scene implements OxyDisposable {
     public static void openScene() {
         String openScene = openDialog(extensionName, null);
         if (openScene != null) {
+            SceneRuntime.clearProviders();
+            SceneRuntime.stop();
             ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, SceneLayer.getInstance(), oxyShader);
-            GizmoLayer.getInstance().build();
             SceneLayer.getInstance().build();
         }
     }
 
     public static void saveScene() {
+        SceneRuntime.stop();
         SceneSerializer.serializeScene(ACTIVE_SCENE.getSceneName() + fileExtension);
     }
 
     public static void newScene() {
+        SceneRuntime.clearProviders();
+        SceneRuntime.stop();
         OxySelectHandler.entityContext = null;
         Scene oldScene = ACTIVE_SCENE;
         oldScene.disposeAllModels();
@@ -418,9 +452,7 @@ public final class Scene implements OxyDisposable {
             scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
         }
         ACTIVE_SCENE = scene;
-        if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
-        SceneLayer.hdrTexture = null;
-        GizmoLayer.getInstance().build();
+//        if(scene.skyLightEntity != null) scene.skyLightEntity.get(SkyLight.class).getHDRTexture().dispose();
         SceneLayer.getInstance().build();
     }
 

@@ -1,8 +1,20 @@
 package OxyEngine.Core.Threading;
 
-public interface OxyProvider {
+import java.util.concurrent.atomic.AtomicBoolean;
 
-    void invokeCreate();
+public abstract class OxyProvider {
 
-    void invokeUpdate(float ts);
+    protected final AtomicBoolean ready = new AtomicBoolean(false);
+
+    public abstract void invokeCreate();
+
+    public abstract void invokeUpdate(float ts);
+
+    public boolean isReady(){
+        return ready.get();
+    }
+
+    protected void setReadyState(boolean state){
+        ready.set(state);
+    }
 }

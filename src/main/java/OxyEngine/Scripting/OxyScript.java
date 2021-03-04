@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngine.Scene.SceneRuntime.scriptThread;
@@ -64,7 +65,7 @@ public class OxyScript {
         return null;
     }
 
-    public static class EntityInfoProvider implements OxyProvider {
+    public static class EntityInfoProvider extends OxyProvider {
 
         private final ScriptableEntity obj;
 
@@ -79,17 +80,19 @@ public class OxyScript {
 
         @Override
         public void invokeCreate() {
+            setReadyState(true);
             obj.onCreate();
         }
 
         @Override
         public void invokeUpdate(float ts) {
+            if(!ACTIVE_SCENE.isValid(obj.entity)) return;
             obj.onUpdate(ts);
         }
     }
 
     public void invokeCreate() {
-        if (provider == null) return;
+        if (provider == null) throw new IllegalStateException("Provider is null!");
         provider.invokeCreate();
     }
 

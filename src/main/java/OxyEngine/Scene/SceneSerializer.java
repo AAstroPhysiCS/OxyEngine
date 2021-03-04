@@ -6,14 +6,15 @@ import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
+import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
-import OxyEngineEditor.UI.Panels.EnvironmentPanel;
 import org.joml.Vector3f;
 
 import java.io.File;
@@ -47,12 +48,7 @@ public final class SceneSerializer {
                     .file(f)
                     .createOxyJSONObject("Scene")
                     .putField("Scene Name", scene.getSceneName().split("\\.")[0])
-                    .separate()
-                    .createOxyJSONObject("Environment")
-                    .putField("Environment Map", SceneLayer.hdrTexture != null ? SceneLayer.hdrTexture.getPath() : "null")
-                    .putField("Environment Gamma Strength", String.valueOf(EnvironmentPanel.gammaStrength[0]))
-                    .putField("Environment LOD", String.valueOf(EnvironmentPanel.mipLevelStrength[0]))
-                    .putField("Environment Exposure", String.valueOf(EnvironmentPanel.exposure[0]));
+                    .separate();
 
             OxyJSON.OxyJSONWriterBuilder builder = INSTANCE.openWritingStream();
 
@@ -64,7 +60,7 @@ public final class SceneSerializer {
                 }
             }
             for (OxyEntity root : rootPooled) {
-                if (!(root instanceof OxyModel)) continue;
+                if (!(root instanceof OxyModel) & !root.has(SkyLight.class)) continue;
                 var obj = array.createOxyJSONObject(root.get(TagComponent.class).tag());
                 int meshPosRoot = -1;
                 String idRoot = root.get(UUIDComponent.class).getUUIDString();
@@ -157,6 +153,11 @@ public final class SceneSerializer {
                     obj.putField("Quadratic", String.valueOf(p.getQuadraticValue()));
                 } else if (l instanceof DirectionalLight d) {
                     obj.putField("Direction", d.getDirection().toString());
+                } else if (l instanceof SkyLight s) {
+                    obj.putField("Environment Map", s.getHDRTexture().getPath());
+                    obj.putField("Environment Gamma Strength", String.valueOf(SkyLight.gammaStrength[0]));
+                    obj.putField("Environment LOD", String.valueOf(s.mipLevelStrength[0]));
+                    obj.putField("Environment Exposure", String.valueOf(SkyLight.exposure[0]));
                 }
                 obj = obj.backToObject();
             }
@@ -191,32 +192,25 @@ public final class SceneSerializer {
 
             var modelsJSON = new OxyJSON.OxyJSONArray();
             var sceneJSON = new OxyJSON.OxyJSONObject();
-            var envJSON = new OxyJSON.OxyJSONObject();
 
             INSTANCE.openReadingStream()
                     .read(path)
                     .getOxyJSONArray("Registry", modelsJSON)
-                    .getOxyJSONObject("Scene", sceneJSON)
-                    .getOxyJSONObject("Environment", envJSON);
+                    .getOxyJSONObject("Scene", sceneJSON);
 
             String sceneName = sceneJSON.getField("Scene Name").value();
 
             Scene oldScene = SceneRuntime.ACTIVE_SCENE;
             oldScene.disposeAllModels();
+
             Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer(), oldScene.getBlittedFrameBuffer(), oldScene.getPickingBuffer());
             for (var n : oldScene.getEntityEntrySet()) {
-                scene.put(n.getKey());
-                scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
+                OxyEntity key = n.getKey();
+                scene.put(key);
+                scene.addComponent(key, n.getValue().toArray(EntityComponent[]::new));
             }
             OxySelectHandler.entityContext = null;
             layer.clear();
-
-            String envMapPath = envJSON.getField("Environment Map").value();
-            layer.loadHDRTextureToScene(!envMapPath.equals("null") ? envMapPath : null, scene);
-
-            EnvironmentPanel.gammaStrength = new float[]{Float.parseFloat(envJSON.getField("Environment Gamma Strength").value())};
-            EnvironmentPanel.mipLevelStrength = new float[]{Float.parseFloat(envJSON.getField("Environment LOD").value())};
-            EnvironmentPanel.exposure = new float[]{Float.parseFloat(envJSON.getField("Environment Exposure").value())};
 
             Scene.optimization_Path = "";
 
@@ -228,7 +222,6 @@ public final class SceneSerializer {
                 readAllInnerObjects(root, scene, shader, rootEntity);
             }
 
-            SceneRuntime.onCreate();
             //I don't have to do this... but just to be sure
             System.gc();
             return scene;
@@ -250,12 +243,31 @@ public final class SceneSerializer {
         }
 
 
-        private static OxyModel readFields(OxyJSON.OxyJSONObject ent, Scene scene, OxyShader shader) {
+        private static OxyEntity readFields(OxyJSON.OxyJSONObject ent, Scene scene, OxyShader shader) {
             String name = ent.getField("Name").value();
             String id = ent.getField("ID").value();
             int meshPos = Integer.parseInt(ent.getField("Mesh Position").value());
+
             boolean emitting = Boolean.parseBoolean(ent.getField("Emitting").value());
             String emittingType = ent.getField("Emitting Type").value();
+
+            //SKYLIGHT
+            if (emitting) {
+                if (emittingType.equals(SkyLight.class.getSimpleName())) {
+                    var lightAttributes = ent.getInnerObjectByName("Light Attributes");
+                    String path = lightAttributes.getField("Environment Map").value();
+
+                    OxyNativeObject skyLightEnt = scene.createSkyLight();
+                    SkyLight skyLightComp = skyLightEnt.get(SkyLight.class);
+                    if (!path.equals("null")) skyLightComp.loadHDR(path);
+                    SkyLight.gammaStrength = new float[]{Float.parseFloat(lightAttributes.getField("Environment Gamma Strength").value())};
+                    SkyLight.exposure = new float[]{Float.parseFloat(lightAttributes.getField("Environment Exposure").value())};
+                    skyLightComp.mipLevelStrength = new float[]{Float.parseFloat(lightAttributes.getField("Environment LOD").value())};
+
+                    return skyLightEnt;
+                }
+            }
+
             Vector3f position = parseStringToVector3f(ent.getField("Position").value());
             Vector3f rot = parseStringToVector3f(ent.getField("Rotation").value());
             Vector3f scale = parseStringToVector3f(ent.getField("Scale").value());

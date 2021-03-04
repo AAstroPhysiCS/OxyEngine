@@ -8,6 +8,7 @@ import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
+import OxyEngine.TextureSlot;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -32,6 +33,7 @@ public class OxyMaterial implements OxyDisposable {
      * Metallic 4
      * AO 5
      * HDR 6, 7, 8, 9
+     * UNUSED 31
      */
 
     public int assimpIndex, index;
@@ -48,20 +50,20 @@ public class OxyMaterial implements OxyDisposable {
 
     public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
                        OxyColor albedoColor) {
-        this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, albedoColor, 1.0f, 1f, 1.0f, 0.0f);
+        this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, albedoColor, 1.0f, 0.5f, 1.0f, 0.0f);
     }
 
     public OxyMaterial(OxyModelLoader.AssimpMaterial assimpMaterial) {
-        this(assimpMaterial.name(), OxyTexture.loadImage(1, assimpMaterial.textPath()), OxyTexture.loadImage(2, assimpMaterial.textPathNormals()),
-                OxyTexture.loadImage(3, assimpMaterial.textPathRoughness()), OxyTexture.loadImage(4, assimpMaterial.textPathMetallic()),
-                OxyTexture.loadImage(5, assimpMaterial.textPathAO()), new OxyColor(assimpMaterial.diffuse()));
+        this(assimpMaterial.name().isEmpty() ? "Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++) : assimpMaterial.name(), OxyTexture.loadImage(TextureSlot.ALBEDO, assimpMaterial.textPath()), OxyTexture.loadImage(TextureSlot.NORMAL, assimpMaterial.textPathNormals()),
+                OxyTexture.loadImage(TextureSlot.ROUGHNESS, assimpMaterial.textPathRoughness()), OxyTexture.loadImage(TextureSlot.METALLIC, assimpMaterial.textPathMetallic()),
+                OxyTexture.loadImage(TextureSlot.AO, assimpMaterial.textPathAO()), new OxyColor(assimpMaterial.diffuse()));
     }
 
     public OxyMaterial(String name, String albedoTexture, String normalTexture, String roughnessTexture, String metallicTexture, String aoTexture,
                        OxyColor albedoColor) {
-        this(name, OxyTexture.loadImage(1, albedoTexture), OxyTexture.loadImage(2, normalTexture),
-                OxyTexture.loadImage(3, roughnessTexture), OxyTexture.loadImage(4, metallicTexture),
-                OxyTexture.loadImage(5, aoTexture), albedoColor, 1.0f, 1.0f, 1.0f, 0.0f);
+        this(name, OxyTexture.loadImage(TextureSlot.ALBEDO, albedoTexture), OxyTexture.loadImage(TextureSlot.NORMAL, normalTexture),
+                OxyTexture.loadImage(TextureSlot.ROUGHNESS, roughnessTexture), OxyTexture.loadImage(TextureSlot.METALLIC, metallicTexture),
+                OxyTexture.loadImage(TextureSlot.AO, aoTexture), albedoColor, 1.0f, 0.5f, 1.0f, 0.0f);
     }
 
     public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
@@ -82,15 +84,15 @@ public class OxyMaterial implements OxyDisposable {
     private static int UNKNOWN_MATERIAL_COUNT = 0;
 
     public OxyMaterial(Vector4f albedoColor) {
-        this("Unknown Material (" + (UNKNOWN_MATERIAL_COUNT++) + ")", (ImageTexture) null, null, null, null, null, new OxyColor(albedoColor));
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null, new OxyColor(albedoColor));
     }
 
     public OxyMaterial(float r, float g, float b, float a) {
-        this("Unknown Material (" + (UNKNOWN_MATERIAL_COUNT++) + ")", (ImageTexture) null, null, null, null, null, new OxyColor(new Vector4f(r, g, b, a)));
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null, new OxyColor(new Vector4f(r, g, b, a)));
     }
 
     public OxyMaterial(Vector4f albedoColor, float metalness, float roughness, float aoStrength) {
-        this("Unknown Material (" + (UNKNOWN_MATERIAL_COUNT++) + ")", (ImageTexture) null, null, null, null, null, new OxyColor(albedoColor));
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null, new OxyColor(albedoColor));
         this.metalness = new float[]{metalness};
         this.roughness = new float[]{roughness};
         this.aoStrength = new float[]{aoStrength};
@@ -235,7 +237,7 @@ public class OxyMaterial implements OxyDisposable {
                 brdfLUTSlot = hdrTexture.getBDRFSlot();
                 hdrTexture.bindAll();
             }
-            oxyShader.setUniform1i("irradianceMap", irradianceSlot);
+            oxyShader.setUniform1i("iblMap", irradianceSlot);
             oxyShader.setUniform1i("prefilterMap", prefilterSlot);
             oxyShader.setUniform1i("brdfLUT", brdfLUTSlot);
             oxyShader.setUniform1f("gamma", EnvironmentPanel.gammaStrength[0]);

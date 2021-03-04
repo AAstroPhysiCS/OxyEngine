@@ -4,17 +4,17 @@ import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scene.SceneState;
+import OxyEngine.TextureSlot;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngine.Scene.SceneRuntime.resume;
 
 public final class SceneRuntimeControlPanel extends Panel {
 
-    private static final ImageTexture playTexture = OxyTexture.loadImage(-1, "src/main/resources/assets/play.png");
-    private static final ImageTexture stopTexture = OxyTexture.loadImage(-1, "src/main/resources/assets/stop.png");
+    private static final ImageTexture playTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/play.png");
+    private static final ImageTexture stopTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/stop.png");
 
     @Override
     public void preload() {
@@ -37,9 +37,8 @@ public final class SceneRuntimeControlPanel extends Panel {
         ImGui.dummy(5, 0);
         ImGui.sameLine();
         if (ImGui.imageButton(playTexture.getTextureId(), size, size, 0, 1, 1, 0, 1)) {
-            SceneRuntime.onCreate();
             ACTIVE_SCENE.STATE = SceneState.RUNNING;
-            resume();
+            SceneRuntime.onCreate();
         }
         ImGui.sameLine(0, 15);
         if (ImGui.imageButton(stopTexture.getTextureId(), size, size, 0, 1, 1, 0, 1)) SceneRuntime.stop();

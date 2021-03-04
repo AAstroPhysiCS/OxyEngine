@@ -7,7 +7,7 @@ import OxyEngine.Scene.Scene;
 public abstract class ScriptableEntity {
 
     private final Scene scene;
-    private final OxyEntity entity;
+    final OxyEntity entity;
 
     public ScriptableEntity(Scene scene, OxyEntity entity) {
         this.scene = scene;

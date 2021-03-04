@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Panels;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
+import imgui.type.ImBoolean;
 
 import static OxyEngine.Globals.normalizeColor;
 
@@ -15,6 +16,8 @@ public class StatsPanel extends Panel {
         return INSTANCE;
     }
 
+    private static final ImBoolean open = new ImBoolean(false);
+
     @Override
     public void preload() {
     }
@@ -25,6 +28,10 @@ public class StatsPanel extends Panel {
 
         ImGui.textColored(normalizeColor(200), normalizeColor(200), normalizeColor(200), 1.0f, OxyRenderer.Stats.getStats());
         ImGui.spacing();
+
+        ImGui.checkbox("Demo", open);
+
+        if(open.get()) ImGui.showDemoWindow();
 
         ImGui.end();
     }

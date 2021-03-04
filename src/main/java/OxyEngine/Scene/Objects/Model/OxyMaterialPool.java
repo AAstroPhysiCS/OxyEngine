@@ -4,6 +4,7 @@ import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.OxyEntity;
+import OxyEngine.TextureSlot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,8 +108,8 @@ public class OxyMaterialPool {
                 return pooled.index;
         }
 
-        OxyMaterial material = new OxyMaterial(name, OxyTexture.loadImage(1, albedoTexture), OxyTexture.loadImage(2, normalTexture),
-                OxyTexture.loadImage(3, roughnessTexture), OxyTexture.loadImage(4, metallicTexture), OxyTexture.loadImage(5, aoTexture), albedoColor, m_normalStrength, m_aoStrength, m_roughness, m_metalness);
+        OxyMaterial material = new OxyMaterial(name, OxyTexture.loadImage(TextureSlot.ALBEDO, albedoTexture), OxyTexture.loadImage(TextureSlot.NORMAL, normalTexture),
+                OxyTexture.loadImage(TextureSlot.ROUGHNESS, roughnessTexture), OxyTexture.loadImage(TextureSlot.METALLIC, metallicTexture), OxyTexture.loadImage(TextureSlot.AO, aoTexture), albedoColor, m_normalStrength, m_aoStrength, m_roughness, m_metalness);
         materialPool.add(material);
         int latest = getLatestSlot();
         return material.index = latest;

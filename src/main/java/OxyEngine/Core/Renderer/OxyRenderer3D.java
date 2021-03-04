@@ -3,7 +3,6 @@ package OxyEngine.Core.Renderer;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Window.WindowHandle;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
@@ -12,13 +11,13 @@ public class OxyRenderer3D extends OxyRenderer {
 
     private static OxyRenderer3D INSTANCE = null;
 
-    private OxyRenderer3D(WindowHandle windowHandle) {
-        super(windowHandle);
+    private OxyRenderer3D() {
+        super();
         type = OxyRendererType.Oxy3D;
     }
 
-    public static OxyRenderer3D getInstance(WindowHandle windowHandle) {
-        if (INSTANCE == null) INSTANCE = new OxyRenderer3D(windowHandle);
+    public static OxyRenderer3D getInstance() {
+        if (INSTANCE == null) INSTANCE = new OxyRenderer3D();
         return INSTANCE;
     }
 

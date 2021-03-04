@@ -78,7 +78,8 @@ public class EditorCamera extends PerspectiveCamera {
     }
 
     private void updateRotationSwipe() {
-        if ((ScenePanel.hoveredWindow || SceneHierarchyPanel.focusedWindowDragging) && mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_MIDDLE]) {
+        if ((ScenePanel.hoveredWindow || SceneHierarchyPanel.focusedWindowDragging) &&
+                mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_RIGHT] && !keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT]) {
             rotate();
         }
 

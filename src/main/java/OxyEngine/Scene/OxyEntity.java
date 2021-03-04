@@ -64,8 +64,6 @@ public abstract class OxyEntity {
         scene.put(this);
     }
 
-    protected abstract void initData(String path);
-
     public abstract void constructData();
 
     public abstract void updateVertexData();

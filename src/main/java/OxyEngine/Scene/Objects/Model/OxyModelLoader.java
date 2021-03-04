@@ -12,6 +12,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -188,7 +189,7 @@ public class OxyModelLoader {
         path.clear();
 
         AIString pathNormals = AIString.calloc();
-        aiGetMaterialTexture(aiMaterial, aiTextureType_HEIGHT, 0, pathNormals, (IntBuffer) null, null, null, null, null, null);
+        aiGetMaterialTexture(aiMaterial, aiTextureType_NORMALS, 0, pathNormals, (IntBuffer) null, null, null, null, null, null);
         String textPathNormals = pathNormals.dataString();
         pathNormals.clear();
 
@@ -215,15 +216,15 @@ public class OxyModelLoader {
         }
 
         float[] metallic = new float[1];
-        result = aiGetMaterialFloatArray(aiMaterial, AI_MATKEY_REFLECTIVITY, aiTextureType_NONE, 0, metallic, new int[]{1});
+        result = aiGetMaterialFloatArray(aiMaterial, AI_MATKEY_COLOR_REFLECTIVE, aiTextureType_NONE, 0, metallic, new int[]{1});
         if (result == 0) {
-//            System.out.println(Arrays.toString(metallic));
+            System.out.println(Arrays.toString(metallic));
         }
 
         float[] roughness = new float[1];
-        result = aiGetMaterialFloatArray(aiMaterial, AI_MATKEY_SHININESS_STRENGTH, aiTextureType_NONE, 0, roughness, new int[]{1});
+        result = aiGetMaterialFloatArray(aiMaterial, AI_MATKEY_COLOR_SPECULAR, aiTextureType_NONE, 0, roughness, new int[]{1});
         if (result == 0) {
-//            System.out.println(Arrays.toString(roughness));
+            System.out.println(Arrays.toString(roughness));
         }
 
         if (textPath.isBlank() || textPath.isEmpty()) textPath = null;

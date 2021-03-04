@@ -59,6 +59,7 @@ public class PointLight extends Light {
 
     private static final float[] constantArr = new float[1], linearArr = new float[1], quadraticArr = new float[1], colorIntensityArr = new float[1];
     public static final GUINode guiNode = () -> {
+        if(entityContext == null) return;
         if (ImGui.treeNodeEx("Point Light", ImGuiTreeNodeFlags.DefaultOpen)) {
 
             ImGui.columns(2, "env column");

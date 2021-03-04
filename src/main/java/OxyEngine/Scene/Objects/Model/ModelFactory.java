@@ -2,6 +2,7 @@ package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Components.TransformComponent;
+import OxyEngine.TextureSlot;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -41,7 +42,7 @@ public class ModelFactory {
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
         TransformComponent c = e.get(TransformComponent.class);
 
-        int slot = 0;
+        int slot = TextureSlot.UNUSED.getValue();
         if(material != null){
             ImageTexture texture = material.albedoTexture;
             if (texture != null) slot = texture.getTextureSlot();
@@ -96,7 +97,7 @@ public class ModelFactory {
         ImageTexture texture = material.albedoTexture;
         TransformComponent c = e.get(TransformComponent.class);
 
-        int slot = 0;
+        int slot = TextureSlot.UNUSED.getValue();
         if (texture != null)
             slot = texture.getTextureSlot();
 

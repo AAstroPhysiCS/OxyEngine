@@ -16,6 +16,7 @@ import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.System.OxyFontSystem;
+import OxyEngine.TextureSlot;
 import imgui.ImFont;
 import imgui.ImGui;
 import imgui.flag.*;
@@ -129,7 +130,7 @@ public class PropertiesPanel extends Panel {
                     ImGuiHoveredFlags.AllowWhenOverlapped)) {
                 ImGui.openPopup("previewPopup");
                 if (ImGui.beginPopup("previewPopup")) {
-                    ImGui.image(t.getTextureId(), 150, 150);
+                    ImGui.image(t.getTextureId(), 150, 150, 0, 1, 1, 0);
                     ImGui.endPopup();
                 }
             }
@@ -271,7 +272,7 @@ public class PropertiesPanel extends Panel {
                             if (!entityContext.getGUINodes().contains(OxyMaterial.guiNode))
                                 entityContext.getGUINodes().add(OxyMaterial.guiNode);
                             entityContext.getGUINodes().add(PointLight.guiNode);
-                            SceneLayer.getInstance().updateAllEntities();
+                            SceneLayer.getInstance().updateModelEntities();
                         }
                         //error or hint that lights are single instanced. TODO
                     }
@@ -281,7 +282,7 @@ public class PropertiesPanel extends Panel {
                             int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
                             entityContext.addComponent(directionalLight, new OxyMaterialIndex(index));
                             entityContext.getGUINodes().add(DirectionalLight.guiNode);
-                            SceneLayer.getInstance().updateAllEntities();
+                            SceneLayer.getInstance().updateModelEntities();
                         }
                         //error or hint that lights are single instanced. TODO
                     }
@@ -360,7 +361,7 @@ public class PropertiesPanel extends Panel {
                                     String path = albedoInputBuffer.get();
                                     if (path != null) {
                                         if (m.albedoTexture != null) m.albedoTexture.dispose();
-                                        m.albedoTexture = OxyTexture.loadImage(2, path);
+                                        m.albedoTexture = OxyTexture.loadImage(TextureSlot.ALBEDO, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -377,7 +378,7 @@ public class PropertiesPanel extends Panel {
                                     albedoInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.albedoTexture != null) m.albedoTexture.dispose();
-                                        m.albedoTexture = OxyTexture.loadImage(2, path);
+                                        m.albedoTexture = OxyTexture.loadImage(TextureSlot.ALBEDO, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -433,7 +434,7 @@ public class PropertiesPanel extends Panel {
                                     normalInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.normalTexture != null) m.normalTexture.dispose();
-                                        m.normalTexture = OxyTexture.loadImage(4, path);
+                                        m.normalTexture = OxyTexture.loadImage(TextureSlot.NORMAL, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -449,7 +450,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.normalTexture != null) m.normalTexture.dispose();
-                                        m.normalTexture = OxyTexture.loadImage(2, path);
+                                        m.normalTexture = OxyTexture.loadImage(TextureSlot.NORMAL, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -466,7 +467,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.popItemWidth();
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.dummy(0, 1);
-                                ImGui.sliderFloat("###hidelabel normals", m.normalStrength, 0, 1);
+                                ImGui.sliderFloat("###hidelabel normals", m.normalStrength, 0, 5);
                                 ImGui.popItemWidth();
                             }
 
@@ -510,7 +511,7 @@ public class PropertiesPanel extends Panel {
                                     metalnessInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.metallicTexture != null) m.metallicTexture.dispose();
-                                        m.metallicTexture = OxyTexture.loadImage(4, path);
+                                        m.metallicTexture = OxyTexture.loadImage(TextureSlot.METALLIC, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -526,7 +527,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.metallicTexture != null) m.metallicTexture.dispose();
-                                        m.metallicTexture = OxyTexture.loadImage(2, path);
+                                        m.metallicTexture = OxyTexture.loadImage(TextureSlot.METALLIC, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -587,7 +588,7 @@ public class PropertiesPanel extends Panel {
                                     reflectivityInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.roughnessTexture != null) m.roughnessTexture.dispose();
-                                        m.roughnessTexture = OxyTexture.loadImage(4, path);
+                                        m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -603,7 +604,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.roughnessTexture != null) m.roughnessTexture.dispose();
-                                        m.roughnessTexture = OxyTexture.loadImage(2, path);
+                                        m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -663,7 +664,7 @@ public class PropertiesPanel extends Panel {
                                     aoInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.aoTexture != null) m.aoTexture.dispose();
-                                        m.aoTexture = OxyTexture.loadImage(4, path);
+                                        m.aoTexture = OxyTexture.loadImage(TextureSlot.AO, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
@@ -679,7 +680,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.aoTexture != null) m.aoTexture.dispose();
-                                        m.aoTexture = OxyTexture.loadImage(2, path);
+                                        m.aoTexture = OxyTexture.loadImage(TextureSlot.AO, path);
                                         for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }

@@ -44,7 +44,7 @@ public class OxyEngine implements OxyDisposable {
 
         OxyRenderCommand.getInstance(RendererContext.getContext(platform), RendererAPI.getContext(platform));
 
-        renderer = OxyRenderer3D.getInstance(windowHandle);
+        renderer = OxyRenderer3D.getInstance();
     }
 
     public enum Antialiasing {

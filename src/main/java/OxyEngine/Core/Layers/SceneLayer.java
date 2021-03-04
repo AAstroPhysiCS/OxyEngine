@@ -6,6 +6,7 @@ import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Light.Light;
+import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderer;
@@ -18,10 +19,9 @@ import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Objects.WorldGrid;
 import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scene.SceneState;
-import OxyEngineEditor.UI.Panels.EnvironmentPanel;
+import OxyEngine.TextureSlot;
 import OxyEngineEditor.UI.Panels.GUINode;
 import OxyEngineEditor.UI.Panels.Panel;
 
@@ -33,6 +33,7 @@ import java.util.Set;
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.currentBoundedSkyLight;
 import static OxyEngineEditor.EditorApplication.editorCameraEntity;
 import static OxyEngineEditor.EditorApplication.oxyShader;
 import static org.lwjgl.opengl.GL30.*;
@@ -46,7 +47,6 @@ public class SceneLayer extends Layer {
 
     //    private static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
     private static final OxyShader cubemapShader = new OxyShader("shaders/OxySkybox.glsl");
-    public static HDRTexture hdrTexture;
 
     private OxyCamera mainCamera;
 
@@ -63,19 +63,15 @@ public class SceneLayer extends Layer {
     @Override
     public void build() {
         cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
-        for (OxyEntity e : cachedNativeMeshes) {
-            e.get(NativeObjectMeshOpenGL.class).addToQueue();
-        }
-
         cachedCameraComponents = ACTIVE_SCENE.view(OxyCamera.class);
-        updateAllEntities();
+        updateModelEntities();
 
         fillPropertyEntries();
     }
 
     @Override
     public void rebuild() {
-        updateAllEntities();
+        updateModelEntities();
 
         //Prep
         {
@@ -115,13 +111,21 @@ public class SceneLayer extends Layer {
         }
     }
 
-    public void updateAllEntities() {
-        allModelEntities = ACTIVE_SCENE.view(ModelMeshOpenGL.class);
+    public void updateLightEntities() {
         cachedLightEntities = ACTIVE_SCENE.view(Light.class);
+    }
+
+    public void updateModelEntities() {
+        allModelEntities = ACTIVE_SCENE.view(ModelMeshOpenGL.class);
+        updateLightEntities();
     }
 
     public void updateCameraEntities() {
         cachedCameraComponents = ACTIVE_SCENE.view(OxyCamera.class);
+    }
+
+    public void updateNativeEntities() {
+        cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
     }
 
     @Override
@@ -163,16 +167,27 @@ public class SceneLayer extends Layer {
 
         //Lights
         int i = 0;
+        currentBoundedSkyLight = null;
         for (OxyEntity e : cachedLightEntities) {
             Light l = e.get(Light.class);
             l.update(e, i++);
+            SkyLight comp;
+            if (((comp = e.get(SkyLight.class)) != null && comp.isPrimary())) {
+                currentBoundedSkyLight = (OxyNativeObject) e;
+            }
         }
     }
-
 
     @Override
     public void render(float ts) {
         if (ACTIVE_SCENE == null) return;
+        HDRTexture hdrTexture = null;
+        OxyNativeObject skyLightEntity = currentBoundedSkyLight;
+        SkyLight skyLightComp = null;
+        if (skyLightEntity != null) {
+            skyLightComp = skyLightEntity.get(SkyLight.class);
+            if (skyLightComp != null) hdrTexture = skyLightComp.getHDRTexture();
+        }
 
         OpenGLFrameBuffer frameBuffer = ACTIVE_SCENE.getFrameBuffer();
         OpenGLFrameBuffer destFrameBuffer = ACTIVE_SCENE.getBlittedFrameBuffer();
@@ -189,33 +204,34 @@ public class SceneLayer extends Layer {
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
                 ModelMeshOpenGL modelMesh = e.get(ModelMeshOpenGL.class);
-                OxyMaterial material = OxyMaterialPool.getMaterial(e);
+                OxyMaterial material = null;
+                if (e.has(OxyMaterialIndex.class)) material = OxyMaterialPool.getMaterial(e);
                 TransformComponent c = e.get(TransformComponent.class);
 
                 OxyShader shader = e.get(OxyShader.class);
                 shader.enable();
                 shader.setUniformMatrix4fv("model", c.transform, false);
-                int irradianceSlot = 0, prefilterSlot = 0, brdfLUTSlot = 0;
+                int iblSlot = TextureSlot.UNUSED.getValue(), prefilterSlot = TextureSlot.UNUSED.getValue(), brdfLUTSlot = TextureSlot.UNUSED.getValue();
                 if (hdrTexture != null) {
-                    irradianceSlot = hdrTexture.getIrradianceSlot();
+                    iblSlot = hdrTexture.getIBLSlot();
                     prefilterSlot = hdrTexture.getPrefilterSlot();
                     brdfLUTSlot = hdrTexture.getBDRFSlot();
                     hdrTexture.bindAll();
                 }
-                shader.setUniform1i("irradianceMap", irradianceSlot);
+                shader.setUniform1i("iblMap", iblSlot);
                 shader.setUniform1i("prefilterMap", prefilterSlot);
                 shader.setUniform1i("brdfLUT", brdfLUTSlot);
-                shader.setUniform1f("gamma", EnvironmentPanel.gammaStrength[0]);
-                shader.setUniform1f("exposure", EnvironmentPanel.exposure[0]);
+                shader.setUniform1f("hdrIntensity", SkyLight.intensity[0]);
+                shader.setUniform1f("gamma", SkyLight.gammaStrength[0]);
+                shader.setUniform1f("exposure", SkyLight.exposure[0]);
                 shader.disable();
-
                 if (material != null) material.push(shader);
                 render(ts, modelMesh, mainCamera, shader);
             }
 
             for (OxyEntity e : cachedNativeMeshes) {
                 OpenGLMesh mesh = e.get(OpenGLMesh.class);
-                if (!e.has(OxyShader.class)) continue;
+                if (!e.has(OxyShader.class) || e.has(SkyLight.class)) continue; //DO NOT RENDER THE SKYLIGHT HERE
 
                 if (e.has(OxyMaterialIndex.class)) {
                     OxyMaterial m = OxyMaterialPool.getMaterial(e);
@@ -225,25 +241,25 @@ public class SceneLayer extends Layer {
                     }
                 }
 
-                if(e.get(OxyShader.class).equals(WorldGrid.shader)){
+                if (e.get(OxyShader.class).equals(WorldGrid.shader)) {
                     render(ts, mesh, mainCamera, WorldGrid.shader);
                 }
+            }
 
+            if (skyLightEntity != null) {
                 if (hdrTexture != null) {
-                    if (mesh.equals(hdrTexture.getMesh())) {
-                        hdrTexture.bindAll();
-                        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-                        cubemapShader.enable();
-                        if (EnvironmentPanel.mipLevelStrength[0] > 0)
-                            cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
-                        else cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
-                        cubemapShader.setUniform1f("mipLevel", EnvironmentPanel.mipLevelStrength[0]);
-                        cubemapShader.setUniform1f("exposure", EnvironmentPanel.exposure[0]);
-                        cubemapShader.setUniform1f("gamma", EnvironmentPanel.gammaStrength[0]);
-                        cubemapShader.disable();
-                        render(ts, mesh, mainCamera, cubemapShader);
-                        glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-                    }
+                    hdrTexture.bindAll();
+                    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+                    cubemapShader.enable();
+                    if (skyLightComp.mipLevelStrength[0] > 0)
+                        cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
+                    else cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
+                    cubemapShader.setUniform1f("mipLevel", skyLightComp.mipLevelStrength[0]);
+                    cubemapShader.setUniform1f("exposure", SkyLight.exposure[0]);
+                    cubemapShader.setUniform1f("gamma", SkyLight.gammaStrength[0]);
+                    cubemapShader.disable();
+                    render(ts, skyLightEntity.get(OpenGLMesh.class), mainCamera, cubemapShader);
+                    glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
                 }
             }
         }
@@ -269,13 +285,6 @@ public class SceneLayer extends Layer {
         for (OxyEntity m : cachedLightEntities) m.addComponent(oxyShader);
     }
 
-    public void loadHDRTextureToScene(String path, Scene s) {
-        if (path == null) return;
-        if (SceneLayer.hdrTexture != null) SceneLayer.hdrTexture.dispose();
-        SceneLayer.hdrTexture = OxyTexture.loadHDRTexture(path, s);
-        cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
-    }
-
     private void render(float ts, OpenGLMesh mesh, OxyCamera camera, OxyShader shader) {
         ACTIVE_SCENE.getRenderer().render(ts, mesh, camera, shader);
         OxyRenderer.Stats.totalShapeCount = ACTIVE_SCENE.getShapeCount();
@@ -286,4 +295,5 @@ public class SceneLayer extends Layer {
         cachedCameraComponents.clear();
         allModelEntities.clear();
     }
+
 }

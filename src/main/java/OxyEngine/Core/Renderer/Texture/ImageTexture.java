@@ -1,5 +1,7 @@
 package OxyEngine.Core.Renderer.Texture;
 
+import OxyEngine.TextureSlot;
+
 import java.nio.ByteBuffer;
 
 import static OxyEngine.System.OxySystem.logger;
@@ -18,13 +20,14 @@ public class ImageTexture extends OxyTexture.AbstractTexture {
         this.alFormat = other.alFormat;
     }
 
-    ImageTexture(int slot, String path, float[] tcs) {
+    ImageTexture(TextureSlot slot, String path, float[] tcs) {
         super(slot, path);
         this.tcs = tcs;
 
-        assert slot != -10 : oxyAssert("No empty texture slot!");
-        assert slot != 0 : oxyAssert("Slot can not be 0");
-        assert slot <= 32 : oxyAssert("32 Texture Slots exceeded!");
+        int slotValue = slot.getValue();
+        assert slotValue != -10 : oxyAssert("No empty texture slot!");
+        assert slotValue != 0 : oxyAssert("Slot can not be 0");
+        assert slotValue <= 32 : oxyAssert("32 Texture Slots exceeded!");
 
         int[] width = new int[1];
         int[] height = new int[1];

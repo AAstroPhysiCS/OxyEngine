@@ -76,19 +76,17 @@ public class OxyModel extends OxyEntity {
             }
         }
 
-        SceneRuntime.onCreate();
         SceneRuntime.stop();
 
         if(has(OpenGLMesh.class)) e.initData(get(OpenGLMesh.class).getPath());
         return e;
     }
 
-    @Override
-    public void initData(String path) {
+    public void initData(String meshPath) {
         assert factory != null : oxyAssert("Models should have a Model Template");
         transformLocally();
         factory.constructData(this);
-        addComponent(new ModelMeshOpenGL(path, GL_TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
+        addComponent(new ModelMeshOpenGL(meshPath, GL_TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
     }
 
     @Override

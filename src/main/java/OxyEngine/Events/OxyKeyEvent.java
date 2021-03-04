@@ -27,8 +27,9 @@ public class OxyKeyEvent extends OxyEvent {
         if (keyEventDispatcher.getKeys()[GLFW_KEY_DELETE] && entityContext != null) {
             SceneRuntime.stop();
             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
-            SceneLayer.getInstance().updateAllEntities();
+            SceneLayer.getInstance().updateModelEntities();
             SceneLayer.getInstance().updateCameraEntities();
+            SceneLayer.getInstance().updateNativeEntities();
             entityContext = null;
             System.gc();
         }
@@ -36,7 +37,7 @@ public class OxyKeyEvent extends OxyEvent {
         if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && keyEventDispatcher.getKeys()[GLFW_KEY_C] &&
                 entityContext instanceof OxyModel m && !cPressed) {
             m.copyMe();
-            SceneLayer.getInstance().updateAllEntities();
+            SceneLayer.getInstance().updateModelEntities();
             cPressed = true;
             System.gc();
         }

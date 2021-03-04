@@ -154,7 +154,7 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                                 e.updateVertexData();
                             }
 
-                            SceneLayer.getInstance().updateAllEntities();
+                            SceneLayer.getInstance().updateModelEntities();
                             meshPath = new ImString(path);
                             entityContext = root;
                         }

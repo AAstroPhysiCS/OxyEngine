@@ -31,7 +31,7 @@ public class OxyNativeObject extends OxyEntity {
     public void pushVertexData(TransformComponent t) {
         TransformComponent tOld = get(TransformComponent.class);
         tOld.set(t);
-        initData(null);
+        initData();
     }
 
     public void pushVertexData(ModelType type){
@@ -46,7 +46,7 @@ public class OxyNativeObject extends OxyEntity {
             vertices[vertPtr++] = transformed.y;
             vertices[vertPtr++] = transformed.z;
         }
-        initData(type.getPath());
+        initData();
     }
 
     @Override
@@ -57,8 +57,7 @@ public class OxyNativeObject extends OxyEntity {
         return e;
     }
 
-    @Override
-    public void initData(String path) {
+    public void initData() {
         assert has(OpenGLMesh.class) : oxyAssert("Game object need to have a template and a Mesh!");
 
         OpenGLMesh mesh = get(OpenGLMesh.class);
@@ -70,6 +69,7 @@ public class OxyNativeObject extends OxyEntity {
 
     @Override
     public void constructData() {
+        if(factory == null) return;
         factory.constructData(this, size);
     }
 
