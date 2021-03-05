@@ -24,6 +24,7 @@ import imgui.type.ImString;
 import org.joml.Vector4f;
 
 import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.materialContext;
@@ -43,6 +44,14 @@ public class PropertiesPanel extends Panel {
 
     ImString name = new ImString(0);
     final ImString searchAddComponent = new ImString(100);
+
+
+    private static final ImString albedoInputBuffer = new ImString(200);
+    private static final ImString metalnessInputBuffer = new ImString(200);
+    private static final ImString reflectivityInputBuffer = new ImString(200);
+    private static final ImString normalInputBuffer = new ImString(200);
+    private static final ImString aoInputBuffer = new ImString(200);
+    private static final ImString emissiveInputBuffer = new ImString(200);
 
     @Override
     public void preload() {
@@ -103,12 +112,6 @@ public class PropertiesPanel extends Panel {
         ImGui.popStyleVar();
         ImGui.popID();
     }
-
-    private static final ImString albedoInputBuffer = new ImString(200);
-    private static final ImString metalnessInputBuffer = new ImString(200);
-    private static final ImString reflectivityInputBuffer = new ImString(200);
-    private static final ImString normalInputBuffer = new ImString(200);
-    private static final ImString aoInputBuffer = new ImString(200);
 
     private String renderImageBesideTreeNode(String name, int textureId, final float sizeX, final float sizeY) {
         name = "\t " + name;
@@ -224,7 +227,7 @@ public class PropertiesPanel extends Panel {
                             entityContext.getGUINodes().add(ModelMeshOpenGL.guiNode);
                     if (ImGui.menuItem("Material"))
                         if (!entityContext.getGUINodes().contains(OxyMaterial.guiNode)) {
-                            int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 1.0f, 1.0f));
+                            int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 1.0f, 1.0f, 1.0f));
                             entityContext.addComponent(new OxyMaterialIndex(index));
                             entityContext.getGUINodes().add(OxyMaterial.guiNode);
                         }
@@ -286,12 +289,24 @@ public class PropertiesPanel extends Panel {
                         }
                         //error or hint that lights are single instanced. TODO
                     }
+
+                    if (ImGui.menuItem("Sky Light")) {
+                        if (!entityContext.has(Light.class)) {
+                            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
+                            ACTIVE_SCENE.createSkyLight();
+                            SceneLayer.getInstance().updateModelEntities();
+                            entityContext = null;
+                        }
+                        //error or hint that lights are single instanced. TODO
+                    }
                     ImGui.endMenu();
                 }
                 ImGui.endPopup();
             }
-            for (GUINode guiNode : entityContext.getGUINodes())
-                guiNode.runEntry();
+            if(entityContext != null) {
+                for (GUINode guiNode : entityContext.getGUINodes())
+                    guiNode.runEntry();
+            }
             ImGui.popStyleColor();
 
         } else if (materialContext != null) {
@@ -698,6 +713,82 @@ public class PropertiesPanel extends Panel {
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.dummy(0, 1);
                                 ImGui.sliderFloat("###hidelabel normals", m.aoStrength, 0, 1);
+                                ImGui.popItemWidth();
+                            }
+
+                            ImGui.treePop();
+                        }
+                        ImGui.endChild();
+                        ImGui.popStyleColor();
+                        ImGui.popStyleVar();
+                    }
+
+                    {
+
+                        ImGui.pushStyleColor(ImGuiCol.ChildBg, Panel.childCardBgC[0], Panel.childCardBgC[1], Panel.childCardBgC[2], Panel.childCardBgC[3]);
+                        ImGui.pushStyleVar(ImGuiStyleVar.ChildRounding, 12);
+                        ImGui.beginChild("EmissiveChild", ImGui.getContentRegionAvailX(), 100);
+
+                        ImGui.dummy(0, 5);
+
+                        if (ImGui.treeNodeEx("Emissive Map", ImGuiTreeNodeFlags.DefaultOpen)) {
+
+                            ImGui.columns(2);
+                            ImGui.setColumnWidth(0, 160);
+
+                            ImGui.alignTextToFramePadding();
+                            renderPreviewImage(m.emissiveTexture, 3);
+                            ImGui.text("Emissive Map");
+
+                            ImGui.dummy(0, 5);
+
+                            ImGui.text("Emissive Strength");
+                            ImGui.nextColumn();
+
+                            {
+                                ImGui.spacing();
+                                ImGui.pushItemWidth(ImGui.getContentRegionAvailX() - 50);
+                                emissiveInputBuffer.set("");
+                                if (m.emissiveTexture != null) emissiveInputBuffer.set(m.emissiveTexture.getPath());
+                                if (ImGui.inputText("##hideLabelEmissiveInput", emissiveInputBuffer, ImGuiInputTextFlags.EnterReturnsTrue)) {
+                                    String path = emissiveInputBuffer.get();
+                                    emissiveInputBuffer.set(path);
+                                    if (path != null) {
+                                        if (m.emissiveTexture != null) m.emissiveTexture.dispose();
+                                        m.emissiveTexture = OxyTexture.loadImage(TextureSlot.EMISSIVE, path);
+                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
+                                    }
+                                }
+                                ImGui.popItemWidth();
+
+                                ImGui.sameLine();
+                                ImGui.pushStyleColor(ImGuiCol.Button, 0, 0, 0, 0);
+                                ImGui.pushStyleColor(ImGuiCol.ButtonActive, 1.0f, 1.0f, 1.0f, 0.2f);
+                                ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.2f);
+                                ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
+
+                                if (ImGui.imageButton(dirAsset.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
+                                    String path = openDialog("", null);
+                                    if (path != null) {
+                                        if (m.emissiveTexture != null) m.emissiveTexture.dispose();
+                                        m.emissiveTexture = OxyTexture.loadImage(TextureSlot.EMISSIVE, path);
+                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
+                                    }
+                                }
+
+                                ImGui.popStyleColor(3);
+                                ImGui.popItemWidth();
+
+                                ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
+                                ImGui.sameLine();
+                                if (ImGui.button("E")) {
+                                    m.emissiveTexture.dispose();
+                                    m.emissiveTexture = null;
+                                }
+                                ImGui.popItemWidth();
+                                ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
+                                ImGui.dummy(0, 1);
+                                ImGui.sliderFloat("###hidelabel emissiveStrength", m.emissiveStrength, 0, 5);
                                 ImGui.popItemWidth();
                             }
 

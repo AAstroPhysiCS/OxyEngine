@@ -63,11 +63,13 @@ vec3 normalMap;
 uniform float gamma;
 //PBR
 uniform int metallicSlot;
-uniform float metallicFloat;
+uniform float metallicStrength;
 uniform int roughnessSlot;
-uniform float roughnessFloat;
+uniform float roughnessStrength;
 uniform int aoSlot;
-uniform float aoFloat;
+uniform float aoStrength;
+uniform int emissiveSlot;
+uniform float emissiveStrength;
 //PBR FILTERING
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
@@ -162,19 +164,19 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
     float metallicMap, roughnessMap, aoMap;
 
     if(metallicSlot == 0){
-       metallicMap = metallicFloat;
+       metallicMap = metallicStrength;
     } else {
        metallicMap = texture(tex[metallicSlot], inVar.texCoordsOut).r;
     }
 
     if(roughnessSlot == 0){
-        roughnessMap = roughnessFloat;
+        roughnessMap = roughnessStrength;
     } else {
         roughnessMap = texture(tex[roughnessSlot], inVar.texCoordsOut).r;
     }
 
     if(aoSlot == 0){
-       aoMap = aoFloat;
+       aoMap = aoStrength;
     } else {
        aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
     }
@@ -188,7 +190,7 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
     }
 
     vec3 IBL = texture(iblMap, norm).rgb;
-    if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL.rgb = vec3(0.1f, 0.1f, 0.1f);
+    if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL = vec3(0.05f, 0.05f, 0.05f);
     vec3 Lo;
     vec3 F0 = vec3(0.04);
     F0 = mix(F0, albedo, metallicMap);
@@ -224,10 +226,13 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
     vec3 ambient = (kD * diffuseMap + specular) * aoMap * hdrIntensity;
 
-    vec3 result = ambient + Lo;
+    vec3 emissive = texture(tex[emissiveSlot], inVar.texCoordsOut).rgb * emissiveStrength;
+
+    vec3 result = ambient + Lo + emissive;
     result = result / (result + vec3(1.0));
     result = vec3(1.0) - exp(-result * exposure);
     result = pow(result, vec3(1f / gamma));
+
     return vec4(result, 1.0f);
 }
 

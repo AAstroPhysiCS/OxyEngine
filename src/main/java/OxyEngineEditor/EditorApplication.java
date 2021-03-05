@@ -76,7 +76,7 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(ProjectPanel.getInstance());
         uiLayer.addPanel(ScenePanel.getInstance());
         uiLayer.addPanel(SceneRuntime.getPanel());
-        uiLayer.addPanel(SceneHierarchyPanel.getInstance(oxyShader));
+        uiLayer.addPanel(SceneHierarchyPanel.getInstance());
         uiLayer.addPanel(PropertiesPanel.getInstance());
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, uiLayer);

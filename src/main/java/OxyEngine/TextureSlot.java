@@ -8,10 +8,11 @@ public enum TextureSlot {
     ROUGHNESS(3),
     METALLIC(4),
     AO(5),
-    HDR(6),
-    IRRADIANCE(7),
-    PREFILTER(8),
-    BDRF(9);
+    EMISSIVE(6),
+    HDR(7),
+    IRRADIANCE(8),
+    PREFILTER(9),
+    BDRF(10);
 
     private final int value;
 

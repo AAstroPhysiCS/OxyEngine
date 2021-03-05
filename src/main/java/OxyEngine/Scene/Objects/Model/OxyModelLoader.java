@@ -48,7 +48,7 @@ public class OxyModelLoader {
 
     public static record AssimpMaterial(String name, String textPath, String textPathMetallic,
                                         String textPathRoughness, String textPathNormals,
-                                        String textPathAO, Vector4f diffuse) {
+                                        String textPathAO, String textPathEmissive, Vector4f diffuse) {
     }
 
     public final List<AssimpMesh> meshes = new ArrayList<>();
@@ -208,6 +208,11 @@ public class OxyModelLoader {
         String textPathAO = pathAO.dataString();
         pathAO.clear();
 
+        AIString pathEmissive = AIString.calloc();
+        aiGetMaterialTexture(aiMaterial, aiTextureType_EMISSIVE, 0, pathEmissive, (IntBuffer) null, null, null, null, null, null);
+        String textPathEmissive = pathEmissive.dataString();
+        pathEmissive.clear();
+
         AIColor4D color = AIColor4D.create();
         Vector4f diffuse = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
         int result = aiGetMaterialColor(aiMaterial, AI_MATKEY_COLOR_DIFFUSE, aiTextureType_NONE, 0, color);
@@ -237,8 +242,10 @@ public class OxyModelLoader {
         else textPathMetallic = parentPath + "\\" + textPathMetallic;
         if (textPathAO.isBlank() || textPathAO.isEmpty()) textPathAO = null;
         else textPathAO = parentPath + "\\" + textPathAO;
+        if (textPathEmissive.isBlank() || textPathEmissive.isEmpty()) textPathEmissive = null;
+        else textPathEmissive = parentPath + "\\" + textPathEmissive;
 
-        materials.add(new AssimpMaterial(matName, textPath, textPathMetallic, textPathRoughness, textPathNormals, textPathAO, diffuse));
+        materials.add(new AssimpMaterial(matName, textPath, textPathMetallic, textPathRoughness, textPathNormals, textPathAO, textPathEmissive, diffuse));
     }
 
     public String getPath() {

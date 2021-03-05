@@ -221,9 +221,15 @@ public class SceneLayer extends Layer {
                 shader.setUniform1i("iblMap", iblSlot);
                 shader.setUniform1i("prefilterMap", prefilterSlot);
                 shader.setUniform1i("brdfLUT", brdfLUTSlot);
-                shader.setUniform1f("hdrIntensity", SkyLight.intensity[0]);
-                shader.setUniform1f("gamma", SkyLight.gammaStrength[0]);
-                shader.setUniform1f("exposure", SkyLight.exposure[0]);
+                if(skyLightComp != null) {
+                    shader.setUniform1f("hdrIntensity", skyLightComp.intensity[0]);
+                    shader.setUniform1f("gamma", skyLightComp.gammaStrength[0]);
+                    shader.setUniform1f("exposure", skyLightComp.exposure[0]);
+                } else {
+                    shader.setUniform1f("hdrIntensity", 1.0f);
+                    shader.setUniform1f("gamma", 2.2f);
+                    shader.setUniform1f("exposure", 1.0f);
+                }
                 shader.disable();
                 if (material != null) material.push(shader);
                 render(ts, modelMesh, mainCamera, shader);
@@ -255,8 +261,8 @@ public class SceneLayer extends Layer {
                         cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getPrefilterSlot());
                     else cubemapShader.setUniform1i("skyBoxTexture", hdrTexture.getTextureSlot());
                     cubemapShader.setUniform1f("mipLevel", skyLightComp.mipLevelStrength[0]);
-                    cubemapShader.setUniform1f("exposure", SkyLight.exposure[0]);
-                    cubemapShader.setUniform1f("gamma", SkyLight.gammaStrength[0]);
+                    cubemapShader.setUniform1f("exposure", skyLightComp.exposure[0]);
+                    cubemapShader.setUniform1f("gamma", skyLightComp.gammaStrength[0]);
                     cubemapShader.disable();
                     render(ts, skyLightEntity.get(OpenGLMesh.class), mainCamera, cubemapShader);
                     glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);

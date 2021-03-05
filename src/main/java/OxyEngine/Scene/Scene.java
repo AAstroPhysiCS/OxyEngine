@@ -1,12 +1,16 @@
 package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
+import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Camera.SceneCamera;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
+import OxyEngine.Core.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
@@ -18,6 +22,7 @@ import OxyEngine.Scene.Objects.SkyLightFactory;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.*;
 
@@ -31,6 +36,7 @@ import static OxyEngine.Scene.SceneSerializer.fileExtension;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.EditorApplication.oxyShader;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 
@@ -101,19 +107,28 @@ public final class Scene implements OxyDisposable {
         return e;
     }
 
-    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader, boolean importedFromFile) {
-        return createModelEntities(type.getPath(), shader, importedFromFile);
+    public OxyEntity createEmptyEntity() {
+        OxyEntity model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        if (entityContext != null) {
+            model.addComponent(new TagComponent("Empty Group"), new SelectedComponent(false));
+            model.setFamily(new EntityFamily(entityContext.getFamily()));
+            model.transformLocally();
+        } else {
+            model.addComponent(new TagComponent("Empty Group"), new SelectedComponent(false));
+            //model.setFamily(new EntityFamily()); this is already the default behaviour once the entity is created
+            model.transformLocally();
+        }
+        SceneLayer.getInstance().rebuild();
+        return model;
     }
 
-    public final OxyModel createModelEntity(ModelType type, OxyShader shader) {
-        return createModelEntity(type.getPath(), shader);
+    public void createMeshEntity() {
+        OxyEntity model = createEmptyEntity();
+        if(!model.getGUINodes().contains(ModelMeshOpenGL.guiNode))
+            model.getGUINodes().add(ModelMeshOpenGL.guiNode);
     }
 
-    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
-        return createModelEntities(type.getPath(), shader, false);
-    }
-
-    public final OxyNativeObject createSkyLight() {
+    public OxyNativeObject createSkyLight() {
         OxyNativeObject skyLightEnt = createNativeObjectEntity();
         skyLightEnt.setFactory(new SkyLightFactory());
         skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight(this));
@@ -124,6 +139,49 @@ public final class Scene implements OxyDisposable {
         SceneLayer.getInstance().updateLightEntities();
         SceneLayer.getInstance().updateNativeEntities();
         return skyLightEnt;
+    }
+
+    public void createPointLight(){
+
+        OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+
+        PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
+        int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
+        model.addComponent(pointLight, new OxyMaterialIndex(index), new TagComponent("Point Light"));
+
+        if (!model.getGUINodes().contains(OxyMaterial.guiNode))
+            model.getGUINodes().add(OxyMaterial.guiNode);
+        model.getGUINodes().add(PointLight.guiNode);
+        SceneLayer.getInstance().updateModelEntities();
+    }
+
+    public void createDirectionalLight(){
+        OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
+        model.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f, new Vector3f()));
+        model.addComponent(new OxyMaterialIndex(index));
+        model.getGUINodes().add(DirectionalLight.guiNode);
+        SceneLayer.getInstance().updateModelEntities();
+    }
+
+    public void createPerspectiveCamera(){
+        OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        model.addComponent(new SceneCamera());
+        if (!model.getGUINodes().contains(OxyCamera.guiNode))
+            model.getGUINodes().add(OxyCamera.guiNode);
+        SceneLayer.getInstance().updateCameraEntities();
+    }
+
+    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader, boolean importedFromFile) {
+        return createModelEntities(type.getPath(), shader, importedFromFile);
+    }
+
+    public final OxyModel createModelEntity(ModelType type, OxyShader shader) {
+        return createModelEntity(type.getPath(), shader);
+    }
+
+    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
+        return createModelEntities(type.getPath(), shader, false);
     }
 
     public final OxyModel createEmptyModel(OxyShader shader) {
@@ -265,7 +323,10 @@ public final class Scene implements OxyDisposable {
         int index = e.get(OxyMaterialIndex.class) != null ? e.get(OxyMaterialIndex.class).index() : -1;
 
         if (e.has(ModelMeshOpenGL.class)) e.get(ModelMeshOpenGL.class).dispose();
-        if (e.has(SkyLight.class)) e.get(SkyLight.class).getHDRTexture().dispose();
+        if (e.has(SkyLight.class)) {
+            HDRTexture texture = e.get(SkyLight.class).getHDRTexture();
+            if(texture != null) texture.dispose();
+        }
 
         for (var scripts : e.getScripts()) {
             if (scripts.getProvider() != null) SceneRuntime.scriptThread.getProviders().remove(scripts.getProvider());

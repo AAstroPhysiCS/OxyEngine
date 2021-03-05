@@ -11,6 +11,7 @@
       <w>coords</w>
       <w>cubemap</w>
       <w>dest</w>
+      <w>emissive</w>
       <w>fovy</w>
       <w>framebuffer</w>
       <w>glfw</w>

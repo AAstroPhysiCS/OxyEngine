@@ -41,7 +41,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
     private IrradianceTexture irradianceTexture;
     private PrefilterTexture prefilterTexture;
-    private static BDRF bdrf;
+    private BDRF bdrf;
 
     HDRTexture(TextureSlot slot, String path, Scene scene) {
         super(slot, path);

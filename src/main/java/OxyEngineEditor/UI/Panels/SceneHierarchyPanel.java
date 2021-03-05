@@ -2,11 +2,9 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.SkyLight;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
@@ -29,8 +27,6 @@ public class SceneHierarchyPanel extends Panel {
 
     private static SceneHierarchyPanel INSTANCE = null;
 
-    private final OxyShader shader;
-
     private static ImageTexture eyeViewTexture;
     private static ImageTexture materialGreyMesh;
     private static ImageTexture materialGroupGizmo;
@@ -42,13 +38,13 @@ public class SceneHierarchyPanel extends Panel {
 
     private static final int TABLE_COLORS = ImGui.getColorU32(bgC[0], bgC[1], bgC[2], bgC[3]);
 
-    public static SceneHierarchyPanel getInstance(OxyShader shader) {
-        if (INSTANCE == null) INSTANCE = new SceneHierarchyPanel(shader);
+    public static SceneHierarchyPanel getInstance() {
+        if (INSTANCE == null) INSTANCE = new SceneHierarchyPanel();
         return INSTANCE;
     }
 
-    private SceneHierarchyPanel(OxyShader shader) {
-        this.shader = shader;
+    private SceneHierarchyPanel() {
+
     }
 
     @Override
@@ -285,31 +281,21 @@ public class SceneHierarchyPanel extends Panel {
 
         if (ImGui.beginPopupContextWindow("Entity menu")) {
             if (ImGui.button("Create Entity"))
-                addEntity(shader);
+                ACTIVE_SCENE.createEmptyEntity();
             ImGui.separator();
+            if (ImGui.button("Mesh"))
+                ACTIVE_SCENE.createMeshEntity();
             if (ImGui.button("Sky Light"))
-                addSkyLight();
+                ACTIVE_SCENE.createSkyLight();
+            if (ImGui.button("Point Light"))
+                ACTIVE_SCENE.createPointLight();
+            if (ImGui.button("Directional Light"))
+                ACTIVE_SCENE.createDirectionalLight();
+            if (ImGui.button("Perspective Camera"))
+                ACTIVE_SCENE.createPerspectiveCamera();
             ImGui.endPopup();
         }
 
         ImGui.end();
-    }
-
-    private void addEntity(OxyShader shader) {
-        OxyEntity model = ACTIVE_SCENE.createEmptyModel(shader);
-        if (entityContext != null) {
-            model.addComponent(new TagComponent("Empty Group"), new SelectedComponent(false));
-            model.setFamily(new EntityFamily(entityContext.getFamily()));
-            model.transformLocally();
-        } else {
-            model.addComponent(new TagComponent("Empty Group"), new SelectedComponent(false));
-            //model.setFamily(new EntityFamily()); this is already the default behaviour once the entity is created
-            model.transformLocally();
-        }
-        SceneLayer.getInstance().rebuild();
-    }
-
-    private void addSkyLight() {
-        ACTIVE_SCENE.createSkyLight();
     }
 }

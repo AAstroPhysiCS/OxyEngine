@@ -17,10 +17,10 @@ import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class SkyLight extends Light {
 
-    public static float[] gammaStrength = new float[]{2.2f};
-    public static float[] exposure = new float[]{1.0f};
-    public static float[] intensity = new float[]{0.0f};
+    public float[] gammaStrength = new float[]{2.2f};
+    public float[] exposure = new float[]{1.0f};
 
+    public float[] intensity = new float[]{1.0f};
     public float[] mipLevelStrength = new float[]{0.0f};
 
     public static final float[] skyboxVertices = {
@@ -68,7 +68,6 @@ public class SkyLight extends Light {
     };
 
     public static final int[] indices = new int[SkyLight.skyboxVertices.length];
-
     static {
         for (int i = 0; i < SkyLight.skyboxVertices.length; i++) {
             indices[i] = i;
@@ -118,6 +117,10 @@ public class SkyLight extends Light {
         return primary;
     }
 
+    public void setPrimary(boolean primary) {
+        this.primary = primary;
+    }
+
     public static final GUINode guiNode = () -> {
 
         if (entityContext == null) return;
@@ -153,10 +156,10 @@ public class SkyLight extends Light {
         ImGui.text("Exposure: ");
         ImGui.nextColumn();
         ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
-        ImGui.sliderFloat("###hidelabel intensitySkyLight", intensity, 0, 10);
-        ImGui.sliderFloat("###hidelabel g", gammaStrength, 0, 10);
+        ImGui.sliderFloat("###hidelabel intensitySkyLight", comp.intensity, 0, 10);
+        ImGui.sliderFloat("###hidelabel g", comp.gammaStrength, 0, 10);
         ImGui.sliderFloat("###hidelabel lod", comp.mipLevelStrength, 0, 5);
-        ImGui.sliderFloat("###hidelabel exposure", exposure, 0, 10);
+        ImGui.sliderFloat("###hidelabel exposure", comp.exposure, 0, 10);
         ImGui.popItemWidth();
         ImGui.columns(1);
 
@@ -168,4 +171,5 @@ public class SkyLight extends Light {
 
         ImGui.separator();
     };
+
 }

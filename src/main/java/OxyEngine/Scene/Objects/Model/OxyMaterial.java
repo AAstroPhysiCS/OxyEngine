@@ -26,19 +26,9 @@ import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public class OxyMaterial implements OxyDisposable {
 
-    /*
-     * Albedo 1
-     * Normal 2
-     * Roughness 3
-     * Metallic 4
-     * AO 5
-     * HDR 6, 7, 8, 9
-     * UNUSED 31
-     */
-
     public int assimpIndex, index;
 
-    public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture;
+    public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, emissiveTexture;
     public final OxyColor albedoColor;
 
     public String name = "Unnamed Material";
@@ -47,55 +37,61 @@ public class OxyMaterial implements OxyDisposable {
     public float[] roughness;
     public float[] aoStrength;
     public final float[] normalStrength;
+    public float[] emissiveStrength;
 
-    public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
+    public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture, ImageTexture emissiveTexture,
                        OxyColor albedoColor) {
-        this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, albedoColor, 1.0f, 0.5f, 1.0f, 0.0f);
+        this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, emissiveTexture, albedoColor, 1.0f, 0.5f, 1.0f, 0.0f, 1.0f);
     }
 
     public OxyMaterial(OxyModelLoader.AssimpMaterial assimpMaterial) {
-        this(assimpMaterial.name().isEmpty() ? "Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++) : assimpMaterial.name(), OxyTexture.loadImage(TextureSlot.ALBEDO, assimpMaterial.textPath()), OxyTexture.loadImage(TextureSlot.NORMAL, assimpMaterial.textPathNormals()),
+        this(assimpMaterial.name().isEmpty() ? "Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++) : assimpMaterial.name(),
+                OxyTexture.loadImage(TextureSlot.ALBEDO, assimpMaterial.textPath()), OxyTexture.loadImage(TextureSlot.NORMAL, assimpMaterial.textPathNormals()),
                 OxyTexture.loadImage(TextureSlot.ROUGHNESS, assimpMaterial.textPathRoughness()), OxyTexture.loadImage(TextureSlot.METALLIC, assimpMaterial.textPathMetallic()),
-                OxyTexture.loadImage(TextureSlot.AO, assimpMaterial.textPathAO()), new OxyColor(assimpMaterial.diffuse()));
+                OxyTexture.loadImage(TextureSlot.AO, assimpMaterial.textPathAO()), OxyTexture.loadImage(TextureSlot.EMISSIVE, assimpMaterial.textPathEmissive()), new OxyColor(assimpMaterial.diffuse()));
     }
 
-    public OxyMaterial(String name, String albedoTexture, String normalTexture, String roughnessTexture, String metallicTexture, String aoTexture,
+    public OxyMaterial(String name, String albedoTexture, String normalTexture, String roughnessTexture, String metallicTexture, String aoTexture, String emissiveTexture,
                        OxyColor albedoColor) {
         this(name, OxyTexture.loadImage(TextureSlot.ALBEDO, albedoTexture), OxyTexture.loadImage(TextureSlot.NORMAL, normalTexture),
                 OxyTexture.loadImage(TextureSlot.ROUGHNESS, roughnessTexture), OxyTexture.loadImage(TextureSlot.METALLIC, metallicTexture),
-                OxyTexture.loadImage(TextureSlot.AO, aoTexture), albedoColor, 1.0f, 0.5f, 1.0f, 0.0f);
+                OxyTexture.loadImage(TextureSlot.AO, aoTexture), OxyTexture.loadImage(TextureSlot.EMISSIVE, emissiveTexture), albedoColor,
+                1.0f, 0.5f, 1.0f, 0.0f, 1.0f);
     }
 
-    public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture,
-                       OxyColor albedoColor, float m_normalStrength, float m_aoStrength, float m_roughness, float m_metalness) {
+    public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture, ImageTexture emissiveTexture,
+                       OxyColor albedoColor, float m_normalStrength, float m_aoStrength, float m_roughness, float m_metalness, float m_emissiveStrength) {
         this.name = name;
         this.albedoTexture = albedoTexture;
         this.roughnessTexture = roughnessTexture;
         this.metallicTexture = metallicTexture;
         this.aoTexture = aoTexture;
         this.normalTexture = normalTexture;
+        this.emissiveTexture = emissiveTexture;
         this.albedoColor = albedoColor;
         metalness = new float[]{m_metalness};
         roughness = new float[]{m_roughness};
         aoStrength = new float[]{m_aoStrength};
         normalStrength = new float[]{m_normalStrength};
+        emissiveStrength = new float[]{m_emissiveStrength};
     }
 
     private static int UNKNOWN_MATERIAL_COUNT = 0;
 
     public OxyMaterial(Vector4f albedoColor) {
-        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null, new OxyColor(albedoColor));
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null, null, new OxyColor(albedoColor));
     }
 
     public OxyMaterial(float r, float g, float b, float a) {
-        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null, new OxyColor(new Vector4f(r, g, b, a)));
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null,null, new OxyColor(new Vector4f(r, g, b, a)));
     }
 
-    public OxyMaterial(Vector4f albedoColor, float metalness, float roughness, float aoStrength) {
-        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null, new OxyColor(albedoColor));
+    public OxyMaterial(Vector4f albedoColor, float metalness, float roughness, float aoStrength, float emissiveStrength) {
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null,null, new OxyColor(albedoColor));
         this.metalness = new float[]{metalness};
         this.roughness = new float[]{roughness};
         this.aoStrength = new float[]{aoStrength};
+        this.emissiveStrength = new float[]{emissiveStrength};
     }
 
     public OxyMaterial(OxyMaterial other) {
@@ -104,11 +100,13 @@ public class OxyMaterial implements OxyDisposable {
         if (other.normalTexture != null) this.normalTexture = new ImageTexture(other.normalTexture);
         if (other.albedoTexture != null) this.albedoTexture = new ImageTexture(other.albedoTexture);
         if (other.metallicTexture != null) this.metallicTexture = new ImageTexture(other.metallicTexture);
+        if (other.emissiveTexture != null) this.emissiveTexture = new ImageTexture(other.emissiveTexture);
         this.albedoColor = new OxyColor(other.albedoColor.getNumbers().clone());
         this.metalness = other.metalness.clone();
         this.roughness = other.roughness.clone();
         this.aoStrength = other.aoStrength.clone();
         this.normalStrength = other.normalStrength.clone();
+        this.emissiveStrength = other.emissiveStrength.clone();
         this.index = other.index;
         this.assimpIndex = other.assimpIndex;
     }
@@ -133,6 +131,7 @@ public class OxyMaterial implements OxyDisposable {
         if (normalTexture != null) glBindTextureUnit(normalTexture.getTextureSlot(), normalTexture.getTextureId());
         if (aoTexture != null) glBindTextureUnit(aoTexture.getTextureSlot(), aoTexture.getTextureId());
         if (albedoTexture != null) glBindTextureUnit(albedoTexture.getTextureSlot(), albedoTexture.getTextureId());
+        if (emissiveTexture != null) glBindTextureUnit(emissiveTexture.getTextureSlot(), emissiveTexture.getTextureId());
     }
 
     public void push(OxyShader shader) {
@@ -153,19 +152,25 @@ public class OxyMaterial implements OxyDisposable {
             shader.setUniform1i("metallicSlot", metallicTexture.getTextureSlot());
         } else {
             shader.setUniform1i("metallicSlot", 0);
-            shader.setUniform1f("metallicFloat", metalness[0]);
+            shader.setUniform1f("metallicStrength", metalness[0]);
         }
         if (aoTexture != null) {
             shader.setUniform1i("aoSlot", aoTexture.getTextureSlot());
         } else {
-            shader.setUniform1f("aoFloat", aoStrength[0]);
+            shader.setUniform1f("aoStrength", aoStrength[0]);
             shader.setUniform1i("aoSlot", 0);
         }
         if (roughnessTexture != null) {
             shader.setUniform1i("roughnessSlot", roughnessTexture.getTextureSlot());
         } else {
-            shader.setUniform1f("roughnessFloat", roughness[0]);
+            shader.setUniform1f("roughnessStrength", roughness[0]);
             shader.setUniform1i("roughnessSlot", 0);
+        }
+        if(emissiveTexture != null){
+            shader.setUniform1f("emissiveStrength", emissiveStrength[0]);
+            shader.setUniform1i("emissiveSlot", emissiveTexture.getTextureSlot());
+        } else {
+            shader.setUniform1i("emissiveSlot", 0);
         }
         shader.disable();
     }

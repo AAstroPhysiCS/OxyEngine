@@ -47,8 +47,8 @@ public class OxyMaterialPool {
         return m.index = latest;
     }
 
-    public static int addMaterial(String name, String albedoTexture, String normalTexture, String roughnessTexture, String metallicTexture, String aoTexture,
-                                  OxyColor albedoColor, float m_normalStrength, float m_aoStrength, float m_roughness, float m_metalness) {
+    public static int addMaterial(String name, String albedoTexture, String normalTexture, String roughnessTexture, String metallicTexture, String aoTexture, String emissiveTexture,
+                                  OxyColor albedoColor, float m_normalStrength, float m_aoStrength, float m_roughness, float m_metalness, float m_emissive) {
 
         for (OxyMaterial pooled : materialPool) {
 
@@ -57,7 +57,7 @@ public class OxyMaterialPool {
 
             //checkers => i need to do that... there's no other way.
 
-            boolean albedoCheck = false, roughnessCheck = false, normalCheck = false, metallicCheck = false, aoCheck = false;
+            boolean albedoCheck = false, roughnessCheck = false, normalCheck = false, metallicCheck = false, aoCheck = false, emissiveCheck = false;
             if (pooled.albedoTexture != null) {
                 if (pooled.albedoTexture.getPath().equals(albedoTexture)) {
                     albedoCheck = true;
@@ -98,18 +98,29 @@ public class OxyMaterialPool {
                 if (roughnessTexture == null || roughnessTexture.equals("null")) roughnessCheck = true;
             }
 
+            if (pooled.emissiveTexture != null) {
+                if (pooled.emissiveTexture.getPath().equals(emissiveTexture)) {
+                    emissiveCheck = true;
+                }
+            } else {
+                if (emissiveTexture == null || emissiveTexture.equals("null")) emissiveCheck = true;
+            }
+
             float[] diffuseArr = albedoColor.getNumbers();
-            if (albedoCheck && normalCheck && roughnessCheck && metallicCheck && aoCheck
+            if (albedoCheck && normalCheck && roughnessCheck && metallicCheck && aoCheck && emissiveCheck
                     && Arrays.equals(pooled.albedoColor.getNumbers(), diffuseArr)
                     && m_normalStrength == pooled.normalStrength[0]
                     && m_aoStrength == pooled.aoStrength[0]
                     && m_metalness == pooled.metalness[0]
-                    && m_roughness == pooled.roughness[0])
+                    && m_roughness == pooled.roughness[0]
+                    && m_emissive == pooled.emissiveStrength[0])
                 return pooled.index;
         }
 
         OxyMaterial material = new OxyMaterial(name, OxyTexture.loadImage(TextureSlot.ALBEDO, albedoTexture), OxyTexture.loadImage(TextureSlot.NORMAL, normalTexture),
-                OxyTexture.loadImage(TextureSlot.ROUGHNESS, roughnessTexture), OxyTexture.loadImage(TextureSlot.METALLIC, metallicTexture), OxyTexture.loadImage(TextureSlot.AO, aoTexture), albedoColor, m_normalStrength, m_aoStrength, m_roughness, m_metalness);
+                OxyTexture.loadImage(TextureSlot.ROUGHNESS, roughnessTexture), OxyTexture.loadImage(TextureSlot.METALLIC, metallicTexture),
+                OxyTexture.loadImage(TextureSlot.AO, aoTexture), OxyTexture.loadImage(TextureSlot.EMISSIVE, emissiveTexture),
+                albedoColor, m_normalStrength, m_aoStrength, m_roughness, m_metalness, m_emissive);
         materialPool.add(material);
         int latest = getLatestSlot();
         return material.index = latest;

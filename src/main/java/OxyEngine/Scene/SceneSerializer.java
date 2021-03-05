@@ -8,6 +8,7 @@ import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scripting.OxyScript;
@@ -119,6 +120,7 @@ public final class SceneSerializer {
             String roughnessTexture = "null", roughnessTextureStrength = "0";
             String metallicTexture = "null", metalnessTextureStrength = "0";
             String aoTexture = "null", aoTextureStrength = "0";
+            String emissiveTexture = "null", emissiveTextureStrength = "0";
             String mesh = "null";
             String materialName = "null";
 
@@ -139,6 +141,8 @@ public final class SceneSerializer {
                 metalnessTextureStrength = String.valueOf(m.metalness[0]);
                 if (m.aoTexture != null) aoTexture = m.aoTexture.getPath();
                 aoTextureStrength = String.valueOf(m.aoStrength[0]);
+                if (m.emissiveTexture != null) emissiveTexture = m.emissiveTexture.getPath();
+                emissiveTextureStrength = String.valueOf(m.emissiveStrength[0]);
             }
             if (e.has(OpenGLMesh.class)) mesh = e.get(OpenGLMesh.class).getPath();
             if (e.has(Light.class)) emitting = true;
@@ -154,10 +158,14 @@ public final class SceneSerializer {
                 } else if (l instanceof DirectionalLight d) {
                     obj.putField("Direction", d.getDirection().toString());
                 } else if (l instanceof SkyLight s) {
-                    obj.putField("Environment Map", s.getHDRTexture().getPath());
-                    obj.putField("Environment Gamma Strength", String.valueOf(SkyLight.gammaStrength[0]));
+                    HDRTexture hdrTexture = s.getHDRTexture();
+                    if(hdrTexture != null) obj.putField("Environment Map", s.getHDRTexture().getPath());
+                    else obj.putField("Environment Map", "null");
+                    obj.putField("Environment Gamma Strength", String.valueOf(s.gammaStrength[0]));
                     obj.putField("Environment LOD", String.valueOf(s.mipLevelStrength[0]));
-                    obj.putField("Environment Exposure", String.valueOf(SkyLight.exposure[0]));
+                    obj.putField("Environment Exposure", String.valueOf(s.exposure[0]));
+                    obj.putField("Environment Intensity", String.valueOf(s.intensity[0]));
+                    obj.putField("Environment Primary", String.valueOf(s.isPrimary()));
                 }
                 obj = obj.backToObject();
             }
@@ -179,6 +187,8 @@ public final class SceneSerializer {
                     .putField("AO Map Strength", aoTextureStrength)
                     .putField("Metallic Map Texture", metallicTexture)
                     .putField("Metallic Map Strength", metalnessTextureStrength)
+                    .putField("Emissive Map Texture", emissiveTexture)
+                    .putField("Emissive Map Strength", emissiveTextureStrength)
                     .putField("Mesh", mesh)
                     .createInnerObject("Script");
             for (var scripts : e.getScripts()) obj.putField("Path", scripts.getPath());
@@ -260,9 +270,11 @@ public final class SceneSerializer {
                     OxyNativeObject skyLightEnt = scene.createSkyLight();
                     SkyLight skyLightComp = skyLightEnt.get(SkyLight.class);
                     if (!path.equals("null")) skyLightComp.loadHDR(path);
-                    SkyLight.gammaStrength = new float[]{Float.parseFloat(lightAttributes.getField("Environment Gamma Strength").value())};
-                    SkyLight.exposure = new float[]{Float.parseFloat(lightAttributes.getField("Environment Exposure").value())};
+                    skyLightComp.gammaStrength = new float[]{Float.parseFloat(lightAttributes.getField("Environment Gamma Strength").value())};
+                    skyLightComp.exposure = new float[]{Float.parseFloat(lightAttributes.getField("Environment Exposure").value())};
                     skyLightComp.mipLevelStrength = new float[]{Float.parseFloat(lightAttributes.getField("Environment LOD").value())};
+                    skyLightComp.intensity = new float[]{Float.parseFloat(lightAttributes.getField("Environment Intensity").value())};
+                    skyLightComp.setPrimary(Boolean.parseBoolean(lightAttributes.getField("Environment Primary").value()));
 
                     return skyLightEnt;
                 }
@@ -284,13 +296,15 @@ public final class SceneSerializer {
             float aoMapStrength = Float.parseFloat(ent.getField("AO Map Strength").value());
             String metallicMapTPath = ent.getField("Metallic Map Texture").value();
             float metallicMapStrength = Float.parseFloat(ent.getField("Metallic Map Strength").value());
+            String emissiveMapTPath = ent.getField("Emissive Map Texture").value();
+            float emissiveMapStrength = Float.parseFloat(ent.getField("Emissive Map Strength").value());
             String meshPath = ent.getField("Mesh").value();
 
             OxyModel modelInstance;
 
             int index = OxyMaterialPool.addMaterial(nameMaterial, albedoTPath,
-                    normalMapTPath, roughnessMapTPath, metallicMapTPath, aoMapTPath,
-                    new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength);
+                    normalMapTPath, roughnessMapTPath, metallicMapTPath, aoMapTPath, emissiveMapTPath,
+                    new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength, emissiveMapStrength);
 
             if (!meshPath.equals("null")) {
                 modelInstance = scene.createModelEntity(meshPath, shader, meshPos, index);
