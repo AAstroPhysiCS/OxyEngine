@@ -6,11 +6,12 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
-import OxyEngine.Scene.Objects.Model.ModelType;
-import OxyEngine.Scene.Objects.Model.OxyModelLoader;
+import OxyEngine.Core.Renderer.Mesh.OxyVertex;
+import OxyEngine.Scene.Objects.Model.DefaultModelType;
+import OxyEngine.Scene.Objects.Importer.ImporterType;
+import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.List;
@@ -34,14 +35,14 @@ public class OxyNativeObject extends OxyEntity {
         initData();
     }
 
-    public void pushVertexData(ModelType type){
-        OxyModelLoader loader = new OxyModelLoader(type.getPath());
-        List<Vector3f> modelVertices = loader.meshes.get(0).vertices;
+    public void pushVertexData(DefaultModelType type){
+        OxyModelImporter loader = new OxyModelImporter(type.getPath(), ImporterType.MeshImporter); //JUST IMPORTING MESH FOR NOW
+        List<OxyVertex> modelVertices = loader.getVertexList(0);
         vertices = new float[modelVertices.size() * 3];
         int vertPtr = 0;
         TransformComponent c = get(TransformComponent.class);
-        for (Vector3f v : modelVertices) {
-            Vector4f transformed = new Vector4f(v, 1.0f).mul(c.transform);
+        for (OxyVertex o : modelVertices) {
+            Vector4f transformed = new Vector4f(o.vertices, 1.0f).mul(c.transform);
             vertices[vertPtr++] = transformed.x;
             vertices[vertPtr++] = transformed.y;
             vertices[vertPtr++] = transformed.z;
@@ -79,10 +80,5 @@ public class OxyNativeObject extends OxyEntity {
 
     public int getSize() {
         return size;
-    }
-
-    @Override
-    public void updateVertexData() {
-        constructData();
     }
 }

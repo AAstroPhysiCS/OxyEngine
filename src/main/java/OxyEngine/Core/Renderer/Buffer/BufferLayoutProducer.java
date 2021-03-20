@@ -20,8 +20,6 @@ public class BufferLayoutProducer {
 
         BufferLayoutImpl setUsage(Usage usage);
 
-        BufferLayoutImpl setStrideSize(int size);
-
         BufferLayoutBuilder create();
     }
 
@@ -33,7 +31,6 @@ public class BufferLayoutProducer {
 
     public static class BufferLayoutImpl implements BufferLayout {
 
-        private int strideSize = -1;
         private BufferLayoutAttributes[] attribPointers;
         private Usage usage;
 
@@ -58,12 +55,6 @@ public class BufferLayoutProducer {
         }
 
         @Override
-        public BufferLayoutImpl setStrideSize(int size) {
-            this.strideSize = size;
-            return this;
-        }
-
-        @Override
         public BufferLayoutBuilder create() {
             return src;
         }
@@ -74,10 +65,6 @@ public class BufferLayoutProducer {
 
         public Usage getUsage() {
             return usage;
-        }
-
-        public int getStrideSize() {
-            return strideSize;
         }
     }
 
@@ -95,7 +82,7 @@ public class BufferLayoutProducer {
         @Override
         public BufferLayoutRecord finalizeRecord() {
 
-            BufferLayoutImpl vertexLayout = null, normalsLayout = null, tangentLayout = null, textureLayout = null, indexLayout = null;
+            BufferLayoutImpl vertexLayout = null, normalsLayout = null, tangentLayout = null, textureLayout = null, indexLayout = null, test = null;
             for (BufferLayoutImpl impl : implementations) {
                 if (VertexBuffer.class.equals(impl.destClass)) {
                     vertexLayout = impl;

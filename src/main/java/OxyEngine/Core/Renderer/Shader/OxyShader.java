@@ -19,11 +19,12 @@ public class OxyShader implements OxyDisposable, EntityComponent {
 
     public static final int VERTICES = 0;
     public static final int TEXTURE_COORDS = 1;
-    public static final int TEXTURE_SLOT = 2;
-    public static final int NORMALS = 4;
-    public static final int BITANGENT = 5;
-    public static final int TANGENT = 6;
-    public static final int OBJECT_ID = 7;
+    public static final int NORMALS = 2;
+    public static final int BITANGENT = 3;
+    public static final int TANGENT = 4;
+    public static final int OBJECT_ID = 5;
+    public static final int BONEIDS = 6;
+    public static final int WEIGHTS = 7;
 
     private final Map<String, ? super Number> uniformLocations = new HashMap<>();
 

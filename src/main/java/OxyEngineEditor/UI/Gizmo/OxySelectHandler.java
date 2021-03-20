@@ -3,6 +3,7 @@ package OxyEngineEditor.UI.Gizmo;
 import OxyEngine.Components.RenderableComponent;
 import OxyEngine.Components.RenderingMode;
 import OxyEngine.Components.SelectedComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
@@ -42,16 +43,22 @@ public class OxySelectHandler {
             glClearTexImage(pickingBuffer.getColorAttachmentTexture(1), 0, pickingBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
             for (OxyEntity e : allModelEntities) {
                 if (!e.has(SelectedComponent.class)) continue;
+                OxyShader shader = e.get(OxyShader.class);
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
-                ACTIVE_SCENE.getRenderer().render(0, e.get(ModelMeshOpenGL.class), currentBoundedCamera, e.get(OxyShader.class));
+                shader.enable();
+                shader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
+                ACTIVE_SCENE.getRenderer().render(0, e.get(ModelMeshOpenGL.class), currentBoundedCamera, shader);
+                shader.disable();
             }
         }
         int id = getEntityID();
+//        System.out.println("ENTITY ID: " + id);
         if (id == -1) {
-//            if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
-//            entityContext = null;
-//            OxySelectHandler.materialContext = null;
+            //IF NO ENTITY IS BEING SELECTED (SELECTING THE "AIR") => ENTITY == NULL
+            //if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
+            //entityContext = null;
+            //OxySelectHandler.materialContext = null;
         } else {
             for (OxyEntity e : allModelEntities) {
                 if (e.getObjectId() == id) {

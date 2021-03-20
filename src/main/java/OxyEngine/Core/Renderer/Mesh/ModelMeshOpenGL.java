@@ -26,10 +26,10 @@ import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class ModelMeshOpenGL extends OpenGLMesh {
 
-    public static final BufferLayoutAttributes attributeVert = new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 5 * Float.BYTES, 0);
-    public static final BufferLayoutAttributes attributeTXSlot = new BufferLayoutAttributes(OxyShader.TEXTURE_SLOT, 1, GL_FLOAT, false, 5 * Float.BYTES, 3 * Float.BYTES);
-
-    private static final BufferLayoutAttributes attributeObjectID = new BufferLayoutAttributes(OxyShader.OBJECT_ID, 1, GL_FLOAT, false, 5 * Float.BYTES, 4 * Float.BYTES);
+    public static final BufferLayoutAttributes attributeVert = new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 12 * Float.BYTES, 0);
+    private static final BufferLayoutAttributes attributeObjectID = new BufferLayoutAttributes(OxyShader.OBJECT_ID, 1, GL_FLOAT, false, 12 * Integer.BYTES, 3 * Integer.BYTES);
+    private static final BufferLayoutAttributes attributeBoneIDS = new BufferLayoutAttributes(OxyShader.BONEIDS, 4, GL_FLOAT, false, 12 * Integer.BYTES, 4 * Integer.BYTES);
+    private static final BufferLayoutAttributes attributeWeights = new BufferLayoutAttributes(OxyShader.WEIGHTS, 4, GL_FLOAT, false, 12 * Float.BYTES, 8 * Float.BYTES);
 
     private static final BufferLayoutAttributes attributeTXCoords = new BufferLayoutAttributes(OxyShader.TEXTURE_COORDS, 2, GL_FLOAT, false, 0, 0);
 
@@ -37,7 +37,6 @@ public class ModelMeshOpenGL extends OpenGLMesh {
 
     private static final BufferLayoutAttributes attributeTangent = new BufferLayoutAttributes(OxyShader.TANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
     private static final BufferLayoutAttributes attributeBiTangent = new BufferLayoutAttributes(OxyShader.BITANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-
     private final String path;
 
     public ModelMeshOpenGL(String path, int mode, BufferLayoutProducer.Usage usage, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
@@ -48,12 +47,12 @@ public class ModelMeshOpenGL extends OpenGLMesh {
 
         BufferLayoutRecord layout = BufferLayoutProducer.create()
                 .createLayout(VertexBuffer.class)
-                .setStrideSize(5)
                 .setUsage(usage)
                 .setAttribPointer(
                         attributeVert,
-                        attributeTXSlot,
-                        attributeObjectID
+                        attributeObjectID,
+                        attributeBoneIDS,
+                        attributeWeights
                 )
                 .create()
                 .createLayout(IndexBuffer.class).create()
@@ -101,7 +100,7 @@ public class ModelMeshOpenGL extends OpenGLMesh {
 
     private static ImString meshPath = new ImString(0);
     public static final GUINode guiNode = () -> {
-        if(entityContext == null) return;
+        if (entityContext == null) return;
 
         {
             if (ImGui.treeNodeEx("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
@@ -151,7 +150,6 @@ public class ModelMeshOpenGL extends OpenGLMesh {
 
                             for (OxyModel e : eList) {
                                 e.transformLocally();
-                                e.updateVertexData();
                             }
 
                             SceneLayer.getInstance().updateModelEntities();

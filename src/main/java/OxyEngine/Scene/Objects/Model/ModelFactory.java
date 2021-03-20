@@ -1,11 +1,8 @@
 package OxyEngine.Scene.Objects.Model;
 
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Components.TransformComponent;
-import OxyEngine.TextureSlot;
+import OxyEngine.Core.Renderer.Mesh.OxyVertex;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,55 +11,61 @@ import static OxyEngine.Globals.toPrimitiveInteger;
 
 public class ModelFactory {
 
-    private final List<Vector3f> verticesNonTransformed;
-    private final List<Vector3f> normals;
-    private final List<Vector3f> tangents;
-    private final List<Vector3f> biTangents;
     private final List<int[]> faces;
-    private final List<Vector2f> textureCoords;
+    private final List<OxyVertex> vertexList;
 
-    public ModelFactory(List<Vector3f> verticesNonTransformed, List<Vector2f> textureCoords, List<Vector3f> normals,
-                        List<int[]> faces, List<Vector3f> tangents, List<Vector3f> biTangents) {
-        this.verticesNonTransformed = verticesNonTransformed;
-        this.textureCoords = textureCoords;
-        this.biTangents = biTangents;
-        this.tangents = tangents;
-        this.normals = normals;
+    public ModelFactory(List<OxyVertex> vertexList, List<int[]> faces) {
+        this.vertexList = vertexList;
         this.faces = faces;
     }
 
     public void constructData(OxyModel e) {
-        e.vertices = new float[verticesNonTransformed.size() * 5];
-        e.normals = new float[verticesNonTransformed.size() * 3];
-        e.tcs = new float[verticesNonTransformed.size() * 2];
-        e.tangents = new float[tangents.size() * 3];
-        e.biTangents = new float[biTangents.size() * 3];
+        e.vertices = new float[vertexList.size() * 12];
+        e.normals = new float[vertexList.size() * 3];
+        e.tcs = new float[vertexList.size() * 2];
+        e.tangents = new float[vertexList.size() * 3];
+        e.biTangents = new float[vertexList.size() * 3];
         List<Integer> indicesArr = new ArrayList<>();
 
-        OxyMaterial material = OxyMaterialPool.getMaterial(e);
-        TransformComponent c = e.get(TransformComponent.class);
-
-        int slot = TextureSlot.UNUSED.getValue();
-        if(material != null){
-            ImageTexture texture = material.albedoTexture;
-            if (texture != null) slot = texture.getTextureSlot();
-        }
-
         int vertPtr = 0;
-        for (Vector3f v : verticesNonTransformed) {
-            Vector4f transformed = new Vector4f(v, 1.0f).mul(c.transform);
-            e.vertices[vertPtr++] = transformed.x;
-            e.vertices[vertPtr++] = transformed.y;
-            e.vertices[vertPtr++] = transformed.z;
-            e.vertices[vertPtr++] = slot;
-            e.vertices[vertPtr++] = e.getObjectId();
-        }
-
         int nPtr = 0;
-        for (Vector3f n : normals) {
-            e.normals[nPtr++] = n.x;
-            e.normals[nPtr++] = n.y;
-            e.normals[nPtr++] = n.z;
+        int tcsPtr = 0;
+        int tangentPtr = 0;
+        int biTangentPtr = 0;
+        for (OxyVertex o : vertexList) {
+            e.vertices[vertPtr++] = o.vertices.x;
+            e.vertices[vertPtr++] = o.vertices.y;
+            e.vertices[vertPtr++] = o.vertices.z;
+            e.vertices[vertPtr++] = e.getObjectId();
+
+            e.vertices[vertPtr++] = o.m_BoneIDs[0];
+            e.vertices[vertPtr++] = o.m_BoneIDs[1];
+            e.vertices[vertPtr++] = o.m_BoneIDs[2];
+            e.vertices[vertPtr++] = o.m_BoneIDs[3];
+
+            e.vertices[vertPtr++] = o.m_Weights[0];
+            e.vertices[vertPtr++] = o.m_Weights[1];
+            e.vertices[vertPtr++] = o.m_Weights[2];
+            e.vertices[vertPtr++] = o.m_Weights[3];
+
+            Vector3f normals = o.normals;
+            e.normals[nPtr++] = normals.x;
+            e.normals[nPtr++] = normals.y;
+            e.normals[nPtr++] = normals.z;
+
+            Vector2f textureCoords = o.textureCoords;
+            e.tcs[tcsPtr++] = textureCoords.x;
+            e.tcs[tcsPtr++] = textureCoords.y;
+
+            Vector3f tangents = o.tangents;
+            e.tangents[tangentPtr++] = tangents.x;
+            e.tangents[tangentPtr++] = tangents.y;
+            e.tangents[tangentPtr++] = tangents.z;
+
+            Vector3f biTangents = o.biTangents;
+            e.biTangents[biTangentPtr++] = biTangents.x;
+            e.biTangents[biTangentPtr++] = biTangents.y;
+            e.biTangents[biTangentPtr++] = biTangents.z;
         }
 
         for (int[] face : faces) {
@@ -70,45 +73,6 @@ public class ModelFactory {
                 indicesArr.add(i);
             }
         }
-
-        int tcsPtr = 0;
-        for (Vector2f v : textureCoords) {
-            e.tcs[tcsPtr++] = v.x;
-            e.tcs[tcsPtr++] = v.y;
-        }
         e.indices = toPrimitiveInteger(indicesArr);
-
-        int tangentPtr = 0;
-        for(Vector3f v : tangents){
-            e.tangents[tangentPtr++] = v.x;
-            e.tangents[tangentPtr++] = v.y;
-            e.tangents[tangentPtr++] = v.z;
-        }
-        int biTangentPtr = 0;
-        for(Vector3f v : biTangents){
-            e.biTangents[biTangentPtr++] = v.x;
-            e.biTangents[biTangentPtr++] = v.y;
-            e.biTangents[biTangentPtr++] = v.z;
-        }
-    }
-
-    public void updateVertexData(OxyModel e) {
-        OxyMaterial material = OxyMaterialPool.getMaterial(e);
-        ImageTexture texture = material.albedoTexture;
-        TransformComponent c = e.get(TransformComponent.class);
-
-        int slot = TextureSlot.UNUSED.getValue();
-        if (texture != null)
-            slot = texture.getTextureSlot();
-
-        int vertPtr = 0;
-        for (Vector3f v : verticesNonTransformed) {
-            Vector4f transformed = new Vector4f(v.x, v.y, v.z, 1.0f).mul(c.transform);
-            e.vertices[vertPtr++] = transformed.x;
-            e.vertices[vertPtr++] = transformed.y;
-            e.vertices[vertPtr++] = transformed.z;
-            e.vertices[vertPtr++] = slot;
-            e.vertices[vertPtr++] = e.getObjectId();
-        }
     }
 }

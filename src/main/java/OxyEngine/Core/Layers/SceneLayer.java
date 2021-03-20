@@ -24,6 +24,7 @@ import OxyEngine.Scene.SceneState;
 import OxyEngine.TextureSlot;
 import OxyEngineEditor.UI.Panels.GUINode;
 import OxyEngineEditor.UI.Panels.Panel;
+import org.joml.Matrix4f;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -176,6 +177,20 @@ public class SceneLayer extends Layer {
                 currentBoundedSkyLight = (OxyNativeObject) e;
             }
         }
+
+        //ANIMATION UPDATE
+        oxyShader.enable();
+        for (OxyEntity e : allModelEntities) {
+            if (e.has(AnimationComponent.class)) {
+                AnimationComponent animComp = e.get(AnimationComponent.class);
+                animComp.updateAnimation(ts);
+                List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
+                for (int j = 0; j < matrix4fList.size(); j++) {
+                    oxyShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                }
+            }
+        }
+        oxyShader.disable();
     }
 
     @Override
@@ -221,7 +236,7 @@ public class SceneLayer extends Layer {
                 shader.setUniform1i("iblMap", iblSlot);
                 shader.setUniform1i("prefilterMap", prefilterSlot);
                 shader.setUniform1i("brdfLUT", brdfLUTSlot);
-                if(skyLightComp != null) {
+                if (skyLightComp != null) {
                     shader.setUniform1f("hdrIntensity", skyLightComp.intensity[0]);
                     shader.setUniform1f("gamma", skyLightComp.gammaStrength[0]);
                     shader.setUniform1f("exposure", skyLightComp.exposure[0]);
@@ -252,6 +267,7 @@ public class SceneLayer extends Layer {
                 }
             }
 
+            //SKY LIGHT RENDER
             if (skyLightEntity != null) {
                 if (hdrTexture != null) {
                     hdrTexture.bindAll();
@@ -281,7 +297,7 @@ public class SceneLayer extends Layer {
 
     public void recompileShader() {
         oxyShader.dispose();
-        oxyShader = new OxyShader("shaders/OxyPBR.glsl");
+        oxyShader = new OxyShader("shaders/OxyPBRAnimation.glsl");
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;
         oxyShader.enable();

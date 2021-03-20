@@ -1,11 +1,13 @@
-package OxyEngine.Scene.Objects.Model;
+package OxyEngine.Scene.Objects.Importer;
 
 import OxyEngine.Components.TagComponent;
+import OxyEngine.Core.Renderer.Mesh.OxyVertex;
 import OxyEngine.Scene.OxyEntity;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
 import java.io.File;
@@ -16,29 +18,28 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static OxyEngine.Components.BoundingBoxComponent.calcPos;
-import static OxyEngine.Components.BoundingBoxComponent.sort;
+import static OxyEngine.Scene.Objects.Importer.OxyModelImporter.convertAIMatrixToJOMLMatrix;
 import static OxyEngine.System.OxySystem.logger;
-import static OxyEngineEditor.EditorApplication.oxyShader;
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.assimp.Assimp.*;
 
-public class OxyModelLoader {
+public non-sealed class MeshImporter implements ModelImporterFactory {
 
-    public static class AssimpMesh {
-        public final List<Vector3f> vertices = new ArrayList<>();
-        public final List<Vector2f> textureCoords = new ArrayList<>();
-        public final List<Vector3f> normals = new ArrayList<>();
-        public final List<Vector3f> tangents = new ArrayList<>();
-        public final List<Vector3f> biTangents = new ArrayList<>();
-        public final List<int[]> faces = new ArrayList<>();
+    static class AssimpMesh {
+        public List<OxyVertex> vertexList;
+        public List<int[]> faces;
+
+        //FOR SORTING (NULL AFTER SORTING IS DONE)
+        public List<Vector3f> verticesList;
 
         public int materialIndex;
-        public Vector3f pos = new Vector3f();
+        public Matrix4f transformation = new Matrix4f();
 
         public final String name;
         public Vector3f min = new Vector3f(), max = new Vector3f();
         public final OxyEntity rootEntity;
+
+        int mNumBones;
+        PointerBuffer mBones;
 
         public AssimpMesh(OxyEntity rootEntity, String name) {
             this.name = name;
@@ -46,92 +47,96 @@ public class OxyModelLoader {
         }
     }
 
-    public static record AssimpMaterial(String name, String textPath, String textPathMetallic,
-                                        String textPathRoughness, String textPathNormals,
-                                        String textPathAO, String textPathEmissive, Vector4f diffuse) {
+    static record AssimpMaterial(String name, String textPath, String textPathMetallic,
+                                 String textPathRoughness, String textPathNormals,
+                                 String textPathAO, String textPathEmissive, Vector4f diffuse) {
     }
 
-    public final List<AssimpMesh> meshes = new ArrayList<>();
-    public final List<AssimpMaterial> materials = new ArrayList<>();
+    final List<AssimpMesh> meshes = new ArrayList<>();
+    final List<AssimpMaterial> materials = new ArrayList<>();
 
-    final String objPath;
-    AIScene aiScene;
+    private String scenePath;
     private String rootName;
-    private OxyEntity rootEnt;
 
-    public OxyModelLoader(String objPath) {
-        this.objPath = objPath;
-        processData();
-    }
-
-    public OxyModelLoader(String objPath, OxyEntity root) {
-        this.objPath = objPath;
-        this.rootEnt = root;
-        processData();
-    }
-
-    void processData() {
-        int flag = aiProcess_Triangulate
-                | aiProcess_FixInfacingNormals
-                | aiProcess_OptimizeMeshes
-                | aiProcess_FlipUVs
-                | aiProcess_CalcTangentSpace
-                | aiProcess_JoinIdenticalVertices
-                | aiProcess_FindInvalidData
-                | aiProcess_FlipWindingOrder
-//                | aiProcess_PreTransformVertices
-                | aiProcess_ValidateDataStructure
-                | aiProcess_GenBoundingBoxes;
-
-        aiScene = aiImportFile(objPath, flag);
-        if (aiScene == null) {
-            logger.warning("Mesh is null");
-            return;
-        }
-
-        rootName = aiScene.mRootNode().mName().dataString();
-        if (rootEnt == null) {
-            rootEnt = ACTIVE_SCENE.createEmptyModel(oxyShader);
-            // rootEnt.setFamily(new EntityFamily()); default behaviour from a entity, once it is created!
-            rootEnt.addComponent(new TagComponent(rootName));
-        }
-
-        for (int i = 0; i < aiScene.mNumMeshes(); i++) {
-            AIMesh mesh = AIMesh.create(Objects.requireNonNull(aiScene.mMeshes()).get(i));
-            AssimpMesh oxyMesh = new AssimpMesh(rootEnt, mesh.mName().dataString());
-            oxyMesh.materialIndex = mesh.mMaterialIndex();
-            processMesh(mesh, oxyMesh);
-            AIAABB aiaabb = mesh.mAABB();
-            oxyMesh.min = new Vector3f(aiaabb.mMin().x(), aiaabb.mMin().y(), aiaabb.mMin().z());
-            oxyMesh.max = new Vector3f(aiaabb.mMax().x(), aiaabb.mMax().y(), aiaabb.mMax().z());
-            float[][] sortedVertices = sort(oxyMesh);
-            calcPos(oxyMesh, sortedVertices);
-            //transforming to 0,0,0
-            Matrix4f transform = new Matrix4f()
-                    .translate(new Vector3f(oxyMesh.pos).negate());
-            for (int j = 0; j < oxyMesh.vertices.size(); j++) {
-                Vector3f vertices3f = oxyMesh.vertices.get(j);
-                Vector4f t4f = new Vector4f(vertices3f, 1.0f).mul(transform);
-                oxyMesh.vertices.get(j).set(t4f.x, t4f.y, t4f.z);
-            }
-            this.meshes.add(oxyMesh);
-        }
+    @Override
+    public void process(AIScene aiScene, String scenePath, OxyEntity root) {
+        this.scenePath = scenePath;
+        rootName = root.get(TagComponent.class).tag();
+        processNode(Objects.requireNonNull(aiScene.mRootNode()), aiScene, root);
 
         for (int i = 0; i < aiScene.mNumMaterials(); i++) {
             AIMaterial material = AIMaterial.create(Objects.requireNonNull(aiScene.mMaterials()).get(i));
             addMaterial(material);
         }
-        aiReleaseImport(aiScene);
+    }
+
+    private void processNode(AINode node, AIScene scene, OxyEntity root) {
+        Matrix4f transformation = convertAIMatrixToJOMLMatrix(node.mTransformation());
+        for (int i = 0; i < node.mNumMeshes(); i++) {
+            AIMesh mesh = AIMesh.create(scene.mMeshes().get(node.mMeshes().get(i)));
+            AssimpMesh oxyMesh = new AssimpMesh(root, mesh.mName().dataString());
+            oxyMesh.transformation = transformation;
+            oxyMesh.mBones = mesh.mBones();
+            oxyMesh.mNumBones = mesh.mNumBones();
+            oxyMesh.materialIndex = mesh.mMaterialIndex();
+            processMesh(mesh, oxyMesh);
+            AIAABB aiaabb = mesh.mAABB();
+            oxyMesh.min = new Vector3f(aiaabb.mMin().x(), aiaabb.mMin().y(), aiaabb.mMin().z());
+            oxyMesh.max = new Vector3f(aiaabb.mMax().x(), aiaabb.mMax().y(), aiaabb.mMax().z());
+            this.meshes.add(oxyMesh);
+        }
+
+        for (int i = 0; i < node.mNumChildren(); i++) {
+            processNode(AINode.create(node.mChildren().get(i)), scene, root);
+        }
     }
 
     private void processMesh(AIMesh mesh, AssimpMesh oxyMesh) {
+
         AIVector3D.Buffer bufferVert = mesh.mVertices();
-        while (bufferVert.hasRemaining()) {
-            AIVector3D vertex = bufferVert.get();
-            oxyMesh.vertices.add(new Vector3f(vertex.x(), vertex.y(), vertex.z()));
+        AIVector3D.Buffer bufferNor = mesh.mNormals();
+        AIVector3D.Buffer textCoords = mesh.mTextureCoords(0);
+        AIVector3D.Buffer tangent = mesh.mTangents();
+        AIVector3D.Buffer bitangent = mesh.mBitangents();
+
+        int size = mesh.mNumVertices();
+        oxyMesh.vertexList = new ArrayList<>(size);
+        oxyMesh.verticesList = new ArrayList<>(size);
+
+        for (int i = 0; i < size; i++) {
+            AIVector3D vertices = bufferVert.get(i);
+            OxyVertex vertex = new OxyVertex();
+
+            Vector3f v = new Vector3f(vertices.x(), vertices.y(), vertices.z());
+
+            vertex.vertices.set(v);
+            oxyMesh.verticesList.add(v);
+
+            if (bufferNor != null) {
+                AIVector3D normals3 = bufferNor.get(i);
+                vertex.normals.set(new Vector3f(normals3.x(), normals3.y(), normals3.z()));
+            } else logger.info("Model: " + rootName + " has no normals");
+
+            if (textCoords != null) {
+                AIVector3D textCoord = textCoords.get(i);
+                vertex.textureCoords.set(new Vector2f(textCoord.x(), 1 - textCoord.y()));
+            } else logger.info("Model: " + rootName + " has no texture coordinates");
+
+            if (tangent != null) {
+                AIVector3D tangentC = tangent.get(i);
+                vertex.tangents.set(new Vector3f(tangentC.x(), tangentC.y(), tangentC.z()));
+            } else logger.info("Model: " + rootName + " has no tangent");
+
+            if (bitangent != null) {
+                AIVector3D biTangentC = bitangent.get(i);
+                vertex.biTangents.set(new Vector3f(biTangentC.x(), biTangentC.y(), biTangentC.z()));
+            } else logger.info("Model: " + rootName + " has no bitangent");
+
+            oxyMesh.vertexList.add(vertex);
         }
 
         int numFaces = mesh.mNumFaces();
+        oxyMesh.faces = new ArrayList<>(numFaces);
         AIFace.Buffer aiFaces = mesh.mFaces();
         for (int i = 0; i < numFaces; i++) {
             AIFace aiFace = aiFaces.get(i);
@@ -141,42 +146,11 @@ public class OxyModelLoader {
             }
         }
 
-        AIVector3D.Buffer bufferNor = mesh.mNormals();
-        if (bufferNor != null) {
-            while (Objects.requireNonNull(bufferNor).hasRemaining()) {
-                AIVector3D normals = bufferNor.get();
-                oxyMesh.normals.add(new Vector3f(normals.x(), normals.y(), normals.z()));
-            }
-        } else logger.info("Model: " + rootName + " has no normals");
-
-        AIVector3D.Buffer textCoords = mesh.mTextureCoords(0);
-        if (textCoords != null) {
-            while (Objects.requireNonNull(textCoords).hasRemaining()) {
-                AIVector3D textCoord = textCoords.get();
-                oxyMesh.textureCoords.add(new Vector2f(textCoord.x(), 1 - textCoord.y()));
-            }
-        } else logger.info("Model: " + rootName + " has no texture coordinates");
-
-        AIVector3D.Buffer tangent = mesh.mTangents();
-        if (tangent != null) {
-            while (Objects.requireNonNull(tangent).hasRemaining()) {
-                AIVector3D tangentC = tangent.get();
-                oxyMesh.tangents.add(new Vector3f(tangentC.x(), tangentC.y(), tangentC.z()));
-            }
-        } else logger.info("Model: " + rootName + " has no tangent");
-
-        AIVector3D.Buffer bitangent = mesh.mBitangents();
-        if (bitangent != null) {
-            while (Objects.requireNonNull(bitangent).hasRemaining()) {
-                AIVector3D biTangentC = bitangent.get();
-                oxyMesh.biTangents.add(new Vector3f(biTangentC.x(), biTangentC.y(), biTangentC.z()));
-            }
-        } else logger.info("Model: " + rootName + " has no bitangent");
     }
 
     private void addMaterial(AIMaterial aiMaterial) {
 
-        String parentPath = new File(objPath).getParent();
+        String parentPath = new File(scenePath).getParent();
 
         AIString nameMaterial = new AIString(ByteBuffer.allocateDirect(1032));
         aiGetMaterialString(aiMaterial, AI_MATKEY_NAME, aiTextureType_NONE, 0, nameMaterial);
@@ -246,9 +220,5 @@ public class OxyModelLoader {
         else textPathEmissive = parentPath + "\\" + textPathEmissive;
 
         materials.add(new AssimpMaterial(matName, textPath, textPathMetallic, textPathRoughness, textPathNormals, textPathAO, textPathEmissive, diffuse));
-    }
-
-    public String getPath() {
-        return objPath;
     }
 }

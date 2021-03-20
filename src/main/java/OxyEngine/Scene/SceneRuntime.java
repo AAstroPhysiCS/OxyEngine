@@ -61,10 +61,7 @@ public final class SceneRuntime {
         if (transformComponents.size() == 0) return;
 
         int i = 0;
-        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) {
-            e.addComponent(transformComponents.get(i++));
-            e.updateVertexData();
-        }
+        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) e.addComponent(transformComponents.get(i++));
         transformComponents.clear();
     }
 

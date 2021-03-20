@@ -5,8 +5,6 @@ import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
-import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.TextureSlot;
 import OxyEngineEditor.UI.Panels.GUINode;
@@ -16,10 +14,7 @@ import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 import org.joml.Vector4f;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.System.OxySystem.parseStringToVector4f;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.materialContext;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
@@ -44,11 +39,11 @@ public class OxyMaterial implements OxyDisposable {
         this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, emissiveTexture, albedoColor, 1.0f, 0.5f, 1.0f, 0.0f, 1.0f);
     }
 
-    public OxyMaterial(OxyModelLoader.AssimpMaterial assimpMaterial) {
-        this(assimpMaterial.name().isEmpty() ? "Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++) : assimpMaterial.name(),
-                OxyTexture.loadImage(TextureSlot.ALBEDO, assimpMaterial.textPath()), OxyTexture.loadImage(TextureSlot.NORMAL, assimpMaterial.textPathNormals()),
-                OxyTexture.loadImage(TextureSlot.ROUGHNESS, assimpMaterial.textPathRoughness()), OxyTexture.loadImage(TextureSlot.METALLIC, assimpMaterial.textPathMetallic()),
-                OxyTexture.loadImage(TextureSlot.AO, assimpMaterial.textPathAO()), OxyTexture.loadImage(TextureSlot.EMISSIVE, assimpMaterial.textPathEmissive()), new OxyColor(assimpMaterial.diffuse()));
+    public OxyMaterial(String name, String... assimpMaterialPaths) {
+        this(name.isEmpty() ? "Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++) : name,
+                OxyTexture.loadImage(TextureSlot.ALBEDO, assimpMaterialPaths[0]), OxyTexture.loadImage(TextureSlot.NORMAL, assimpMaterialPaths[1]),
+                OxyTexture.loadImage(TextureSlot.ROUGHNESS, assimpMaterialPaths[2]), OxyTexture.loadImage(TextureSlot.METALLIC, assimpMaterialPaths[3]),
+                OxyTexture.loadImage(TextureSlot.AO, assimpMaterialPaths[4]), OxyTexture.loadImage(TextureSlot.EMISSIVE, assimpMaterialPaths[5]), new OxyColor(parseStringToVector4f(assimpMaterialPaths[6])));
     }
 
     public OxyMaterial(String name, String albedoTexture, String normalTexture, String roughnessTexture, String metallicTexture, String aoTexture, String emissiveTexture,
@@ -111,18 +106,6 @@ public class OxyMaterial implements OxyDisposable {
         this.assimpIndex = other.assimpIndex;
     }
 
-    public static List<OxyEntity> updateAllEntities(OxyMaterial m) {
-        List<OxyEntity> list = new ArrayList<>();
-        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
-            if (!(e instanceof OxyNativeObject)) continue;
-            if (!e.has(OxyMaterialIndex.class)) continue;
-            if (e.get(OxyMaterialIndex.class).index() == m.index) {
-                list.add(e);
-            }
-        }
-        return list;
-    }
-
     private void bindTextures() {
         if (roughnessTexture != null)
             glBindTextureUnit(roughnessTexture.getTextureSlot(), roughnessTexture.getTextureId());
@@ -137,11 +120,18 @@ public class OxyMaterial implements OxyDisposable {
     public void push(OxyShader shader) {
         shader.enable();
         bindTextures();
+
         if (albedoColor != null) {
             shader.setUniformVec3("material.diffuse", albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]);
             shader.setUniformVec3("colorOut", albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]);
             shader.setUniformVec4("colorOut4f", albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2], albedoColor.getNumbers()[3]);
         }
+        if(albedoTexture != null){
+            shader.setUniform1i("albedoMapSlot", albedoTexture.getTextureSlot());
+        } else {
+            shader.setUniform1i("albedoMapSlot", 0);
+        }
+
         if (normalTexture != null) {
             shader.setUniform1i("normalMapSlot", normalTexture.getTextureSlot());
             shader.setUniform1f("normalMapStrength", normalStrength[0]);

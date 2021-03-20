@@ -2,7 +2,7 @@ package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.System.OxySystem;
 
-public enum ModelType {
+public enum DefaultModelType {
     Plane(OxySystem.FileSystem.getResourceByPath("/models/plane.obj")),
     Sphere(OxySystem.FileSystem.getResourceByPath("/models/sphere.obj")),
     Cone(OxySystem.FileSystem.getResourceByPath("/models/cone.obj")),
@@ -10,7 +10,7 @@ public enum ModelType {
 
     private final String path;
 
-    ModelType(String path){
+    DefaultModelType(String path){
         this.path = path;
     }
 

@@ -3,8 +3,8 @@ package OxyEngine.Core.Renderer.Buffer;
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.System.OxyDisposable;
 import OxyEngine.Scene.OxyEntity;
+import OxyEngine.System.OxyDisposable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,6 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         glBindVertexArray(vao);
 
         vertexBuffer.load();
-
         if (indexBuffer != null) if (indexBuffer.glBufferNull() && !indexBuffer.emptyData()) indexBuffer.load();
         if (normalsBuffer != null) if (normalsBuffer.glBufferNull() && !normalsBuffer.emptyData()) normalsBuffer.load();
         if (tangentBuffer != null) if (tangentBuffer.glBufferNull() && !tangentBuffer.emptyData()) tangentBuffer.load();

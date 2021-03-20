@@ -5,8 +5,8 @@ import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
+import static org.lwjgl.opengl.EXTGPUShader4.glVertexAttribIPointerEXT;
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glVertexAttribIPointer;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public final class OpenGLVertexBuffer extends VertexBuffer {
@@ -25,7 +25,7 @@ public final class OpenGLVertexBuffer extends VertexBuffer {
         BufferLayoutAttributes[] attribPointers = impl.getAttribPointers();
         for (BufferLayoutAttributes ptr : attribPointers) {
             glEnableVertexAttribArray(ptr.index());
-            if(ptr.type() == GL_INT) glVertexAttribIPointer(ptr.index(), ptr.size(), ptr.type(), ptr.stride(), ptr.pointer());
+            if(ptr.type() == GL_INT || ptr.type() == GL_UNSIGNED_INT) glVertexAttribIPointerEXT(ptr.index(), ptr.size(), ptr.type(), ptr.stride(), ptr.pointer());
             else glVertexAttribPointer(ptr.index(), ptr.size(), ptr.type(), ptr.normalized(), ptr.stride(), ptr.pointer());
         }
     }
@@ -37,7 +37,7 @@ public final class OpenGLVertexBuffer extends VertexBuffer {
 
     private void loadDynamically() {
         glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-        glBufferData(GL_ARRAY_BUFFER, (long) vertices.length * impl.getStrideSize(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (long) vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
     }
 
     @Override

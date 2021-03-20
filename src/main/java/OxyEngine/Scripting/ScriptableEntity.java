@@ -25,7 +25,6 @@ public abstract class ScriptableEntity {
     protected void updateData() {
         if (entity == null) return;
         entity.transformLocally();
-        entity.updateVertexData();
     }
 
     public abstract void onCreate();

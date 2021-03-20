@@ -15,7 +15,7 @@ public abstract class VertexBuffer extends Buffer {
     public VertexBuffer(BufferLayoutProducer.BufferLayoutImpl impl) {
         this.impl = impl;
 
-        assert impl.getUsage() != null && impl.getStrideSize() != -1 && impl.getAttribPointers() != null : oxyAssert("Some Implementation arguments are null");
+        assert impl.getUsage() != null && impl.getAttribPointers() != null : oxyAssert("Some Implementation arguments are null");
     }
 
     public abstract void updateSingleEntityData(int pos, float[] newVertices);

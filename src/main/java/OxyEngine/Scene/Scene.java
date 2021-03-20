@@ -16,6 +16,8 @@ import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
+import OxyEngine.Scene.Objects.Importer.ImporterType;
+import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
 import OxyEngine.Scene.Objects.Model.*;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Objects.SkyLightFactory;
@@ -54,7 +56,7 @@ public final class Scene implements OxyDisposable {
 
     public SceneState STATE = SceneState.IDLE;
 
-    private OxyModelLoader modelLoader;
+    private OxyModelImporter modelImporter;
 
     public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer) {
         this(sceneName, renderer, frameBuffer,
@@ -124,13 +126,14 @@ public final class Scene implements OxyDisposable {
 
     public void createMeshEntity() {
         OxyEntity model = createEmptyEntity();
-        if(!model.getGUINodes().contains(ModelMeshOpenGL.guiNode))
+        if (!model.getGUINodes().contains(ModelMeshOpenGL.guiNode))
             model.getGUINodes().add(ModelMeshOpenGL.guiNode);
     }
 
     public OxyNativeObject createSkyLight() {
         OxyNativeObject skyLightEnt = createNativeObjectEntity();
         skyLightEnt.setFactory(new SkyLightFactory());
+        if (entityContext != null) skyLightEnt.setFamily(new EntityFamily(entityContext.getFamily()));
         skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight(this));
         skyLightEnt.addComponent(skyLightMesh, skyLightShader);
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
@@ -141,9 +144,10 @@ public final class Scene implements OxyDisposable {
         return skyLightEnt;
     }
 
-    public void createPointLight(){
+    public void createPointLight() {
 
         OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
 
         PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
         int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
@@ -152,35 +156,40 @@ public final class Scene implements OxyDisposable {
         if (!model.getGUINodes().contains(OxyMaterial.guiNode))
             model.getGUINodes().add(OxyMaterial.guiNode);
         model.getGUINodes().add(PointLight.guiNode);
+        model.transformLocally();
         SceneLayer.getInstance().updateModelEntities();
     }
 
-    public void createDirectionalLight(){
+    public void createDirectionalLight() {
         OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
         int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
         model.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f, new Vector3f()));
         model.addComponent(new OxyMaterialIndex(index));
         model.getGUINodes().add(DirectionalLight.guiNode);
+        model.transformLocally();
         SceneLayer.getInstance().updateModelEntities();
     }
 
-    public void createPerspectiveCamera(){
+    public void createPerspectiveCamera() {
         OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
         model.addComponent(new SceneCamera());
         if (!model.getGUINodes().contains(OxyCamera.guiNode))
             model.getGUINodes().add(OxyCamera.guiNode);
+        model.transformLocally();
         SceneLayer.getInstance().updateCameraEntities();
     }
 
-    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader, boolean importedFromFile) {
+    public final List<OxyModel> createModelEntities(DefaultModelType type, OxyShader shader, boolean importedFromFile) {
         return createModelEntities(type.getPath(), shader, importedFromFile);
     }
 
-    public final OxyModel createModelEntity(ModelType type, OxyShader shader) {
+    public final OxyModel createModelEntity(DefaultModelType type, OxyShader shader) {
         return createModelEntity(type.getPath(), shader);
     }
 
-    public final List<OxyModel> createModelEntities(ModelType type, OxyShader shader) {
+    public final List<OxyModel> createModelEntities(DefaultModelType type, OxyShader shader) {
         return createModelEntities(type.getPath(), shader, false);
     }
 
@@ -217,30 +226,35 @@ public final class Scene implements OxyDisposable {
 
     public final List<OxyModel> createModelEntities(String path, OxyShader shader, boolean importedFromFile) {
         List<OxyModel> models = new ArrayList<>();
-        modelLoader = new OxyModelLoader(path);
+        modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
 
         int pos = 0;
         OxyMaterialPool.newBatch();
-        for (OxyModelLoader.AssimpMesh assimpMesh : modelLoader.meshes) {
-            int index = OxyMaterialPool.addMaterial(assimpMesh, modelLoader.materials.get(assimpMesh.materialIndex));
+        for (int i = 0; i < modelImporter.getMeshSize(); i++) {
+            int materialIndex = modelImporter.getMaterialIndex(i);
+            int index = OxyMaterialPool.addMaterial(modelImporter.getMaterialName(materialIndex), materialIndex, modelImporter.getMaterialPaths(materialIndex));
             OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
             e.importedFromFile = importedFromFile;
             put(e);
-            e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
-            e.setFamily(new EntityFamily(assimpMesh.rootEntity.getFamily()));
+            e.factory = new ModelFactory(modelImporter.getVertexList(i), modelImporter.getFaces(i));
+            e.setFamily(new EntityFamily(modelImporter.getRootEntity(i).getFamily()));
             e.addComponent(
                     new UUIDComponent(UUID.randomUUID()),
                     shader,
                     new BoundingBoxComponent(
-                            assimpMesh.min,
-                            assimpMesh.max
+                            modelImporter.getBoundingBoxMin(i),
+                            modelImporter.getBoundingBoxMax(i)
                     ),
-                    new TransformComponent(new Vector3f(assimpMesh.pos)),
-                    new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
+                    new TransformComponent(modelImporter.getTransformation(i)),
+                    new TagComponent(modelImporter.getMeshName(i)),
                     new MeshPosition(pos),
                     new RenderableComponent(RenderingMode.Normal),
                     new OxyMaterialIndex(index)
             );
+            if(modelImporter.getScene().mNumAnimations() > 0){
+                e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
+                System.gc();
+            }
             e.initData(path);
             models.add(e);
             pos++;
@@ -253,23 +267,23 @@ public final class Scene implements OxyDisposable {
     }
 
     public final OxyModel createModelEntity(String path, OxyShader shader, int i) {
-        modelLoader = new OxyModelLoader(path);
+        modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
         OxyMaterialPool.newBatch();
-        OxyModelLoader.AssimpMesh assimpMesh = modelLoader.meshes.get(i);
-        int index = OxyMaterialPool.addMaterial(assimpMesh, modelLoader.materials.get(assimpMesh.materialIndex));
+        int materialIndex = modelImporter.getMaterialIndex(i);
+        int index = OxyMaterialPool.addMaterial(modelImporter.getMaterialName(materialIndex), materialIndex, modelImporter.getMaterialPaths(materialIndex));
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         put(e);
-        e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
-        e.setFamily(new EntityFamily(assimpMesh.rootEntity.getFamily()));
+        e.factory = new ModelFactory(modelImporter.getVertexList(i), modelImporter.getFaces(i));
+        e.setFamily(new EntityFamily(modelImporter.getRootEntity(i).getFamily()));
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
                 new BoundingBoxComponent(
-                        assimpMesh.min,
-                        assimpMesh.max
+                        modelImporter.getBoundingBoxMin(i),
+                        modelImporter.getBoundingBoxMax(i)
                 ),
-                new TransformComponent(new Vector3f(assimpMesh.pos)),
-                new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
+                new TransformComponent(modelImporter.getTransformation(i)),
+                new TagComponent(modelImporter.getMeshName(i)),
                 new MeshPosition(i),
                 new RenderableComponent(RenderingMode.Normal),
                 new OxyMaterialIndex(index)
@@ -282,23 +296,22 @@ public final class Scene implements OxyDisposable {
 
     public final OxyModel createModelEntity(String path, OxyShader shader, int i, int materialIndex) {
         if (!Scene.optimization_Path.equals(path)) {
-            modelLoader = new OxyModelLoader(path);
+            modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
             Scene.optimization_Path = path;
         }
-        OxyModelLoader.AssimpMesh assimpMesh = modelLoader.meshes.get(i);
         OxyMaterialPool.newBatch();
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         put(e);
-        e.factory = new ModelFactory(assimpMesh.vertices, assimpMesh.textureCoords, assimpMesh.normals, assimpMesh.faces, assimpMesh.tangents, assimpMesh.biTangents);
+        e.factory = new ModelFactory(modelImporter.getVertexList(i), modelImporter.getFaces(i));
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
                 shader,
                 new BoundingBoxComponent(
-                        assimpMesh.min,
-                        assimpMesh.max
+                        modelImporter.getBoundingBoxMin(i),
+                        modelImporter.getBoundingBoxMax(i)
                 ),
-                new TransformComponent(new Vector3f(assimpMesh.pos)),
-                new TagComponent(assimpMesh.name == null ? "Unnamed" : assimpMesh.name),
+                new TransformComponent(modelImporter.getTransformation(i)),
+                new TagComponent(modelImporter.getMeshName(i)),
                 new MeshPosition(i),
                 new RenderableComponent(RenderingMode.Normal),
                 new OxyMaterialIndex(materialIndex)
@@ -325,7 +338,7 @@ public final class Scene implements OxyDisposable {
         if (e.has(ModelMeshOpenGL.class)) e.get(ModelMeshOpenGL.class).dispose();
         if (e.has(SkyLight.class)) {
             HDRTexture texture = e.get(SkyLight.class).getHDRTexture();
-            if(texture != null) texture.dispose();
+            if (texture != null) texture.dispose();
         }
 
         for (var scripts : e.getScripts()) {

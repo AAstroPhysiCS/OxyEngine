@@ -1,9 +1,12 @@
 package OxyEngineEditor;
 
+import OxyEngine.Components.TagComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.EditorCamera;
-import OxyEngine.Components.TagComponent;
-import OxyEngine.Core.Layers.*;
+import OxyEngine.Core.Layers.GizmoLayer;
+import OxyEngine.Core.Layers.Layer;
+import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Layers.UILayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
@@ -27,7 +30,8 @@ import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
+import static org.lwjgl.opengl.GL11.glGetError;
 
 public class EditorApplication extends OxyApplication {
 
@@ -44,7 +48,7 @@ public class EditorApplication extends OxyApplication {
     public void init() {
         oxyEngine.init();
 
-        oxyShader = new OxyShader("shaders/OxyPBR.glsl");
+        oxyShader = new OxyShader("shaders/OxyPBRAnimation.glsl");
         OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
 
         scene = new Scene("Test Scene 1", oxyRenderer,
@@ -67,6 +71,7 @@ public class EditorApplication extends OxyApplication {
         oxyShader.disable();
 
         SceneRuntime.ACTIVE_SCENE = scene;
+
         SceneLayer sceneLayer = SceneLayer.getInstance();
         GizmoLayer gizmoLayer = GizmoLayer.getInstance();
         UILayer uiLayer = UILayer.getInstance();

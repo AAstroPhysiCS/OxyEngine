@@ -5,7 +5,7 @@ import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Scene.Objects.Model.ModelType;
+import OxyEngine.Scene.Objects.Model.DefaultModelType;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
@@ -21,13 +21,12 @@ public class PreviewEntity {
                     .setFormats(FrameBufferTextureFormat.RGBA8)
                     .setFilter(GL_LINEAR, GL_LINEAR));
 
-    public static final OxyModel previewSphereEntity = ACTIVE_SCENE.createModelEntity(ModelType.Sphere, oxyShader);
+    public static final OxyModel previewSphereEntity = ACTIVE_SCENE.createModelEntity(DefaultModelType.Sphere, oxyShader);
 
     static {
         previewSphereEntity.addComponent(oxyShader);
         previewSphereEntity.get(TransformComponent.class).scale.set(15);
         previewSphereEntity.transformLocally();
-        previewSphereEntity.updateVertexData();
     }
 
     private PreviewEntity(){}

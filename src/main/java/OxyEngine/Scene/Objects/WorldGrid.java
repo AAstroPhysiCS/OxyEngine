@@ -23,7 +23,7 @@ public class WorldGrid {
     public WorldGrid(Scene scene, int size) {
         this.scene = scene;
         worldGridMesh = new NativeObjectMeshOpenGL(GL_LINES, BufferLayoutProducer.Usage.STATIC,
-                NativeObjectMeshOpenGL.attributeVert, NativeObjectMeshOpenGL.attributeTXSlot);
+                NativeObjectMeshOpenGL.attributeVert);
         add(size);
         worldGridMesh.addToQueue();
     }
@@ -70,7 +70,6 @@ public class WorldGrid {
                 e.vertices[vertPtr++] = transformed.x;
                 e.vertices[vertPtr++] = transformed.y;
                 e.vertices[vertPtr++] = transformed.z;
-                e.vertices[vertPtr++] = 0;
             }
         }
         int indicesPtr = 0;

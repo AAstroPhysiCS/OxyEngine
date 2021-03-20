@@ -24,6 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static OxyEngine.System.OxySystem.parseStringToFloatArray;
+import static OxyEngine.System.OxySystem.parseStringToVector3f;
+
 public final class SceneSerializer {
 
     public static final String fileExtension = ".osc", extensionName = "osc";
@@ -347,29 +350,5 @@ public final class SceneSerializer {
 
             return modelInstance;
         }
-    }
-
-    private static Vector3f parseStringToVector3f(String sValue) {
-        String[] splittedVector = sValue.replace("(", "").replace(")", "").split(" ");
-        String[] valuesPos = new String[3];
-        int ptr = 0;
-        for (String s : splittedVector) {
-            if (s.isBlank() || s.isEmpty()) continue;
-            valuesPos[ptr++] = s;
-        }
-        return new Vector3f(Float.parseFloat(valuesPos[0]), Float.parseFloat(valuesPos[1]), Float.parseFloat(valuesPos[2]));
-    }
-
-    private static float[] parseStringToFloatArray(String sValue, int len) {
-        float[] valuesPos = new float[len];
-        if (sValue.equals("null")) {
-            Arrays.fill(valuesPos, 0f);
-            return valuesPos;
-        }
-        String[] splittedVector = sValue.replace("[", "").replace("]", "").split(", ");
-        for (int i = 0; i < valuesPos.length; i++) {
-            valuesPos[i] = Float.parseFloat(splittedVector[i]);
-        }
-        return valuesPos;
     }
 }

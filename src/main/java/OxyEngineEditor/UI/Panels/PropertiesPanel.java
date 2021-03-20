@@ -10,7 +10,7 @@ import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
@@ -206,7 +206,6 @@ public class PropertiesPanel extends Panel {
                     t.rotation.set(rotationX[0], rotationY[0], rotationZ[0]);
                     t.scale.set(scaleX[0], scaleY[0], scaleZ[0]);
                     entityContext.transformLocally();
-                    entityContext.updateVertexData();
                     addParentTransformToChildren(entityContext);
                 }
 
@@ -293,9 +292,9 @@ public class PropertiesPanel extends Panel {
                     if (ImGui.menuItem("Sky Light")) {
                         if (!entityContext.has(Light.class)) {
                             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
-                            ACTIVE_SCENE.createSkyLight();
+                            OxyNativeObject skyLightEnt = ACTIVE_SCENE.createSkyLight();
                             SceneLayer.getInstance().updateModelEntities();
-                            entityContext = null;
+                            entityContext = skyLightEnt;
                         }
                         //error or hint that lights are single instanced. TODO
                     }
@@ -303,10 +302,8 @@ public class PropertiesPanel extends Panel {
                 }
                 ImGui.endPopup();
             }
-            if(entityContext != null) {
-                for (GUINode guiNode : entityContext.getGUINodes())
-                    guiNode.runEntry();
-            }
+            for (GUINode guiNode : entityContext.getGUINodes())
+                guiNode.runEntry();
             ImGui.popStyleColor();
 
         } else if (materialContext != null) {
@@ -377,7 +374,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.albedoTexture != null) m.albedoTexture.dispose();
                                         m.albedoTexture = OxyTexture.loadImage(TextureSlot.ALBEDO, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -394,7 +390,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.albedoTexture != null) m.albedoTexture.dispose();
                                         m.albedoTexture = OxyTexture.loadImage(TextureSlot.ALBEDO, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
 
@@ -450,7 +445,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.normalTexture != null) m.normalTexture.dispose();
                                         m.normalTexture = OxyTexture.loadImage(TextureSlot.NORMAL, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -466,7 +460,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.normalTexture != null) m.normalTexture.dispose();
                                         m.normalTexture = OxyTexture.loadImage(TextureSlot.NORMAL, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
 
@@ -527,7 +520,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.metallicTexture != null) m.metallicTexture.dispose();
                                         m.metallicTexture = OxyTexture.loadImage(TextureSlot.METALLIC, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -543,7 +535,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.metallicTexture != null) m.metallicTexture.dispose();
                                         m.metallicTexture = OxyTexture.loadImage(TextureSlot.METALLIC, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
 
@@ -604,7 +595,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.roughnessTexture != null) m.roughnessTexture.dispose();
                                         m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -620,7 +610,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.roughnessTexture != null) m.roughnessTexture.dispose();
                                         m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
 
@@ -680,7 +669,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.aoTexture != null) m.aoTexture.dispose();
                                         m.aoTexture = OxyTexture.loadImage(TextureSlot.AO, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -696,7 +684,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.aoTexture != null) m.aoTexture.dispose();
                                         m.aoTexture = OxyTexture.loadImage(TextureSlot.AO, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
 
@@ -756,7 +743,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.emissiveTexture != null) m.emissiveTexture.dispose();
                                         m.emissiveTexture = OxyTexture.loadImage(TextureSlot.EMISSIVE, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -772,7 +758,6 @@ public class PropertiesPanel extends Panel {
                                     if (path != null) {
                                         if (m.emissiveTexture != null) m.emissiveTexture.dispose();
                                         m.emissiveTexture = OxyTexture.loadImage(TextureSlot.EMISSIVE, path);
-                                        for (OxyEntity e : OxyMaterial.updateAllEntities(m)) e.updateVertexData();
                                     }
                                 }
 

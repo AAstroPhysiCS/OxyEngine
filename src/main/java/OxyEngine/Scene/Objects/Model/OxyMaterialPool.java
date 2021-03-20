@@ -126,10 +126,10 @@ public class OxyMaterialPool {
         return material.index = latest;
     }
 
-    public static int addMaterial(OxyModelLoader.AssimpMesh mesh, OxyModelLoader.AssimpMaterial m) {
-        for (OxyMaterial oxyM : materialPool) if (oxyM.assimpIndex == mesh.materialIndex) return oxyM.index;
-        OxyMaterial material = new OxyMaterial(m);
-        material.assimpIndex = mesh.materialIndex;
+    public static int addMaterial(String name, int meshMaterialIndex, String... assimpMaterialPaths) {
+        for (OxyMaterial oxyM : materialPool) if (oxyM.assimpIndex == meshMaterialIndex) return oxyM.index;
+        OxyMaterial material = new OxyMaterial(name, assimpMaterialPaths);
+        material.assimpIndex = meshMaterialIndex;
         materialPool.add(material);
         int latest = getLatestSlot();
         return material.index = latest;

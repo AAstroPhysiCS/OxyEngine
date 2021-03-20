@@ -66,8 +66,6 @@ public abstract class OxyEntity {
 
     public abstract void constructData();
 
-    public abstract void updateVertexData();
-
     public void transformLocally() {
         TransformComponent c = get(TransformComponent.class);
         c.transform = new Matrix4f()
@@ -90,11 +88,6 @@ public abstract class OxyEntity {
         for (EntityComponent c : component) {
             if (c instanceof OpenGLMesh m) {
                 m.addToList(this);
-            }
-            //if someone decides to add a seperate TransformComponent, then validate it
-            //if the entity was imported from a oxy scene file, then do not validate it, because it has been already validated.
-            if (c instanceof TransformComponent t && !importedFromFile) {
-                t.validate(this);
             }
 
             //Camera position and rotation from the entity to the camera component
@@ -126,7 +119,6 @@ public abstract class OxyEntity {
         if (relatedEntities.size() == 0) return;
         for (OxyEntity m : relatedEntities) {
             m.transformLocally();
-            m.updateVertexData();
             addParentTransformToChildren(m);
         }
     }
@@ -143,11 +135,6 @@ public abstract class OxyEntity {
             scene.addComponent(this, c);
             if (c instanceof OpenGLMesh m) {
                 m.addToList(this);
-            }
-            //if someone decides to add a seperate TransformComponent, then validate it
-            //if the entity was imported from a oxy scene file, then do not validate it, because it has been already validated.
-            if (c instanceof TransformComponent t && !importedFromFile) {
-                t.validate(this);
             }
         }
     }

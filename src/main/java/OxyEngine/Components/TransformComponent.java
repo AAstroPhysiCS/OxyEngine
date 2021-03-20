@@ -1,8 +1,7 @@
 package OxyEngine.Components;
 
-import OxyEngine.Scene.OxyEntity;
-import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class TransformComponent implements EntityComponent {
@@ -50,23 +49,23 @@ public class TransformComponent implements EntityComponent {
         this(position, rotation, new Vector3f(scale, scale, scale));
     }
 
-    @Deprecated
     public TransformComponent(Matrix4f t){
         this.transform = t;
         this.position = new Vector3f();
         this.rotation = new Vector3f();
         this.scale = new Vector3f();
-        AxisAngle4f rot = new AxisAngle4f();
-        t.getTranslation(position);
-        t.getRotation(rot);
-        t.getScale(scale);
-        rot.transform(rotation);
-    }
-
-    public void validate(OxyEntity entity) {
-        if (entity != null && entity.has(BoundingBoxComponent.class) && entity.has(TransformComponent.class)) { // safety
-            entity.get(TransformComponent.class).position.mul(new Vector3f(entity.get(TransformComponent.class).scale));
+        Quaternionf rot = new Quaternionf();
+        transform.getTranslation(position);
+        transform.getUnnormalizedRotation(rot);
+        transform.getScale(scale);
+        //TODO: Could function or could not function idk.
+        if(scale.x < 0.01f && scale.y < 0.01f && scale.z < 0.01f) scale.set(1);
+        else {
+            scale.mul(0.01f);
+            position.mul(0.01f);
         }
+        rot.getEulerAnglesXYZ(this.rotation);
+        this.rotation.mul((float) (180 / Math.PI));
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation) {
