@@ -288,6 +288,10 @@ public final class Scene implements OxyDisposable {
                 new RenderableComponent(RenderingMode.Normal),
                 new OxyMaterialIndex(index)
         );
+        if(modelImporter.getScene().mNumAnimations() > 0){
+            e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
+            System.gc();
+        }
         e.initData(path);
         return e;
     }

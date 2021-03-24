@@ -17,19 +17,19 @@ public class EditorCamera extends PerspectiveCamera {
     }
 
     @Override
+    public Matrix4f setProjectionMatrix() {
+        Matrix4f m = new Matrix4f();
+        m.setPerspective((float) Math.toRadians(fovY), aspect, zNear, zFar);
+        return m;
+    }
+
+    @Override
     public Matrix4f setModelMatrix() {
         Matrix4f m = new Matrix4f();
         m.translate(0, 0, -zoom);
         m.rotateX(-this.getRotation().x);
         m.rotateY(-this.getRotation().y);
-        m.translate(this.getPosition().x, this.getPosition().y, this.getPosition().z);
-        return m;
-    }
-
-    @Override
-    public Matrix4f setProjectionMatrix() {
-        Matrix4f m = new Matrix4f();
-        m.setPerspective((float) Math.toRadians(fovY), aspect, zNear, zFar);
+        m.translate(-this.getPosition().x, -this.getPosition().y, -this.getPosition().z);
         return m;
     }
 
@@ -89,9 +89,9 @@ public class EditorCamera extends PerspectiveCamera {
             float dx = (float) (mouseCursorPosDispatcher.getXPos() - oldMouseX);
             float dy = (float) (mouseCursorPosDispatcher.getYPos() - oldMouseY);
             float angle90 = rotationRef.y;
-            positionRef.x -= Math.cos(angle90) * (-dx * mouseSpeed);
-            positionRef.z += Math.sin(angle90) * (-dx * mouseSpeed);
-            positionRef.y += (-dy * mouseSpeed);
+            positionRef.x += Math.cos(angle90) * (-dx * mouseSpeed);
+            positionRef.z -= Math.sin(angle90) * (-dx * mouseSpeed);
+            positionRef.y -= (-dy * mouseSpeed);
         }
 
         oldMouseX = mouseCursorPosDispatcher.getXPos();

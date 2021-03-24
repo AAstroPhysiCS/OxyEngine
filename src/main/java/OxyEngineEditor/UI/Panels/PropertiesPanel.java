@@ -48,7 +48,7 @@ public class PropertiesPanel extends Panel {
 
     private static final ImString albedoInputBuffer = new ImString(200);
     private static final ImString metalnessInputBuffer = new ImString(200);
-    private static final ImString reflectivityInputBuffer = new ImString(200);
+    private static final ImString roughnessInputBuffer = new ImString(200);
     private static final ImString normalInputBuffer = new ImString(200);
     private static final ImString aoInputBuffer = new ImString(200);
     private static final ImString emissiveInputBuffer = new ImString(200);
@@ -111,15 +111,6 @@ public class PropertiesPanel extends Panel {
 
         ImGui.popStyleVar();
         ImGui.popID();
-    }
-
-    private String renderImageBesideTreeNode(String name, int textureId, final float sizeX, final float sizeY) {
-        name = "\t " + name;
-        float cursorPosX = ImGui.getCursorPosX();
-        ImGui.setCursorPosX(cursorPosX + 20);
-        ImGui.image(textureId, sizeX, sizeY, 0, 1, 1, 0);
-        ImGui.sameLine(1);
-        return name;
     }
 
     private void renderPreviewImage(ImageTexture t, float offsetY) {
@@ -321,7 +312,7 @@ public class PropertiesPanel extends Panel {
             if (ImGui.beginChild("MasterMaterialCard", ImGui.getContentRegionAvailX(), ImGui.getContentRegionAvailY())) {
                 ImGui.spacing();
 
-                String text = renderImageBesideTreeNode(m.name, materialPinkSphere.getTextureId(), 20, 20);
+                String text = renderImageBesideTreeNode(m.name, materialPinkSphere.getTextureId(), 19, 0, 20, 20);
 
                 if (ImGui.treeNodeEx(text, ImGuiTreeNodeFlags.DefaultOpen)) {
                     {
@@ -565,33 +556,33 @@ public class PropertiesPanel extends Panel {
 
                         ImGui.pushStyleColor(ImGuiCol.ChildBg, Panel.childCardBgC[0], Panel.childCardBgC[1], Panel.childCardBgC[2], Panel.childCardBgC[3]);
                         ImGui.pushStyleVar(ImGuiStyleVar.ChildRounding, 12);
-                        ImGui.beginChild("ReflectivityChild", ImGui.getContentRegionAvailX(), 100);
+                        ImGui.beginChild("RoughnessChild", ImGui.getContentRegionAvailX(), 100);
 
                         ImGui.dummy(0, 5);
 
-                        if (ImGui.treeNodeEx("Reflectivity", ImGuiTreeNodeFlags.DefaultOpen)) {
+                        if (ImGui.treeNodeEx("Roughness", ImGuiTreeNodeFlags.DefaultOpen)) {
 
                             ImGui.columns(2);
                             ImGui.setColumnWidth(0, 160);
 
                             ImGui.alignTextToFramePadding();
                             renderPreviewImage(m.roughnessTexture, 3);
-                            ImGui.text("Reflectivity Map");
+                            ImGui.text("Roughness Map");
 
                             ImGui.dummy(0, 5);
 
-                            ImGui.text("Reflectivity Strength");
+                            ImGui.text("Roughness Strength");
                             ImGui.nextColumn();
 
                             {
                                 ImGui.spacing();
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX() - 50);
-                                reflectivityInputBuffer.set("");
+                                roughnessInputBuffer.set("");
                                 if (m.roughnessTexture != null)
-                                    reflectivityInputBuffer.set(m.roughnessTexture.getPath());
-                                if (ImGui.inputText("##hideLabelReflectivityInput", reflectivityInputBuffer, ImGuiInputTextFlags.EnterReturnsTrue)) {
-                                    String path = reflectivityInputBuffer.get();
-                                    reflectivityInputBuffer.set(path);
+                                    roughnessInputBuffer.set(m.roughnessTexture.getPath());
+                                if (ImGui.inputText("##hideLabelRoughnessInput", roughnessInputBuffer, ImGuiInputTextFlags.EnterReturnsTrue)) {
+                                    String path = roughnessInputBuffer.get();
+                                    roughnessInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.roughnessTexture != null) m.roughnessTexture.dispose();
                                         m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path);
@@ -625,7 +616,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.popItemWidth();
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.dummy(0, 1);
-                                ImGui.sliderFloat("###hidelabel reflectivity", m.roughness, 0, 1);
+                                ImGui.sliderFloat("###hidelabel Roughness", m.roughness, 0, 1);
                                 ImGui.popItemWidth();
                             }
 

@@ -2,6 +2,7 @@ package OxyEngine.Scene.Objects;
 
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scene.Objects.Native.NativeObjectFactory;
@@ -10,8 +11,6 @@ import OxyEngine.Scene.Scene;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-
-import static org.lwjgl.opengl.GL11.GL_LINES;
 
 public class WorldGrid {
 
@@ -22,7 +21,7 @@ public class WorldGrid {
 
     public WorldGrid(Scene scene, int size) {
         this.scene = scene;
-        worldGridMesh = new NativeObjectMeshOpenGL(GL_LINES, BufferLayoutProducer.Usage.STATIC,
+        worldGridMesh = new NativeObjectMeshOpenGL(MeshRenderMode.LINES, BufferLayoutProducer.Usage.STATIC,
                 NativeObjectMeshOpenGL.attributeVert);
         add(size);
         worldGridMesh.addToQueue();

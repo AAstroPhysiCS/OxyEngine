@@ -111,7 +111,7 @@ public class EditorApplication extends OxyApplication {
 
             double time = 0;
             long timeMillis = System.currentTimeMillis();
-            int frames = 0;
+            double frames = 0;
 
             while (oxyEngine.getMainThread().isAlive() && !glfwWindowShouldClose(windowHandle.getPointer())) {
                 if (keyEventDispatcher.getKeys()[GLFW.GLFW_KEY_ESCAPE]) break;
@@ -126,7 +126,8 @@ public class EditorApplication extends OxyApplication {
 
                 if (System.currentTimeMillis() - timeMillis > 1000) {
                     timeMillis += 1000;
-                    FPS = frames;
+                    FRAME_TIME = (float) (1000 / frames);
+                    FPS = (int) frames;
                     frames = 0;
                 }
 

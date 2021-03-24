@@ -82,13 +82,13 @@ public class SceneHierarchyPanel extends Panel {
                 String name = tagComponent.tag();
 
                 if (isLight) {
-                    name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 22f, 20f);
+                    name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 19, 2, 22f, 20f);
                 } else if (hasMesh) {
-                    name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 22.4f, 20f);
+                    name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 19, 2, 22.4f, 20f);
                 } else if (isCamera) {
-                    name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 22f, 20f);
+                    name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 19, 2, 22f, 20f);
                 } else { //its a group
-                    name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(), 22, 20);
+                    name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(),19, 2,  22, 20);
                 }
 
                 if (ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth)) {
@@ -163,14 +163,7 @@ public class SceneHierarchyPanel extends Panel {
         ImGui.text(type);
     }
 
-    private String renderImageBesideTreeNode(String name, int textureId, final float sizeX, final float sizeY) {
-        name = "\t " + name;
-        float cursorPosX = ImGui.getCursorPosX();
-        ImGui.setCursorPosX(cursorPosX + 19);
-        ImGui.image(textureId, sizeX, sizeY, 0, 1, 1, 0);
-        ImGui.sameLine(cursorPosX);
-        return name;
-    }
+
 
     private void renderTreeNode(List<OxyEntity> relatedEntities) {
         if (relatedEntities == null) return;
@@ -194,13 +187,13 @@ public class SceneHierarchyPanel extends Panel {
             String name = e.get(TagComponent.class).tag();
 
             if (isLight) {
-                name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 22f, 20f);
+                name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(),19, 2,  22f, 20f);
             } else if (hasMesh) {
-                name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 22.4f, 20f);
+                name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(),19, 2,  22f, 20f);
             } else if (isCamera) {
-                name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 22f, 20f);
+                name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 19, 2, 22f, 20f);
             } else { //its a group
-                name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(), 22, 20);
+                name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(),19, 2,  22, 20f);
             }
 
             if (ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth)) {
@@ -230,9 +223,9 @@ public class SceneHierarchyPanel extends Panel {
             ImGui.tableNextRow();
             renderType(null, "Material");
             ImGui.tableSetColumnIndex(0);
-            ImGui.setCursorPosY(ImGui.getCursorPosY() - 1);
             ImGui.image(materialPinkSphere.getTextureId(), 20, 20, 0, 1, 1, 0);
             ImGui.sameLine();
+            ImGui.setCursorPosY(ImGui.getCursorPosY() + 2);
             if (ImGui.selectable(m.name, false)) {
                 OxySelectHandler.materialContext = m;
                 entityContext = null;
@@ -268,7 +261,7 @@ public class SceneHierarchyPanel extends Panel {
             ImGui.tableSetColumnIndex(0);
             ImGui.tableSetBgColor(ImGuiTableBgTarget.CellBg, TABLE_COLORS);
             String name = "Looks";
-            name = renderImageBesideTreeNode(name, dirAssetGrey.getTextureId(), 20, 20);
+            name = renderImageBesideTreeNode(name, dirAssetGrey.getTextureId(), 19, 2, 20, 20);
             if (ImGui.treeNodeEx(name)) {
                 updateLooks();
                 ImGui.treePop();

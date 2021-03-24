@@ -10,6 +10,7 @@ import imgui.flag.ImGuiInputTextFlags;
 import imgui.type.ImString;
 import org.lwjgl.stb.STBImage;
 
+import static OxyEngine.Scene.Objects.SkyLightFactory.skyboxVertices;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.logger;
@@ -23,53 +24,9 @@ public class SkyLight extends Light {
     public float[] intensity = new float[]{1.0f};
     public float[] mipLevelStrength = new float[]{0.0f};
 
-    public static final float[] skyboxVertices = {
-            -1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, 1.0f, -1.0f,
-            // front face
-            -1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, -1.0f, 1.0f,
-            // left face
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            // right face
-            1.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            // bottom face
-            -1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, -1.0f,
-            // top face
-            -1.0f, 1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, 1.0f, 1.0f,
-    };
-
-    public static final int[] indices = new int[SkyLight.skyboxVertices.length];
+    public static final int[] indices = new int[skyboxVertices.length];
     static {
-        for (int i = 0; i < SkyLight.skyboxVertices.length; i++) {
+        for (int i = 0; i < skyboxVertices.length; i++) {
             indices[i] = i;
         }
     }

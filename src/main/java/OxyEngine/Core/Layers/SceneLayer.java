@@ -46,7 +46,7 @@ public class SceneLayer extends Layer {
     public Set<OxyEntity> cachedCameraComponents;
     public Set<OxyEntity> allModelEntities;
 
-    //    private static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
+//    private static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
     private static final OxyShader cubemapShader = new OxyShader("shaders/OxySkybox.glsl");
 
     private OxyCamera mainCamera;
@@ -177,20 +177,6 @@ public class SceneLayer extends Layer {
                 currentBoundedSkyLight = (OxyNativeObject) e;
             }
         }
-
-        //ANIMATION UPDATE
-        oxyShader.enable();
-        for (OxyEntity e : allModelEntities) {
-            if (e.has(AnimationComponent.class)) {
-                AnimationComponent animComp = e.get(AnimationComponent.class);
-                animComp.updateAnimation(ts);
-                List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
-                for (int j = 0; j < matrix4fList.size(); j++) {
-                    oxyShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
-                }
-            }
-        }
-        oxyShader.disable();
     }
 
     @Override
@@ -225,6 +211,17 @@ public class SceneLayer extends Layer {
 
                 OxyShader shader = e.get(OxyShader.class);
                 shader.enable();
+
+                //ANIMATION UPDATE
+                if (e.has(AnimationComponent.class)) {
+                    AnimationComponent animComp = e.get(AnimationComponent.class);
+                    animComp.updateAnimation(ts);
+                    List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
+                    for (int j = 0; j < matrix4fList.size(); j++) {
+                        oxyShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                    }
+                }
+
                 shader.setUniformMatrix4fv("model", c.transform, false);
                 int iblSlot = TextureSlot.UNUSED.getValue(), prefilterSlot = TextureSlot.UNUSED.getValue(), brdfLUTSlot = TextureSlot.UNUSED.getValue();
                 if (hdrTexture != null) {

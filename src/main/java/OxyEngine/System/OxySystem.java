@@ -5,11 +5,17 @@ import OxyEngine.Scene.SceneRuntime;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
+import org.lwjgl.assimp.AIString;
+import org.lwjgl.assimp.Assimp;
+import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.nfd.NativeFileDialog;
 import org.reflections.Reflections;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -29,6 +35,8 @@ public interface OxySystem {
 
     Reflections reflections = new Reflections("OxyEngine");
 
+    List<String> extensionList = new ArrayList<>();
+
     static void init() {
         for (Handler handlers : logger.getHandlers())
             logger.removeHandler(handlers);
@@ -37,6 +45,13 @@ public interface OxySystem {
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new OxyLogger());
         logger.addHandler(handler);
+        AIString extensionString = new AIString(ByteBuffer.allocateDirect(1032));
+        Assimp.aiGetExtensionList(extensionString);
+        String[] extensionArray = extensionString.dataString().split(";");
+        for(String s : extensionArray){
+            s = s.replace(".", "").replace("*", "");
+            extensionList.add(s);
+        }
     }
 
     static String oxyAssert(String msg) {
@@ -46,13 +61,6 @@ public interface OxySystem {
 
     static <T> Set<Class<? extends T>> getSubClasses(Class<T> type) {
         return reflections.getSubTypesOf(type);
-    }
-
-    static File[] getCurrentProjectFiles(boolean hideHiddenFiles){
-        File[] f = new File(BASE_PATH).listFiles();
-        if(f == null) return null;
-        if(hideHiddenFiles) return Arrays.stream(f).filter(file -> !file.isHidden()).toArray(File[]::new);
-        return f;
     }
 
     static boolean isValidPath(String path) {
@@ -84,24 +92,26 @@ public interface OxySystem {
         static String openDialog(String filterList, String defaultPath) {
             SceneRuntime.stop();
             String path = null;
-            PointerBuffer buffer = PointerBuffer.allocateDirect(16);
-            int result = NativeFileDialog.NFD_OpenDialog(filterList, defaultPath, buffer);
-            if (result == NativeFileDialog.NFD_OKAY) {
-                path = buffer.getStringASCII();
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                PointerBuffer buffer = stack.mallocPointer(1);
+                int result = NativeFileDialog.NFD_OpenDialog(filterList, defaultPath, buffer);
+                if (result == NativeFileDialog.NFD_OKAY) {
+                    path = buffer.getStringASCII();
+                }
             }
-            NativeFileDialog.nNFD_Free(buffer.get());
             return path;
         }
 
-        static String saveDialog(String filterList, String defaultPath){
+        static String saveDialog(String filterList, String defaultPath) {
             SceneRuntime.stop();
             String path = null;
-            PointerBuffer buffer = PointerBuffer.allocateDirect(16);
-            int result = NativeFileDialog.NFD_SaveDialog(filterList, defaultPath, buffer);
-            if (result == NativeFileDialog.NFD_OKAY) {
-                path = buffer.getStringASCII();
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                PointerBuffer buffer = stack.mallocPointer(1);
+                int result = NativeFileDialog.NFD_SaveDialog(filterList, defaultPath, buffer);
+                if (result == NativeFileDialog.NFD_OKAY) {
+                    path = buffer.getStringASCII();
+                }
             }
-            NativeFileDialog.nNFD_Free(buffer.get());
             return path;
         }
     }
@@ -139,5 +149,21 @@ public interface OxySystem {
             valuesPos[i] = Float.parseFloat(splittedVector[i]);
         }
         return valuesPos;
+    }
+
+    static String removeFileExtension(String filename) {
+        //regex from internet
+        return filename.replaceFirst("[.][^.]+$", "");
+    }
+
+    static String getExtension(String filePath){
+        return filePath.split("\\.")[1];
+    }
+
+    static boolean isSupportedModelFileExtension(String extensionToSupport) {
+        for (String extensions : extensionList) {
+            if(extensions.equalsIgnoreCase(extensionToSupport)) return true;
+        }
+        return false;
     }
 }

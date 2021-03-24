@@ -82,7 +82,7 @@ public class BufferLayoutProducer {
         @Override
         public BufferLayoutRecord finalizeRecord() {
 
-            BufferLayoutImpl vertexLayout = null, normalsLayout = null, tangentLayout = null, textureLayout = null, indexLayout = null, test = null;
+            BufferLayoutImpl vertexLayout = null, normalsLayout = null, tangentLayout = null, textureLayout = null, indexLayout = null;
             for (BufferLayoutImpl impl : implementations) {
                 if (VertexBuffer.class.equals(impl.destClass)) {
                     vertexLayout = impl;

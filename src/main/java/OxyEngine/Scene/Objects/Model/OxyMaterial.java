@@ -123,8 +123,6 @@ public class OxyMaterial implements OxyDisposable {
 
         if (albedoColor != null) {
             shader.setUniformVec3("material.diffuse", albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]);
-            shader.setUniformVec3("colorOut", albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]);
-            shader.setUniformVec4("colorOut4f", albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2], albedoColor.getNumbers()[3]);
         }
         if(albedoTexture != null){
             shader.setUniform1i("albedoMapSlot", albedoTexture.getTextureSlot());

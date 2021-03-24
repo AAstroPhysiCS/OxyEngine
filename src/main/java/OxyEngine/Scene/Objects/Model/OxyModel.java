@@ -5,6 +5,7 @@ import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
+import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scene.OxyEntity;
@@ -16,7 +17,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 
 public class OxyModel extends OxyEntity {
 
@@ -85,7 +85,7 @@ public class OxyModel extends OxyEntity {
         assert factory != null : oxyAssert("Models should have a Model Template");
         transformLocally();
         factory.constructData(this);
-        addComponent(new ModelMeshOpenGL(meshPath, GL_TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
+        addComponent(new ModelMeshOpenGL(meshPath, MeshRenderMode.TRIANGLES, BufferLayoutProducer.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
     }
 
     @Override

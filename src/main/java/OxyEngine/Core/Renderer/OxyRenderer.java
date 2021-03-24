@@ -34,6 +34,7 @@ public abstract class OxyRenderer {
         public static String getStats() {
             if (currentBoundedCamera == null) return "FPS: %s, No Camera".formatted(OxyApplication.FPS);
             String s = """
+                    Frame Time: %.02f ms
                     FPS: %s
                     Draw Calls: %s
                     Total Shapes: %s
@@ -57,7 +58,7 @@ public abstract class OxyRenderer {
                         Y: %s, 
                         Z: %s
                     Zoom: %s
-                    """.formatted(
+                    """.formatted(OxyApplication.FRAME_TIME,
                     OxyApplication.FPS,
                     drawCalls,
                     totalShapeCount,

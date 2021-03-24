@@ -156,9 +156,9 @@ vec3 calcPBR(vec3 L, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec
      return (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
 }
 
-vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
+vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 albedo;
+    vec3 albedo, emissive;
     float metallicMap, roughnessMap, aoMap;
 
     if(metallicSlot == 0){
@@ -183,14 +183,19 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
        albedo = pow(vec3(material.diffuse), vec3(gamma));
     } else {
        vec4 texture = texture(tex[albedoMapSlot], texCoordsOut).rgba;
-       if(texture.w < 0.1f) discard;
+       if(texture.w < 0.5f) discard;
        albedo = pow(texture.rgb, vec3(gamma));
     }
 
+    if(emissiveSlot != 0)
+        emissive = texture(tex[emissiveSlot], inVar.texCoordsOut).rgb * emissiveStrength;
+
     vec3 IBL = texture(iblMap, norm).rgb;
     if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL = vec3(0.05f, 0.05f, 0.05f);
+
     vec3 Lo;
     vec3 F0 = vec3(0.04);
+
     F0 = mix(F0, albedo, metallicMap);
     for(int i = 0; i < d_Light.length; i++){
         if(d_Light[i].activeState == 0) continue;
@@ -224,8 +229,6 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
     vec3 ambient = (kD * diffuseMap + specular) * aoMap * hdrIntensity;
 
-    vec3 emissive = texture(tex[emissiveSlot], inVar.texCoordsOut).rgb * emissiveStrength;
-
     vec3 result = ambient + Lo + emissive;
     result = result / (result + vec3(1.0));
     result = vec3(1.0) - exp(-result * exposure);
@@ -239,10 +242,9 @@ void main(){
     o_IDBuffer = v_ObjectID;
 
     vec3 vertexPos = inVar.vertexPos;
-    vec3 cameraPosVec3 = cameraPos;
     vec2 texCoordsOut = inVar.texCoordsOut;
 
-    vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
+    vec3 viewDir = normalize(cameraPos - vertexPos);
 
     vec3 norm;
     if(normalMapSlot != 0 && normalMapStrength != 0.0f){
@@ -253,7 +255,7 @@ void main(){
         norm = vec3(normalize(inVar.normalsOut));
     }
 
-    vec4 result = startPBR(vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
+    vec4 result = startPBR(vertexPos, texCoordsOut, viewDir, norm);
     color = vec4(result.xyz, 1.0f);
 }
 
@@ -298,7 +300,7 @@ void main(){
     if(boneIDInt[0] == -1 && boneIDInt[1] == -1 && boneIDInt[2] == -1 && boneIDInt[3] == -1){
         //mesh has no animations
         totalPos = vec4(pos, 1.0f);
-        totalNorm = vec4(normals, 0.0f);
+        totalNorm = vec4(normals, 1.0f);
     } else {
         //mesh has animations
         mat4 transformPos = finalBonesMatrices[boneIDInt[0]] * weights[0];
@@ -316,7 +318,7 @@ void main(){
         totalNorm = transformNorm * vec4(normals, 0.0f);
     }
 
-    outVar.vertexPos = mat3(model) * totalPos.xyz;
+    outVar.vertexPos = (model * totalPos).xyz;
     outVar.normalsOut = mat3(model) * totalNorm.xyz;
 
     vec3 T = normalize(mat3(model) * tangent);
@@ -326,5 +328,6 @@ void main(){
     mat3 TBN = mat3(T, B, N);
     outVar.TBN = TBN;
 
-    gl_Position = model * totalPos * v_Matrix;
+    vec4 modelPos = model * totalPos;
+    gl_Position = modelPos * v_Matrix;
 }

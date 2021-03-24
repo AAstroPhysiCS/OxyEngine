@@ -206,17 +206,37 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
             System.out.println(Arrays.toString(roughness));
         }
 
-        if (textPath.isBlank() || textPath.isEmpty()) textPath = null;
+        String warningString = "For the file: %s, ".formatted(scenePath);
+
+        if (textPath.isBlank() || textPath.isEmpty()) {
+            logger.warning(warningString + "Albedo map is empty!");
+            textPath = null;
+        }
         else textPath = parentPath + "\\" + textPath;
-        if (textPathNormals.isBlank() || textPathNormals.isEmpty()) textPathNormals = null;
+        if (textPathNormals.isBlank() || textPathNormals.isEmpty()){
+            logger.warning(warningString + "Normal map is empty!");
+            textPathNormals = null;
+        }
         else textPathNormals = parentPath + "\\" + textPathNormals;
-        if (textPathRoughness.isBlank() || textPathRoughness.isEmpty()) textPathRoughness = null;
+        if (textPathRoughness.isBlank() || textPathRoughness.isEmpty()){
+            logger.warning(warningString + "Roughness map is empty!");
+            textPathRoughness = null;
+        }
         else textPathRoughness = parentPath + "\\" + textPathRoughness;
-        if (textPathMetallic.isBlank() || textPathMetallic.isEmpty()) textPathMetallic = null;
+        if (textPathMetallic.isBlank() || textPathMetallic.isEmpty()){
+            logger.warning(warningString + "Metallic map is empty!");
+            textPathMetallic = null;
+        }
         else textPathMetallic = parentPath + "\\" + textPathMetallic;
-        if (textPathAO.isBlank() || textPathAO.isEmpty()) textPathAO = null;
+        if (textPathAO.isBlank() || textPathAO.isEmpty()){
+            logger.warning(warningString + "AO map is empty!");
+            textPathAO = null;
+        }
         else textPathAO = parentPath + "\\" + textPathAO;
-        if (textPathEmissive.isBlank() || textPathEmissive.isEmpty()) textPathEmissive = null;
+        if (textPathEmissive.isBlank() || textPathEmissive.isEmpty()){
+            logger.warning(warningString + "Emissive map is empty!");
+            textPathEmissive = null;
+        }
         else textPathEmissive = parentPath + "\\" + textPathEmissive;
 
         materials.add(new AssimpMaterial(matName, textPath, textPathMetallic, textPathRoughness, textPathNormals, textPathAO, textPathEmissive, diffuse));

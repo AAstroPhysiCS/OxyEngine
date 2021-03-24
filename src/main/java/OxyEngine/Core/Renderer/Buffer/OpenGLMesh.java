@@ -2,6 +2,7 @@ package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
+import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
@@ -22,7 +23,8 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
 
     protected String path;
 
-    protected int mode, vao;
+    protected int vao;
+    protected MeshRenderMode mode;
 
     public boolean empty() {
         return indexBuffer.glBufferNull() && vertexBuffer.glBufferNull();
@@ -50,7 +52,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
     }
 
     private void draw() {
-        glDrawElements(mode, indexBuffer.length(), GL_UNSIGNED_INT, 0);
+        glDrawElements(mode.getModeID(), indexBuffer.length(), GL_UNSIGNED_INT, 0);
     }
 
     private void bind() {
@@ -106,5 +108,9 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         if (normalsBuffer != null) normalsBuffer.dispose();
         if (tangentBuffer != null) tangentBuffer.dispose();
         glDeleteVertexArrays(vao);
+    }
+
+    public void setRenderingMode(MeshRenderMode mode) {
+        this.mode = mode;
     }
 }

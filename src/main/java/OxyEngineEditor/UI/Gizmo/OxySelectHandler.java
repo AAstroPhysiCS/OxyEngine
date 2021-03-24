@@ -1,23 +1,24 @@
 package OxyEngineEditor.UI.Gizmo;
 
-import OxyEngine.Components.RenderableComponent;
-import OxyEngine.Components.RenderingMode;
-import OxyEngine.Components.SelectedComponent;
-import OxyEngine.Components.TransformComponent;
+import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.ScenePanel;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
+import java.util.List;
 import java.util.Set;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
+import static OxyEngineEditor.EditorApplication.oxyShader;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL44.glClearTexImage;
 
@@ -47,8 +48,16 @@ public class OxySelectHandler {
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
                 shader.enable();
+                //ANIMATION UPDATE
+                if (e.has(AnimationComponent.class)) {
+                    AnimationComponent animComp = e.get(AnimationComponent.class);
+                    List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
+                    for (int j = 0; j < matrix4fList.size(); j++) {
+                        oxyShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                    }
+                }
                 shader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
-                ACTIVE_SCENE.getRenderer().render(0, e.get(ModelMeshOpenGL.class), currentBoundedCamera, shader);
+                ACTIVE_SCENE.getRenderer().render(SceneRuntime.TS, e.get(ModelMeshOpenGL.class), currentBoundedCamera, shader);
                 shader.disable();
             }
         }

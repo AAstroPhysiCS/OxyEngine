@@ -5,8 +5,8 @@ import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
-import static org.lwjgl.opengl.EXTGPUShader4.glVertexAttribIPointerEXT;
 import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.GL30.glVertexAttribIPointer;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public final class OpenGLVertexBuffer extends VertexBuffer {
@@ -25,8 +25,10 @@ public final class OpenGLVertexBuffer extends VertexBuffer {
         BufferLayoutAttributes[] attribPointers = impl.getAttribPointers();
         for (BufferLayoutAttributes ptr : attribPointers) {
             glEnableVertexAttribArray(ptr.index());
-            if(ptr.type() == GL_INT || ptr.type() == GL_UNSIGNED_INT) glVertexAttribIPointerEXT(ptr.index(), ptr.size(), ptr.type(), ptr.stride(), ptr.pointer());
-            else glVertexAttribPointer(ptr.index(), ptr.size(), ptr.type(), ptr.normalized(), ptr.stride(), ptr.pointer());
+            if (ptr.type() == GL_INT || ptr.type() == GL_UNSIGNED_INT)
+                glVertexAttribIPointer(ptr.index(), ptr.size(), ptr.type(), ptr.stride(), ptr.pointer());
+            else
+                glVertexAttribPointer(ptr.index(), ptr.size(), ptr.type(), ptr.normalized(), ptr.stride(), ptr.pointer());
         }
     }
 
@@ -67,7 +69,7 @@ public final class OpenGLVertexBuffer extends VertexBuffer {
         this.offsetToUpdate = pos * Float.BYTES;
         this.dataToUpdate = newVertices;
         for (float newVertex : newVertices) {
-            if(this.vertices == null) return; //for not breaking when object is deleted
+            if (this.vertices == null) return; //for not breaking when object is deleted
             vertices[pos++] = newVertex;
         }
     }
