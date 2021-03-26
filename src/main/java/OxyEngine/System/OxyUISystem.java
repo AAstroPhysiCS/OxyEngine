@@ -87,7 +87,7 @@ public class OxyUISystem {
         assert file != null;
         for (File f : file) {
             OxyFontSystem.load(io, f.getPath(), 15, f.getName().split("\\.")[0]);
-//            OxyFontSystem.load(io, f.getPath(), 22, f.getName().split("\\.")[0]);
+            OxyFontSystem.load(io, f.getPath(), 18, f.getName().split("\\.")[0]);
         }
 
         imGuiRenderer.init(gl_Version);

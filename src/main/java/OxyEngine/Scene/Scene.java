@@ -164,7 +164,7 @@ public final class Scene implements OxyDisposable {
         OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
         int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
-        model.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f, new Vector3f()));
+        model.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f));
         model.addComponent(new OxyMaterialIndex(index));
         model.getGUINodes().add(DirectionalLight.guiNode);
         model.transformLocally();

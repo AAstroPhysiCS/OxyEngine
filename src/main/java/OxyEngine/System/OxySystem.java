@@ -45,6 +45,7 @@ public interface OxySystem {
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new OxyLogger());
         logger.addHandler(handler);
+
         AIString extensionString = new AIString(ByteBuffer.allocateDirect(1032));
         Assimp.aiGetExtensionList(extensionString);
         String[] extensionArray = extensionString.dataString().split(";");
@@ -157,7 +158,8 @@ public interface OxySystem {
     }
 
     static String getExtension(String filePath){
-        return filePath.split("\\.")[1];
+        String[] splitted = filePath.split("\\.");
+        return splitted[splitted.length - 1];
     }
 
     static boolean isSupportedModelFileExtension(String extensionToSupport) {
@@ -165,5 +167,11 @@ public interface OxySystem {
             if(extensions.equalsIgnoreCase(extensionToSupport)) return true;
         }
         return false;
+    }
+
+    static boolean isSupportedTextureFile(String extensionToSupport){
+        return extensionToSupport.equalsIgnoreCase("jpg") ||
+                extensionToSupport.equalsIgnoreCase("png") ||
+                extensionToSupport.equalsIgnoreCase("jpeg");
     }
 }

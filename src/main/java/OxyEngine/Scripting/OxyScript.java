@@ -22,6 +22,7 @@ import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngine.Scene.SceneRuntime.scriptThread;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class OxyScript {
 
@@ -122,7 +123,7 @@ public class OxyScript {
             ImGui.inputText("##hidelabel oxyScript" + hashCode, bufferPath, ImGuiInputTextFlags.ReadOnly);
             ImGui.sameLine();
             ImGui.pushID(entityContext.get(UUIDComponent.class).getUUIDString() + hashCode());
-            if (ImGui.button("...")) {
+            if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
                 String pathDialog = openDialog("java", null);
                 if (pathDialog != null) {
                     this.path = pathDialog;

@@ -23,12 +23,16 @@ import imgui.flag.*;
 import imgui.type.ImString;
 import org.joml.Vector4f;
 
+import java.io.File;
+
 import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
+import static OxyEngine.System.OxySystem.getExtension;
+import static OxyEngine.System.OxySystem.isSupportedTextureFile;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.materialContext;
-import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAsset;
+import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 import static OxyEngineEditor.UI.Panels.SceneHierarchyPanel.materialPinkSphere;
 
 public class PropertiesPanel extends Panel {
@@ -368,6 +372,8 @@ public class PropertiesPanel extends Panel {
                                     }
                                 }
                                 ImGui.popItemWidth();
+                                ImageTexture imgText = acceptTexturePayload(TextureSlot.ALBEDO);
+                                if(imgText != null) m.albedoTexture = imgText;
 
                                 ImGui.sameLine();
                                 ImGui.pushStyleColor(ImGuiCol.Button, 0, 0, 0, 0);
@@ -375,7 +381,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
 
-                                if (ImGui.imageButton(dirAsset.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
+                                if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
                                     String path = openDialog("", null);
                                     albedoInputBuffer.set(path);
                                     if (path != null) {
@@ -386,6 +392,9 @@ public class PropertiesPanel extends Panel {
 
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
+
+                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.ALBEDO);
+                                if(imgButton != null) m.albedoTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.sameLine();
@@ -439,6 +448,8 @@ public class PropertiesPanel extends Panel {
                                     }
                                 }
                                 ImGui.popItemWidth();
+                                ImageTexture imgText = acceptTexturePayload(TextureSlot.NORMAL);
+                                if(imgText != null) m.normalTexture = imgText;
 
                                 ImGui.sameLine();
                                 ImGui.pushStyleColor(ImGuiCol.Button, 0, 0, 0, 0);
@@ -446,7 +457,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
 
-                                if (ImGui.imageButton(dirAsset.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
+                                if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.normalTexture != null) m.normalTexture.dispose();
@@ -456,6 +467,9 @@ public class PropertiesPanel extends Panel {
 
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
+
+                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.NORMAL);
+                                if(imgButton != null) m.normalTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.sameLine();
@@ -515,13 +529,16 @@ public class PropertiesPanel extends Panel {
                                 }
                                 ImGui.popItemWidth();
 
+                                ImageTexture imgText = acceptTexturePayload(TextureSlot.METALLIC);
+                                if(imgText != null) m.metallicTexture = imgText;
+
                                 ImGui.sameLine();
                                 ImGui.pushStyleColor(ImGuiCol.Button, 0, 0, 0, 0);
                                 ImGui.pushStyleColor(ImGuiCol.ButtonActive, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
 
-                                if (ImGui.imageButton(dirAsset.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
+                                if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.metallicTexture != null) m.metallicTexture.dispose();
@@ -531,6 +548,9 @@ public class PropertiesPanel extends Panel {
 
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
+
+                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.METALLIC);
+                                if(imgButton != null) m.metallicTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.sameLine();
@@ -590,13 +610,16 @@ public class PropertiesPanel extends Panel {
                                 }
                                 ImGui.popItemWidth();
 
+                                ImageTexture imgText = acceptTexturePayload(TextureSlot.ROUGHNESS);
+                                if(imgText != null) m.roughnessTexture = imgText;
+
                                 ImGui.sameLine();
                                 ImGui.pushStyleColor(ImGuiCol.Button, 0, 0, 0, 0);
                                 ImGui.pushStyleColor(ImGuiCol.ButtonActive, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
 
-                                if (ImGui.imageButton(dirAsset.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
+                                if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.roughnessTexture != null) m.roughnessTexture.dispose();
@@ -606,6 +629,9 @@ public class PropertiesPanel extends Panel {
 
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
+
+                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.ROUGHNESS);
+                                if(imgButton != null) m.roughnessTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.sameLine();
@@ -664,13 +690,16 @@ public class PropertiesPanel extends Panel {
                                 }
                                 ImGui.popItemWidth();
 
+                                ImageTexture imgText = acceptTexturePayload(TextureSlot.AO);
+                                if(imgText != null) m.aoTexture = imgText;
+
                                 ImGui.sameLine();
                                 ImGui.pushStyleColor(ImGuiCol.Button, 0, 0, 0, 0);
                                 ImGui.pushStyleColor(ImGuiCol.ButtonActive, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
 
-                                if (ImGui.imageButton(dirAsset.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
+                                if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.aoTexture != null) m.aoTexture.dispose();
@@ -680,6 +709,9 @@ public class PropertiesPanel extends Panel {
 
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
+
+                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.AO);
+                                if(imgButton != null) m.aoTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.sameLine();
@@ -738,13 +770,16 @@ public class PropertiesPanel extends Panel {
                                 }
                                 ImGui.popItemWidth();
 
+                                ImageTexture imgText = acceptTexturePayload(TextureSlot.EMISSIVE);
+                                if(imgText != null) m.emissiveTexture = imgText;
+
                                 ImGui.sameLine();
                                 ImGui.pushStyleColor(ImGuiCol.Button, 0, 0, 0, 0);
                                 ImGui.pushStyleColor(ImGuiCol.ButtonActive, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushStyleColor(ImGuiCol.ButtonHovered, 1.0f, 1.0f, 1.0f, 0.2f);
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
 
-                                if (ImGui.imageButton(dirAsset.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
+                                if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.emissiveTexture != null) m.emissiveTexture.dispose();
@@ -754,6 +789,9 @@ public class PropertiesPanel extends Panel {
 
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
+
+                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.EMISSIVE);
+                                if(imgButton != null) m.emissiveTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
                                 ImGui.sameLine();
@@ -783,5 +821,19 @@ public class PropertiesPanel extends Panel {
             ImGui.popStyleColor();
         }
         ImGui.end();
+    }
+
+    private ImageTexture acceptTexturePayload(TextureSlot slot){
+        if(ImGui.beginDragDropTarget()) {
+            File f = (File) ImGui.acceptDragDropPayloadObject("projectPanelFile");
+            if (f != null) {
+                String fPath = f.getPath();
+                if (isSupportedTextureFile(getExtension(fPath))) {
+                    return OxyTexture.loadImage(slot, fPath);
+                }
+            }
+            ImGui.endDragDropTarget();
+        }
+        return null;
     }
 }

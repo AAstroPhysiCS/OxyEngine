@@ -15,6 +15,7 @@ import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.logger;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class SkyLight extends Light {
 
@@ -97,7 +98,7 @@ public class SkyLight extends Light {
             guiNodeLoad();
         ImGui.popItemWidth();
         ImGui.sameLine();
-        if (ImGui.button("..."))
+        if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0))
             guiNodeLoad();
         ImGui.spacing();
 

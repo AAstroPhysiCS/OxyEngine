@@ -22,6 +22,7 @@ import java.util.List;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class ModelMeshOpenGL extends OpenGLMesh {
@@ -120,7 +121,7 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                 ImGui.inputText("##hidelabel", meshPath, ImGuiInputTextFlags.ReadOnly);
                 ImGui.popItemWidth();
                 ImGui.sameLine();
-                if (ImGui.button("...")) {
+                if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
                     String path = openDialog("", null);
                     if (path != null) {
                         if (entityContext != null) {

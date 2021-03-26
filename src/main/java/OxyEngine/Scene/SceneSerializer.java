@@ -158,8 +158,8 @@ public final class SceneSerializer {
                     obj.putField("Constant", String.valueOf(p.getConstantValue()));
                     obj.putField("Linear", String.valueOf(p.getLinearValue()));
                     obj.putField("Quadratic", String.valueOf(p.getQuadraticValue()));
-                } else if (l instanceof DirectionalLight d) {
-                    obj.putField("Direction", d.getDirection().toString());
+                } else if (l instanceof DirectionalLight) {
+                    obj.putField("Direction", e.get(TransformComponent.class).rotation.toString());
                 } else if (l instanceof SkyLight s) {
                     HDRTexture hdrTexture = s.getHDRTexture();
                     if(hdrTexture != null) obj.putField("Environment Map", s.getHDRTexture().getPath());
@@ -330,7 +330,7 @@ public final class SceneSerializer {
                 } else if (emittingType.equals(DirectionalLight.class.getSimpleName())) {
                     Vector3f dir = parseStringToVector3f(lightAttributes.getField("Direction").value());
 
-                    modelInstance.addComponent(new DirectionalLight(colorIntensity, dir));
+                    modelInstance.addComponent(new DirectionalLight(colorIntensity));
                     modelInstance.getGUINodes().add(DirectionalLight.guiNode);
                 }
 

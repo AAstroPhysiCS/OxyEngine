@@ -4,6 +4,8 @@ import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Camera.PerspectiveCamera;
+import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.WorldGrid;
 import OxyEngine.Scene.SceneRuntime;
@@ -16,8 +18,7 @@ import java.io.File;
 import java.util.List;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngine.System.OxySystem.getExtension;
-import static OxyEngine.System.OxySystem.isSupportedModelFileExtension;
+import static OxyEngine.System.OxySystem.*;
 import static OxyEngineEditor.EditorApplication.oxyShader;
 
 public class ScenePanel extends Panel {
@@ -76,6 +77,9 @@ public class ScenePanel extends Panel {
                         for(OxyModel e : eList){
                             e.addComponent(new SelectedComponent(false));
                             e.constructData();
+                            e.getGUINodes().add(ModelMeshOpenGL.guiNode);
+                            if (!e.getGUINodes().contains(OxyMaterial.guiNode))
+                                e.getGUINodes().add(OxyMaterial.guiNode);
                         }
                         SceneLayer.getInstance().updateModelEntities();
                     }
