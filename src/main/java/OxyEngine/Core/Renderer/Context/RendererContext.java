@@ -1,17 +1,17 @@
 package OxyEngine.Core.Renderer.Context;
 
-import OxyEngine.Core.Renderer.OxyRendererPlatform;
+import OxyEngine.TargetPlatform;
 import OxyEngine.Core.Window.WindowHandle;
 
 import static OxyEngine.System.OxySystem.logger;
 
 public abstract class RendererContext {
 
-    public static OxyRendererPlatform selectedPlatform;
+    public static TargetPlatform selectedPlatform;
 
-    public static RendererContext getContext(OxyRendererPlatform platform){
+    public static RendererContext getContext(TargetPlatform platform){
         selectedPlatform = platform;
-        if(platform == OxyRendererPlatform.OpenGL){
+        if(platform == TargetPlatform.OpenGL){
             return new OpenGLContext();
         }
         logger.severe("Vulkan not yet supported");

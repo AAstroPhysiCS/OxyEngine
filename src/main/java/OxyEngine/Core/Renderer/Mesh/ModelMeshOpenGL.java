@@ -40,13 +40,13 @@ public class ModelMeshOpenGL extends OpenGLMesh {
     private static final BufferLayoutAttributes attributeBiTangent = new BufferLayoutAttributes(OxyShader.BITANGENT, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
     private final String path;
 
-    public ModelMeshOpenGL(String path, MeshRenderMode mode, BufferLayoutProducer.Usage usage, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
+    public ModelMeshOpenGL(String path, MeshRenderMode mode, BufferLayoutConstructor.Usage usage, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
         this.path = path;
         this.mode = mode;
 
         assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
 
-        BufferLayoutRecord layout = BufferLayoutProducer.create()
+        BufferLayoutRecord layout = BufferLayoutConstructor.create()
                 .createLayout(VertexBuffer.class)
                 .setUsage(usage)
                 .setAttribPointer(

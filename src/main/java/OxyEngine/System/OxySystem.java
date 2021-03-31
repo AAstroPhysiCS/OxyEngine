@@ -172,6 +172,7 @@ public interface OxySystem {
     static boolean isSupportedTextureFile(String extensionToSupport){
         return extensionToSupport.equalsIgnoreCase("jpg") ||
                 extensionToSupport.equalsIgnoreCase("png") ||
-                extensionToSupport.equalsIgnoreCase("jpeg");
+                extensionToSupport.equalsIgnoreCase("jpeg") ||
+                extensionToSupport.equalsIgnoreCase("tga");
     }
 }

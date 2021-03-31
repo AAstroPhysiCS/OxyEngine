@@ -16,6 +16,8 @@ public enum FrameBufferTextureFormat {
 
     RGB16F(GL_RGB16F, GL_RGB),
 
+    DEPTHCOMPONENT32(GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT),
+
     RGB32F(GL_RGB32F, GL_RGB);
 
     final int storageFormat;

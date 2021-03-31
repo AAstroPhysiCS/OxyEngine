@@ -35,7 +35,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
     }
 
     private void texImage2D(FrameBufferSpecification spec, int targetTexture) {
-        if(spec.textureFormat == null) return;
+        if (spec.textureFormat == null) return;
         if (spec.multiSampled) {
             int samples = OxyEngine.getAntialiasing().getLevel();
             glTexImage2DMultisample(targetTexture, samples, spec.textureFormat.internalFormatInteger, width, height, true);
@@ -53,16 +53,16 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         }
     }
 
-    private void storage(FrameBufferSpecification spec, int targetTexture) {
+    private void storage(FrameBufferSpecification spec, int targetTexture, int colorAttachmentTexture) {
         if (spec.isStorage) {
             glTexStorage2D(targetTexture, spec.level, GL_DEPTH24_STENCIL8, width, height);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, targetTexture, spec.colorAttachmentTexture, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, targetTexture, colorAttachmentTexture, 0);
         }
     }
 
     private int[] drawIndices = null;
 
-    public void drawBuffers(int... buffers){
+    public void drawBuffers(int... buffers) {
         this.drawIndices = buffers;
     }
 
@@ -75,12 +75,23 @@ public class OpenGLFrameBuffer extends FrameBuffer {
 
     }
 
-    private void textureParameters(FrameBufferSpecification spec) {
-        if (spec.paramMinFilter != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, spec.paramMinFilter);
-        if (spec.paramMagFilter != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, spec.paramMagFilter);
+    private void disableDrawReadBuffer(FrameBufferSpecification spec){
+        if(spec.disableReadWriteBuffer){
+            glDrawBuffer(GL_NONE);
+            glReadBuffer(GL_NONE);
+        }
     }
 
-    private final List<Integer> colorAttachments = new ArrayList<>();
+    private void textureParameters(FrameBufferSpecification spec, int targetTexture) {
+        if (spec.paramMinFilter != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, spec.paramMinFilter);
+        if (spec.paramMagFilter != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, spec.paramMagFilter);
+        if (spec.textureFormat == FrameBufferTextureFormat.DEPTHCOMPONENT32) glTexParameteri(targetTexture, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+        if (spec.wrapS != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, spec.wrapS);
+        if (spec.wrapT != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, spec.wrapT);
+        if (spec.wrapR != -1) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, spec.wrapR);
+    }
+
+    private final List<int[]> colorAttachments = new ArrayList<>();
 
     @Override
     public void load() {
@@ -91,26 +102,30 @@ public class OpenGLFrameBuffer extends FrameBuffer {
 
         if (bufferId == 0) bufferId = glCreateFramebuffers();
         glBindFramebuffer(GL_FRAMEBUFFER, bufferId);
-        for (int i = 0; i < specs.length; i++) {
+        for (int i = 0; i < specs.length; i++)  {
             FrameBufferSpecification fbS = specs[i];
             int targetTexture = getTargetTexture(fbS);
-            fbS.colorAttachmentTexture = glCreateTextures(targetTexture);
-            glBindTexture(targetTexture, fbS.colorAttachmentTexture);
-            texImage2D(fbS, targetTexture);
-            textureParameters(fbS);
-            if(!fbS.isStorage) glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + fbS.attachmentIndex, targetTexture, fbS.colorAttachmentTexture, 0);
-            if (fbS.renderBuffered) {
-                int rbo = glCreateRenderbuffers();
-                glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-                renderBufferStorage(fbS);
-                glBindRenderbuffer(GL_RENDERBUFFER, 0);
-                glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+            glCreateTextures(targetTexture, fbS.colorAttachmentTextures);
+            for(int colorAttachmentTexture : fbS.colorAttachmentTextures) {
+                glBindTexture(targetTexture, colorAttachmentTexture);
+                texImage2D(fbS, targetTexture);
+                textureParameters(fbS, targetTexture);
+                if (!fbS.isStorage)
+                    glFramebufferTexture2D(GL_FRAMEBUFFER, fbS.textureFormat == FrameBufferTextureFormat.DEPTHCOMPONENT32 ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0 + fbS.attachmentIndex, targetTexture, colorAttachmentTexture, 0);
+                if (fbS.renderBuffered) {
+                    int rbo = glCreateRenderbuffers();
+                    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+                    renderBufferStorage(fbS);
+                    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+                    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+                }
+                storage(fbS, targetTexture, colorAttachmentTexture);
+                glBindTexture(targetTexture, 0);
             }
-            storage(fbS, targetTexture);
-            glBindTexture(targetTexture, 0);
-            if(fbS.attachmentIndex != -1) colorAttachments.add(fbS.attachmentIndex, fbS.colorAttachmentTexture);
+            if (fbS.attachmentIndex != -1) colorAttachments.add(fbS.attachmentIndex, fbS.colorAttachmentTextures);
+            disableDrawReadBuffer(specs[i]);
         }
-        if(drawIndices != null) drawBuffers();
+        if (drawIndices != null) drawBuffers();
 
         assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -148,13 +163,13 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         glDeleteFramebuffers(bufferId);
     }
 
-    public int getColorAttachmentTexture(int index) {
-        if(colorAttachments.size() == 0) return -1;
+    public int[] getColorAttachmentTexture(int index) {
+        if (colorAttachments.size() == 0) return null;
         return colorAttachments.get(index);
     }
 
     public FrameBufferTextureFormat getTextureFormat(int index) {
-        if(specs[index].textureFormat == null){
+        if (specs[index].textureFormat == null) {
             logger.warning("Accessing a buffer which is null");
             return null;
         }
@@ -162,7 +177,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
     }
 
     public FrameBufferTextureFormat getRenderBufferFormat(int index) {
-        if(specs[index].renderBufferFormat == null){
+        if (specs[index].renderBufferFormat == null) {
             logger.warning("Accessing a buffer which is null");
             return null;
         }

@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\src\main\java\OxyEngineEditor\UI\Panels\ScenePanel.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\src\main\java\OxyEngine\Components\AnimationComponent.java">
           <value>
             <Attribute>
@@ -31,7 +38,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\src\main\java\OxyEngine\Core\Renderer\Buffer\Platform\OpenGLFrameBuffer.java">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\src\main\java\OxyEngine\Core\Renderer\Buffer\Platform\OpenGLVertexBuffer.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\src\main\java\OxyEngine\GeometryPipeline.java">
           <value>
             <Attribute>
               <option name="separator" value=";" />
@@ -80,7 +101,21 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\src\main\java\OxyEngine\Scene\OxyEntity.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\src\main\java\OxyEngine\Scene\Scene.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\src\main\java\OxyEngine\ShadowMap.java">
           <value>
             <Attribute>
               <option name="separator" value=";" />

@@ -5,7 +5,7 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.SceneCamera;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
+import OxyEngine.Core.Renderer.Buffer.Platform.BufferConstructor;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
@@ -13,8 +13,8 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.OxyRenderer3D;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Scene.Objects.Importer.ImporterType;
 import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
@@ -37,7 +37,6 @@ import static OxyEngine.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Scene.SceneSerializer.fileExtension;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.EditorApplication.oxyShader;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
@@ -45,8 +44,6 @@ import static org.lwjgl.opengl.GL11.GL_NEAREST;
 public final class Scene implements OxyDisposable {
 
     private final Registry registry = new Registry();
-
-    private final OxyRenderer3D renderer;
 
     private final OpenGLFrameBuffer frameBuffer, blittedFrameBuffer, pickingBuffer;
 
@@ -58,34 +55,36 @@ public final class Scene implements OxyDisposable {
 
     private OxyModelImporter modelImporter;
 
-    public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer) {
-        this(sceneName, renderer, frameBuffer,
-                BufferProducer.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
+    public Scene(String sceneName, OpenGLFrameBuffer frameBuffer) {
+        this(sceneName, frameBuffer,
+                BufferConstructor.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
                         OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setTextureCount(1)
                                 .setAttachmentIndex(0)
                                 .setFormats(FrameBufferTextureFormat.RGBA8)
                                 .setFilter(GL_LINEAR, GL_LINEAR)),
-                BufferProducer.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
+                BufferConstructor.createFrameBuffer(frameBuffer.getWidth(), frameBuffer.getHeight(),
                         OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setTextureCount(1)
                                 .setAttachmentIndex(0)
                                 .setFormats(FrameBufferTextureFormat.RGBA8)
                                 .setFilter(GL_LINEAR, GL_LINEAR),
                         OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setTextureCount(1)
                                 .setAttachmentIndex(1)
                                 .setFormats(FrameBufferTextureFormat.R32I)
                                 .setFilter(GL_NEAREST, GL_NEAREST),
                         OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setTextureCount(1)
                                 .setStorage(true, 1)));
     }
 
-    public Scene(String sceneName, OxyRenderer3D renderer, OpenGLFrameBuffer frameBuffer, OpenGLFrameBuffer blittedFrameBuffer, OpenGLFrameBuffer pickingBuffer) {
-        this.renderer = renderer;
+    public Scene(String sceneName, OpenGLFrameBuffer frameBuffer, OpenGLFrameBuffer blittedFrameBuffer, OpenGLFrameBuffer pickingBuffer) {
         this.frameBuffer = frameBuffer;
         this.sceneName = sceneName;
         this.blittedFrameBuffer = blittedFrameBuffer;
         this.pickingBuffer = pickingBuffer;
         this.pickingBuffer.drawBuffers(0, 1);
-
     }
 
     public final void put(OxyEntity e) {
@@ -110,7 +109,8 @@ public final class Scene implements OxyDisposable {
     }
 
     public OxyEntity createEmptyEntity() {
-        OxyEntity model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+        OxyEntity model = ACTIVE_SCENE.createEmptyModel(pbrShader);
         if (entityContext != null) {
             model.addComponent(new TagComponent("Empty Group"), new SelectedComponent(false));
             model.setFamily(new EntityFamily(entityContext.getFamily()));
@@ -134,7 +134,7 @@ public final class Scene implements OxyDisposable {
         OxyNativeObject skyLightEnt = createNativeObjectEntity();
         skyLightEnt.setFactory(new SkyLightFactory());
         if (entityContext != null) skyLightEnt.setFamily(new EntityFamily(entityContext.getFamily()));
-        skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight(this));
+        skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight());
         skyLightEnt.addComponent(skyLightMesh, skyLightShader);
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
             skyLightEnt.getGUINodes().add(SkyLight.guiNode);
@@ -146,7 +146,8 @@ public final class Scene implements OxyDisposable {
 
     public void createPointLight() {
 
-        OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+        OxyModel model = ACTIVE_SCENE.createEmptyModel(pbrShader);
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
 
         PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
@@ -161,7 +162,8 @@ public final class Scene implements OxyDisposable {
     }
 
     public void createDirectionalLight() {
-        OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+        OxyModel model = ACTIVE_SCENE.createEmptyModel(pbrShader);
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
         int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
         model.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f));
@@ -172,7 +174,8 @@ public final class Scene implements OxyDisposable {
     }
 
     public void createPerspectiveCamera() {
-        OxyModel model = ACTIVE_SCENE.createEmptyModel(oxyShader);
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+        OxyModel model = ACTIVE_SCENE.createEmptyModel(pbrShader);
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
         model.addComponent(new SceneCamera());
         if (!model.getGUINodes().contains(OxyCamera.guiNode))
@@ -422,10 +425,6 @@ public final class Scene implements OxyDisposable {
         return registry.entityList.keySet().size();
     }
 
-    public OxyRenderer3D getRenderer() {
-        return renderer;
-    }
-
     public Set<OxyEntity> getEntities() {
         return registry.entityList.keySet();
     }
@@ -475,18 +474,19 @@ public final class Scene implements OxyDisposable {
                 it.remove();
             }
         }
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
         for (int i = 0; i < LIGHT_SIZE; i++) {
-            oxyShader.enable();
-            oxyShader.setUniformVec3("p_Light[" + i + "].position", 0, 0, 0);
-            oxyShader.setUniformVec3("p_Light[" + i + "].diffuse", 0, 0, 0);
-            oxyShader.setUniform1f("p_Light[" + i + "].constant", 0);
-            oxyShader.setUniform1f("p_Light[" + i + "].linear", 0);
-            oxyShader.setUniform1f("p_Light[" + i + "].quadratic", 0);
+            pbrShader.enable();
+            pbrShader.setUniformVec3("p_Light[" + i + "].position", 0, 0, 0);
+            pbrShader.setUniformVec3("p_Light[" + i + "].diffuse", 0, 0, 0);
+            pbrShader.setUniform1f("p_Light[" + i + "].constant", 0);
+            pbrShader.setUniform1f("p_Light[" + i + "].linear", 0);
+            pbrShader.setUniform1f("p_Light[" + i + "].quadratic", 0);
 
-            oxyShader.setUniformVec3("d_Light[" + i + "].direction", 0, 0, 0);
-            oxyShader.setUniformVec3("d_Light[" + i + "].diffuse", 0, 0, 0);
+            pbrShader.setUniformVec3("d_Light[" + i + "].direction", 0, 0, 0);
+            pbrShader.setUniformVec3("d_Light[" + i + "].diffuse", 0, 0, 0);
 
-            oxyShader.disable();
+            pbrShader.disable();
         }
     }
 
@@ -503,11 +503,12 @@ public final class Scene implements OxyDisposable {
     }
 
     public static void openScene() {
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
         String openScene = openDialog(extensionName, null);
         if (openScene != null) {
             SceneRuntime.clearProviders();
             SceneRuntime.stop();
-            ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, SceneLayer.getInstance(), oxyShader);
+            ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, SceneLayer.getInstance(), pbrShader);
             SceneLayer.getInstance().build();
         }
     }
@@ -524,7 +525,7 @@ public final class Scene implements OxyDisposable {
         Scene oldScene = ACTIVE_SCENE;
         oldScene.disposeAllModels();
 
-        Scene scene = new Scene("Test Scene 1", oldScene.getRenderer(), oldScene.getFrameBuffer(), oldScene.getBlittedFrameBuffer(), oldScene.getPickingBuffer());
+        Scene scene = new Scene("Test Scene 1", oldScene.getFrameBuffer(), oldScene.getBlittedFrameBuffer(), oldScene.getPickingBuffer());
         for (var n : oldScene.getEntityEntrySet()) {
             scene.put(n.getKey());
             scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));

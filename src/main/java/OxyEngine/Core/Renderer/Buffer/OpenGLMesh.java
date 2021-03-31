@@ -45,7 +45,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         if (tangentBuffer != null) if (tangentBuffer.glBufferNull() && !tangentBuffer.emptyData()) tangentBuffer.load();
         if (textureBuffer != null) if (textureBuffer.glBufferNull() && !textureBuffer.emptyData()) textureBuffer.load();
 
-        if (vertexBuffer.getImplementation().getUsage() == BufferLayoutProducer.Usage.DYNAMIC) {
+        if (vertexBuffer.getImplementation().getUsage() == BufferLayoutConstructor.Usage.DYNAMIC) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.getBufferId());
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer.getVertices());
         }
@@ -58,7 +58,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
     private void bind() {
         glBindVertexArray(vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.bufferId);
-        if (vertexBuffer.getImplementation().getUsage() == BufferLayoutProducer.Usage.DYNAMIC && vertexBuffer.offsetToUpdate != -1) {
+        if (vertexBuffer.getImplementation().getUsage() == BufferLayoutConstructor.Usage.DYNAMIC && vertexBuffer.offsetToUpdate != -1) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.bufferId);
             glBufferSubData(GL_ARRAY_BUFFER, vertexBuffer.offsetToUpdate, vertexBuffer.dataToUpdate);
 
@@ -81,7 +81,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         entities.add(e);
     }
 
-    public void addToQueue() {
+    public void addToBuffer() {
         vertexBuffer.addToBuffer(OxyEntity.sumAllVertices(entities));
         indexBuffer.addToBuffer(OxyEntity.sumAllIndices(entities));
 

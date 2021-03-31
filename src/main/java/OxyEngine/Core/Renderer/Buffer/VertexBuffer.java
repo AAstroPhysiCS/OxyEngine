@@ -7,12 +7,16 @@ import static OxyEngine.System.OxySystem.oxyAssert;
 public abstract class VertexBuffer extends Buffer {
 
     protected float[] vertices = new float[0];
-    protected final BufferLayoutProducer.BufferLayoutImpl impl;
+    protected final BufferLayoutConstructor.BufferLayoutImpl impl;
 
-    protected int offsetToUpdate = -1;
+    public int offsetToUpdate = -1;
     protected float[] dataToUpdate;
 
-    public VertexBuffer(BufferLayoutProducer.BufferLayoutImpl impl) {
+    public float[] getDataToUpdate() {
+        return dataToUpdate;
+    }
+
+    public VertexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl) {
         this.impl = impl;
 
         assert impl.getUsage() != null && impl.getAttribPointers() != null : oxyAssert("Some Implementation arguments are null");
@@ -22,7 +26,7 @@ public abstract class VertexBuffer extends Buffer {
 
     protected abstract void copy(float[] m_Vertices);
 
-    public BufferLayoutProducer.BufferLayoutImpl getImplementation() {
+    public BufferLayoutConstructor.BufferLayoutImpl getImplementation() {
         return impl;
     }
 

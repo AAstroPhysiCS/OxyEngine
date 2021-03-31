@@ -2,11 +2,11 @@ package OxyEngine.Core.Renderer.Buffer;
 
 public abstract class TextureBuffer extends Buffer {
 
-    protected final BufferLayoutProducer.BufferLayoutImpl implementation;
+    protected final BufferLayoutConstructor.BufferLayoutImpl implementation;
 
     protected float[] textureCoords;
 
-    public TextureBuffer(BufferLayoutProducer.BufferLayoutImpl template) {
+    public TextureBuffer(BufferLayoutConstructor.BufferLayoutImpl template) {
         this.implementation = template;
         textureCoords = new float[0];
     }

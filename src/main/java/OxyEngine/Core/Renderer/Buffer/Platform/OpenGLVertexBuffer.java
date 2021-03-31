@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
@@ -11,7 +11,7 @@ import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public final class OpenGLVertexBuffer extends VertexBuffer {
 
-    OpenGLVertexBuffer(BufferLayoutProducer.BufferLayoutImpl impl) {
+    OpenGLVertexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl) {
         super(impl);
     }
 
@@ -19,7 +19,7 @@ public final class OpenGLVertexBuffer extends VertexBuffer {
     public void load() {
         if (bufferId == 0) bufferId = glCreateBuffers();
 
-        if (impl.getUsage() == BufferLayoutProducer.Usage.STATIC) loadStatically();
+        if (impl.getUsage() == BufferLayoutConstructor.Usage.STATIC) loadStatically();
         else loadDynamically();
 
         BufferLayoutAttributes[] attribPointers = impl.getAttribPointers();

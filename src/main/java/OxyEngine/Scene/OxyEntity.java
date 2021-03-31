@@ -52,6 +52,10 @@ public abstract class OxyEntity {
         }
     }
 
+    public boolean nullData(){
+        return vertices == null;
+    }
+
     public void setFamily(EntityFamily component) {
         this.family = component;
     }

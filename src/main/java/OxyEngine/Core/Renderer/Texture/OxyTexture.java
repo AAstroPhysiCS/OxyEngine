@@ -85,11 +85,11 @@ public class OxyTexture {
         return new CubemapTexture(slot, path, scene);
     }
 
-    public static HDRTexture loadHDRTexture(String path, Scene scene) {
+    public static HDRTexture loadHDRTexture(String path) {
         if (!isValidPath(path)) {
             logger.warning("Path not valid!");
             return null;
         }
-        return new HDRTexture(TextureSlot.HDR, path, scene);
+        return new HDRTexture(TextureSlot.HDR, path);
     }
 }

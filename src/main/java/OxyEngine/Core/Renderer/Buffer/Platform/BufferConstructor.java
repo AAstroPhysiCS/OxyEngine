@@ -2,28 +2,28 @@ package OxyEngine.Core.Renderer.Buffer.Platform;
 
 import OxyEngine.Core.Renderer.Buffer.*;
 import OxyEngine.Core.Renderer.Context.RendererContext;
-import OxyEngine.Core.Renderer.OxyRendererPlatform;
+import OxyEngine.TargetPlatform;
 
 import static OxyEngine.System.OxySystem.logger;
 
 @SuppressWarnings("unchecked")
-public class BufferProducer {
+public class BufferConstructor {
 
-    private BufferProducer(){}
+    private BufferConstructor(){}
 
     private static void contextCheck(){
-        if(RendererContext.selectedPlatform != OxyRendererPlatform.OpenGL){
+        if(RendererContext.selectedPlatform != TargetPlatform.OpenGL){
             logger.severe("Unsupported Platform!");
             System.exit(-1);
         }
     }
 
-    public static <T extends VertexBuffer> T createVertexBuffer(BufferLayoutProducer.BufferLayoutImpl impl){
+    public static <T extends VertexBuffer> T createVertexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl){
         contextCheck();
         return (T) new OpenGLVertexBuffer(impl);
     }
 
-    public static <T extends IndexBuffer> T createIndexBuffer(BufferLayoutProducer.BufferLayoutImpl impl){
+    public static <T extends IndexBuffer> T createIndexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl){
         contextCheck();
         return (T) new OpenGLIndexBuffer(impl);
     }
@@ -33,17 +33,17 @@ public class BufferProducer {
         return (T) new OpenGLFrameBuffer(width, height, specBuilders);
     }
 
-    public static <T extends NormalsBuffer> T createNormalsBuffer(BufferLayoutProducer.BufferLayoutImpl impl){
+    public static <T extends NormalsBuffer> T createNormalsBuffer(BufferLayoutConstructor.BufferLayoutImpl impl){
         contextCheck();
         return (T) new OpenGLNormalsBuffer(impl);
     }
 
-    public static <T extends TangentBuffer> T createTangentBuffer(BufferLayoutProducer.BufferLayoutImpl impl){
+    public static <T extends TangentBuffer> T createTangentBuffer(BufferLayoutConstructor.BufferLayoutImpl impl){
         contextCheck();
         return (T) new OpenGLTangentBuffer(impl);
     }
 
-    public static <T extends TextureBuffer> T createTextureBuffer(BufferLayoutProducer.BufferLayoutImpl impl){
+    public static <T extends TextureBuffer> T createTextureBuffer(BufferLayoutConstructor.BufferLayoutImpl impl){
         contextCheck();
         return (T) new OpenGLTextureBuffer(impl);
     }

@@ -32,9 +32,25 @@ public abstract class PerspectiveCamera extends OxyCamera {
         viewMatrixNoTranslation.rotateX(-this.getRotation().x);
         viewMatrixNoTranslation.rotateY(-this.getRotation().y);
     }
-
+    
     public void setAspect(float aspect) {
         this.aspect = aspect;
+    }
+
+    public float getAspect() {
+        return aspect;
+    }
+
+    public float getFovY() {
+        return fovY;
+    }
+
+    public float getZFar() {
+        return zFar;
+    }
+
+    public float getZNear() {
+        return zNear;
     }
 
     public Matrix4f getProjectionMatrix() {

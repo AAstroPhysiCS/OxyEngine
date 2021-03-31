@@ -11,6 +11,7 @@ public class WindowHandle implements OxyDisposable {
     private final WindowSpecs specs;
     private int width;
     private int height;
+    private final int[] x = new int[1], y = new int[1];
     private long pointer;
     private final String title;
 
@@ -53,6 +54,7 @@ public class WindowHandle implements OxyDisposable {
         int[] w = new int[1];
         int[] h = new int[1];
 
+        glfwGetWindowPos(pointer, x, y);
         glfwGetWindowSize(pointer, w, h);
         this.width = w[0];
         this.height = h[0];
@@ -76,6 +78,14 @@ public class WindowHandle implements OxyDisposable {
 
     public int getWidth() {
         return width;
+    }
+
+    public int getX() {
+        return x[0];
+    }
+
+    public int getY() {
+        return y[0];
     }
 
     public String getTitle() {

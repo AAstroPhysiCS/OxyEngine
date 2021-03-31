@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Buffer.TangentBuffer;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -11,7 +11,7 @@ import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public class OpenGLTangentBuffer extends TangentBuffer {
 
-    OpenGLTangentBuffer(BufferLayoutProducer.BufferLayoutImpl template) {
+    OpenGLTangentBuffer(BufferLayoutConstructor.BufferLayoutImpl template) {
         super(template);
     }
 

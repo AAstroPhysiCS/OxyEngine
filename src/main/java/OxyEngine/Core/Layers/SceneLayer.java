@@ -11,6 +11,7 @@ import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
@@ -36,7 +37,6 @@ import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneRuntime.currentBoundedSkyLight;
 import static OxyEngineEditor.EditorApplication.editorCameraEntity;
-import static OxyEngineEditor.EditorApplication.oxyShader;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
@@ -46,8 +46,8 @@ public class SceneLayer extends Layer {
     public Set<OxyEntity> cachedCameraComponents;
     public Set<OxyEntity> allModelEntities;
 
-//    private static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
-    private static final OxyShader cubemapShader = new OxyShader("shaders/OxySkybox.glsl");
+    //    private static final OxyShader outlineShader = new OxyShader("shaders/OxyOutline.glsl");
+    private static final OxyShader cubemapShader = OxyShader.createShader("SkyboxShader", "shaders/OxySkybox.glsl");
 
     private OxyCamera mainCamera;
 
@@ -79,7 +79,7 @@ public class SceneLayer extends Layer {
             List<OxyEntity> cachedConverted = new ArrayList<>(allModelEntities);
             if (cachedConverted.size() == 0) return;
             ModelMeshOpenGL mesh = cachedConverted.get(cachedConverted.size() - 1).get(ModelMeshOpenGL.class);
-            mesh.addToQueue();
+            mesh.addToBuffer();
         }
     }
 
@@ -159,11 +159,12 @@ public class SceneLayer extends Layer {
         }
 
         //RESET ALL THE LIGHT STATES
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
         for (int i = 0; i < LIGHT_SIZE; i++) {
-            oxyShader.enable();
-            oxyShader.setUniform1i("p_Light[" + i + "].activeState", 0);
-            oxyShader.setUniform1i("d_Light[" + i + "].activeState", 0);
-            oxyShader.disable();
+            pbrShader.enable();
+            pbrShader.setUniform1i("p_Light[" + i + "].activeState", 0);
+            pbrShader.setUniform1i("d_Light[" + i + "].activeState", 0);
+            pbrShader.disable();
         }
 
         //Lights
@@ -182,6 +183,7 @@ public class SceneLayer extends Layer {
     @Override
     public void render(float ts) {
         if (ACTIVE_SCENE == null) return;
+
         HDRTexture hdrTexture = null;
         OxyNativeObject skyLightEntity = currentBoundedSkyLight;
         SkyLight skyLightComp = null;
@@ -218,7 +220,7 @@ public class SceneLayer extends Layer {
                     animComp.updateAnimation(ts);
                     List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
                     for (int j = 0; j < matrix4fList.size(); j++) {
-                        oxyShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                        shader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
                     }
                 }
 
@@ -244,7 +246,7 @@ public class SceneLayer extends Layer {
                 }
                 shader.disable();
                 if (material != null) material.push(shader);
-                render(ts, modelMesh, mainCamera, shader);
+                render(modelMesh, mainCamera, shader);
             }
 
             for (OxyEntity e : cachedNativeMeshes) {
@@ -255,12 +257,12 @@ public class SceneLayer extends Layer {
                     OxyMaterial m = OxyMaterialPool.getMaterial(e);
                     if (m != null) {
                         m.push(e.get(OxyShader.class));
-                        render(ts, mesh, mainCamera, e.get(OxyShader.class));
+                        render(mesh, mainCamera, e.get(OxyShader.class));
                     }
                 }
 
                 if (e.get(OxyShader.class).equals(WorldGrid.shader)) {
-                    render(ts, mesh, mainCamera, WorldGrid.shader);
+                    render(mesh, mainCamera, WorldGrid.shader);
                 }
             }
 
@@ -277,7 +279,7 @@ public class SceneLayer extends Layer {
                     cubemapShader.setUniform1f("exposure", skyLightComp.exposure[0]);
                     cubemapShader.setUniform1f("gamma", skyLightComp.gammaStrength[0]);
                     cubemapShader.disable();
-                    render(ts, skyLightEntity.get(OpenGLMesh.class), mainCamera, cubemapShader);
+                    render(skyLightEntity.get(OpenGLMesh.class), mainCamera, cubemapShader);
                     glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
                 }
             }
@@ -287,25 +289,28 @@ public class SceneLayer extends Layer {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         frameBuffer.unbind();
+
+
         OxyTexture.unbindAllTextures();
 
         UILayer.uiSystem.dispatchNativeEvents();
     }
 
     public void recompileShader() {
-        oxyShader.dispose();
-        oxyShader = new OxyShader("shaders/OxyPBRAnimation.glsl");
+        OxyShader pbrShaderOld = ShaderLibrary.get("OxyPBRAnimation");
+        pbrShaderOld.dispose();
+        OxyShader pbrShader = OxyShader.createShader("OxyPBRAnimation", "shaders/OxyPBRAnimation.glsl");
         int[] samplers = new int[32];
         for (int i = 0; i < samplers.length; i++) samplers[i] = i;
-        oxyShader.enable();
-        oxyShader.setUniform1iv("tex", samplers);
-        oxyShader.disable();
-        for (OxyEntity m : allModelEntities) m.addComponent(oxyShader);
-        for (OxyEntity m : cachedLightEntities) m.addComponent(oxyShader);
+        pbrShader.enable();
+        pbrShader.setUniform1iv("tex", samplers);
+        pbrShader.disable();
+        for (OxyEntity m : allModelEntities) m.addComponent(pbrShader);
+        for (OxyEntity m : cachedLightEntities) m.addComponent(pbrShader);
     }
 
-    private void render(float ts, OpenGLMesh mesh, OxyCamera camera, OxyShader shader) {
-        ACTIVE_SCENE.getRenderer().render(ts, mesh, camera, shader);
+    private void render(OpenGLMesh mesh, OxyCamera camera, OxyShader shader) {
+        OxyRenderer.render(mesh, camera, shader);
         OxyRenderer.Stats.totalShapeCount = ACTIVE_SCENE.getShapeCount();
     }
 

@@ -13,8 +13,8 @@ import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 
 public final class SceneRuntimeControlPanel extends Panel {
 
-    private static final ImageTexture playTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/play.png");
-    private static final ImageTexture stopTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/stop.png");
+    public static final ImageTexture playTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/play.png");
+    public static final ImageTexture stopTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/stop.png");
 
     @Override
     public void preload() {

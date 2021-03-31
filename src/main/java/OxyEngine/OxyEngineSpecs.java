@@ -1,6 +1,4 @@
 package OxyEngine;
 
-import OxyEngine.Core.Renderer.OxyRendererPlatform;
-
-public record OxyEngineSpecs(OxyRendererPlatform platform) {
+public record OxyEngineSpecs(TargetPlatform platform) {
 }

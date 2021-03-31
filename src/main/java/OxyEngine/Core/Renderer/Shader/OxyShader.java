@@ -31,8 +31,17 @@ public class OxyShader implements OxyDisposable, EntityComponent {
     private static final FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
 
     private final int program;
+    private final String name;
 
-    public OxyShader(String glslPath) {
+    public static OxyShader createShader(String name, String glslPath){
+        ShaderLibrary.removeShaderIfExist(name);
+        OxyShader s = new OxyShader(name, glslPath);
+        ShaderLibrary.addShaders(s);
+        return s;
+    }
+
+    private OxyShader(String name, String glslPath) {
+        this.name = name;
         String loadedString = ShaderUtil.loadAsString(glslPath);
         program = ShaderUtil.create(ShaderUtil.getVertex(loadedString).trim(), ShaderUtil.getFragment(loadedString).trim());
     }
@@ -122,8 +131,13 @@ public class OxyShader implements OxyDisposable, EntityComponent {
         return program;
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public void dispose() {
+        ShaderLibrary.removeShaderIfExist(name);
         buffer.clear();
         glDeleteProgram(program);
     }

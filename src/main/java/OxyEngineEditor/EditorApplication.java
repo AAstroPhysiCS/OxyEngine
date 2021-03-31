@@ -1,5 +1,7 @@
 package OxyEngineEditor;
 
+
+
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.EditorCamera;
@@ -7,20 +9,18 @@ import OxyEngine.Core.Layers.GizmoLayer;
 import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
-import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
+import OxyEngine.Core.Renderer.Buffer.Platform.BufferConstructor;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Renderer.OxyRenderer3D;
-import OxyEngine.Core.Renderer.OxyRendererPlatform;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.OxyEngineSpecs;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -37,23 +37,22 @@ public class EditorApplication extends OxyApplication {
 
     public EditorApplication() {
         windowHandle = new WindowHandle("OxyEngine - Editor", 1366, 768, WindowHandle.WindowMode.WINDOWEDFULLSCREEN);
-        oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, true, new OxyEngineSpecs(OxyRendererPlatform.OpenGL));
+        oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, true, TargetPlatform.OpenGL);
         oxyEngine.start();
     }
 
-    public static OxyShader oxyShader;
     public static OxyNativeObject editorCameraEntity;
 
     @Override
     public void init() {
         oxyEngine.init();
 
-        oxyShader = new OxyShader("shaders/OxyPBRAnimation.glsl");
-        OxyRenderer3D oxyRenderer = (OxyRenderer3D) oxyEngine.getRenderer();
+        OxyShader oxyShader = OxyShader.createShader("OxyPBRAnimation","shaders/OxyPBRAnimation.glsl");
 
-        scene = new Scene("Test Scene 1", oxyRenderer,
-                BufferProducer.createFrameBuffer(windowHandle.getWidth(), windowHandle.getHeight(),
+        scene = new Scene("Test Scene 1",
+                BufferConstructor.createFrameBuffer(windowHandle.getWidth(), windowHandle.getHeight(),
                         OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                                .setTextureCount(1)
                                 .setAttachmentIndex(0)
                                 .setMultiSampled(true)
                                 .setFormats(FrameBufferTextureFormat.RGBA8, FrameBufferTextureFormat.DEPTH24STENCIL8)
@@ -83,6 +82,7 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(SceneRuntime.getPanel());
         uiLayer.addPanel(SceneHierarchyPanel.getInstance());
         uiLayer.addPanel(PropertiesPanel.getInstance());
+        uiLayer.addPanel(AnimationPanel.getInstance());
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, uiLayer);
         for (Layer l : layerStack.getLayerStack())

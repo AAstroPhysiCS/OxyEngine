@@ -1,13 +1,13 @@
 package OxyEngine.Core.Renderer.Buffer;
 
-import OxyEngine.Core.Renderer.Buffer.Platform.BufferProducer;
+import OxyEngine.Core.Renderer.Buffer.Platform.BufferConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class BufferLayoutProducer {
+public class BufferLayoutConstructor {
 
-    private BufferLayoutProducer() {
+    private BufferLayoutConstructor() {
     }
 
     public enum Usage {
@@ -97,11 +97,11 @@ public class BufferLayoutProducer {
                 }
             }
 
-            VertexBuffer vertexBuffer = BufferProducer.createVertexBuffer(vertexLayout);
-            IndexBuffer indexBuffer = BufferProducer.createIndexBuffer(indexLayout);
-            TangentBuffer tangentBuffer = BufferProducer.createTangentBuffer(tangentLayout);
-            NormalsBuffer normalsBuffer = BufferProducer.createNormalsBuffer(normalsLayout);
-            TextureBuffer textureBuffer = BufferProducer.createTextureBuffer(textureLayout);
+            VertexBuffer vertexBuffer = BufferConstructor.createVertexBuffer(vertexLayout);
+            IndexBuffer indexBuffer = BufferConstructor.createIndexBuffer(indexLayout);
+            TangentBuffer tangentBuffer = BufferConstructor.createTangentBuffer(tangentLayout);
+            NormalsBuffer normalsBuffer = BufferConstructor.createNormalsBuffer(normalsLayout);
+            TextureBuffer textureBuffer = BufferConstructor.createTextureBuffer(textureLayout);
 
             return new BufferLayoutRecord(vertexBuffer, indexBuffer, textureBuffer, tangentBuffer, normalsBuffer);
         }

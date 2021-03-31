@@ -15,9 +15,9 @@ public class OxyLogger extends Formatter {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW = "\u001B[33m";
 
-    public static final OxyColor ANSI_BLUE_OXY = new OxyColor(0.1f, 0.1f, 1.0f, 1.0f);
-    public static final OxyColor ANSI_RED_OXY = new OxyColor(1f, 0.1f, 0.1f, 1.0f);
-    public static final OxyColor ANSI_YELLOW_OXY = new OxyColor(1.0f, 1.0f, 0.1f, 1.0f);
+    public static final OxyColor ANSI_BLUE_OXY = new OxyColor(0.3f, 0.3f, 1.0f, 1.0f);
+    public static final OxyColor ANSI_RED_OXY = new OxyColor(1f, 0.3f, 0.3f, 1.0f);
+    public static final OxyColor ANSI_YELLOW_OXY = new OxyColor(1.0f, 1.0f, 0.3f, 1.0f);
 
     //apparently, we cant take console output with System.in... System.in is null
     //for the history, we need to define our own buffer and limit its size

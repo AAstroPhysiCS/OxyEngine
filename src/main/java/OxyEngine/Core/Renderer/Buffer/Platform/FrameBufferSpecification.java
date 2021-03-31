@@ -7,10 +7,21 @@ public class FrameBufferSpecification {
     FrameBufferTextureFormat textureFormat, renderBufferFormat;
     int paramMinFilter = -1, paramMagFilter = -1;
 
-    int colorAttachmentTexture = -1;
+    int wrapS = -1, wrapT = -1, wrapR = -1;
+
+    int[] colorAttachmentTextures = null;
+    boolean disableReadWriteBuffer;
 
     boolean isStorage;
     int level = -1;
+
+    int textureCount = -1;
+
+    public FrameBufferSpecification setTextureCount(int textureCount){
+        this.textureCount = textureCount;
+        colorAttachmentTextures = new int[textureCount];
+        return this;
+    }
 
     public FrameBufferSpecification setAttachmentIndex(int attachmentIndex) {
         this.attachmentIndex = attachmentIndex;
@@ -38,9 +49,21 @@ public class FrameBufferSpecification {
         return this;
     }
 
+    public FrameBufferSpecification disableReadWriteBuffer(boolean disableReadWriteBuffer){
+        this.disableReadWriteBuffer = disableReadWriteBuffer;
+        return this;
+    }
+
     public FrameBufferSpecification setFilter(int paramMinFilter, int paramMagFilter) {
         this.paramMagFilter = paramMagFilter;
         this.paramMinFilter = paramMinFilter;
+        return this;
+    }
+
+    public FrameBufferSpecification wrapSTR(int s, int t, int r){
+        this.wrapS = s;
+        this.wrapT = t;
+        this.wrapR = r;
         return this;
     }
 

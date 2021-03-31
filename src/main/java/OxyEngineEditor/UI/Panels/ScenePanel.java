@@ -1,10 +1,12 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.SelectedComponent;
+import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.WorldGrid;
@@ -18,8 +20,8 @@ import java.io.File;
 import java.util.List;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngine.System.OxySystem.*;
-import static OxyEngineEditor.EditorApplication.oxyShader;
+import static OxyEngine.System.OxySystem.getExtension;
+import static OxyEngine.System.OxySystem.isSupportedModelFileExtension;
 
 public class ScenePanel extends Panel {
 
@@ -28,6 +30,7 @@ public class ScenePanel extends Panel {
     public static final ImVec2 windowSize = new ImVec2();
     public static final ImVec2 windowPos = new ImVec2();
     public static final ImVec2 mousePos = new ImVec2();
+    public static final ImVec2 offsetScreenPos = new ImVec2();
     public static final ImVec2 offset = new ImVec2(); //Window position relative to the window... means that it subtracts the tab
 
     private static ScenePanel INSTANCE = null;
@@ -56,6 +59,7 @@ public class ScenePanel extends Panel {
         ImGui.getWindowPos(windowPos);
         ImGui.getMousePos(mousePos);
         ImGui.getCursorPos(offset);
+        ImGui.getCursorScreenPos(offsetScreenPos);
 
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
         focusedWindow = ImGui.isWindowFocused();
@@ -67,13 +71,15 @@ public class ScenePanel extends Panel {
         OpenGLFrameBuffer blittedFrameBuffer = ACTIVE_SCENE.getBlittedFrameBuffer();
 
         if (blittedFrameBuffer != null) {
-            ImGui.image(blittedFrameBuffer.getColorAttachmentTexture(0), blittedFrameBuffer.getWidth(), blittedFrameBuffer.getHeight(), 0, 1, 1, 0);
+            ImGui.image(blittedFrameBuffer.getColorAttachmentTexture(0)[0], blittedFrameBuffer.getWidth(), blittedFrameBuffer.getHeight(), 0, 1, 1, 0);
             if(ImGui.beginDragDropTarget()){
                 File f = (File) ImGui.acceptDragDropPayloadObject("projectPanelFile");
                 if(f != null) {
                     String fPath = f.getPath();
-                    if (isSupportedModelFileExtension(getExtension(fPath))) {
-                        List<OxyModel> eList = ACTIVE_SCENE.createModelEntities(fPath, oxyShader);
+                    String extension = getExtension(fPath);
+                    if (isSupportedModelFileExtension(extension)) {
+                        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+                        List<OxyModel> eList = ACTIVE_SCENE.createModelEntities(fPath, pbrShader);
                         for(OxyModel e : eList){
                             e.addComponent(new SelectedComponent(false));
                             e.constructData();

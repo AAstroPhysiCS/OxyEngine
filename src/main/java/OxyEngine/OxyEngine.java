@@ -3,9 +3,6 @@ package OxyEngine;
 import OxyEngine.Core.Renderer.Context.OxyRenderCommand;
 import OxyEngine.Core.Renderer.Context.RendererAPI;
 import OxyEngine.Core.Renderer.Context.RendererContext;
-import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.Core.Renderer.OxyRenderer3D;
-import OxyEngine.Core.Renderer.OxyRendererPlatform;
 import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxyDisposable;
@@ -29,22 +26,16 @@ public class OxyEngine implements OxyDisposable {
 
     private final Thread thread;
 
-    private final OxyRenderer renderer;
-
     private static final float[][] LOADED_THEME = UIThemeLoader.getInstance().load();
 
-    public OxyEngine(Supplier<Runnable> supplier, WindowHandle windowHandle, Antialiasing antialiasing, boolean vSync, boolean debug, OxyEngineSpecs specs) {
+    public OxyEngine(Supplier<Runnable> supplier, WindowHandle windowHandle, Antialiasing antialiasing, boolean vSync, boolean debug, TargetPlatform targetPlatform) {
         thread = new Thread(supplier.get(), "OxyEngine - 1");
         OxyEngine.windowHandle = windowHandle;
         this.vSync = vSync;
         this.debug = debug;
         OxyEngine.antialiasing = antialiasing;
 
-        OxyRendererPlatform platform = specs.platform();
-
-        OxyRenderCommand.getInstance(RendererContext.getContext(platform), RendererAPI.getContext(platform));
-
-        renderer = OxyRenderer3D.getInstance();
+        OxyRenderCommand.getInstance(RendererContext.getContext(targetPlatform), RendererAPI.getContext(targetPlatform));
     }
 
     public enum Antialiasing {
@@ -98,10 +89,6 @@ public class OxyEngine implements OxyDisposable {
 
     public static Antialiasing getAntialiasing() {
         return antialiasing;
-    }
-
-    public OxyRenderer getRenderer() {
-        return renderer;
     }
 
     public Thread getMainThread() {

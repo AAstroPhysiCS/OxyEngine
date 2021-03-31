@@ -1,6 +1,6 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Buffer.IndexBuffer;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public final class OpenGLIndexBuffer extends IndexBuffer {
 
-    OpenGLIndexBuffer(BufferLayoutProducer.BufferLayoutImpl impl) {
+    OpenGLIndexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl) {
         super(impl);
     }
 

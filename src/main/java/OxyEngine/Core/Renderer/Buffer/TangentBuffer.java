@@ -4,9 +4,9 @@ public abstract class TangentBuffer extends Buffer {
 
     protected float[] biAndTangent = new float[0];
 
-    protected final BufferLayoutProducer.BufferLayoutImpl implementation;
+    protected final BufferLayoutConstructor.BufferLayoutImpl implementation;
 
-    public TangentBuffer(BufferLayoutProducer.BufferLayoutImpl template) {
+    public TangentBuffer(BufferLayoutConstructor.BufferLayoutImpl template) {
         this.implementation = template;
     }
 

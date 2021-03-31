@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Buffer.TextureBuffer;
 
 import static org.lwjgl.opengl.GL20.*;
@@ -9,7 +9,7 @@ import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public class OpenGLTextureBuffer extends TextureBuffer {
 
-    OpenGLTextureBuffer(BufferLayoutProducer.BufferLayoutImpl template) {
+    OpenGLTextureBuffer(BufferLayoutConstructor.BufferLayoutImpl template) {
         super(template);
     }
 

@@ -33,7 +33,7 @@ public class ProjectPanel extends Panel {
     private static final String rootPath = (BASE_PATH + "\\src\\main\\resources");
     private static final ImString currentPathImString = new ImString(1000);
     private static final File[] rootFiles = new File(rootPath).listFiles();
-    private static File currentFile = null;
+    private static File currentFile = new File(rootPath);
     public static File lastDragDropFile = null;
 
     static {
@@ -114,11 +114,15 @@ public class ProjectPanel extends Panel {
             if (ImGui.beginTabItem("Console")) {
 
                 ImGui.pushStyleColor(ImGuiCol.ChildBg, Panel.bgC[0] - 0.05f, Panel.bgC[1] - 0.05f, Panel.bgC[2] - 0.05f, Panel.bgC[3] - 0.05f);
-                if (ImGui.beginChild("ConsoleChild")) {
+
+                ImGui.pushStyleVar(ImGuiStyleVar.ScrollbarSize, 10);
+                if (ImGui.beginChild("ConsoleChild", ImGui.getContentRegionAvailX(), ImGui.getContentRegionAvailY(), false,
+                        ImGuiWindowFlags.AlwaysVerticalScrollbar | ImGuiWindowFlags.AlwaysHorizontalScrollbar)) {
                     renderConsole();
                     ImGui.endChild();
                 }
                 ImGui.popStyleColor();
+                ImGui.popStyleVar();
 
                 ImGui.endTabItem();
             }
@@ -158,7 +162,7 @@ public class ProjectPanel extends Panel {
         ImGui.beginChild("StructureChild", 400, ImGui.getContentRegionAvailY() - 10);
 
         if (ImGui.isMouseClicked(ImGuiMouseButton.Left) && !ImGui.isAnyItemHovered() && ImGui.isWindowHovered()) {
-            currentFile = null;
+            currentFile = new File(rootPath);
             currentPathImString.set(rootPath);
         }
 
@@ -216,7 +220,7 @@ public class ProjectPanel extends Panel {
         float windowVisible = ImGui.getWindowPosX() + childWidth;
 
         if (ImGui.isMouseClicked(ImGuiMouseButton.Left) && !ImGui.isAnyItemHovered() && ImGui.isWindowHovered()) {
-            currentFile = null;
+            currentFile = new File(rootPath);
             currentPathImString.set(rootPath);
         }
 
@@ -360,6 +364,8 @@ public class ProjectPanel extends Panel {
             ImGui.imageButton(pngAsset.getTextureId(), sizeX, sizeY, 0, 1, 1, 0);
         else if (destExtension.equalsIgnoreCase("jpg") || destExtension.equalsIgnoreCase("jpeg"))
             ImGui.imageButton(jpgAsset.getTextureId(), sizeX, sizeY, 0, 1, 1, 0);
+        else if (destExtension.equalsIgnoreCase("tga"))
+            ImGui.imageButton(fileAsset.getTextureId(), sizeX, sizeY, 0, 1, 1, 0);
 
         return true;
     }

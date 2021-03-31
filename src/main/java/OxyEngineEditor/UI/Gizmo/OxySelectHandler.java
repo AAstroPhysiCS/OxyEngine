@@ -4,10 +4,10 @@ import OxyEngine.Components.*;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -18,7 +18,6 @@ import java.util.Set;
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
-import static OxyEngineEditor.EditorApplication.oxyShader;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL44.glClearTexImage;
 
@@ -41,7 +40,7 @@ public class OxySelectHandler {
             pickingBuffer.bind();
             rendererAPI.clearBuffer();
             rendererAPI.clearColor(32, 32, 32, 1.0f);
-            glClearTexImage(pickingBuffer.getColorAttachmentTexture(1), 0, pickingBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
+            glClearTexImage(pickingBuffer.getColorAttachmentTexture(1)[0], 0, pickingBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
             for (OxyEntity e : allModelEntities) {
                 if (!e.has(SelectedComponent.class)) continue;
                 OxyShader shader = e.get(OxyShader.class);
@@ -53,11 +52,11 @@ public class OxySelectHandler {
                     AnimationComponent animComp = e.get(AnimationComponent.class);
                     List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
                     for (int j = 0; j < matrix4fList.size(); j++) {
-                        oxyShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                        shader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
                     }
                 }
                 shader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
-                ACTIVE_SCENE.getRenderer().render(SceneRuntime.TS, e.get(ModelMeshOpenGL.class), currentBoundedCamera, shader);
+                OxyRenderer.render(e.get(ModelMeshOpenGL.class), currentBoundedCamera, shader);
                 shader.disable();
             }
         }

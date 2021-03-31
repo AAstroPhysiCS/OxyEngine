@@ -1,7 +1,7 @@
 package OxyEngine.Scene.Objects;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
@@ -17,14 +17,14 @@ public class WorldGrid {
     private final Scene scene;
     private final NativeObjectMeshOpenGL worldGridMesh;
 
-    public static final OxyShader shader = new OxyShader("shaders/OxyGrid.glsl");
+    public static final OxyShader shader = OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
 
     public WorldGrid(Scene scene, int size) {
         this.scene = scene;
-        worldGridMesh = new NativeObjectMeshOpenGL(MeshRenderMode.LINES, BufferLayoutProducer.Usage.STATIC,
+        worldGridMesh = new NativeObjectMeshOpenGL(MeshRenderMode.LINES, BufferLayoutConstructor.Usage.STATIC,
                 NativeObjectMeshOpenGL.attributeVert);
         add(size);
-        worldGridMesh.addToQueue();
+        worldGridMesh.addToBuffer();
     }
 
     private void add(int size) {

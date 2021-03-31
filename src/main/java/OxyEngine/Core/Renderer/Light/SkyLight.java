@@ -3,7 +3,6 @@ package OxyEngine.Core.Renderer.Light;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Scene.Scene;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -35,10 +34,9 @@ public class SkyLight extends Light {
     private boolean primary;
 
     private HDRTexture hdrTexture;
-    private final Scene scene;
 
-    public SkyLight(Scene s) {
-        this.scene = s;
+    public SkyLight() {
+
     }
 
     public void loadHDR(String pathToHDR) {
@@ -48,7 +46,7 @@ public class SkyLight extends Light {
             return;
         }
         if(hdrTexture != null) hdrTexture.dispose();
-        hdrTexture = OxyTexture.loadHDRTexture(pathToHDR, scene);
+        hdrTexture = OxyTexture.loadHDRTexture(pathToHDR);
     }
 
     @Override

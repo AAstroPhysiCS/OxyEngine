@@ -216,7 +216,7 @@ public final class SceneSerializer {
             Scene oldScene = SceneRuntime.ACTIVE_SCENE;
             oldScene.disposeAllModels();
 
-            Scene scene = new Scene(sceneName, oldScene.getRenderer(), oldScene.getFrameBuffer(), oldScene.getBlittedFrameBuffer(), oldScene.getPickingBuffer());
+            Scene scene = new Scene(sceneName, oldScene.getFrameBuffer(), oldScene.getBlittedFrameBuffer(), oldScene.getPickingBuffer());
             for (var n : oldScene.getEntityEntrySet()) {
                 OxyEntity key = n.getKey();
                 scene.put(key);

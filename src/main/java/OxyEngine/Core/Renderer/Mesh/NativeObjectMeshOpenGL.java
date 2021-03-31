@@ -13,15 +13,15 @@ public class NativeObjectMeshOpenGL extends OpenGLMesh {
 
     public int indicesX, indicesY, indicesZ;
 
-    public NativeObjectMeshOpenGL(MeshRenderMode mode, BufferLayoutProducer.Usage usage, BufferLayoutAttributes... attributes) {
+    public NativeObjectMeshOpenGL(MeshRenderMode mode, BufferLayoutConstructor.Usage usage, BufferLayoutAttributes... attributes) {
         this.mode = mode;
 
         assert mode != null && usage != null : oxyAssert("Some arguments not defined!");
 
-        BufferLayoutRecord layout = BufferLayoutProducer.create()
+        BufferLayoutRecord layout = BufferLayoutConstructor.create()
                 .createLayout(VertexBuffer.class)
-                    .setUsage(usage)
-                    .setAttribPointer(attributes)
+                .setUsage(usage)
+                .setAttribPointer(attributes)
                 .create()
                 .createLayout(IndexBuffer.class).create()
                 .finalizeRecord();

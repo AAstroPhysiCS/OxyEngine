@@ -26,12 +26,18 @@ public class AnimationComponent implements EntityComponent {
     private final List<OxyAnimation> animations;
     private OxyNode rootNode;
 
+    private boolean stop;
+
     public AnimationComponent(AIScene scene, Map<String, BoneInfo> boneInfoMap) {
         this.boneInfoMap = boneInfoMap;
         this.currentAIScene = scene;
         for (int i = 0; i < MAX_BONES; i++) finalBoneMatrices.add(new Matrix4f().identity());
         nodeAnimMap = new HashMap<>(MAX_BONES);
         animations = new ArrayList<>(scene.mNumAnimations());
+    }
+
+    public void stopAnimation(boolean stop){
+        this.stop = stop;
     }
 
     public OxyNodeAnimation findNodeAnim(OxyAnimation animation, String nodeName) {
@@ -190,6 +196,7 @@ public class AnimationComponent implements EntityComponent {
     float currentTime = 0;
 
     public void updateAnimation(float dt) {
+        if(stop) return;
         //Runs one time
         if (animations.size() == 0) {
             for (int i = 0; i < currentAIScene.mNumAnimations(); i++) {
@@ -210,6 +217,14 @@ public class AnimationComponent implements EntityComponent {
 
     public List<Matrix4f> getFinalBoneMatrices() {
         return finalBoneMatrices;
+    }
+
+    public float getCurrentTime() {
+        return currentTime;
+    }
+
+    public void setCurrentTime(float currentTime) {
+        this.currentTime = currentTime;
     }
 
     private static record OxyNode(String name, Matrix4f transformation, int numChildren, List<OxyNode> children) {

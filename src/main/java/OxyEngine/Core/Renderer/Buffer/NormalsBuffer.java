@@ -4,9 +4,9 @@ public abstract class NormalsBuffer extends Buffer {
 
     protected float[] normals = new float[0];
 
-    protected final BufferLayoutProducer.BufferLayoutImpl implementation;
+    protected final BufferLayoutConstructor.BufferLayoutImpl implementation;
 
-    public NormalsBuffer(BufferLayoutProducer.BufferLayoutImpl template) {
+    public NormalsBuffer(BufferLayoutConstructor.BufferLayoutImpl template) {
         this.implementation = template;
     }
 

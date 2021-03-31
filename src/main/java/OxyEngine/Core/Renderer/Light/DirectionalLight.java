@@ -8,11 +8,15 @@ import OxyEngine.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class DirectionalLight extends Light {
+
+    private Vector3f dir = null;
 
     public DirectionalLight(float colorIntensity) {
         this.colorIntensity = colorIntensity;
@@ -27,11 +31,20 @@ public class DirectionalLight extends Light {
         OxyShader shader = e.get(OxyShader.class);
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
         TransformComponent t = e.get(TransformComponent.class);
+
+        Matrix3f transform3x3 = new Matrix3f();
+        new Matrix4f(t.transform).normalize3x3(transform3x3);
+        dir = transform3x3.transform(new Vector3f(1.0f));
+
         shader.enable();
-        shader.setUniformVec3("d_Light[" + i + "].direction", t.rotation.x, t.rotation.y, t.rotation.z);
+        shader.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
         shader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
         shader.setUniform1i("d_Light[" + i + "].activeState", 1);
         shader.disable();
+    }
+
+    public Vector3f getDirection() {
+        return dir;
     }
 
     final float[] colorIntensityArr = new float[1];

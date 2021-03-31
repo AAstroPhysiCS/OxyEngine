@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Texture;
 
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Scene.Scene;
 import OxyEngine.TextureSlot;
 import org.joml.Matrix4f;
 
@@ -16,8 +16,6 @@ import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 import static org.lwjgl.stb.STBImage.*;
 
 public class HDRTexture extends OxyTexture.AbstractTexture {
-
-    private static Scene scene;
 
     private static final Matrix4f[] captureViews = new Matrix4f[]{
             new Matrix4f()
@@ -43,9 +41,8 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
     private PrefilterTexture prefilterTexture;
     private BDRF bdrf;
 
-    HDRTexture(TextureSlot slot, String path, Scene scene) {
+    HDRTexture(TextureSlot slot, String path) {
         super(slot, path);
-        HDRTexture.scene = scene;
         assert slot.getValue() != 0 : oxyAssert("Slot can not be 0");
         load();
     }
@@ -106,7 +103,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                     GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
             rendererAPI.clearBuffer();
-            scene.getRenderer().render(skyLightMesh, skyLightShader);
+            OxyRenderer.render(skyLightMesh, skyLightShader);
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -155,7 +152,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
     static class IrradianceTexture extends OxyTexture.AbstractTexture {
 
-        final static OxyShader shader = new OxyShader("shaders/OxyIBL.glsl");
+        final static OxyShader shader = OxyShader.createShader("OxyIBL", "shaders/OxyIBL.glsl");
 
         IrradianceTexture(TextureSlot slot, String path, HDRTexture mainTexture) {
             super(slot, path);
@@ -191,7 +188,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
                 rendererAPI.clearBuffer();
-                scene.getRenderer().render(skyLightMesh, shader);
+                OxyRenderer.render(skyLightMesh, shader);
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
@@ -199,7 +196,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
     static class PrefilterTexture extends OxyTexture.AbstractTexture {
 
-        final static OxyShader shader = new OxyShader("shaders/OxyPrefiltering.glsl");
+        final static OxyShader shader = OxyShader.createShader("OxyPrefiltering", "shaders/OxyPrefiltering.glsl");
 
         PrefilterTexture(TextureSlot slot, String path, HDRTexture mainTexture) {
             super(slot, path);
@@ -244,7 +241,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);
                     rendererAPI.clearBuffer();
-                    scene.getRenderer().render(skyLightMesh, shader);
+                    OxyRenderer.render(skyLightMesh, shader);
                 }
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -253,7 +250,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
     static class BDRF extends OxyTexture.AbstractTexture {
 
-        final static OxyShader shader = new OxyShader("shaders/OxyBDRF.glsl");
+        final static OxyShader shader = OxyShader.createShader("OxyBDRF", "shaders/OxyBDRF.glsl");
 
         BDRF(TextureSlot slot, String path, HDRTexture mainTexture) {
             super(slot, path);

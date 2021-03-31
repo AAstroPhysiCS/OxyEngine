@@ -1,7 +1,7 @@
 package OxyEngine.Scene.Objects;
 
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutProducer;
+import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
@@ -13,9 +13,9 @@ import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class SkyLightFactory implements NativeObjectFactory {
 
-    public static final OxyShader skyLightShader = new OxyShader("shaders/OxyHDR.glsl");
+    public static final OxyShader skyLightShader = OxyShader.createShader("OxyHDR", "shaders/OxyHDR.glsl");
     public static final NativeObjectMeshOpenGL skyLightMesh =
-            new NativeObjectMeshOpenGL(MeshRenderMode.TRIANGLES, BufferLayoutProducer.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));
+            new NativeObjectMeshOpenGL(MeshRenderMode.TRIANGLES, BufferLayoutConstructor.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));
 
     public static final float[] skyboxVertices = {
             -1.0f, -1.0f, -1.0f,
@@ -70,6 +70,6 @@ public class SkyLightFactory implements NativeObjectFactory {
 
     public void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh) {
         e.indices = SkyLight.indices;
-        mesh.addToQueue();
+        mesh.addToBuffer();
     }
 }

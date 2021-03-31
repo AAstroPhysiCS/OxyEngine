@@ -7,9 +7,9 @@ public abstract class IndexBuffer extends Buffer {
     protected int length;
     protected int[] indices;
 
-    protected final BufferLayoutProducer.BufferLayoutImpl impl;
+    protected final BufferLayoutConstructor.BufferLayoutImpl impl;
 
-    public IndexBuffer(BufferLayoutProducer.BufferLayoutImpl impl) {
+    public IndexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl) {
         this.impl = impl;
     }
 
