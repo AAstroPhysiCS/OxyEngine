@@ -5,8 +5,6 @@ import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.WorldGrid;
@@ -78,8 +76,7 @@ public class ScenePanel extends Panel {
                     String fPath = f.getPath();
                     String extension = getExtension(fPath);
                     if (isSupportedModelFileExtension(extension)) {
-                        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
-                        List<OxyModel> eList = ACTIVE_SCENE.createModelEntities(fPath, pbrShader);
+                        List<OxyModel> eList = ACTIVE_SCENE.createModelEntities(fPath);
                         for(OxyModel e : eList){
                             e.addComponent(new SelectedComponent(false));
                             e.constructData();

@@ -3,8 +3,6 @@ package OxyEngine.Scene.Objects.Importer;
 import OxyEngine.Components.AnimationComponent;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Core.Renderer.Mesh.OxyVertex;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
 import OxyEngine.Scene.OxyEntity;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -76,8 +74,7 @@ public class OxyModelImporter {
 
         String rootName = aiScene.mRootNode().mName().dataString();
         if (root == null) {
-            OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
-            root = ACTIVE_SCENE.createEmptyModel(pbrShader);
+            root = ACTIVE_SCENE.createEmptyModel();
             // rootEnt.setFamily(new EntityFamily()); default behaviour from a entity, once it is created!
             root.addComponent(new TagComponent(rootName));
         }

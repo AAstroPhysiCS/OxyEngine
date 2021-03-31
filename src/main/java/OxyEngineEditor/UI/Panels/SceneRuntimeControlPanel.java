@@ -1,10 +1,9 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scene.SceneState;
-import OxyEngine.TextureSlot;
+import OxyEngineEditor.UI.AssetManager;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
@@ -13,8 +12,8 @@ import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 
 public final class SceneRuntimeControlPanel extends Panel {
 
-    public static final ImageTexture playTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/play.png");
-    public static final ImageTexture stopTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/stop.png");
+    private static final ImageTexture playTexture = AssetManager.getInstance().getAsset("UI PLAY");
+    private static final ImageTexture stopTexture = AssetManager.getInstance().getAsset("UI STOP");
 
     @Override
     public void preload() {

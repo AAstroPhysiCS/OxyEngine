@@ -6,12 +6,11 @@ import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.OxyEntity;
-import OxyEngine.TextureSlot;
+import OxyEngineEditor.UI.AssetManager;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import imgui.ImGui;
 import imgui.flag.*;
@@ -27,12 +26,12 @@ public class SceneHierarchyPanel extends Panel {
 
     private static SceneHierarchyPanel INSTANCE = null;
 
-    private static ImageTexture eyeViewTexture;
-    private static ImageTexture materialGreyMesh;
-    private static ImageTexture materialGroupGizmo;
-    private static ImageTexture materialLightBulb;
-    private static ImageTexture materialCamera;
-    static ImageTexture materialPinkSphere;
+    private static final ImageTexture eyeViewTexture = AssetManager.getInstance().getAsset("UI VIEW");
+    private static final ImageTexture materialGreyMesh = AssetManager.getInstance().getAsset("UI MATERIALGREYMESH");
+    private static final ImageTexture materialGroupGizmo = AssetManager.getInstance().getAsset("UI MATERIALGROUPGIZMO");
+    private static final ImageTexture materialLightBulb = AssetManager.getInstance().getAsset("UI MATERIALLIGHTBULB");
+    private static final ImageTexture materialCamera = AssetManager.getInstance().getAsset("UI MATERIALCAMERA");
+    static final ImageTexture materialPinkSphere = AssetManager.getInstance().getAsset("UI MATERIALPINKSPHERE");
 
     public static boolean focusedWindow, focusedWindowDragging;
 
@@ -44,17 +43,11 @@ public class SceneHierarchyPanel extends Panel {
     }
 
     private SceneHierarchyPanel() {
-
     }
 
     @Override
     public void preload() {
-        eyeViewTexture = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/view.png");
-        materialPinkSphere = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialPinkSphere.png");
-        materialGreyMesh = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialGreyMesh.png");
-        materialGroupGizmo = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialGroupGizmo.png");
-        materialLightBulb = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialLightBulb.png");
-        materialCamera = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/materialCamera.png");
+
     }
 
     private void updateEntityPanel(Set<OxyEntity> entities) {
@@ -88,7 +81,7 @@ public class SceneHierarchyPanel extends Panel {
                 } else if (isCamera) {
                     name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 19, 2, 22f, 20f);
                 } else { //its a group
-                    name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(),19, 2,  22, 20);
+                    name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(), 19, 2, 22, 20);
                 }
 
                 if (ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth)) {
@@ -164,7 +157,6 @@ public class SceneHierarchyPanel extends Panel {
     }
 
 
-
     private void renderTreeNode(List<OxyEntity> relatedEntities) {
         if (relatedEntities == null) return;
         if (relatedEntities.size() == 0) return;
@@ -187,13 +179,13 @@ public class SceneHierarchyPanel extends Panel {
             String name = e.get(TagComponent.class).tag();
 
             if (isLight) {
-                name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(),19, 2,  22f, 20f);
+                name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 19, 2, 22f, 20f);
             } else if (hasMesh) {
-                name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(),19, 2,  22f, 20f);
+                name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 19, 2, 22f, 20f);
             } else if (isCamera) {
                 name = renderImageBesideTreeNode(name, materialCamera.getTextureId(), 19, 2, 22f, 20f);
             } else { //its a group
-                name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(),19, 2,  22, 20f);
+                name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(), 19, 2, 22, 20f);
             }
 
             if (ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth)) {

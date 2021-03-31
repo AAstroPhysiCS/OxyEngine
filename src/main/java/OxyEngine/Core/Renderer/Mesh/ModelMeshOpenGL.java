@@ -127,7 +127,7 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                         if (entityContext != null) {
                             //removing the added entity with the new model entities and carrying the transform of the old entity to the new models.
                             TransformComponent c = entityContext.get(TransformComponent.class);
-                            List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path, entityContext.get(OxyShader.class));
+                            List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path);
                             OxyEntity root = eList.get(0).getRoot();
                             EntityFamily family = entityContext.getFamily();
                             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);

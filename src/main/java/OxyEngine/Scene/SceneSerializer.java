@@ -310,10 +310,10 @@ public final class SceneSerializer {
                     new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength, emissiveMapStrength);
 
             if (!meshPath.equals("null")) {
-                modelInstance = scene.createModelEntity(meshPath, shader, meshPos, index);
+                modelInstance = scene.createModelEntity(meshPath, meshPos, index);
                 modelInstance.getGUINodes().add(OxyMaterial.guiNode);
             } else {
-                modelInstance = scene.createEmptyModel(shader, meshPos);
+                modelInstance = scene.createEmptyModel(meshPos);
             }
 
             if (emitting) {

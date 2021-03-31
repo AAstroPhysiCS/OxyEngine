@@ -142,7 +142,7 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
                 indices[i] = i;
             }
             cube.indices = indices;
-            cube.addComponent(mesh, shader);
+            cube.addComponent(mesh);
             mesh.addToBuffer();
         }
     }

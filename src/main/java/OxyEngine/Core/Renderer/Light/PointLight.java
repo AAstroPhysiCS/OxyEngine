@@ -2,6 +2,7 @@ package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
@@ -33,7 +34,7 @@ public class PointLight extends Light {
 
     @Override
     public void update(OxyEntity e, int i) {
-        OxyShader shader = e.get(OxyShader.class);
+        OxyShader shader = ShaderLibrary.get("OxyPBRAnimation");
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
         shader.enable();
         shader.setUniformVec3("p_Light[" + i + "].position", e.get(TransformComponent.class).worldSpacePosition);

@@ -6,6 +6,7 @@ import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.ScenePanel;
@@ -34,6 +35,7 @@ public class OxySelectHandler {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         OpenGLFrameBuffer pickingBuffer = ACTIVE_SCENE.getPickingBuffer();
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
         //ID RENDER PASS
         if (pickingBuffer.getBufferId() != 0) {
             int[] clearValue = {-1};
@@ -43,21 +45,20 @@ public class OxySelectHandler {
             glClearTexImage(pickingBuffer.getColorAttachmentTexture(1)[0], 0, pickingBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
             for (OxyEntity e : allModelEntities) {
                 if (!e.has(SelectedComponent.class)) continue;
-                OxyShader shader = e.get(OxyShader.class);
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
-                shader.enable();
+                pbrShader.enable();
                 //ANIMATION UPDATE
                 if (e.has(AnimationComponent.class)) {
                     AnimationComponent animComp = e.get(AnimationComponent.class);
                     List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
                     for (int j = 0; j < matrix4fList.size(); j++) {
-                        shader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                        pbrShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
                     }
                 }
-                shader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
-                OxyRenderer.render(e.get(ModelMeshOpenGL.class), currentBoundedCamera, shader);
-                shader.disable();
+                pbrShader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
+                OxyRenderer.render(e.get(ModelMeshOpenGL.class), currentBoundedCamera, pbrShader);
+                pbrShader.disable();
             }
         }
         int id = getEntityID();

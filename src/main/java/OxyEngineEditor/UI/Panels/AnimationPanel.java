@@ -1,15 +1,18 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.AnimationComponent;
+import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngineEditor.UI.AssetManager;
 import imgui.ImGui;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
-import static OxyEngineEditor.UI.Panels.SceneRuntimeControlPanel.playTexture;
-import static OxyEngineEditor.UI.Panels.SceneRuntimeControlPanel.stopTexture;
 
 public class AnimationPanel extends Panel {
+
+    private static final ImageTexture playTexture = AssetManager.getInstance().getAsset("UI PLAY");
+    private static final ImageTexture stopTexture = AssetManager.getInstance().getAsset("UI STOP");
 
     private static final float[] animationController = new float[1];
 

@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 //TODO: Write this class
 public abstract class OrthographicCamera extends OxyCamera {
 
-    public float left, right, bottom, top, zNear, zFar;
+    public final float left, right, bottom, top, zNear, zFar;
 
     public OrthographicCamera(float left, float right, float bottom, float top, float zNear, float zFar, boolean transpose) {
         this(left, right, bottom, top, zNear, zFar, transpose, new Vector3f(0, 0, 0));

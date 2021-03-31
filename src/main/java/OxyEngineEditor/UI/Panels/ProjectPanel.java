@@ -1,10 +1,9 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyFontSystem;
 import OxyEngine.System.OxyLogger;
-import OxyEngine.TextureSlot;
+import OxyEngineEditor.UI.AssetManager;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.*;
@@ -54,15 +53,15 @@ public class ProjectPanel extends Panel {
 
     @Override
     public void preload() {
-        fileAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/fileAsset2.png");
-        objAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/objFileAsset.png");
-        fbxAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/fbxFileAsset.png");
-        gltfAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/gltfFileAsset.png");
-        dirAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/dirAsset.png");
-        dirAssetGrey = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/dirAsset-grey.png");
-        pngAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/pngFileAsset.png");
-        jpgAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/jpgFileAsset.png");
-        blendAsset = OxyTexture.loadImage(TextureSlot.UITEXTURE, "src/main/resources/assets/blendFileAsset.png");
+        fileAsset = AssetManager.getInstance().getAsset("UI FILEASSET2");
+        objAsset = AssetManager.getInstance().getAsset("UI OBJFILEASSET");
+        fbxAsset = AssetManager.getInstance().getAsset("UI FBXFILEASSET");
+        gltfAsset = AssetManager.getInstance().getAsset("UI GLTFFILEASSET");
+        dirAsset = AssetManager.getInstance().getAsset("UI DIRASSET");
+        dirAssetGrey = AssetManager.getInstance().getAsset("UI DIRASSET-GREY");
+        pngAsset = AssetManager.getInstance().getAsset("UI PNGFILEASSET");
+        jpgAsset = AssetManager.getInstance().getAsset("UI JPGFILEASSET");
+        blendAsset = AssetManager.getInstance().getAsset("UI BLENDFILEASSET");
     }
 
     @Override
@@ -133,20 +132,18 @@ public class ProjectPanel extends Panel {
         ImGui.end();
     }
 
-    private void renderConsole(){
+    private void renderConsole() {
         ImGui.pushFont(OxyFontSystem.getAllFonts().get(1));
         String[] splitted = OxyLogger.getHistory().toString().split("\n");
-        for(String s : splitted){
+        for (String s : splitted) {
             float[] colors = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
-            if(s.contains(OxyLogger.ANSI_RED)){
+            if (s.contains(OxyLogger.ANSI_RED)) {
                 colors = OxyLogger.ANSI_RED_OXY.getNumbers();
                 s = s.replace(OxyLogger.ANSI_RED, "");
-            }
-            else if(s.contains(OxyLogger.ANSI_BLUE)){
+            } else if (s.contains(OxyLogger.ANSI_BLUE)) {
                 colors = OxyLogger.ANSI_BLUE_OXY.getNumbers();
                 s = s.replace(OxyLogger.ANSI_BLUE, "");
-            }
-            else if(s.contains(OxyLogger.ANSI_YELLOW)){
+            } else if (s.contains(OxyLogger.ANSI_YELLOW)) {
                 colors = OxyLogger.ANSI_YELLOW_OXY.getNumbers();
                 s = s.replace(OxyLogger.ANSI_YELLOW, "");
             }

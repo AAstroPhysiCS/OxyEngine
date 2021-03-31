@@ -7,7 +7,6 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
@@ -51,7 +50,6 @@ public class OxyModel extends OxyEntity {
 
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
-                get(OxyShader.class),
                 new TransformComponent(this.get(TransformComponent.class)),
                 new MeshPosition(get(MeshPosition.class).meshPos()),
                 new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),

@@ -2,7 +2,6 @@ package OxyEngine.Core.Renderer.Shader;
 
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.System.OxyDisposable;
-import OxyEngine.Components.EntityComponent;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 import static org.lwjgl.opengl.GL20.*;
 
-public class OxyShader implements OxyDisposable, EntityComponent {
+public class OxyShader implements OxyDisposable {
 
     public static final int VERTICES = 0;
     public static final int TEXTURE_COORDS = 1;

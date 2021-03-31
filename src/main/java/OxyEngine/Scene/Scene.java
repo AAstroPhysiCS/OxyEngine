@@ -31,7 +31,6 @@ import java.util.*;
 import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
 import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.Scene.Objects.SkyLightFactory.skyLightMesh;
-import static OxyEngine.Scene.Objects.SkyLightFactory.skyLightShader;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Scene.SceneSerializer.fileExtension;
@@ -109,8 +108,7 @@ public final class Scene implements OxyDisposable {
     }
 
     public OxyEntity createEmptyEntity() {
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
-        OxyEntity model = ACTIVE_SCENE.createEmptyModel(pbrShader);
+        OxyEntity model = ACTIVE_SCENE.createEmptyModel();
         if (entityContext != null) {
             model.addComponent(new TagComponent("Empty Group"), new SelectedComponent(false));
             model.setFamily(new EntityFamily(entityContext.getFamily()));
@@ -135,7 +133,7 @@ public final class Scene implements OxyDisposable {
         skyLightEnt.setFactory(new SkyLightFactory());
         if (entityContext != null) skyLightEnt.setFamily(new EntityFamily(entityContext.getFamily()));
         skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight());
-        skyLightEnt.addComponent(skyLightMesh, skyLightShader);
+        skyLightEnt.addComponent(skyLightMesh);
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
             skyLightEnt.getGUINodes().add(SkyLight.guiNode);
         skyLightEnt.initData();
@@ -146,8 +144,7 @@ public final class Scene implements OxyDisposable {
 
     public void createPointLight() {
 
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
-        OxyModel model = ACTIVE_SCENE.createEmptyModel(pbrShader);
+        OxyModel model = ACTIVE_SCENE.createEmptyModel();
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
 
         PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
@@ -162,8 +159,7 @@ public final class Scene implements OxyDisposable {
     }
 
     public void createDirectionalLight() {
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
-        OxyModel model = ACTIVE_SCENE.createEmptyModel(pbrShader);
+        OxyModel model = ACTIVE_SCENE.createEmptyModel();
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
         int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
         model.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f));
@@ -174,8 +170,7 @@ public final class Scene implements OxyDisposable {
     }
 
     public void createPerspectiveCamera() {
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
-        OxyModel model = ACTIVE_SCENE.createEmptyModel(pbrShader);
+        OxyModel model = ACTIVE_SCENE.createEmptyModel();
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
         model.addComponent(new SceneCamera());
         if (!model.getGUINodes().contains(OxyCamera.guiNode))
@@ -184,25 +179,20 @@ public final class Scene implements OxyDisposable {
         SceneLayer.getInstance().updateCameraEntities();
     }
 
-    public final List<OxyModel> createModelEntities(DefaultModelType type, OxyShader shader, boolean importedFromFile) {
-        return createModelEntities(type.getPath(), shader, importedFromFile);
+    public final List<OxyModel> createModelEntities(DefaultModelType type, boolean importedFromFile) {
+        return createModelEntities(type.getPath(), importedFromFile);
     }
 
-    public final OxyModel createModelEntity(DefaultModelType type, OxyShader shader) {
-        return createModelEntity(type.getPath(), shader);
+    public final List<OxyModel> createModelEntities(DefaultModelType type) {
+        return createModelEntities(type.getPath(), false);
     }
 
-    public final List<OxyModel> createModelEntities(DefaultModelType type, OxyShader shader) {
-        return createModelEntities(type.getPath(), shader, false);
-    }
-
-    public final OxyModel createEmptyModel(OxyShader shader) {
+    public final OxyModel createEmptyModel() {
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         e.importedFromFile = false;
         put(e);
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
-                shader,
                 new TransformComponent(new Vector3f(0, 0, 0)),
                 new TagComponent("Empty Group"),
                 new MeshPosition(0),
@@ -212,12 +202,11 @@ public final class Scene implements OxyDisposable {
         return e;
     }
 
-    public final OxyModel createEmptyModel(OxyShader shader, int i) {
+    public final OxyModel createEmptyModel(int i) {
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         put(e);
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
-                shader,
                 new TransformComponent(new Vector3f(0, 0, 0)),
                 new TagComponent("Empty Group"),
                 new MeshPosition(i),
@@ -227,7 +216,7 @@ public final class Scene implements OxyDisposable {
         return e;
     }
 
-    public final List<OxyModel> createModelEntities(String path, OxyShader shader, boolean importedFromFile) {
+    public final List<OxyModel> createModelEntities(String path, boolean importedFromFile) {
         List<OxyModel> models = new ArrayList<>();
         modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
 
@@ -243,7 +232,6 @@ public final class Scene implements OxyDisposable {
             e.setFamily(new EntityFamily(modelImporter.getRootEntity(i).getFamily()));
             e.addComponent(
                     new UUIDComponent(UUID.randomUUID()),
-                    shader,
                     new BoundingBoxComponent(
                             modelImporter.getBoundingBoxMin(i),
                             modelImporter.getBoundingBoxMax(i)
@@ -265,11 +253,11 @@ public final class Scene implements OxyDisposable {
         return models;
     }
 
-    public final List<OxyModel> createModelEntities(String path, OxyShader shader) {
-        return createModelEntities(path, shader, false);
+    public final List<OxyModel> createModelEntities(String path) {
+        return createModelEntities(path, false);
     }
 
-    public final OxyModel createModelEntity(String path, OxyShader shader, int i) {
+    public final OxyModel createModelEntity(String path, int i) {
         modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
         OxyMaterialPool.newBatch();
         int materialIndex = modelImporter.getMaterialIndex(i);
@@ -280,7 +268,6 @@ public final class Scene implements OxyDisposable {
         e.setFamily(new EntityFamily(modelImporter.getRootEntity(i).getFamily()));
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
-                shader,
                 new BoundingBoxComponent(
                         modelImporter.getBoundingBoxMin(i),
                         modelImporter.getBoundingBoxMax(i)
@@ -301,7 +288,7 @@ public final class Scene implements OxyDisposable {
 
     static String optimization_Path = ""; //optimization for the scene serialization import
 
-    public final OxyModel createModelEntity(String path, OxyShader shader, int i, int materialIndex) {
+    public final OxyModel createModelEntity(String path, int i, int materialIndex) {
         if (!Scene.optimization_Path.equals(path)) {
             modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
             Scene.optimization_Path = path;
@@ -312,7 +299,6 @@ public final class Scene implements OxyDisposable {
         e.factory = new ModelFactory(modelImporter.getVertexList(i), modelImporter.getFaces(i));
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
-                shader,
                 new BoundingBoxComponent(
                         modelImporter.getBoundingBoxMin(i),
                         modelImporter.getBoundingBoxMax(i)
@@ -325,10 +311,6 @@ public final class Scene implements OxyDisposable {
         );
         e.initData(path);
         return e;
-    }
-
-    public final OxyModel createModelEntity(String path, OxyShader shader) {
-        return createModelEntity(path, shader, 0);
     }
 
     public final void removeEntity(OxyEntity e) {

@@ -6,22 +6,35 @@
       <w>bdrf</w>
       <w>birchwood</w>
       <w>bitangent</w>
+      <w>blendfileasset</w>
       <w>blitted</w>
       <w>childiren</w>
       <w>coords</w>
       <w>cubemap</w>
       <w>dest</w>
+      <w>dirasset</w>
       <w>emissive</w>
+      <w>fbxfileasset</w>
+      <w>fileasset</w>
       <w>fovy</w>
       <w>framebuffer</w>
       <w>glfw</w>
       <w>glsl</w>
+      <w>gltffileasset</w>
       <w>imgui</w>
       <w>irradiance</w>
       <w>jcenter</w>
+      <w>jpgfileasset</w>
       <w>lwjgl</w>
       <w>macos</w>
+      <w>materialcamera</w>
+      <w>materialgreymesh</w>
+      <w>materialgroupgizmo</w>
+      <w>materiallightbulb</w>
+      <w>materialpinksphere</w>
       <w>maximov</w>
+      <w>objfileasset</w>
+      <w>pngfileasset</w>
       <w>polyfbx</w>
       <w>prefilter</w>
       <w>reloader</w>

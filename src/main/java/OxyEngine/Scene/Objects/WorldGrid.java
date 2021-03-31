@@ -16,8 +16,9 @@ public class WorldGrid {
 
     private final Scene scene;
     private final NativeObjectMeshOpenGL worldGridMesh;
+    public static OxyNativeObject grid;
 
-    public static final OxyShader shader = OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
+    public static final OxyShader gridShader = OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
 
     public WorldGrid(Scene scene, int size) {
         this.scene = scene;
@@ -28,12 +29,12 @@ public class WorldGrid {
     }
 
     private void add(int size) {
-        OxyNativeObject mainObj = scene.createNativeObjectEntity(size * size * 4);
-        mainObj.setFactory(new GridFactory());
-        mainObj.addComponent(shader, worldGridMesh);
+        grid = scene.createNativeObjectEntity(size * size * 4);
+        grid.setFactory(new GridFactory());
+        grid.addComponent(worldGridMesh);
         for (int x = -size; x < size; x++) {
             for (int z = -size; z < size; z++) {
-                mainObj.pushVertexData(new TransformComponent(new Vector3f(x, 0, z), 2f));
+                grid.pushVertexData(new TransformComponent(new Vector3f(x, 0, z), 2f));
             }
         }
     }
