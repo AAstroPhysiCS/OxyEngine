@@ -36,7 +36,7 @@ public class OxyMaterial implements OxyDisposable {
 
     public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture, ImageTexture emissiveTexture,
                        OxyColor albedoColor) {
-        this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, emissiveTexture, albedoColor, 1.0f, 0.5f, 1.0f, 0.0f, 1.0f);
+        this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, emissiveTexture, albedoColor, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
     }
 
     public OxyMaterial(String name, String... assimpMaterialPaths) {
@@ -51,7 +51,7 @@ public class OxyMaterial implements OxyDisposable {
         this(name, OxyTexture.loadImage(TextureSlot.ALBEDO, albedoTexture), OxyTexture.loadImage(TextureSlot.NORMAL, normalTexture),
                 OxyTexture.loadImage(TextureSlot.ROUGHNESS, roughnessTexture), OxyTexture.loadImage(TextureSlot.METALLIC, metallicTexture),
                 OxyTexture.loadImage(TextureSlot.AO, aoTexture), OxyTexture.loadImage(TextureSlot.EMISSIVE, emissiveTexture), albedoColor,
-                1.0f, 0.5f, 1.0f, 0.0f, 1.0f);
+                1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
     }
 
     public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture, ImageTexture emissiveTexture,

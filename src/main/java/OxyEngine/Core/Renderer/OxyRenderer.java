@@ -14,7 +14,7 @@ public class OxyRenderer {
 
     private OxyRenderer(){}
 
-    public static void render(OpenGLMesh mesh, OxyCamera camera, OxyShader shader) {
+    public static void renderMesh(OpenGLMesh mesh, OxyCamera camera, OxyShader shader) {
         assert shader != null : oxyAssert("Shader is not instantiated.");
         shader.enable();
         shader.setUniformVec3("cameraPos", camera.origin);
@@ -25,7 +25,7 @@ public class OxyRenderer {
         shader.disable();
     }
 
-    public static void render(OpenGLMesh mesh, OxyShader shader){
+    public static void renderMesh(OpenGLMesh mesh, OxyShader shader){
         assert shader != null : oxyAssert("Shader is not instantiated.");
         shader.enable();
         if (mesh.empty())

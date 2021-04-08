@@ -30,6 +30,8 @@ public class BufferConstructor {
 
     public static <T extends FrameBuffer> T createFrameBuffer(int width, int height, FrameBufferSpecification... specBuilders){
         contextCheck();
+        for(FrameBufferSpecification spec : specBuilders)
+            if(spec.attachmentIndex == -1) logger.severe("Framebuffer incomplete: Attachment Index not defined!");
         return (T) new OpenGLFrameBuffer(width, height, specBuilders);
     }
 

@@ -103,7 +103,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                     GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
             rendererAPI.clearBuffer();
-            OxyRenderer.render(skyLightMesh, skyLightShader);
+            OxyRenderer.renderMesh(skyLightMesh, skyLightShader);
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -188,7 +188,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
                 rendererAPI.clearBuffer();
-                OxyRenderer.render(skyLightMesh, shader);
+                OxyRenderer.renderMesh(skyLightMesh, shader);
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
@@ -241,7 +241,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);
                     rendererAPI.clearBuffer();
-                    OxyRenderer.render(skyLightMesh, shader);
+                    OxyRenderer.renderMesh(skyLightMesh, shader);
                 }
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);

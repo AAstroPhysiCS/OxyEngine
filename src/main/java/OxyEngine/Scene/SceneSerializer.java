@@ -7,14 +7,13 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Light.SkyLight;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
-import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
 
@@ -40,9 +39,9 @@ public final class SceneSerializer {
         WRITER.writeScene(new File(path), SceneRuntime.ACTIVE_SCENE);
     }
 
-    public static Scene deserializeScene(String path, SceneLayer layer, OxyShader shader) {
+    public static Scene deserializeScene(String path, SceneLayer layer) {
         if (READER == null) READER = new SceneReader();
-        return READER.readScene(path, layer, shader);
+        return READER.readScene(path, layer);
     }
 
     private static final class SceneWriter {
@@ -162,7 +161,7 @@ public final class SceneSerializer {
                     obj.putField("Direction", e.get(TransformComponent.class).rotation.toString());
                 } else if (l instanceof SkyLight s) {
                     HDRTexture hdrTexture = s.getHDRTexture();
-                    if(hdrTexture != null) obj.putField("Environment Map", s.getHDRTexture().getPath());
+                    if (hdrTexture != null) obj.putField("Environment Map", s.getHDRTexture().getPath());
                     else obj.putField("Environment Map", "null");
                     obj.putField("Environment Gamma Strength", String.valueOf(s.gammaStrength[0]));
                     obj.putField("Environment LOD", String.valueOf(s.mipLevelStrength[0]));
@@ -200,7 +199,7 @@ public final class SceneSerializer {
 
     private static final class SceneReader {
 
-        public Scene readScene(String path, SceneLayer layer, OxyShader shader) {
+        public Scene readScene(String path, SceneLayer layer) {
             SceneRuntime.stop();
 
             var modelsJSON = new OxyJSON.OxyJSONArray();
@@ -229,10 +228,10 @@ public final class SceneSerializer {
 
             for (var root : modelsJSON.getObjectList()) {
                 var familyComponentRoot = new EntityFamily();
-                OxyEntity rootEntity = readFields(root, scene, shader);
+                OxyEntity rootEntity = readFields(root, scene);
                 rootEntity.setFamily(familyComponentRoot);
                 rootEntity.transformLocally();
-                readAllInnerObjects(root, scene, shader, rootEntity);
+                readAllInnerObjects(root, scene, rootEntity);
             }
 
             //I don't have to do this... but just to be sure
@@ -240,23 +239,23 @@ public final class SceneSerializer {
             return scene;
         }
 
-        private static void readAllInnerObjects(OxyJSON.OxyJSONObject root, Scene scene, OxyShader shader, OxyEntity rootEntity) {
+        private static void readAllInnerObjects(OxyJSON.OxyJSONObject root, Scene scene, OxyEntity rootEntity) {
             for (var ent : root.getInnerObjects()) {
                 if (ent.getName().startsWith("Script")) continue;
                 if (ent.getName().startsWith("Light Attributes")) continue;
 
                 var childFamilyComponent = new EntityFamily(rootEntity.getFamily());
-                OxyEntity childEntity = readFields(ent, scene, shader);
+                OxyEntity childEntity = readFields(ent, scene);
                 childEntity.setFamily(childFamilyComponent);
                 childEntity.transformLocally();
                 childEntity.constructData();
 
-                readAllInnerObjects(ent, scene, shader, childEntity);
+                readAllInnerObjects(ent, scene, childEntity);
             }
         }
 
 
-        private static OxyEntity readFields(OxyJSON.OxyJSONObject ent, Scene scene, OxyShader shader) {
+        private static OxyEntity readFields(OxyJSON.OxyJSONObject ent, Scene scene) {
             String name = ent.getField("Name").value();
             String id = ent.getField("ID").value();
             int meshPos = Integer.parseInt(ent.getField("Mesh Position").value());

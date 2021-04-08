@@ -47,6 +47,8 @@ public class ProjectPanel extends Panel {
     public static ImageTexture dirAsset;
     public static ImageTexture dirAssetGrey;
 
+    private static final float[] bg = new float[]{48 / 255f, 46 / 255f, 48 / 255f, 1.0f};
+
     private ProjectPanel() {
 
     }
@@ -104,7 +106,9 @@ public class ProjectPanel extends Panel {
 
                     renderFolderStructureChild();
                     ImGui.sameLine();
+                    ImGui.pushStyleColor(ImGuiCol.Button, bg[0], bg[1], bg[2], bg[3]);
                     renderFolderContentChild();
+                    ImGui.popStyleColor();
 
                     ImGui.endChild();
                 }
@@ -155,7 +159,7 @@ public class ProjectPanel extends Panel {
 
     private void renderFolderStructureChild() {
         ImGui.spacing();
-        ImGui.pushStyleColor(ImGuiCol.ChildBg, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
+        ImGui.pushStyleColor(ImGuiCol.ChildBg, bg[0], bg[1], bg[2], bg[3]);
         ImGui.beginChild("StructureChild", 400, ImGui.getContentRegionAvailY() - 10);
 
         if (ImGui.isMouseClicked(ImGuiMouseButton.Left) && !ImGui.isAnyItemHovered() && ImGui.isWindowHovered()) {
@@ -210,7 +214,7 @@ public class ProjectPanel extends Panel {
     }
 
     private void renderFolderContentChild() {
-        ImGui.pushStyleColor(ImGuiCol.ChildBg, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
+        ImGui.pushStyleColor(ImGuiCol.ChildBg, bg[0], bg[1], bg[2], bg[3]);
         final float childWidth = ImGui.getContentRegionAvailX() - 20;
         final float childHeight = ImGui.getContentRegionAvailY() - 10;
         ImGui.beginChild("ContentChild", childWidth, childHeight);

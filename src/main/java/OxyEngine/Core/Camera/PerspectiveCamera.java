@@ -52,12 +52,4 @@ public abstract class PerspectiveCamera extends OxyCamera {
     public float getZNear() {
         return zNear;
     }
-
-    public Matrix4f getProjectionMatrix() {
-        return projectionMatrix;
-    }
-
-    public Matrix4f getModelMatrix() {
-        return modelMatrix;
-    }
 }

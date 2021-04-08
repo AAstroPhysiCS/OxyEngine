@@ -18,6 +18,10 @@ public abstract class FrameBuffer extends Buffer {
 
     public abstract void resize(float width, float height);
 
+    public abstract void bindDepthAttachment(int specIndex, int index);
+
+    public abstract void bindColorAttachment(int specIndex, int index);
+
     public int getWidth() {
         return width;
     }

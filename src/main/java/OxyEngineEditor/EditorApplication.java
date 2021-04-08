@@ -24,6 +24,7 @@ import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
+import OxyEngine.RenderPass.ShadowRenderPass.DebugPanel;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererContext;
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
@@ -60,7 +61,7 @@ public class EditorApplication extends OxyApplication {
 
         //Editor Camera should be native.
         editorCameraEntity = scene.createNativeObjectEntity();
-        EditorCamera editorCamera = new EditorCamera(true, 50, (float) windowHandle.getWidth() / windowHandle.getHeight(), 1f, 10000f, true);
+        EditorCamera editorCamera = new EditorCamera(true, 45f, (float) windowHandle.getWidth() / windowHandle.getHeight(), 1f, 10000f, true);
         editorCameraEntity.addComponent(new TransformComponent(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f)), editorCamera, new TagComponent("Editor Camera"));
 
         int[] samplers = new int[32];
@@ -83,6 +84,7 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(SceneHierarchyPanel.getInstance());
         uiLayer.addPanel(PropertiesPanel.getInstance());
         uiLayer.addPanel(AnimationPanel.getInstance());
+        uiLayer.addPanel(DebugPanel.getInstance());
 
         layerStack.pushLayer(sceneLayer, gizmoLayer, uiLayer);
         for (Layer l : layerStack.getLayerStack())

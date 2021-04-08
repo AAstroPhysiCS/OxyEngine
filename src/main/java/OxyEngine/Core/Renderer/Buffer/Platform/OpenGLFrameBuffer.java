@@ -139,6 +139,16 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         }
     }
 
+    @Override
+    public void bindDepthAttachment(int specIndex, int index) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, colorAttachments.get(specIndex)[index], 0);
+    }
+
+    @Override
+    public void bindColorAttachment(int specIndex, int index) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, colorAttachments.get(specIndex)[index], 0);
+    }
+
     public static void blit(OpenGLFrameBuffer srcBuffer, OpenGLFrameBuffer destBuffer) {
         glBindFramebuffer(GL_READ_FRAMEBUFFER, srcBuffer.getBufferId());
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destBuffer.getBufferId());

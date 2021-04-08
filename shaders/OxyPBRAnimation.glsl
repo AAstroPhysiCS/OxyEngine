@@ -1,6 +1,8 @@
 //#type fragment
 #version 460 core
 
+#define NUMBER_CASCADES 3 //convert this and many things into uniform buffer objects
+
 layout(location = 0) out vec4 color;
 layout(location = 1) out int o_IDBuffer;
 
@@ -9,7 +11,8 @@ in OUT_VARIABLES {
     vec3 normalsOut;
     vec3 vertexPos;
 
-    //NORMAL MAPPING
+    vec4 lightSpacePos[NUMBER_CASCADES];
+
     mat3 TBN;
 } inVar;
 
@@ -19,7 +22,7 @@ uniform vec3 cameraPos;
 
 flat in int v_ObjectID;
 
-struct Material{
+struct Material {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -76,6 +79,12 @@ uniform samplerCube iblMap;
 //hdr
 uniform float exposure;
 uniform float hdrIntensity;
+
+//shadows
+uniform sampler2D shadowMap[NUMBER_CASCADES];
+uniform vec3 lightShadowDirPos[NUMBER_CASCADES];
+uniform float cascadeSplits[NUMBER_CASCADES];
+in float clipSpacePosZ;
 
 #define PI 3.14159265358979323
 
@@ -135,25 +144,49 @@ vec3 calcPBR(vec3 L, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec
      vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
      vec3 nominator    = NDF * G * F;
-     float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
+     float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
      vec3 specular     = nominator / denominator;
 
-     // kS is equal to Fresnel
      vec3 kS = F;
-     // for energy conservation, the diffuse and specular light can't
-     // be above 1.0 (unless the surface emits light); to preserve this
-     // relationship the diffuse component (kD) should equal 1.0 - kS.
      vec3 kD = vec3(1.0) - kS;
-     // multiply kD by the inverse metalness such that only non-metals
-     // have diffuse lighting, or a linear blend if partly metal (pure metals
-     // have no diffuse light).
+
      kD *= 1.0 - metallic;
 
-     // scale light by NdotL
      float NdotL = max(dot(N, L), 0.0);
 
-     // add to outgoing radiance Lo
-     return (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+     return (kD * albedo / PI + specular) * radiance * NdotL;
+}
+
+float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
+{
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+
+    projCoords = projCoords * 0.5 + 0.5;
+
+    float closestDepth = texture(shadowMap[index], projCoords.xy).r;
+
+    float currentDepth = projCoords.z;
+
+    vec3 normal = norm;
+    //float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = 0.003;
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap[index], 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(shadowMap[index], projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+        }    
+    }
+    shadow /= 9.0;
+    
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+        
+    return shadow;
 }
 
 vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
@@ -191,17 +224,33 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
         emissive = texture(tex[emissiveSlot], inVar.texCoordsOut).rgb * emissiveStrength;
 
     vec3 IBL = texture(iblMap, norm).rgb;
-    if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL = vec3(0.05f, 0.05f, 0.05f);
+    if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL = vec3(0.025f, 0.025f, 0.025f);
 
     vec3 Lo;
     vec3 F0 = vec3(0.04);
+
+    vec4 cascadeIndicator = vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
     F0 = mix(F0, albedo, metallicMap);
     for(int i = 0; i < d_Light.length; i++){
         if(d_Light[i].activeState == 0) continue;
         vec3 lightDir = normalize(-d_Light[i].direction);
 
-        Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0);
+        float shadowCalc = 0.0f;
+        for(int j = 0; j < NUMBER_CASCADES; j++){
+            if(clipSpacePosZ <= cascadeSplits[j]) {
+               shadowCalc = ShadowCalculation(norm, inVar.lightSpacePos[j], lightDir, j);
+               if (j == 0)
+                   cascadeIndicator = vec4(0.1, 0.0, 0.0, 0.0);
+               else if (j == 1)
+                   cascadeIndicator = vec4(0.0, 0.1, 0.0, 0.0);
+               else if (j == 2)
+                   cascadeIndicator = vec4(0.0, 0.0, 0.1, 0.0);
+               break;
+            }
+        }
+
+        Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0) * (1.0 - shadowCalc);
     }
 
     for(int i = 0; i < p_Light.length; i++){
@@ -234,7 +283,7 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
     result = vec3(1.0) - exp(-result * exposure);
     result = pow(result, vec3(1f / gamma));
 
-    return vec4(result, 1.0f);
+    return vec4(result, 1.0f)/* + cascadeIndicator*/;
 }
 
 void main(){
@@ -274,12 +323,19 @@ layout(location = 7) in vec4 weights;
 uniform mat4 v_Matrix;
 uniform mat4 model;
 
+#define NUMBER_CASCADES 3
+
+uniform mat4 lightSpaceMatrix[NUMBER_CASCADES];
+
 flat out int v_ObjectID;
+out float clipSpacePosZ;
 
 out OUT_VARIABLES {
     vec2 texCoordsOut;
     vec3 normalsOut;
     vec3 vertexPos;
+
+    vec4 lightSpacePos[NUMBER_CASCADES];
 
     //NORMAL MAPPING
     mat3 TBN;
@@ -321,6 +377,10 @@ void main(){
     outVar.vertexPos = (model * totalPos).xyz;
     outVar.normalsOut = mat3(model) * totalNorm.xyz;
 
+    for(int i = 0; i < NUMBER_CASCADES; i++){
+        outVar.lightSpacePos[i] = lightSpaceMatrix[i] * model * vec4(pos, 1.0f);
+    }
+
     vec3 T = normalize(mat3(model) * tangent);
     vec3 B = normalize(mat3(model) * biTangent);
     vec3 N = normalize(mat3(model) * totalNorm.xyz);
@@ -330,4 +390,5 @@ void main(){
 
     vec4 modelPos = model * totalPos;
     gl_Position = modelPos * v_Matrix;
+    clipSpacePosZ = gl_Position.z;
 }

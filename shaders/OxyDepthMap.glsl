@@ -12,14 +12,14 @@ layout(location = 6) in vec4 boneIds;
 layout(location = 7) in vec4 weights;
 
 uniform mat4 model;
-uniform mat4 orthoShadow;
+uniform mat4 lightSpaceMatrix;
 const int MAX_BONES = 100;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 
 void main(){
 
     ivec4 boneIDInt = ivec4(boneIds);
-    vec4 totalPos = vec4(pos, 1.0f);
+    vec4 totalPos = vec4(0.0f);
 
     if(boneIDInt[0] == -1 && boneIDInt[1] == -1 && boneIDInt[2] == -1 && boneIDInt[3] == -1){
         //mesh has no animations
@@ -34,5 +34,5 @@ void main(){
         totalPos = transformPos * vec4(pos, 1.0f);
     }
 
-    gl_Position = orthoShadow * model * totalPos;
+    gl_Position = lightSpaceMatrix * model * totalPos;
 }

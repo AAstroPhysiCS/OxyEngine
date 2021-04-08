@@ -48,18 +48,31 @@ public class DirectionalLight extends Light {
         return dir;
     }
 
+    private boolean castShadows;
+
+    public boolean isCastingShadows() {
+        return castShadows;
+    }
+
     final float[] colorIntensityArr = new float[1];
     public static final GUINode guiNode = () -> {
         if (ImGui.treeNodeEx("Directional Light", ImGuiTreeNodeFlags.DefaultOpen)) {
             DirectionalLight dL = entityContext.get(DirectionalLight.class);
             ImGui.columns(2, "env column");
             ImGui.alignTextToFramePadding();
+            ImGui.text("Cast Hard Shadows:");
             ImGui.text("Color intensity:");
             ImGui.nextColumn();
             ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
+
+            if(ImGui.radioButton("##hideLabel dCastShadows", dL.castShadows)){
+                dL.castShadows = !dL.castShadows;
+            }
+
             dL.colorIntensityArr[0] = dL.colorIntensity;
             ImGui.dragFloat("###hidelabel intensity d", dL.colorIntensityArr, 0.1f, 0f, 1000f);
             dL.colorIntensity = dL.colorIntensityArr[0];
+
             ImGui.popItemWidth();
             ImGui.columns(1);
             ImGui.separator();

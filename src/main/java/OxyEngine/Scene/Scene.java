@@ -242,7 +242,7 @@ public final class Scene implements OxyDisposable {
                     new RenderableComponent(RenderingMode.Normal),
                     new OxyMaterialIndex(index)
             );
-            if(modelImporter.getScene().mNumAnimations() > 0){
+            if (modelImporter.getScene().mNumAnimations() > 0) {
                 e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
                 System.gc();
             }
@@ -278,7 +278,7 @@ public final class Scene implements OxyDisposable {
                 new RenderableComponent(RenderingMode.Normal),
                 new OxyMaterialIndex(index)
         );
-        if(modelImporter.getScene().mNumAnimations() > 0){
+        if (modelImporter.getScene().mNumAnimations() > 0) {
             e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
             System.gc();
         }
@@ -309,6 +309,10 @@ public final class Scene implements OxyDisposable {
                 new RenderableComponent(RenderingMode.Normal),
                 new OxyMaterialIndex(materialIndex)
         );
+        if (modelImporter.getScene().mNumAnimations() > 0) {
+            e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
+            System.gc();
+        }
         e.initData(path);
         return e;
     }
@@ -485,12 +489,11 @@ public final class Scene implements OxyDisposable {
     }
 
     public static void openScene() {
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
         String openScene = openDialog(extensionName, null);
         if (openScene != null) {
             SceneRuntime.clearProviders();
             SceneRuntime.stop();
-            ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, SceneLayer.getInstance(), pbrShader);
+            ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene, SceneLayer.getInstance());
             SceneLayer.getInstance().build();
         }
     }

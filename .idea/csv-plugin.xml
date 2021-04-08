@@ -38,6 +38,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\src\main\java\OxyEngine\Core\Renderer\Buffer\Platform\FrameBufferSpecification.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\src\main\java\OxyEngine\Core\Renderer\Buffer\Platform\OpenGLFrameBuffer.java">
           <value>
             <Attribute>

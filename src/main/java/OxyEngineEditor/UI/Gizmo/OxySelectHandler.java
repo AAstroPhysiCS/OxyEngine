@@ -57,7 +57,7 @@ public class OxySelectHandler {
                     }
                 }
                 pbrShader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
-                OxyRenderer.render(e.get(ModelMeshOpenGL.class), currentBoundedCamera, pbrShader);
+                OxyRenderer.renderMesh(e.get(ModelMeshOpenGL.class), currentBoundedCamera, pbrShader);
                 pbrShader.disable();
             }
         }
