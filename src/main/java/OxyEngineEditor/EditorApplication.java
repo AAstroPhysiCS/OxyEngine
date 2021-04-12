@@ -1,11 +1,5 @@
 package OxyEngineEditor;
 
-
-
-import OxyEngine.Components.TagComponent;
-import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Camera.EditorCamera;
-import OxyEngine.Core.Layers.GizmoLayer;
 import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
@@ -13,18 +7,15 @@ import OxyEngine.Core.Renderer.Buffer.Platform.BufferConstructor;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
-import OxyEngine.RenderPass.ShadowRenderPass.DebugPanel;
+import OxyEngine.Core.Renderer.Passes.ShadowRenderPass.DebugPanel;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererContext;
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
@@ -42,13 +33,9 @@ public class EditorApplication extends OxyApplication {
         oxyEngine.start();
     }
 
-    public static OxyNativeObject editorCameraEntity;
-
     @Override
     public void init() {
         oxyEngine.init();
-
-        OxyShader oxyShader = OxyShader.createShader("OxyPBRAnimation","shaders/OxyPBRAnimation.glsl");
 
         scene = new Scene("Test Scene 1",
                 BufferConstructor.createFrameBuffer(windowHandle.getWidth(), windowHandle.getHeight(),
@@ -60,20 +47,10 @@ public class EditorApplication extends OxyApplication {
                                 .useRenderBuffer(true)));
 
         //Editor Camera should be native.
-        editorCameraEntity = scene.createNativeObjectEntity();
-        EditorCamera editorCamera = new EditorCamera(true, 45f, (float) windowHandle.getWidth() / windowHandle.getHeight(), 1f, 10000f, true);
-        editorCameraEntity.addComponent(new TransformComponent(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f)), editorCamera, new TagComponent("Editor Camera"));
-
-        int[] samplers = new int[32];
-        for (int i = 0; i < samplers.length; i++) samplers[i] = i;
-        oxyShader.enable();
-        oxyShader.setUniform1iv("tex", samplers);
-        oxyShader.disable();
 
         SceneRuntime.ACTIVE_SCENE = scene;
 
         SceneLayer sceneLayer = SceneLayer.getInstance();
-        GizmoLayer gizmoLayer = GizmoLayer.getInstance();
         UILayer uiLayer = UILayer.getInstance();
 
         uiLayer.addPanel(StatsPanel.getInstance());
@@ -86,7 +63,7 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(AnimationPanel.getInstance());
         uiLayer.addPanel(DebugPanel.getInstance());
 
-        layerStack.pushLayer(sceneLayer, gizmoLayer, uiLayer);
+        layerStack.pushLayer(sceneLayer, uiLayer);
         for (Layer l : layerStack.getLayerStack())
             l.build();
     }

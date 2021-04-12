@@ -12,7 +12,8 @@ public enum TextureSlot {
     HDR(7),
     IRRADIANCE(8),
     PREFILTER(9),
-    BDRF(10);
+    BDRF(10),
+    CSM(11); // + NUMBER CASCADES
 
     private final int value;
 

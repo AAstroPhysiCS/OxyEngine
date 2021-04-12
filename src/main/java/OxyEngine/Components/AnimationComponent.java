@@ -18,7 +18,7 @@ import static org.lwjgl.assimp.Assimp.aiReleaseImport;
 @SuppressWarnings("ConstantConditions")
 public class AnimationComponent implements EntityComponent {
 
-    private final List<Matrix4f> finalBoneMatrices = new ArrayList<>(MAX_BONES);
+    private List<Matrix4f> finalBoneMatrices = new ArrayList<>(MAX_BONES);
     private final Map<String, BoneInfo> boneInfoMap;
     private final Map<String, OxyNodeAnimation> nodeAnimMap;
     private final AIScene currentAIScene;
@@ -36,7 +36,20 @@ public class AnimationComponent implements EntityComponent {
         animations = new ArrayList<>(scene.mNumAnimations());
     }
 
-    public void stopAnimation(boolean stop){
+    public AnimationComponent(AnimationComponent other) {
+        this.finalBoneMatrices = new ArrayList<>();
+        for (Matrix4f otherMatrix : other.finalBoneMatrices) {
+            finalBoneMatrices.add(new Matrix4f(otherMatrix));
+        }
+        this.boneInfoMap = Map.copyOf(other.boneInfoMap);
+        this.nodeAnimMap = Map.copyOf(other.nodeAnimMap);
+        this.animations = List.copyOf(other.animations);
+        this.rootNode = other.rootNode;
+        this.currentAIScene = other.currentAIScene;
+        this.currentTime = other.currentTime;
+    }
+
+    public void stopAnimation(boolean stop) {
         this.stop = stop;
     }
 
@@ -154,7 +167,7 @@ public class AnimationComponent implements EntityComponent {
         return result.normalize();
     }
 
-    public void addAllNodeChildren(AINode aiNode, OxyNode parentNode){
+    public void addAllNodeChildren(AINode aiNode, OxyNode parentNode) {
         for (int i = 0; i < aiNode.mNumChildren(); i++) {
             AINode children = AINode.create(aiNode.mChildren().get(i));
             OxyNode childrenOxy = new OxyNode(children.mName().dataString(), convertAIMatrixToJOMLMatrix(children.mTransformation()), children.mNumChildren(), new ArrayList<>());
@@ -196,7 +209,7 @@ public class AnimationComponent implements EntityComponent {
     float currentTime = 0;
 
     public void updateAnimation(float dt) {
-        if(stop) return;
+        if (stop) return;
         //Runs one time
         if (animations.size() == 0) {
             for (int i = 0; i < currentAIScene.mNumAnimations(); i++) {
@@ -277,7 +290,7 @@ public class AnimationComponent implements EntityComponent {
         }
 
         public void addAnimationKey(AnimationKeyType type, AnimationKey key) {
-            if(animationKeyMap.containsKey(type)){
+            if (animationKeyMap.containsKey(type)) {
                 animationKeyMap.get(type).add(key);
             } else {
                 List<AnimationKey> list = new ArrayList<>();

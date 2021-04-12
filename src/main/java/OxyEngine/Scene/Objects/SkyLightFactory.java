@@ -13,7 +13,6 @@ import static org.lwjgl.opengl.GL11.GL_FLOAT;
 
 public class SkyLightFactory implements NativeObjectFactory {
 
-    public static final OxyShader skyLightShader = OxyShader.createShader("OxyHDR", "shaders/OxyHDR.glsl");
     public static final NativeObjectMeshOpenGL skyLightMesh =
             new NativeObjectMeshOpenGL(MeshRenderMode.TRIANGLES, BufferLayoutConstructor.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));
 

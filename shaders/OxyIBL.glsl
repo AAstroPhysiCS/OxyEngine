@@ -4,7 +4,7 @@
 layout(location = 0) out vec4 color;
 
 in vec3 localPosOut;
-uniform samplerCube skyBoxTexture;
+uniform samplerCube u_skyBoxTextureIBL;
 
 #define PI 3.14159265358979323
 
@@ -26,7 +26,7 @@ void main(){
             // tangent space to world
             vec3 sampleVec = tangentSample.x * right + tangentSample.y * up + tangentSample.z * N;
 
-            irradiance += texture(skyBoxTexture, sampleVec).rgb * cos(theta) * sin(theta);
+            irradiance += texture(u_skyBoxTextureIBL, sampleVec).rgb * cos(theta) * sin(theta);
             nrSamples++;
         }
     }
@@ -41,10 +41,10 @@ layout(location = 0) in vec3 pos;
 
 out vec3 localPosOut;
 
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 u_viewIBL;
+uniform mat4 u_projectionIBL;
 
 void main(){
     localPosOut = pos;
-    gl_Position = projection * view * vec4(pos, 1.0f);
+    gl_Position = u_projectionIBL * u_viewIBL * vec4(pos, 1.0f);
 }

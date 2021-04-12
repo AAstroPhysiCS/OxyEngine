@@ -4,15 +4,15 @@
 layout(location = 0) out vec4 color;
 
 in vec3 tcsOut;
-uniform samplerCube skyBoxTexture;
-uniform float mipLevel;
-uniform float exposure;
-uniform float gamma;
+uniform samplerCube u_skyBoxTexture;
+uniform float u_mipLevel;
+uniform float u_exposure;
+uniform float u_gamma;
 
 void main(){
-    vec3 textureRGB = textureLod(skyBoxTexture, tcsOut, mipLevel).rgb;
-    textureRGB = vec3(1.0) - exp(-textureRGB * exposure);
-    textureRGB = pow(textureRGB, vec3(1.0/gamma));
+    vec3 textureRGB = textureLod(u_skyBoxTexture, tcsOut, u_mipLevel).rgb;
+    textureRGB = vec3(1.0) - exp(-textureRGB * u_exposure);
+    textureRGB = pow(textureRGB, vec3(1.0/u_gamma));
     color = vec4(textureRGB, 1.0);
 }
 

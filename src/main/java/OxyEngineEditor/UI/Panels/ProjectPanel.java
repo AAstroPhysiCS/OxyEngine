@@ -298,7 +298,7 @@ public class ProjectPanel extends Panel {
                 if (ImGui.isItemClicked()) lastDragDropFile = f;
                 if (lastDragDropFile != null) {
                     if (ImGui.beginDragDropSource()) {
-                        ImGui.setDragDropPayloadObject("projectPanelFile", lastDragDropFile);
+                        ImGui.setDragDropPayload("projectPanelFile", lastDragDropFile);
                         ImGui.endDragDropSource();
                     }
                 }

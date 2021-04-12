@@ -84,17 +84,30 @@ public class SceneHierarchyPanel extends Panel {
                     name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(), 19, 2, 22, 20);
                 }
 
-                if (ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth)) {
+                boolean open = ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth);
 
-                    if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
-                        OxySelectHandler.materialContext = null;
-                        if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
-                        entityContext = e;
-                        entityContext.get(SelectedComponent.class).selected = true;
-                    }
+                if (ImGui.beginDragDropTarget()) {
+                    OxyModel srcEntity = ImGui.acceptDragDropPayload(OxyModel.class);
+                    if (srcEntity != null)
+                        srcEntity.getFamily().setRoot(e.getFamily());
+                    ImGui.endDragDropTarget();
+                }
 
-                    List<OxyEntity> relatedEntities = e.getEntitiesRelatedTo();
-                    renderTreeNode(relatedEntities);
+                if (ImGui.beginDragDropSource()) {
+                    ImGui.setDragDropPayload(e);
+                    ImGui.endDragDropSource();
+                }
+
+                if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
+                    OxySelectHandler.materialContext = null;
+                    if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
+                    entityContext = e;
+                    entityContext.get(SelectedComponent.class).selected = true;
+                }
+
+                if (open) {
+                    List<OxyEntity> relatedToRelated = e.getEntitiesRelatedTo();
+                    renderTreeNode(relatedToRelated);
                     ImGui.treePop();
                 } else {
                     if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
@@ -188,13 +201,28 @@ public class SceneHierarchyPanel extends Panel {
                 name = renderImageBesideTreeNode(name, materialGroupGizmo.getTextureId(), 19, 2, 22, 20f);
             }
 
-            if (ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth)) {
-                if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
-                    OxySelectHandler.materialContext = null;
-                    if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
-                    entityContext = e;
-                    entityContext.get(SelectedComponent.class).selected = true;
-                }
+            boolean open = ImGui.treeNodeEx(name, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanFullWidth);
+
+            if (ImGui.beginDragDropTarget()) {
+                OxyModel srcEntity = ImGui.acceptDragDropPayload(OxyModel.class);
+                if (srcEntity != null)
+                    srcEntity.getFamily().setRoot(e.getFamily());
+                ImGui.endDragDropTarget();
+            }
+
+            if (ImGui.beginDragDropSource()) {
+                ImGui.setDragDropPayload(e);
+                ImGui.endDragDropSource();
+            }
+
+            if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
+                OxySelectHandler.materialContext = null;
+                if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
+                entityContext = e;
+                entityContext.get(SelectedComponent.class).selected = true;
+            }
+
+            if (open) {
                 List<OxyEntity> relatedToRelated = e.getEntitiesRelatedTo();
                 renderTreeNode(relatedToRelated);
                 ImGui.treePop();
@@ -206,6 +234,7 @@ public class SceneHierarchyPanel extends Panel {
                     entityContext.get(SelectedComponent.class).selected = true;
                 }
             }
+
             ImGui.popID();
         }
     }
@@ -242,7 +271,7 @@ public class SceneHierarchyPanel extends Panel {
         ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
         if (ImGui.beginTable("HierarchyTable", 3, ImGuiTableFlags.BordersInnerV)) {
             ImGui.tableSetupColumn("\tName", ImGuiTableColumnFlags.WidthFixed, ImGui.getWindowWidth() / 1.55f);
-            ImGui.tableSetupColumn("View", ImGuiTableColumnFlags.WidthFixed, 30f);
+            ImGui.tableSetupColumn(" View", ImGuiTableColumnFlags.WidthFixed, 35f);
             ImGui.tableSetupColumn("\tType", ImGuiTableColumnFlags.WidthFixed, ImGui.getContentRegionAvailX() / 2);
             ImGui.tableHeadersRow();
 

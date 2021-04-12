@@ -820,12 +820,13 @@ public class PropertiesPanel extends Panel {
             ImGui.popStyleVar();
             ImGui.popStyleColor();
         }
+
         ImGui.end();
     }
 
     private ImageTexture acceptTexturePayload(TextureSlot slot){
         if(ImGui.beginDragDropTarget()) {
-            File f = (File) ImGui.acceptDragDropPayloadObject("projectPanelFile");
+            File f = ImGui.acceptDragDropPayload("projectPanelFile");
             if (f != null) {
                 String fPath = f.getPath();
                 if (isSupportedTextureFile(getExtension(fPath))) {

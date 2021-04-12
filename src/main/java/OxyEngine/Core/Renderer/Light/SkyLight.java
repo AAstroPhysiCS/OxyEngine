@@ -1,5 +1,7 @@
 package OxyEngine.Core.Renderer.Light;
 
+import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.OxyEntity;
@@ -18,13 +20,8 @@ import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class SkyLight extends Light {
 
-    public float[] gammaStrength = new float[]{2.2f};
-    public float[] exposure = new float[]{1.0f};
-
-    public float[] intensity = new float[]{1.0f};
-    public float[] mipLevelStrength = new float[]{0.0f};
-
     public static final int[] indices = new int[skyboxVertices.length];
+
     static {
         for (int i = 0; i < skyboxVertices.length; i++) {
             indices[i] = i;
@@ -35,8 +32,17 @@ public class SkyLight extends Light {
 
     private HDRTexture hdrTexture;
 
-    public SkyLight() {
+    static {
+        OxyShader.createShader("OxySkybox", "shaders/OxySkybox.glsl");
+    }
 
+    public float[] gammaStrength = new float[]{2.2f};
+    public float[] exposure = new float[]{1.0f};
+
+    public float[] intensity = new float[]{1.0f};
+    public float[] mipLevelStrength = new float[]{0.0f};
+
+    public SkyLight() {
     }
 
     public void loadHDR(String pathToHDR) {
@@ -45,8 +51,9 @@ public class SkyLight extends Light {
             logger.severe("Image is not HDR");
             return;
         }
-        if(hdrTexture != null) hdrTexture.dispose();
-        hdrTexture = OxyTexture.loadHDRTexture(pathToHDR);
+
+        if (hdrTexture != null) hdrTexture.dispose();
+        hdrTexture = OxyTexture.loadHDRTexture(pathToHDR, SceneLayer.getInstance().getHDRPipeline());
     }
 
     @Override

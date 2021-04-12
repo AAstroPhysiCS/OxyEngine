@@ -1,5 +1,6 @@
 package OxyEngine.Core.Renderer.Texture;
 
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.System.OxyDisposable;
 import OxyEngine.Scene.Scene;
 import OxyEngine.TextureSlot;
@@ -85,11 +86,11 @@ public class OxyTexture {
         return new CubemapTexture(slot, path, scene);
     }
 
-    public static HDRTexture loadHDRTexture(String path) {
+    public static HDRTexture loadHDRTexture(String path, OxyPipeline hdrPipeline) {
         if (!isValidPath(path)) {
             logger.warning("Path not valid!");
             return null;
         }
-        return new HDRTexture(TextureSlot.HDR, path);
+        return new HDRTexture(TextureSlot.HDR, path, hdrPipeline);
     }
 }

@@ -13,25 +13,23 @@ layout(location = 7) in vec4 weights;
 
 uniform mat4 model;
 uniform mat4 lightSpaceMatrix;
+
 const int MAX_BONES = 100;
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform int animatedModel;
 
 void main(){
 
     ivec4 boneIDInt = ivec4(boneIds);
-    vec4 totalPos = vec4(0.0f);
-
-    if(boneIDInt[0] == -1 && boneIDInt[1] == -1 && boneIDInt[2] == -1 && boneIDInt[3] == -1){
-        //mesh has no animations
-        totalPos = vec4(pos, 1.0f);
-    } else {
+    vec4 totalPos = vec4(pos, 1.0f);
+    if(bool(animatedModel)){
         //mesh has animations
-        mat4 transformPos = finalBonesMatrices[boneIDInt[0]] * weights[0];
-                transformPos += finalBonesMatrices[boneIDInt[1]] * weights[1];
-                transformPos += finalBonesMatrices[boneIDInt[2]] * weights[2];
-                transformPos += finalBonesMatrices[boneIDInt[3]] * weights[3];
+        mat4 transform = finalBonesMatrices[boneIDInt[0]] * weights[0];
+        transform += finalBonesMatrices[boneIDInt[1]] * weights[1];
+        transform += finalBonesMatrices[boneIDInt[2]] * weights[2];
+        transform += finalBonesMatrices[boneIDInt[3]] * weights[3];
 
-        totalPos = transformPos * vec4(pos, 1.0f);
+        totalPos = transform * vec4(pos, 1.0f);
     }
 
     gl_Position = lightSpaceMatrix * model * totalPos;

@@ -6,7 +6,7 @@ import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 
 import static OxyEngine.System.OxyEventSystem.mouseButtonDispatcher;
-import static OxyEngineEditor.EditorApplication.editorCameraEntity;
+import static OxyEngineEditor.UI.Panels.ScenePanel.editorCameraEntity;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 

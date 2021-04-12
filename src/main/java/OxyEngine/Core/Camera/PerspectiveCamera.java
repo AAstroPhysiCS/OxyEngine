@@ -1,5 +1,6 @@
 package OxyEngine.Core.Camera;
 
+import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Matrix4f;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
@@ -31,6 +32,12 @@ public abstract class PerspectiveCamera extends OxyCamera {
         viewMatrixNoTranslation.set(getProjectionMatrix());
         viewMatrixNoTranslation.rotateX(-this.getRotation().x);
         viewMatrixNoTranslation.rotateY(-this.getRotation().y);
+        setViewMatrixInverted();
+    }
+
+    public void setViewMatrixInverted(){
+        viewMatrixInverted = new Matrix4f();
+        viewMatrixInverted.setPerspective((float) Math.toRadians(90), ScenePanel.windowSize.x / ScenePanel.windowSize.y, zNear, zFar);
     }
     
     public void setAspect(float aspect) {

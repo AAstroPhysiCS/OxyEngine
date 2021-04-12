@@ -5,8 +5,7 @@ import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.ScenePanel;
@@ -18,7 +17,6 @@ import java.util.Set;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL44.glClearTexImage;
 
@@ -35,30 +33,33 @@ public class OxySelectHandler {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         OpenGLFrameBuffer pickingBuffer = ACTIVE_SCENE.getPickingBuffer();
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+
         //ID RENDER PASS
         if (pickingBuffer.getBufferId() != 0) {
             int[] clearValue = {-1};
             pickingBuffer.bind();
             rendererAPI.clearBuffer();
             rendererAPI.clearColor(32, 32, 32, 1.0f);
+            OxyPipeline geometryPipeline = SceneLayer.getInstance().getGeometryPipeline();
             glClearTexImage(pickingBuffer.getColorAttachmentTexture(1)[0], 0, pickingBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
             for (OxyEntity e : allModelEntities) {
                 if (!e.has(SelectedComponent.class)) continue;
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
-                pbrShader.enable();
+                geometryPipeline.begin();
                 //ANIMATION UPDATE
+                geometryPipeline.setUniform1i("animatedModel", 0);
                 if (e.has(AnimationComponent.class)) {
+                    geometryPipeline.setUniform1i("animatedModel", 1);
                     AnimationComponent animComp = e.get(AnimationComponent.class);
                     List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
                     for (int j = 0; j < matrix4fList.size(); j++) {
-                        pbrShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                        geometryPipeline.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
                     }
                 }
-                pbrShader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
-                OxyRenderer.renderMesh(e.get(ModelMeshOpenGL.class), currentBoundedCamera, pbrShader);
-                pbrShader.disable();
+                geometryPipeline.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
+                OxyRenderer.renderMesh(geometryPipeline, e.get(ModelMeshOpenGL.class));
+                geometryPipeline.end();
             }
         }
         int id = getEntityID();

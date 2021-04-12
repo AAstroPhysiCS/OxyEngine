@@ -4,10 +4,10 @@
 layout(location = 0) out vec4 color;
 
 in vec3 localPosOut;
-uniform samplerCube skyBoxTexture;
-uniform float roughness;
+uniform samplerCube u_skyBoxTexturePrefilter;
+uniform float u_roughness;
 
-uniform float faceSize;
+uniform float u_faceSize;
 
 #define PI 3.14159265358979323
 
@@ -76,25 +76,25 @@ void main(){
     {
         // generates a sample vector that's biased towards the preferred alignment direction (importance sampling).
         vec2 Xi = Hammersley(i, SAMPLE_COUNT);
-        vec3 H = ImportanceSampleGGX(Xi, N, roughness);
+        vec3 H = ImportanceSampleGGX(Xi, N, u_roughness);
         vec3 L  = normalize(2.0 * dot(V, H) * H - V);
 
         float NdotL = max(dot(N, L), 0.0);
         if(NdotL > 0.0)
         {
             // sample from the environment's mip level based on roughness/pdf
-            float D   = DistributionGGX(N, H, roughness);
+            float D   = DistributionGGX(N, H, u_roughness);
             float NdotH = max(dot(N, H), 0.0);
             float HdotV = max(dot(H, V), 0.0);
             float pdf = D * NdotH / (4.0 * HdotV) + 0.0001;
 
-            float resolution = faceSize; // resolution of source cubemap (per face)
+            float resolution = u_faceSize; // resolution of source cubemap (per face)
             float saTexel  = 4.0 * PI / (6.0 * resolution * resolution);
             float saSample = 1.0 / (float(SAMPLE_COUNT) * pdf + 0.0001);
 
-            float mipLevel = roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
+            float mipLevel = u_roughness == 0.0 ? 0.0 : 0.5 * log2(saSample / saTexel);
 
-            prefilteredColor += textureLod(skyBoxTexture, L, mipLevel).rgb * NdotL;
+            prefilteredColor += textureLod(u_skyBoxTexturePrefilter, L, mipLevel).rgb * NdotL;
             totalWeight      += NdotL;
         }
     }
@@ -109,10 +109,10 @@ void main(){
 layout(location = 0) in vec3 pos;
 
 out vec3 localPosOut;
-uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 u_viewPrefilter;
+uniform mat4 u_projectionPrefilter;
 
 void main(){
     localPosOut = pos;
-    gl_Position = projection * view * vec4(pos, 1.0f);
+    gl_Position = u_projectionPrefilter * u_viewPrefilter * vec4(pos, 1.0f);
 }

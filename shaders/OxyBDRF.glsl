@@ -4,8 +4,6 @@
 layout(location = 0) out vec2 color;
 
 in vec2 tcsOut;
-uniform samplerCube skyBoxTexture;
-uniform float roughness;
 
 #define PI 3.14159265358979323
 

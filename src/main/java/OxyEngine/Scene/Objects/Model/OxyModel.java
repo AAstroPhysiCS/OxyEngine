@@ -66,6 +66,7 @@ public class OxyModel extends OxyEntity {
 
         if (this.has(PointLight.class)) e.addComponent(this.get(PointLight.class));
         if (this.has(DirectionalLight.class)) e.addComponent(this.get(DirectionalLight.class));
+        if (this.has(AnimationComponent.class)) e.addComponent(new AnimationComponent(this.get(AnimationComponent.class)));
 
         //SCRIPTS (with GUINode-Script)
         for (OxyScript s : this.getScripts()) e.addScript(new OxyScript(s.getPath()));

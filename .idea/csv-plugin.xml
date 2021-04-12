@@ -59,6 +59,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\src\main\java\OxyEngine\Core\Renderer\Texture\HDRTexture.java">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\src\main\java\OxyEngine\GeometryPipeline.java">
           <value>
             <Attribute>
@@ -102,6 +109,13 @@
           </value>
         </entry>
         <entry key="\src\main\java\OxyEngine\Scene\Objects\Model\OxyModelLoader.java">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\src\main\java\OxyEngine\Scene\Objects\WorldGrid.java">
           <value>
             <Attribute>
               <option name="separator" value=";" />

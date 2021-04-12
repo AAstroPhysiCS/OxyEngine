@@ -14,7 +14,7 @@ public abstract class OxyCamera implements EntityComponent {
 
     protected final boolean transpose;
     protected boolean primary;
-    protected Matrix4f viewMatrix, modelMatrix, projectionMatrix, viewMatrixNoTranslation = new Matrix4f();
+    protected Matrix4f viewMatrix, viewMatrixInverted = new Matrix4f(), modelMatrix, projectionMatrix, viewMatrixNoTranslation = new Matrix4f();
 
     protected Vector3f rotationRef;
     protected Vector3f positionRef;
@@ -46,6 +46,10 @@ public abstract class OxyCamera implements EntityComponent {
 
     public Matrix4f getViewMatrix() {
         return viewMatrix;
+    }
+
+    public Matrix4f getViewMatrixInverted() {
+        return viewMatrixInverted;
     }
 
     public Matrix4f getViewMatrixNoTranslation() {

@@ -1,7 +1,7 @@
 //#type fragment
 #version 460 core
 
-#define NUMBER_CASCADES 3 //convert this and many things into uniform buffer objects
+#define NUMBER_CASCADES 3 //TODO: convert this and many things into uniform buffer objects
 
 layout(location = 0) out vec4 color;
 layout(location = 1) out int o_IDBuffer;
@@ -59,8 +59,10 @@ uniform DirectionalLight d_Light[4];
 uniform int normalMapSlot = -1;
 uniform float normalMapStrength;
 vec3 normalMap;
+
 //GAMMA
 uniform float gamma;
+
 //PBR
 uniform int albedoMapSlot;
 uniform int metallicSlot;
@@ -71,11 +73,14 @@ uniform int aoSlot;
 uniform float aoStrength;
 uniform int emissiveSlot;
 uniform float emissiveStrength;
+
 //PBR FILTERING
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
+
 //irradiance
 uniform samplerCube iblMap;
+
 //hdr
 uniform float exposure;
 uniform float hdrIntensity;
@@ -85,11 +90,11 @@ uniform sampler2D shadowMap[NUMBER_CASCADES];
 uniform vec3 lightShadowDirPos[NUMBER_CASCADES];
 uniform float cascadeSplits[NUMBER_CASCADES];
 in float clipSpacePosZ;
+uniform int castShadows;
 
 #define PI 3.14159265358979323
 
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a = roughness*roughness;
     float a2 = a*a;
     float NdotH = max(dot(N, H), 0.0);
@@ -102,8 +107,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
     return nom / max(denom, 0.001); // prevent divide by zero for roughness=0.0 and NdotH=1.0
 }
 
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
+float GeometrySchlickGGX(float NdotV, float roughness) {
     float r = (roughness + 1.0);
     float k = (r*r) / 8.0;
 
@@ -113,8 +117,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
     return nom / denom;
 }
 
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     float NdotV = max(dot(N, V), 0.0);
     float NdotL = max(dot(N, L), 0.0);
     float ggx2 = GeometrySchlickGGX(NdotV, roughness);
@@ -123,13 +126,11 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
     return ggx1 * ggx2;
 }
 
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
-{
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
-{
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
@@ -168,8 +169,7 @@ float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
     float currentDepth = projCoords.z;
 
     vec3 normal = norm;
-    //float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-    float bias = 0.003;
+    float bias = 0.001;
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap[index], 0);
@@ -237,16 +237,19 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
         vec3 lightDir = normalize(-d_Light[i].direction);
 
         float shadowCalc = 0.0f;
-        for(int j = 0; j < NUMBER_CASCADES; j++){
-            if(clipSpacePosZ <= cascadeSplits[j]) {
-               shadowCalc = ShadowCalculation(norm, inVar.lightSpacePos[j], lightDir, j);
-               if (j == 0)
-                   cascadeIndicator = vec4(0.1, 0.0, 0.0, 0.0);
-               else if (j == 1)
-                   cascadeIndicator = vec4(0.0, 0.1, 0.0, 0.0);
-               else if (j == 2)
-                   cascadeIndicator = vec4(0.0, 0.0, 0.1, 0.0);
-               break;
+
+        if(bool(castShadows)){
+            for(int j = 0; j < NUMBER_CASCADES; j++){
+                if(clipSpacePosZ <= cascadeSplits[j]) {
+                   shadowCalc = ShadowCalculation(norm, inVar.lightSpacePos[j], lightDir, j);
+                   if (j == 0)
+                       cascadeIndicator = vec4(0.1, 0.0, 0.0, 0.0);
+                   else if (j == 1)
+                       cascadeIndicator = vec4(0.0, 0.1, 0.0, 0.0);
+                   else if (j == 2)
+                       cascadeIndicator = vec4(0.0, 0.0, 0.1, 0.0);
+                   break;
+                }
             }
         }
 
@@ -343,6 +346,7 @@ out OUT_VARIABLES {
 
 const int MAX_BONES = 100;
 uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform int animatedModel;
 
 void main(){
 
@@ -350,28 +354,22 @@ void main(){
     outVar.texCoordsOut = tcs;
 
     ivec4 boneIDInt = ivec4(boneIds);
-    vec4 totalPos = vec4(0.0f);
-    vec4 totalNorm = vec4(0.0f);
+    vec4 totalPos = vec4(pos, 1.0f);
+    vec4 totalNorm = vec4(normals, 1.0f);
+    vec4 finalTangent = vec4(tangent, 1.0f);
+    vec4 finalBiTangent = vec4(biTangent, 1.0f);
 
-    if(boneIDInt[0] == -1 && boneIDInt[1] == -1 && boneIDInt[2] == -1 && boneIDInt[3] == -1){
-        //mesh has no animations
-        totalPos = vec4(pos, 1.0f);
-        totalNorm = vec4(normals, 1.0f);
-    } else {
+    if(bool(animatedModel)){
         //mesh has animations
-        mat4 transformPos = finalBonesMatrices[boneIDInt[0]] * weights[0];
-                transformPos += finalBonesMatrices[boneIDInt[1]] * weights[1];
-                transformPos += finalBonesMatrices[boneIDInt[2]] * weights[2];
-                transformPos += finalBonesMatrices[boneIDInt[3]] * weights[3];
+        mat4 transform = finalBonesMatrices[boneIDInt[0]] * weights[0];
+             transform += finalBonesMatrices[boneIDInt[1]] * weights[1];
+             transform += finalBonesMatrices[boneIDInt[2]] * weights[2];
+             transform += finalBonesMatrices[boneIDInt[3]] * weights[3];
 
-        totalPos = transformPos * vec4(pos, 1.0f);
-
-        mat4 transformNorm = finalBonesMatrices[boneIDInt[0]] * weights[0];
-                transformNorm += finalBonesMatrices[boneIDInt[1]] * weights[1];
-                transformNorm += finalBonesMatrices[boneIDInt[2]] * weights[2];
-                transformNorm += finalBonesMatrices[boneIDInt[3]] * weights[3];
-
-        totalNorm = transformNorm * vec4(normals, 0.0f);
+        totalPos = transform * vec4(pos, 1.0f);
+        totalNorm = transform * vec4(normals, 0.0f);
+        finalTangent = transform * vec4(tangent, 0.0f);
+        finalBiTangent = transform * vec4(biTangent, 0.0f);
     }
 
     outVar.vertexPos = (model * totalPos).xyz;
@@ -381,8 +379,8 @@ void main(){
         outVar.lightSpacePos[i] = lightSpaceMatrix[i] * model * vec4(pos, 1.0f);
     }
 
-    vec3 T = normalize(mat3(model) * tangent);
-    vec3 B = normalize(mat3(model) * biTangent);
+    vec3 T = normalize(mat3(model) * finalTangent.xyz);
+    vec3 B = normalize(mat3(model) * finalBiTangent.xyz);
     vec3 N = normalize(mat3(model) * totalNorm.xyz);
 
     mat3 TBN = mat3(T, B, N);

@@ -63,7 +63,7 @@ public class OxyKeyEvent extends OxyEvent {
 
         if (keyEventDispatcher.getKeyState(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
                 keyEventDispatcher.getKeyState(GLFW_KEY_G) == GLFW_PRESS) {
-            SceneLayer.getInstance().recompileShader();
+            SceneLayer.getInstance().recompileGeometryShader();
         }
     }
 }

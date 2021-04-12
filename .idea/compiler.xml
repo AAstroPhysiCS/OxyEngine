@@ -9,8 +9,8 @@
         <module name="OxyEngine" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="OxyEngine - Editor" target="14" />
-    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_STRING" value="--add-modules jdk.incubator.foreign" />
   </component>
 </project>

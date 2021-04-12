@@ -3,8 +3,8 @@ package OxyEngine.Core.Renderer.Texture;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Scene;
@@ -100,7 +100,7 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
             int[] height = new int[1];
             int[] channels = new int[1];
             ByteBuffer buffer = stbi_load(totalFiles.get(i), width, height, channels, 0);
-            if (buffer == null){
+            if (buffer == null) {
                 logger.warning("Texture: " + path + " could not be loaded!");
                 return;
             }
@@ -118,21 +118,24 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
-    public void init(Set<EntityComponent> allOtherShaders) {
+    public void init(Set<OxyPipeline> allOtherPipelines) {
 
-        for (EntityComponent s : allOtherShaders) {
-            OxyShader ss = (OxyShader) s;
-            ss.enable();
-            ss.setUniform1i("skyBoxTexture", textureSlot.getValue());
-            ss.disable();
+        for (OxyPipeline s : allOtherPipelines) {
+            s.begin();
+            s.setUniform1i("skyBoxTexture", textureSlot.getValue());
+            s.end();
         }
 
         if (shader == null) {
 
             shader = OxyShader.createShader("OxySkybox", "shaders/OxySkybox.glsl");
-            shader.enable();
-            shader.setUniform1i("skyBoxTexture", textureSlot.getValue());
-            shader.disable();
+            OxyPipeline skyBoxPipeline = OxyPipeline.createNewPipeline(OxyPipeline.createNewSpecification()
+                    .setDebugName("Cube Map Texture Rendering Pipeline")
+                    .setShader(shader));
+
+            skyBoxPipeline.begin();
+            skyBoxPipeline.setUniform1i("skyBoxTexture", textureSlot.getValue());
+            skyBoxPipeline.end();
 
             NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL(MeshRenderMode.TRIANGLES, BufferLayoutConstructor.Usage.STATIC, new BufferLayoutAttributes(OxyShader.VERTICES, 3, GL_FLOAT, false, 0, 0));
             OxyNativeObject cube = scene.createNativeObjectEntity();

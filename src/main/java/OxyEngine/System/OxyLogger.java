@@ -48,7 +48,7 @@ public class OxyLogger extends Formatter {
     private String getDateFromMillis(){
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
-        return date.toString() + " " + time;
+        return date + " " + time;
     }
 
     public static StringBuilder getHistory() {

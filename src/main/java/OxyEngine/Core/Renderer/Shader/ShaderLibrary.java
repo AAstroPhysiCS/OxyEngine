@@ -18,6 +18,13 @@ public class ShaderLibrary {
         throw new IllegalStateException("No Shader named: " + shaderName);
     }
 
+    public static boolean has(String shaderName){
+        for(OxyShader s : shaderLibrary){
+            if(s.getName().equals(shaderName)) return true;
+        }
+        return false;
+    }
+
     static void addShaders(OxyShader shader){
         if(!check(shader)) {
             logger.severe("Adding shaders that is already in the library");

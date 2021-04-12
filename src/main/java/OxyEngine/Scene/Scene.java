@@ -13,8 +13,7 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Scene.Objects.Importer.ImporterType;
 import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
@@ -460,19 +459,19 @@ public final class Scene implements OxyDisposable {
                 it.remove();
             }
         }
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+        OxyPipeline pbrPipeline = SceneLayer.getInstance().getGeometryPipeline();
         for (int i = 0; i < LIGHT_SIZE; i++) {
-            pbrShader.enable();
-            pbrShader.setUniformVec3("p_Light[" + i + "].position", 0, 0, 0);
-            pbrShader.setUniformVec3("p_Light[" + i + "].diffuse", 0, 0, 0);
-            pbrShader.setUniform1f("p_Light[" + i + "].constant", 0);
-            pbrShader.setUniform1f("p_Light[" + i + "].linear", 0);
-            pbrShader.setUniform1f("p_Light[" + i + "].quadratic", 0);
+            pbrPipeline.begin();
+            pbrPipeline.setUniformVec3("p_Light[" + i + "].position", 0, 0, 0);
+            pbrPipeline.setUniformVec3("p_Light[" + i + "].diffuse", 0, 0, 0);
+            pbrPipeline.setUniform1f("p_Light[" + i + "].constant", 0);
+            pbrPipeline.setUniform1f("p_Light[" + i + "].linear", 0);
+            pbrPipeline.setUniform1f("p_Light[" + i + "].quadratic", 0);
 
-            pbrShader.setUniformVec3("d_Light[" + i + "].direction", 0, 0, 0);
-            pbrShader.setUniformVec3("d_Light[" + i + "].diffuse", 0, 0, 0);
+            pbrPipeline.setUniformVec3("d_Light[" + i + "].direction", 0, 0, 0);
+            pbrPipeline.setUniformVec3("d_Light[" + i + "].diffuse", 0, 0, 0);
 
-            pbrShader.disable();
+            pbrPipeline.end();
         }
     }
 

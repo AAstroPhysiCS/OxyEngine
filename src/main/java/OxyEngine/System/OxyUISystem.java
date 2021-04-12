@@ -86,8 +86,8 @@ public class OxyUISystem {
         File[] file = new File(OxySystem.FileSystem.getResourceByPath("/fonts/")).listFiles();
         assert file != null;
         for (File f : file) {
-            OxyFontSystem.load(io, f.getPath(), 15, f.getName().split("\\.")[0]);
-            OxyFontSystem.load(io, f.getPath(), 18, f.getName().split("\\.")[0]);
+            OxyFontSystem.load(io, f.getPath(), 16, f.getName().split("\\.")[0]);
+            OxyFontSystem.load(io, f.getPath(), 19, f.getName().split("\\.")[0]);
         }
 
         imGuiRenderer.init(gl_Version);

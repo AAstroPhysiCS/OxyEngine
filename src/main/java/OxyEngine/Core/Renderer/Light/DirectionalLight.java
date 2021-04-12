@@ -1,8 +1,8 @@
 package OxyEngine.Core.Renderer.Light;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
+import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
@@ -29,7 +29,6 @@ public class DirectionalLight extends Light {
 
     @Override
     public void update(OxyEntity e, int i) {
-        OxyShader shader = ShaderLibrary.get("OxyPBRAnimation");
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
         TransformComponent t = e.get(TransformComponent.class);
 
@@ -37,18 +36,19 @@ public class DirectionalLight extends Light {
         new Matrix4f(t.transform).normalize3x3(transform3x3);
         dir = transform3x3.transform(new Vector3f(1.0f));
 
-        shader.enable();
-        shader.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
-        shader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
-        shader.setUniform1i("d_Light[" + i + "].activeState", 1);
-        shader.disable();
+        OxyPipeline pbrPipeline = SceneLayer.getInstance().getGeometryPipeline();
+        pbrPipeline.begin();
+        pbrPipeline.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
+        pbrPipeline.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
+        pbrPipeline.setUniform1i("d_Light[" + i + "].activeState", 1);
+        pbrPipeline.end();
     }
 
     public Vector3f getDirection() {
         return dir;
     }
 
-    private boolean castShadows;
+    private boolean castShadows = true;
 
     public boolean isCastingShadows() {
         return castShadows;

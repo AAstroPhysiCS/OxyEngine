@@ -75,7 +75,6 @@ public class OxyEngine implements OxyDisposable {
         });
         windowHandle.init();
         glfwSwapInterval(vSync ? 1 : 0);
-
         OxyRenderCommand.init(debug);
     }
 

@@ -70,8 +70,7 @@ public final class SceneSerializer {
                 String tagRoot = "null";
                 if (root.has(MeshPosition.class)) meshPosRoot = root.get(MeshPosition.class).meshPos();
                 if (root.has(TagComponent.class)) tagRoot = root.get(TagComponent.class).tag();
-                boolean emittingRoot = false;
-                if (root.has(Light.class)) emittingRoot = true;
+                boolean emittingRoot = root.has(Light.class);
 
                 obj.putField("ID", idRoot)
                         .putField("Mesh Position", String.valueOf(meshPosRoot))
@@ -94,8 +93,7 @@ public final class SceneSerializer {
                 String tag = "null";
                 if (e.has(MeshPosition.class)) meshPos = e.get(MeshPosition.class).meshPos();
                 if (e.has(TagComponent.class)) tag = e.get(TagComponent.class).tag();
-                boolean emitting = false;
-                if (e.has(Light.class)) emitting = true;
+                boolean emitting = e.has(Light.class);
 
                 var obj = arr.createInnerObject(e.get(TagComponent.class).tag())
                         .putField("ID", id)
@@ -327,8 +325,6 @@ public final class SceneSerializer {
                     modelInstance.addComponent(new PointLight(colorIntensity, constant, linear, quadratic));
                     modelInstance.getGUINodes().add(PointLight.guiNode);
                 } else if (emittingType.equals(DirectionalLight.class.getSimpleName())) {
-                    Vector3f dir = parseStringToVector3f(lightAttributes.getField("Direction").value());
-
                     modelInstance.addComponent(new DirectionalLight(colorIntensity));
                     modelInstance.getGUINodes().add(DirectionalLight.guiNode);
                 }

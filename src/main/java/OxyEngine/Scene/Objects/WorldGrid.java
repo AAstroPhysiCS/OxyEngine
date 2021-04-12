@@ -1,9 +1,11 @@
 package OxyEngine.Scene.Objects;
 
 import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Renderer.Shader.OxyShader;
 import OxyEngine.Scene.Objects.Native.NativeObjectFactory;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
@@ -18,7 +20,10 @@ public class WorldGrid {
     private final NativeObjectMeshOpenGL worldGridMesh;
     public static OxyNativeObject grid;
 
-    public static final OxyShader gridShader = OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
+    private static final OxyShader gridShader = OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
+    public static final OxyPipeline gridPipeline = OxyPipeline.createNewPipeline(OxyPipeline.createNewSpecification()
+            .setDebugName("Grid Rendering Pipeline")
+            .setShader(gridShader));
 
     public WorldGrid(Scene scene, int size) {
         this.scene = scene;
@@ -26,6 +31,7 @@ public class WorldGrid {
                 NativeObjectMeshOpenGL.attributeVert);
         add(size);
         worldGridMesh.addToBuffer();
+        SceneLayer.getInstance().updateNativeEntities();
     }
 
     private void add(int size) {
@@ -52,6 +58,7 @@ public class WorldGrid {
                     0.5f, 0.5f, -0.5f,
             };
         }
+
         int vertPtr = 0;
 
         public void constructData(OxyNativeObject e, int size) {
@@ -72,6 +79,7 @@ public class WorldGrid {
                 e.vertices[vertPtr++] = transformed.z;
             }
         }
+
         int indicesPtr = 0;
 
         public void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh) {
@@ -79,7 +87,7 @@ public class WorldGrid {
                     mesh.indicesX, 1 + mesh.indicesY, 3 + mesh.indicesZ,
                     3 + mesh.indicesX, mesh.indicesY, 2 + mesh.indicesZ,
             };
-            if(e.indices == null) e.indices = new int[indices.length * e.getSize()];
+            if (e.indices == null) e.indices = new int[indices.length * e.getSize()];
             for (int index : indices) {
                 e.indices[indicesPtr++] = index;
             }

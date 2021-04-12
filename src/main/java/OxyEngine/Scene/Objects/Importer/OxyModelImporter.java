@@ -30,12 +30,10 @@ public class OxyModelImporter {
             aiProcess_LimitBoneWeights |
             aiProcess_RemoveRedundantMaterials |
             aiProcess_Triangulate |
+            aiProcess_GenUVCoords |
             aiProcess_FlipUVs |
 //            aiProcess_PreTransformVertices |
-            aiProcess_SplitLargeMeshes |
-            aiProcess_SortByPType |
-            aiProcess_FindDegenerates |
-            aiProcess_FindInstances |
+//            aiProcess_SplitLargeMeshes |
             aiProcess_FindInvalidData |
             aiProcess_OptimizeMeshes;
 
