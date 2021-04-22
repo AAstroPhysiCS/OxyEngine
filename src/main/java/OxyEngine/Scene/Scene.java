@@ -95,7 +95,7 @@ public final class Scene implements OxyDisposable {
         skyLightEnt.setFactory(new SkyLight.Factory());
         if (entityContext != null) skyLightEnt.setFamily(new EntityFamily(entityContext.getFamily()));
         skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight());
-        skyLightEnt.addComponent(new NativeObjectMeshOpenGL(SceneRenderer.getInstance().getHDRPipeline()));
+        skyLightEnt.addComponent(SkyLight.mesh);
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
             skyLightEnt.getGUINodes().add(SkyLight.guiNode);
         skyLightEnt.initData();

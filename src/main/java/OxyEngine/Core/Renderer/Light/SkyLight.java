@@ -24,6 +24,8 @@ public class SkyLight extends Light {
 
     private boolean primary;
 
+    public static final NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL(SceneRenderer.getInstance().getHDRPipeline());
+
     private HDRTexture hdrTexture;
 
     static {

@@ -6,23 +6,26 @@ import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.OxyApplication;
+import OxyEngine.OxyEngine;
+import org.lwjgl.glfw.GLFW;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
+import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.*;
 
 public final class OxyRenderer {
 
-    private OxyRenderer(){}
-
-    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyShader shader){
-        pipeline.updatePipelineShader();
-        shader.begin();
-        pipeline.setCameraUniforms(shader, currentBoundedCamera);
-        if (mesh.empty())
-            mesh.load(pipeline);
-        mesh.render();
-        shader.end();
+    private static final Thread renderThread = new Thread(run(), "Oxy Renderer - OpenGL Thread");
+    static {
+        renderThread.start();
     }
+
+    private OxyRenderer(){}
 
     public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera){
         pipeline.updatePipelineShader();
@@ -52,6 +55,16 @@ public final class OxyRenderer {
             mesh.load(pipeline);
         mesh.render();
         pipeline.getShader().end();
+    }
+
+    public static Runnable run(){
+        return () -> {
+            while(!glfwWindowShouldClose(OxyEngine.getWindowHandle().getPointer())){
+                if (keyEventDispatcher.getKeys()[GLFW.GLFW_KEY_ESCAPE]) break;
+
+                RenderQueue.runQueue();
+            }
+        };
     }
 
     public static record Stats() {
