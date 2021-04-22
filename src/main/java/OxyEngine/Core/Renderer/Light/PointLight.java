@@ -1,8 +1,8 @@
 package OxyEngine.Core.Renderer.Light;
 
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
@@ -34,16 +34,16 @@ public class PointLight extends Light {
 
     @Override
     public void update(OxyEntity e, int i) {
-        OxyPipeline pbrPipeline = SceneLayer.getInstance().getGeometryPipeline();
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
         OxyMaterial material = OxyMaterialPool.getMaterial(e);
-        pbrPipeline.begin();
-        pbrPipeline.setUniformVec3("p_Light[" + i + "].position", e.get(TransformComponent.class).worldSpacePosition);
-        pbrPipeline.setUniformVec3("p_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
-        pbrPipeline.setUniform1f("p_Light[" + i + "].constant", constant);
-        pbrPipeline.setUniform1f("p_Light[" + i + "].linear", linear);
-        pbrPipeline.setUniform1f("p_Light[" + i + "].quadratic", quadratic);
-        pbrPipeline.setUniform1i("p_Light[" + i + "].activeState", 1);
-        pbrPipeline.end();
+        pbrShader.begin();
+        pbrShader.setUniformVec3("p_Light[" + i + "].position", e.get(TransformComponent.class).worldSpacePosition);
+        pbrShader.setUniformVec3("p_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
+        pbrShader.setUniform1f("p_Light[" + i + "].constant", constant);
+        pbrShader.setUniform1f("p_Light[" + i + "].linear", linear);
+        pbrShader.setUniform1f("p_Light[" + i + "].quadratic", quadratic);
+        pbrShader.setUniform1i("p_Light[" + i + "].activeState", 1);
+        pbrShader.end();
     }
 
     public float getConstantValue() {

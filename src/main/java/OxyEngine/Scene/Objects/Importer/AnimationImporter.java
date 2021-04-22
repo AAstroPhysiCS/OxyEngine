@@ -39,7 +39,7 @@ public non-sealed class AnimationImporter implements ModelImporterFactory {
                     boneID = boneCounter;
                     boneCounter++;
                 } else {
-                    boneID = boneInfoMap.get(boneName).getId();
+                    boneID = boneInfoMap.get(boneName).id();
                 }
 
                 AIVertexWeight.Buffer weights = bone.mWeights();

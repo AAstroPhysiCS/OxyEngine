@@ -2,7 +2,6 @@ package OxyEngine.Scene;
 
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Threading.OxyProviderThread;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
@@ -52,7 +51,7 @@ public final class SceneRuntime {
     private static final List<TransformComponent> transformComponents = new ArrayList<>();
 
     private static void saveSceneState() {
-        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) {
+        for (OxyEntity e : SceneRenderer.getInstance().allModelEntities) {
             transformComponents.add(new TransformComponent(e.get(TransformComponent.class)));
         }
     }
@@ -61,7 +60,7 @@ public final class SceneRuntime {
         if (transformComponents.size() == 0) return;
 
         int i = 0;
-        for (OxyEntity e : SceneLayer.getInstance().allModelEntities) e.addComponent(transformComponents.get(i++));
+        for (OxyEntity e : SceneRenderer.getInstance().allModelEntities) e.addComponent(transformComponents.get(i++));
         transformComponents.clear();
     }
 

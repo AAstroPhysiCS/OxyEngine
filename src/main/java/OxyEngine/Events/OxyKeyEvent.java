@@ -1,7 +1,7 @@
 package OxyEngine.Events;
 
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
 
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
@@ -27,9 +27,9 @@ public class OxyKeyEvent extends OxyEvent {
         if (keyEventDispatcher.getKeys()[GLFW_KEY_DELETE] && entityContext != null) {
             SceneRuntime.stop();
             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
-            SceneLayer.getInstance().updateModelEntities();
-            SceneLayer.getInstance().updateCameraEntities();
-            SceneLayer.getInstance().updateNativeEntities();
+            SceneRenderer.getInstance().updateModelEntities();
+            SceneRenderer.getInstance().updateCameraEntities();
+            SceneRenderer.getInstance().updateNativeEntities();
             entityContext = null;
             System.gc();
         }
@@ -37,7 +37,7 @@ public class OxyKeyEvent extends OxyEvent {
         if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_CONTROL] && keyEventDispatcher.getKeys()[GLFW_KEY_C] &&
                 entityContext instanceof OxyModel m && !cPressed) {
             m.copyMe();
-            SceneLayer.getInstance().updateModelEntities();
+            SceneRenderer.getInstance().updateModelEntities();
             cPressed = true;
             System.gc();
         }
@@ -63,7 +63,7 @@ public class OxyKeyEvent extends OxyEvent {
 
         if (keyEventDispatcher.getKeyState(GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS &&
                 keyEventDispatcher.getKeyState(GLFW_KEY_G) == GLFW_PRESS) {
-            SceneLayer.getInstance().recompileGeometryShader();
+            SceneRenderer.getInstance().recompileGeometryShader();
         }
     }
 }

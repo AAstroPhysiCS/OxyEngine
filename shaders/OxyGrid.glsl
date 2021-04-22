@@ -10,9 +10,10 @@ void main(){
 //#type vertex
 #version 460 core
 
-layout(location = 0) in vec4 pos;
-layout(location = 4) uniform mat4 v_Matrix;
+layout(location = 0) in vec3 pos;
+
+uniform mat4 v_Matrix;
 
 void main(){
-    gl_Position = pos * v_Matrix;
+    gl_Position = vec4(pos, 1.0f) * v_Matrix;
 }

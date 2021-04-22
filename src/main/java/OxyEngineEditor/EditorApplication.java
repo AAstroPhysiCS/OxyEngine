@@ -3,10 +3,6 @@ package OxyEngineEditor;
 import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
-import OxyEngine.Core.Renderer.Buffer.Platform.BufferConstructor;
-import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
-import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
-import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
@@ -15,7 +11,7 @@ import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
 import org.lwjgl.glfw.GLFW;
-import OxyEngine.Core.Renderer.Passes.ShadowRenderPass.DebugPanel;
+import OxyEngine.Core.Renderer.ShadowRender.DebugPanel;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererContext;
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
@@ -37,16 +33,7 @@ public class EditorApplication extends OxyApplication {
     public void init() {
         oxyEngine.init();
 
-        scene = new Scene("Test Scene 1",
-                BufferConstructor.createFrameBuffer(windowHandle.getWidth(), windowHandle.getHeight(),
-                        OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
-                                .setTextureCount(1)
-                                .setAttachmentIndex(0)
-                                .setMultiSampled(true)
-                                .setFormats(FrameBufferTextureFormat.RGBA8, FrameBufferTextureFormat.DEPTH24STENCIL8)
-                                .useRenderBuffer(true)));
-
-        //Editor Camera should be native.
+        scene = new Scene("Test Scene 1");
 
         SceneRuntime.ACTIVE_SCENE = scene;
 

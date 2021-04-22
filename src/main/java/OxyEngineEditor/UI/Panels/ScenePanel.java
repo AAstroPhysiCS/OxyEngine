@@ -5,13 +5,14 @@ import OxyEngine.Components.TagComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.EditorCamera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
+import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiStyleVar;
@@ -65,12 +66,12 @@ public class ScenePanel extends Panel {
         ImGui.getCursorPos(offset);
         ImGui.getCursorScreenPos(offsetScreenPos);
 
-        if (editorCameraEntity == null) {
+        if (editorCameraEntity == null) { //editor camera init
             editorCameraEntity = ACTIVE_SCENE.createNativeObjectEntity();
             EditorCamera editorCamera = new EditorCamera(true, 45f, ScenePanel.windowSize.x / ScenePanel.windowSize.y, 1f, 10000f, true);
             editorCameraEntity.addComponent(new TransformComponent(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f)), editorCamera, new TagComponent("Editor Camera"));
             currentBoundedCamera = editorCamera;
-            SceneLayer.getInstance().mainCamera = editorCamera;
+            SceneRenderer.getInstance().mainCamera = editorCamera;
         }
 
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
@@ -80,7 +81,7 @@ public class ScenePanel extends Panel {
         ImVec2 availContentRegionSize = new ImVec2();
         ImGui.getContentRegionAvail(availContentRegionSize);
 
-        OpenGLFrameBuffer blittedFrameBuffer = ACTIVE_SCENE.getBlittedFrameBuffer();
+        OpenGLFrameBuffer blittedFrameBuffer = SceneRenderer.getInstance().getBlittedFrameBuffer();
 
         if (blittedFrameBuffer != null) {
             ImGui.image(blittedFrameBuffer.getColorAttachmentTexture(0)[0], blittedFrameBuffer.getWidth(), blittedFrameBuffer.getHeight(), 0, 1, 1, 0);
@@ -98,7 +99,7 @@ public class ScenePanel extends Panel {
                             if (!e.getGUINodes().contains(OxyMaterial.guiNode))
                                 e.getGUINodes().add(OxyMaterial.guiNode);
                         }
-                        SceneLayer.getInstance().updateModelEntities();
+                        SceneRenderer.getInstance().updateModelEntities();
                     }
                     ProjectPanel.lastDragDropFile = null;
                 }
@@ -106,11 +107,10 @@ public class ScenePanel extends Panel {
             }
 
             if (availContentRegionSize.x != blittedFrameBuffer.getWidth() || availContentRegionSize.y != blittedFrameBuffer.getHeight()) {
-                OpenGLFrameBuffer pickingBuffer = ACTIVE_SCENE.getPickingBuffer();
-                OpenGLFrameBuffer srcFrameBuffer = ACTIVE_SCENE.getFrameBuffer();
+                OpenGLFrameBuffer srcFrameBuffer = SceneRenderer.getInstance().getFrameBuffer();
                 blittedFrameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
                 srcFrameBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
-                pickingBuffer.resize(availContentRegionSize.x, availContentRegionSize.y);
+                OxySelectHandler.resizePickingBuffer(availContentRegionSize.x, availContentRegionSize.y);
                 if (SceneRuntime.currentBoundedCamera instanceof PerspectiveCamera p)
                     p.setAspect((float) blittedFrameBuffer.getWidth() / blittedFrameBuffer.getHeight());
             }

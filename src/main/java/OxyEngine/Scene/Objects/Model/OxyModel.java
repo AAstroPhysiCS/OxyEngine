@@ -1,14 +1,14 @@
 package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
-import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Renderer.OxyRenderPass;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
+import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scripting.OxyScript;
 
@@ -59,14 +59,11 @@ public class OxyModel extends OxyEntity {
         );
 
         e.setFamily(new EntityFamily(this.getFamily().root()));
-        /*for (OxyEntity child : getEntitiesRelatedTo()) {
-            child.copyMe();
-            child.setFamily(new EntityFamily(e.getFamily()));
-        }*/
 
         if (this.has(PointLight.class)) e.addComponent(this.get(PointLight.class));
         if (this.has(DirectionalLight.class)) e.addComponent(this.get(DirectionalLight.class));
-        if (this.has(AnimationComponent.class)) e.addComponent(new AnimationComponent(this.get(AnimationComponent.class)));
+        if (this.has(AnimationComponent.class))
+            e.addComponent(new AnimationComponent(this.get(AnimationComponent.class)));
 
         //SCRIPTS (with GUINode-Script)
         for (OxyScript s : this.getScripts()) e.addScript(new OxyScript(s.getPath()));
@@ -77,14 +74,26 @@ public class OxyModel extends OxyEntity {
         SceneRuntime.stop();
 
         if (has(OpenGLMesh.class)) e.initData(get(OpenGLMesh.class).getPath());
+
+        copyChildRecursive(e);
+
         return e;
+    }
+
+    private void copyChildRecursive(OxyEntity parent) {
+        for (OxyEntity child : getEntitiesRelatedTo()) {
+            OxyEntity copy = child.copyMe();
+            copy.setFamily(new EntityFamily(parent.getFamily()));
+        }
     }
 
     public void initData(String meshPath) {
         assert factory != null : oxyAssert("Models should have a Model Template");
         transformLocally();
         factory.constructData(this);
-        addComponent(new ModelMeshOpenGL(meshPath, MeshRenderMode.TRIANGLES, BufferLayoutConstructor.Usage.DYNAMIC, vertices, indices, tcs, normals, tangents, biTangents));
+        OxyRenderPass geometryRenderPass = SceneRenderer.getInstance().getGeometryPipeline().getRenderPass();
+        addComponent(new ModelMeshOpenGL(SceneRenderer.getInstance().getGeometryPipeline(), meshPath, geometryRenderPass.getMeshRenderingMode(),
+                vertices, indices, tcs, normals, tangents, biTangents));
     }
 
     @Override

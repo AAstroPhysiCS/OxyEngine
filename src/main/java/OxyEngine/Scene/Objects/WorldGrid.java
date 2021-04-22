@@ -1,40 +1,62 @@
 package OxyEngine.Scene.Objects;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
+import OxyEngine.Core.Renderer.Buffer.IndexBuffer;
+import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
+import OxyEngine.Core.Renderer.CullMode;
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
+import OxyEngine.Core.Renderer.OxyRenderPass;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Renderer.Pipeline.ShaderType;
 import OxyEngine.Scene.Objects.Native.NativeObjectFactory;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.Scene;
+import OxyEngine.Scene.SceneRenderer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class WorldGrid {
 
-    private final Scene scene;
-    private final NativeObjectMeshOpenGL worldGridMesh;
     public static OxyNativeObject grid;
-
-    private static final OxyShader gridShader = OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
-    public static final OxyPipeline gridPipeline = OxyPipeline.createNewPipeline(OxyPipeline.createNewSpecification()
-            .setDebugName("Grid Rendering Pipeline")
-            .setShader(gridShader));
+    private static OxyPipeline gridPipeline;
 
     public WorldGrid(Scene scene, int size) {
-        this.scene = scene;
-        worldGridMesh = new NativeObjectMeshOpenGL(MeshRenderMode.LINES, BufferLayoutConstructor.Usage.STATIC,
-                NativeObjectMeshOpenGL.attributeVert);
-        add(size);
-        worldGridMesh.addToBuffer();
-        SceneLayer.getInstance().updateNativeEntities();
+        initPipeline();
+        var worldGridMesh = new NativeObjectMeshOpenGL(gridPipeline);
+        add(worldGridMesh, scene, size);
+        worldGridMesh.addToBuffer(gridPipeline);
+        SceneRenderer.getInstance().updateNativeEntities();
     }
 
-    private void add(int size) {
+    public static void initPipeline(){
+        OxyShader gridShader = OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
+
+        OxyRenderPass gridRenderPass = OxyRenderPass.createBuilder(SceneRenderer.getInstance().getFrameBuffer())
+                .renderingMode(MeshRenderMode.LINES)
+                .setCullFace(CullMode.BACK)
+                .create();
+
+        gridPipeline = OxyPipeline.createNewPipeline(OxyPipeline.createNewSpecification()
+                .setDebugName("Grid Pipeline")
+                .setRenderPass(gridRenderPass)
+                .createLayout(OxyPipeline.createNewPipelineLayout()
+                        .targetBuffer(VertexBuffer.class)
+                        .set(OxyShader.VERTICES, ShaderType.Float3)
+                )
+                .createLayout(OxyPipeline.createNewPipelineLayout()
+                        .targetBuffer(IndexBuffer.class)
+                )
+                .setShader(gridShader));
+    }
+
+    public static OxyPipeline getPipeline() {
+        return gridPipeline;
+    }
+
+    private void add(NativeObjectMeshOpenGL worldGridMesh, Scene scene, int size) {
         grid = scene.createNativeObjectEntity(size * size * 4);
         grid.setFactory(new GridFactory());
         grid.addComponent(worldGridMesh);

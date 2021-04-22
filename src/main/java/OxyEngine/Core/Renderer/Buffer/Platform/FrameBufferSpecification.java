@@ -1,5 +1,8 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class FrameBufferSpecification {
 
     int attachmentIndex = -1;
@@ -16,6 +19,8 @@ public class FrameBufferSpecification {
     int level = -1;
 
     int textureCount = -1;
+
+    final Map<Integer, int[]> sizeForTextures = new HashMap<>();
 
     public FrameBufferSpecification setTextureCount(int textureCount){
         this.textureCount = textureCount;
@@ -57,6 +62,11 @@ public class FrameBufferSpecification {
     public FrameBufferSpecification setFilter(int paramMinFilter, int paramMagFilter) {
         this.paramMagFilter = paramMagFilter;
         this.paramMinFilter = paramMinFilter;
+        return this;
+    }
+
+    public FrameBufferSpecification setSizeForTextures(int textureIndex, int width, int height){
+        sizeForTextures.put(textureIndex, new int[]{width, height});
         return this;
     }
 

@@ -1,4 +1,4 @@
-package OxyEngine.Core.Renderer.Shader;
+package OxyEngine.Core.Renderer.Pipeline;
 
 import OxyEngine.System.OxySystem;
 

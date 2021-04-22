@@ -42,11 +42,6 @@ public class UILayer extends Layer {
     }
 
     @Override
-    public void rebuild() {
-
-    }
-
-    @Override
     public void update(float ts) {
         OxyEngine.getWindowHandle().update();
     }

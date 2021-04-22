@@ -1,7 +1,6 @@
 package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
@@ -39,9 +38,9 @@ public final class SceneSerializer {
         WRITER.writeScene(new File(path), SceneRuntime.ACTIVE_SCENE);
     }
 
-    public static Scene deserializeScene(String path, SceneLayer layer) {
+    public static Scene deserializeScene(String path) {
         if (READER == null) READER = new SceneReader();
-        return READER.readScene(path, layer);
+        return READER.readScene(path);
     }
 
     private static final class SceneWriter {
@@ -197,7 +196,7 @@ public final class SceneSerializer {
 
     private static final class SceneReader {
 
-        public Scene readScene(String path, SceneLayer layer) {
+        public Scene readScene(String path) {
             SceneRuntime.stop();
 
             var modelsJSON = new OxyJSON.OxyJSONArray();
@@ -213,14 +212,14 @@ public final class SceneSerializer {
             Scene oldScene = SceneRuntime.ACTIVE_SCENE;
             oldScene.disposeAllModels();
 
-            Scene scene = new Scene(sceneName, oldScene.getFrameBuffer(), oldScene.getBlittedFrameBuffer(), oldScene.getPickingBuffer());
+            Scene scene = new Scene(sceneName);
             for (var n : oldScene.getEntityEntrySet()) {
                 OxyEntity key = n.getKey();
                 scene.put(key);
                 scene.addComponent(key, n.getValue().toArray(EntityComponent[]::new));
             }
             OxySelectHandler.entityContext = null;
-            layer.clear();
+            SceneRenderer.getInstance().clear();
 
             Scene.optimization_Path = "";
 

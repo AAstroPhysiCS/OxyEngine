@@ -1,15 +1,15 @@
 package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
-import OxyEngine.Core.Renderer.Shader.ShaderLibrary;
+import OxyEngine.Core.Renderer.Pipeline.OxyShader;
+import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.TextureSlot;
 import org.joml.Matrix4f;
 
 import java.nio.FloatBuffer;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
-import static OxyEngine.Scene.Objects.SkyLightFactory.skyLightMesh;
+import static OxyEngine.Core.Renderer.Light.SkyLight.skyLightMesh;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
@@ -43,16 +43,16 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
     private final OxyPipeline hdrPipeline;
 
-    HDRTexture(TextureSlot slot, String path, OxyPipeline pipeline) {
+    HDRTexture(TextureSlot slot, String path) {
         super(slot, path);
         assert slot.getValue() != 0 : oxyAssert("Slot can not be 0");
-        this.hdrPipeline = pipeline;
+        this.hdrPipeline = SceneRenderer.getInstance().getHDRPipeline();
         load();
     }
 
     private void load(){
 
-        hdrPipeline.setShader(ShaderLibrary.get("OxyHDR"));
+        OxyShader hdrShader = hdrPipeline.getShader();
 
         captureFBO = glGenFramebuffers();
         captureRBO = glGenRenderbuffers();
@@ -92,34 +92,35 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        hdrPipeline.begin();
-        hdrPipeline.setUniform1i("u_hdrTexture", 0);
-        hdrPipeline.setUniformMatrix4fv("u_projectionHDR", captureProjection, true);
-        hdrPipeline.end();
+        hdrShader.begin();
+        hdrShader.setUniform1i("u_hdrTexture", 0);
+        hdrShader.setUniformMatrix4fv("u_projectionHDR", captureProjection, true);
+        hdrShader.end();
+
+        if(skyLightMesh.empty())
+            skyLightMesh.load(hdrPipeline);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, hdrTexture);
         glViewport(0, 0, 1920, 1920);
         glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
         for (int i = 0; i < 6; ++i) {
-            hdrPipeline.begin();
-            hdrPipeline.setUniformMatrix4fv("u_viewHDR", captureViews[i], true);
+            hdrShader.begin();
+            hdrShader.setUniformMatrix4fv("u_viewHDR", captureViews[i], true);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                     GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
             rendererAPI.clearBuffer();
-            if (skyLightMesh.empty())
-                skyLightMesh.load();
             skyLightMesh.render();
-            hdrPipeline.end();
+            hdrShader.end();
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-        irradianceTexture = new IrradianceTexture(TextureSlot.IRRADIANCE, path, this, hdrPipeline);
-        prefilterTexture = new PrefilterTexture(TextureSlot.PREFILTER, path, this, hdrPipeline);
-        bdrf = new BDRF(TextureSlot.BDRF, path, this, hdrPipeline);
+        irradianceTexture = new IrradianceTexture(TextureSlot.IRRADIANCE, path, this);
+        prefilterTexture = new PrefilterTexture(TextureSlot.PREFILTER, path, this);
+        bdrf = new BDRF(TextureSlot.BDRF, path, this);
 
         OxyTexture.unbindAllTextures();
     }
@@ -162,10 +163,8 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
         final static OxyShader shader = OxyShader.createShader("OxyIBL", "shaders/OxyIBL.glsl");
 
-        IrradianceTexture(TextureSlot slot, String path, HDRTexture mainTexture, OxyPipeline pipeline) {
+        IrradianceTexture(TextureSlot slot, String path, HDRTexture mainTexture) {
             super(slot, path);
-
-            pipeline.setShader(shader);
 
             textureId = glGenTextures();
             glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
@@ -183,25 +182,23 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glBindRenderbuffer(GL_RENDERBUFFER, mainTexture.captureRBO);
             glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
 
-            pipeline.begin();
-            pipeline.setUniform1i("u_skyBoxTextureIBL", 0);
-            pipeline.setUniformMatrix4fv("u_projectionIBL", captureProjection, true);
-            pipeline.end();
+            shader.begin();
+            shader.setUniform1i("u_skyBoxTextureIBL", 0);
+            shader.setUniformMatrix4fv("u_projectionIBL", captureProjection, true);
+            shader.end();
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_CUBE_MAP, mainTexture.textureId);
             glViewport(0, 0, 32, 32);
             glBindFramebuffer(GL_FRAMEBUFFER, mainTexture.captureFBO);
             for (int i = 0; i < 6; ++i) {
-                pipeline.begin();
-                pipeline.setUniformMatrix4fv("u_viewIBL", captureViews[i], true);
+                shader.begin();
+                shader.setUniformMatrix4fv("u_viewIBL", captureViews[i], true);
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
                 rendererAPI.clearBuffer();
-                if (skyLightMesh.empty())
-                    skyLightMesh.load();
                 skyLightMesh.render();
-                pipeline.end();
+                shader.end();
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
@@ -211,10 +208,8 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
         final static OxyShader shader = OxyShader.createShader("OxyPrefiltering", "shaders/OxyPrefiltering.glsl");
 
-        PrefilterTexture(TextureSlot slot, String path, HDRTexture mainTexture, OxyPipeline pipeline) {
+        PrefilterTexture(TextureSlot slot, String path, HDRTexture mainTexture) {
             super(slot, path);
-
-            pipeline.setShader(shader);
 
             textureId = glGenTextures();
             glBindTexture(GL_TEXTURE_CUBE_MAP, textureId);
@@ -229,11 +224,11 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-            pipeline.begin();
-            pipeline.setUniform1i("u_skyBoxTexturePrefilter", 0);
-            pipeline.setUniformMatrix4fv("u_projectionPrefilter", captureProjection, true);
-            pipeline.setUniform1f("u_faceSize", 1920);
-            pipeline.end();
+            shader.begin();
+            shader.setUniform1i("u_skyBoxTexturePrefilter", 0);
+            shader.setUniformMatrix4fv("u_projectionPrefilter", captureProjection, true);
+            shader.setUniform1f("u_faceSize", 1920);
+            shader.end();
 
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_CUBE_MAP, mainTexture.textureId);
@@ -246,19 +241,17 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, mipWidth, mipHeight);
                 glViewport(0, 0, mipWidth, mipHeight);
                 float roughness = (float) mip / (float) (maxMipLevels - 1);
-                pipeline.begin();
-                pipeline.setUniform1f("u_roughness", roughness);
-                pipeline.end();
+                shader.begin();
+                shader.setUniform1f("u_roughness", roughness);
+                shader.end();
                 for (int i = 0; i < 6; ++i) {
-                    pipeline.begin();
-                    pipeline.setUniformMatrix4fv("u_viewPrefilter", captureViews[i], true);
+                    shader.begin();
+                    shader.setUniformMatrix4fv("u_viewPrefilter", captureViews[i], true);
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);
                     rendererAPI.clearBuffer();
-                    if (skyLightMesh.empty())
-                        skyLightMesh.load();
                     skyLightMesh.render();
-                    pipeline.end();
+                    shader.end();
                 }
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -269,10 +262,8 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
 
         final static OxyShader shader = OxyShader.createShader("OxyBDRF", "shaders/OxyBDRF.glsl");
 
-        BDRF(TextureSlot slot, String path, HDRTexture mainTexture, OxyPipeline pipeline) {
+        BDRF(TextureSlot slot, String path, HDRTexture mainTexture) {
             super(slot, path);
-
-            pipeline.setShader(shader);
 
             textureId = glGenTextures();
             glBindTexture(GL_TEXTURE_2D, textureId);
@@ -289,9 +280,9 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
             glViewport(0, 0, 512, 512);
             rendererAPI.clearBuffer();
-            pipeline.begin();
+            shader.begin();
             renderQuad();
-            pipeline.end();
+            shader.end();
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
     }

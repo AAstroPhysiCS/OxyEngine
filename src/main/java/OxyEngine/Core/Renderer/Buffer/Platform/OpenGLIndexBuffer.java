@@ -1,7 +1,7 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Buffer.IndexBuffer;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
 import static org.lwjgl.opengl.GL15.*;
@@ -9,8 +9,8 @@ import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public final class OpenGLIndexBuffer extends IndexBuffer {
 
-    OpenGLIndexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl) {
-        super(impl);
+    OpenGLIndexBuffer(OxyPipeline.Layout layout) {
+        super(layout);
     }
 
     @Override
@@ -49,5 +49,6 @@ public final class OpenGLIndexBuffer extends IndexBuffer {
     public void dispose() {
         indices = null;
         glDeleteBuffers(bufferId);
+        bufferId = 0;
     }
 }

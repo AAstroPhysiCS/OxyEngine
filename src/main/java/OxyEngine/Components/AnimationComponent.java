@@ -300,18 +300,6 @@ public class AnimationComponent implements EntityComponent {
         }
     }
 
-    public static class BoneInfo {
-
-        private final Matrix4f offset;
-        private final int id;
-
-        public BoneInfo(int id, Matrix4f offset) {
-            this.id = id;
-            this.offset = offset;
-        }
-
-        public int getId() {
-            return id;
-        }
+    public record BoneInfo(int id, Matrix4f offset) {
     }
 }

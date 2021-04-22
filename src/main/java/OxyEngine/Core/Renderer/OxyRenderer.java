@@ -4,31 +4,54 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.OxyApplication;
 
 import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
 import static org.lwjgl.opengl.GL11.*;
 
-public class OxyRenderer {
+public final class OxyRenderer {
 
     private OxyRenderer(){}
 
+    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyShader shader){
+        pipeline.updatePipelineShader();
+        shader.begin();
+        pipeline.setCameraUniforms(shader, currentBoundedCamera);
+        if (mesh.empty())
+            mesh.load(pipeline);
+        mesh.render();
+        shader.end();
+    }
+
     public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera){
-        pipeline.begin();
+        pipeline.updatePipelineShader();
+        pipeline.getShader().begin();
         pipeline.setCameraUniforms(camera);
         if (mesh.empty())
-            mesh.load();
+            mesh.load(pipeline);
         mesh.render();
-        pipeline.end();
+        pipeline.getShader().end();
+    }
+
+    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera, OxyShader shader){
+        pipeline.updatePipelineShader();
+        shader.begin();
+        pipeline.setCameraUniforms(shader, camera);
+        if (mesh.empty())
+            mesh.load(pipeline);
+        mesh.render();
+        shader.end();
     }
 
     public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh){
-        pipeline.begin();
+        pipeline.updatePipelineShader();
+        pipeline.getShader().begin();
         pipeline.setCameraUniforms(currentBoundedCamera);
         if (mesh.empty())
-            mesh.load();
+            mesh.load(pipeline);
         mesh.render();
-        pipeline.end();
+        pipeline.getShader().end();
     }
 
     public static record Stats() {
@@ -60,13 +83,13 @@ public class OxyRenderer {
                         X: %s,
                         Y: %s,
                         Z: %s
-                    Current Origin: 
-                        X: %s, 
-                        Y: %s, 
+                    Current Origin:
+                        X: %s,
+                        Y: %s,
                         Z: %s
-                    Current Rotation: 
-                        X: %s, 
-                        Y: %s, 
+                    Current Rotation:
+                        X: %s,
+                        Y: %s,
                         Z: %s
                     Zoom: %s
                     """.formatted(OxyApplication.FRAME_TIME,

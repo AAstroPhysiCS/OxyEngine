@@ -3,7 +3,10 @@ package OxyEngine.Core.Renderer.Buffer;
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Renderer.Buffer.Platform.*;
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
+import OxyEngine.Core.Renderer.Mesh.MeshUsage;
 import OxyEngine.Core.Renderer.OxyRenderer;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Renderer.Pipeline.ShaderType;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 
@@ -34,7 +37,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         return path;
     }
 
-    public void load() {
+    public void load(OxyPipeline pipeline) {
 
         if (vao == 0) vao = glCreateVertexArrays();
         glBindVertexArray(vao);
@@ -45,10 +48,12 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         if (tangentBuffer != null) if (tangentBuffer.glBufferNull() && !tangentBuffer.emptyData()) tangentBuffer.load();
         if (textureBuffer != null) if (textureBuffer.glBufferNull() && !textureBuffer.emptyData()) textureBuffer.load();
 
-        if (vertexBuffer.getImplementation().getUsage() == BufferLayoutConstructor.Usage.DYNAMIC) {
+        if (vertexBuffer.getUsage() == MeshUsage.DYNAMIC) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.getBufferId());
             glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer.getVertices());
         }
+
+        processPipeline(pipeline);
     }
 
     private void draw() {
@@ -58,7 +63,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
     private void bind() {
         glBindVertexArray(vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.bufferId);
-        if (vertexBuffer.getImplementation().getUsage() == BufferLayoutConstructor.Usage.DYNAMIC && vertexBuffer.offsetToUpdate != -1) {
+        if (vertexBuffer.getUsage() == MeshUsage.DYNAMIC && vertexBuffer.offsetToUpdate != -1) {
             glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.bufferId);
             glBufferSubData(GL_ARRAY_BUFFER, vertexBuffer.offsetToUpdate, vertexBuffer.dataToUpdate);
 
@@ -81,11 +86,11 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         entities.add(e);
     }
 
-    public void addToBuffer() {
+    public void addToBuffer(OxyPipeline pipeline) {
         vertexBuffer.addToBuffer(OxyEntity.sumAllVertices(entities));
         indexBuffer.addToBuffer(OxyEntity.sumAllIndices(entities));
 
-        load();
+        load(pipeline);
         entities.clear();
     }
 
@@ -103,14 +108,58 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
     public void dispose() {
         entities.clear();
         vertexBuffer.dispose();
-        indexBuffer.dispose();
+        if (indexBuffer != null) indexBuffer.dispose();
         if (textureBuffer != null) textureBuffer.dispose();
         if (normalsBuffer != null) normalsBuffer.dispose();
         if (tangentBuffer != null) tangentBuffer.dispose();
         glDeleteVertexArrays(vao);
+        vao = 0;
     }
 
     public void setRenderingMode(MeshRenderMode mode) {
         this.mode = mode;
+    }
+
+    private void processPipeline(OxyPipeline pipeline) {
+        for (OxyPipeline.Layout layout : pipeline.getLayouts()) {
+
+            int offset = 0;
+            int stride = 0;
+
+            //stride = 0 when just vertexbuffer and indexbuffer is defined
+            if(pipeline.getLayouts().size() != 2){ //vertexbuffer and indexbuffer
+                for (var type : layout.shaderLayout().values()) {
+                    stride += type.getSize();
+                }
+            }
+
+            if(layout.getTargetBuffer().equals(VertexBuffer.class)){
+                glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.bufferId);
+            } else if(layout.getTargetBuffer().equals(IndexBuffer.class)){
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.bufferId);
+            } else if(layout.getTargetBuffer().equals(TextureBuffer.class)){
+                glBindBuffer(GL_ARRAY_BUFFER, textureBuffer.bufferId);
+            } else if(layout.getTargetBuffer().equals(NormalsBuffer.class)){
+                glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer.bufferId);
+            } else if(layout.getTargetBuffer().equals(TangentBuffer.class)){
+                glBindBuffer(GL_ARRAY_BUFFER, tangentBuffer.bufferId);
+            }
+
+            for (var entrySet : layout.shaderLayout().entrySet()) {
+                int bufferIndex = entrySet.getKey();
+                ShaderType type = entrySet.getValue();
+
+                glEnableVertexAttribArray(bufferIndex);
+                switch (type) {
+                    case Float1, Float2, Float3, Float4, Matrix3f, Matrix4f -> glVertexAttribPointer(bufferIndex, type.getSize(), type.getOpenGLType(), layout.normalized(), stride * Float.BYTES, (long) offset * Float.BYTES);
+                    case Int1, Int2, Int3, Int4 -> glVertexAttribIPointer(bufferIndex, type.getSize(), type.getOpenGLType(), stride * Float.BYTES, (long) offset * Integer.BYTES);
+                    default -> throw new IllegalStateException("No implementation to a type");
+                }
+                offset += type.getSize();
+            }
+
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        }
     }
 }

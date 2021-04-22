@@ -1,16 +1,21 @@
 package OxyEngine.Core.Renderer.Buffer;
 
+import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLIndexBuffer;
+import OxyEngine.Core.Renderer.Context.OpenGLRendererAPI;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+
+import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 
 public abstract class IndexBuffer extends Buffer {
 
     protected int length;
     protected int[] indices;
 
-    protected final BufferLayoutConstructor.BufferLayoutImpl impl;
+    protected final OxyPipeline.Layout layout;
 
-    public IndexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl) {
-        this.impl = impl;
+    public IndexBuffer(OxyPipeline.Layout layout) {
+        this.layout = layout;
     }
 
     protected abstract void copy(int[] m_indices);
@@ -33,5 +38,19 @@ public abstract class IndexBuffer extends Buffer {
 
     public boolean emptyData() {
         return indices == null;
+    }
+
+    public static <T extends IndexBuffer> T create(OxyPipeline pipeline){
+        if(rendererAPI instanceof OpenGLRendererAPI) {
+            var layout = pipeline.getLayout(IndexBuffer.class);
+            try {
+                var constructor = OpenGLIndexBuffer.class.getDeclaredConstructor(OxyPipeline.Layout.class);
+                constructor.setAccessible(true);
+                return (T) constructor.newInstance(layout);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        throw new IllegalStateException("API not supported yet!");
     }
 }

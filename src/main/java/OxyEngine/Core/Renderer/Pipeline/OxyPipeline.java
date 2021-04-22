@@ -1,35 +1,39 @@
 package OxyEngine.Core.Renderer.Pipeline;
 
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Renderer.Passes.OxyRenderPass;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
+import OxyEngine.Core.Renderer.Buffer.Buffer;
+import OxyEngine.Core.Renderer.OxyRenderPass;
 
-import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL20.*;
+import static OxyEngine.System.OxySystem.logger;
 
 public final class OxyPipeline {
 
-    protected OxyShader shader;
-    protected final String debugName;
-    //protected OxyRenderPass renderPass;
+    private OxyShader shader;
+    private final String debugName;
+    private final List<Layout> layouts;
+    private final OxyRenderPass renderPass;
 
-    protected final Map<String, ? super Number> parameterLocations = new HashMap<>();
-
-    private OxyPipeline(PipelineSpecification builder){
+    private OxyPipeline(PipelineSpecification builder) {
         this.shader = builder.shader;
         this.debugName = builder.debugName;
+        this.layouts = builder.layouts;
+        this.renderPass = builder.renderPass;
     }
 
-    public static PipelineSpecification createNewSpecification(){
+    public static PipelineSpecification createNewSpecification() {
         return new PipelineSpecification();
+    }
+
+    //if the shader has been recompiled...
+    //we are destroying the old shader and we need to update shader reference for this class too
+    public void updatePipelineShader() {
+        String name = shader.getName();
+        shader = ShaderLibrary.get(name);
     }
 
     interface Builder {
@@ -39,97 +43,131 @@ public final class OxyPipeline {
         Builder setRenderPass(OxyRenderPass renderPass);
 
         Builder setDebugName(String name);
+
+        Builder createLayout(Layout layout);
     }
 
-    public static OxyPipeline createNewPipeline(PipelineSpecification builder){
+    public static final class Layout {
+
+        private final Map<Integer, ShaderType> shaderLayout;
+        private boolean normalized;
+        private Class<? extends Buffer> bufferClass;
+
+        public Layout(Map<Integer, ShaderType> shaderLayout) {
+            this.shaderLayout = shaderLayout;
+        }
+
+        public Layout set(int shaderPos, ShaderType type) {
+            if (bufferClass == null) throw new IllegalStateException("Buffer class not defined!");
+            if (shaderLayout.containsKey(shaderPos)) {
+                logger.severe("Shader layout duplicate name error!");
+                return this;
+            }
+            shaderLayout.put(shaderPos, type);
+            return this;
+        }
+
+        public Layout targetBuffer(Class<? extends Buffer> bufferClass) {
+            this.bufferClass = bufferClass;
+            return this;
+        }
+
+        public Layout normalized(boolean normalized) {
+            this.normalized = normalized;
+            return this;
+        }
+
+        public Map<Integer, ShaderType> shaderLayout() {
+            return shaderLayout;
+        }
+
+        public boolean normalized() {
+            return normalized;
+        }
+
+        public Class<? extends Buffer> getTargetBuffer() {
+            return bufferClass;
+        }
+    }
+
+    public static class PipelineSpecification implements OxyPipeline.Builder {
+
+        OxyShader shader;
+        String debugName;
+        List<Layout> layouts;
+        OxyRenderPass renderPass;
+
+        PipelineSpecification() {
+        }
+
+        @Override
+        public PipelineSpecification setShader(OxyShader shader) {
+            this.shader = shader;
+            return this;
+        }
+
+        @Override
+        public PipelineSpecification setRenderPass(OxyRenderPass renderPass) {
+            this.renderPass = renderPass;
+            return this;
+        }
+
+        @Override
+        public PipelineSpecification setDebugName(String name) {
+            this.debugName = name;
+            return this;
+        }
+
+        @Override
+        public PipelineSpecification createLayout(Layout layout) {
+            if (layouts == null) layouts = new ArrayList<>();
+            layouts.add(layout);
+            return this;
+        }
+    }
+
+    public static Layout createNewPipelineLayout() {
+        return new Layout(new HashMap<>());
+    }
+
+    public static OxyPipeline createNewPipeline(PipelineSpecification builder) {
+        if(builder.renderPass == null) throw new IllegalStateException("RenderPass is null!");
+        if(builder.shader == null) throw new IllegalStateException("Shader is null!");
         return new OxyPipeline(builder);
     }
 
-    public void begin(){
-        glUseProgram(shader.getProgram());
+    public List<Layout> getLayouts() {
+        return layouts;
     }
 
-    public void setShader(OxyShader shader){
-        this.shader = shader;
+    public Layout getLayout(Class<? extends Buffer> bufferClass) {
+        for (Layout l : layouts) {
+            if (l.bufferClass.equals(bufferClass)) return l;
+        }
+        return null;
     }
 
-    public void end(){
-        glUseProgram(0);
+    public OxyRenderPass getRenderPass() {
+        return renderPass;
     }
 
-    private static final FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
+    public OxyShader getShader() {
+        return shader;
+    }
 
     public void setCameraUniforms(OxyCamera camera) {
-        setUniformMatrix4fv("pr_Matrix", camera.getProjectionMatrix(), camera.isTranspose());
-        setUniformMatrix4fv("m_Matrix", camera.getModelMatrix(), camera.isTranspose());
-        setUniformMatrix4fv("v_Matrix", camera.getViewMatrix(), camera.isTranspose());
-        setUniformMatrix4fv("v_Matrix_NoTransform", camera.getViewMatrixNoTranslation(), camera.isTranspose());
-        setUniformVec3("cameraPos", camera.origin);
+        shader.setUniformMatrix4fv("pr_Matrix", camera.getProjectionMatrix(), camera.isTranspose());
+        shader.setUniformMatrix4fv("m_Matrix", camera.getModelMatrix(), camera.isTranspose());
+        shader.setUniformMatrix4fv("v_Matrix", camera.getViewMatrix(), camera.isTranspose());
+        shader.setUniformMatrix4fv("v_Matrix_NoTransform", camera.getViewMatrixNoTranslation(), camera.isTranspose());
+        shader.setUniformVec3("cameraPos", camera.origin);
     }
 
-    public void setUniform1i(String name, int value) {
-        if (!parameterLocations.containsKey(name)) {
-            parameterLocations.put(name, glGetUniformLocation(shader.getProgram(), name));
-        }
-        glUniform1i((Integer) parameterLocations.get(name), value);
-    }
-
-    public void setUniform1iv(String name, int[] value) {
-        if (!parameterLocations.containsKey(name)) {
-            parameterLocations.put(name, glGetUniformLocation(shader.getProgram(), name));
-        }
-        glUniform1iv((Integer) parameterLocations.get(name), value);
-    }
-
-    public void setUniform1f(String name, float value) {
-        if (!parameterLocations.containsKey(name)) {
-            parameterLocations.put(name, glGetUniformLocation(shader.getProgram(), name));
-        }
-        glUniform1f((Integer) parameterLocations.get(name), value);
-    }
-
-    public void setUniformVec4(String vecName, float x, float y, float z, float w) {
-        if (!parameterLocations.containsKey(vecName)) {
-            parameterLocations.put(vecName, glGetUniformLocation(shader.getProgram(), vecName));
-        }
-        glUniform4f((Integer) parameterLocations.get(vecName), x, y, z, w);
-    }
-
-    public void setUniformVec4(Vector4f vec, int location) {
-        glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
-    }
-
-    public void setUniformVec3(String vecName, float x, float y, float z) {
-        if (!parameterLocations.containsKey(vecName)) {
-            parameterLocations.put(vecName, glGetUniformLocation(shader.getProgram(), vecName));
-        }
-        glUniform3f((Integer) parameterLocations.get(vecName), x, y, z);
-    }
-
-    public void setUniformVec3(String vecName, Vector3f vec) {
-        if (!parameterLocations.containsKey(vecName)) {
-            parameterLocations.put(vecName, glGetUniformLocation(shader.getProgram(), vecName));
-        }
-        glUniform3f((Integer) parameterLocations.get(vecName), vec.x, vec.y, vec.z);
-    }
-
-    public void setUniformVec3(Vector3f vec, int location) {
-        glUniform3f(location, vec.x, vec.y, vec.z);
-    }
-
-    public void setUniformMatrix4fv(String name, Matrix4f m, boolean transpose) {
-        m.get(buffer);
-        if (!parameterLocations.containsKey(name)) {
-            parameterLocations.put(name, glGetUniformLocation(shader.getProgram(), name));
-        }
-        glUniformMatrix4fv((Integer) parameterLocations.get(name), transpose, buffer);
-    }
-
-    public void setUniformMatrix3fv(String name, Matrix3f m, boolean transpose) {
-        m.get(buffer);
-        if (!parameterLocations.containsKey(name)) {
-            parameterLocations.put(name, glGetUniformLocation(shader.getProgram(), name));
-        }
-        glUniformMatrix3fv((Integer) parameterLocations.get(name), transpose, buffer);
+    public void setCameraUniforms(OxyShader shader, OxyCamera camera) {
+        shader.setUniformMatrix4fv("pr_Matrix", camera.getProjectionMatrix(), camera.isTranspose());
+        shader.setUniformMatrix4fv("m_Matrix", camera.getModelMatrix(), camera.isTranspose());
+        shader.setUniformMatrix4fv("v_Matrix", camera.getViewMatrix(), camera.isTranspose());
+        shader.setUniformMatrix4fv("v_Matrix_NoTransform", camera.getViewMatrixNoTranslation(), camera.isTranspose());
+        shader.setUniformVec3("cameraPos", camera.origin);
     }
 }

@@ -1,7 +1,7 @@
 //#type fragment
 #version 460 core
 
-#define NUMBER_CASCADES 3 //TODO: convert this and many things into uniform buffer objects
+#define NUMBER_CASCADES 4 //TODO: convert this and many things into uniform buffer objects
 
 layout(location = 0) out vec4 color;
 layout(location = 1) out int o_IDBuffer;
@@ -91,6 +91,7 @@ uniform vec3 lightShadowDirPos[NUMBER_CASCADES];
 uniform float cascadeSplits[NUMBER_CASCADES];
 in float clipSpacePosZ;
 uniform int castShadows;
+uniform int cascadeIndicatorToggle;
 
 #define PI 3.14159265358979323
 
@@ -169,19 +170,23 @@ float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
     float currentDepth = projCoords.z;
 
     vec3 normal = norm;
-    float bias = 0.001;
+    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.002);
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap[index], 0);
-    for(int x = -1; x <= 1; ++x)
+
+    int pcfSample = 4;
+
+    for(int x = -pcfSample; x <= pcfSample; ++x)
     {
-        for(int y = -1; y <= 1; ++y)
+        for(int y = -pcfSample; y <= pcfSample; ++y)
         {
             float pcfDepth = texture(shadowMap[index], projCoords.xy + vec2(x, y) * texelSize).r;
             shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
         }    
     }
-    shadow /= 9.0;
+
+    shadow /= pow((pcfSample * 2.0 + 1.0), 2);
     
     if(projCoords.z > 1.0)
         shadow = 0.0;
@@ -248,6 +253,8 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
                        cascadeIndicator = vec4(0.0, 0.1, 0.0, 0.0);
                    else if (j == 2)
                        cascadeIndicator = vec4(0.0, 0.0, 0.1, 0.0);
+                   else if(j == 3)
+                       cascadeIndicator = vec4(0.0, 0.5, 0.5, 0.0);
                    break;
                 }
             }
@@ -286,7 +293,10 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
     result = vec3(1.0) - exp(-result * exposure);
     result = pow(result, vec3(1f / gamma));
 
-    return vec4(result, 1.0f)/* + cascadeIndicator*/;
+    if(bool(cascadeIndicatorToggle))
+        result += cascadeIndicator.xyz;
+
+    return vec4(result, 1.0f);
 }
 
 void main(){
@@ -326,7 +336,7 @@ layout(location = 7) in vec4 weights;
 uniform mat4 v_Matrix;
 uniform mat4 model;
 
-#define NUMBER_CASCADES 3
+#define NUMBER_CASCADES 4
 
 uniform mat4 lightSpaceMatrix[NUMBER_CASCADES];
 

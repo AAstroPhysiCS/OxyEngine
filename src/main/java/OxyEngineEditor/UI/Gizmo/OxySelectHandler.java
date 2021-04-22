@@ -1,13 +1,18 @@
 package OxyEngineEditor.UI.Gizmo;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
+import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Renderer.OxyRenderPass;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.SceneRenderer;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -15,8 +20,6 @@ import org.joml.Vector2f;
 import java.util.List;
 import java.util.Set;
 
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL44.glClearTexImage;
 
@@ -25,41 +28,71 @@ public class OxySelectHandler {
     public static OxyEntity entityContext;
     public static OxyMaterial materialContext;
 
+    private static OpenGLFrameBuffer pickingFrameBuffer;
+    private static OxyRenderPass pickingRenderPass;
+
+    public static void initRenderPass(int width, int height){
+        pickingFrameBuffer = FrameBuffer.create(width, height,
+                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                        .setTextureCount(1)
+                        .setAttachmentIndex(0)
+                        .setFormats(FrameBufferTextureFormat.RGBA8)
+                        .setFilter(GL_LINEAR, GL_LINEAR),
+                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                        .setTextureCount(1)
+                        .setAttachmentIndex(1)
+                        .setFormats(FrameBufferTextureFormat.R32I)
+                        .setFilter(GL_NEAREST, GL_NEAREST),
+                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                        .setTextureCount(1)
+                        .setStorage(true, 1));
+        pickingFrameBuffer.drawBuffers(0, 1);
+        pickingRenderPass = OxyRenderPass.createBuilder(pickingFrameBuffer).create();
+    }
+
+    public static void resizePickingBuffer(float width, float height){
+        pickingFrameBuffer.resize(width, height);
+    }
+
     public static void startPicking() {
-        Set<OxyEntity> allModelEntities = SceneLayer.getInstance().allModelEntities;
+        Set<OxyEntity> allModelEntities = SceneRenderer.getInstance().allModelEntities;
 
         if (allModelEntities.size() == 0) return;
         glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        OpenGLFrameBuffer pickingBuffer = ACTIVE_SCENE.getPickingBuffer();
 
         //ID RENDER PASS
-        if (pickingBuffer.getBufferId() != 0) {
+        if (pickingFrameBuffer.getBufferId() != 0) {
             int[] clearValue = {-1};
-            pickingBuffer.bind();
-            rendererAPI.clearBuffer();
-            rendererAPI.clearColor(32, 32, 32, 1.0f);
-            OxyPipeline geometryPipeline = SceneLayer.getInstance().getGeometryPipeline();
-            glClearTexImage(pickingBuffer.getColorAttachmentTexture(1)[0], 0, pickingBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
+
+            pickingFrameBuffer.flush();
+
+            pickingRenderPass.beginRenderPass();
+
+            OxyPipeline geometryPipeline = SceneRenderer.getInstance().getGeometryPipeline();
+            OxyShader pbrShader = geometryPipeline.getShader();
+
+            glClearTexImage(pickingFrameBuffer.getColorAttachmentTexture(1)[0], 0, pickingFrameBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
+
             for (OxyEntity e : allModelEntities) {
                 if (!e.has(SelectedComponent.class)) continue;
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
-                geometryPipeline.begin();
+                pbrShader.begin();
                 //ANIMATION UPDATE
-                geometryPipeline.setUniform1i("animatedModel", 0);
+                pbrShader.setUniform1i("animatedModel", 0);
                 if (e.has(AnimationComponent.class)) {
-                    geometryPipeline.setUniform1i("animatedModel", 1);
+                    pbrShader.setUniform1i("animatedModel", 1);
                     AnimationComponent animComp = e.get(AnimationComponent.class);
                     List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
                     for (int j = 0; j < matrix4fList.size(); j++) {
-                        geometryPipeline.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                        pbrShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
                     }
                 }
-                geometryPipeline.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
+                pbrShader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
                 OxyRenderer.renderMesh(geometryPipeline, e.get(ModelMeshOpenGL.class));
-                geometryPipeline.end();
+                pbrShader.end();
             }
         }
         int id = getEntityID();
@@ -79,14 +112,15 @@ public class OxySelectHandler {
                 }
             }
         }
-        pickingBuffer.unbind();
+
+        pickingRenderPass.endRenderPass();
     }
 
     private static int getEntityID() {
         Vector2f mousePos = new Vector2f(
                 ScenePanel.mousePos.x - ScenePanel.windowPos.x - ScenePanel.offset.x,
                 ScenePanel.mousePos.y - ScenePanel.windowPos.y - ScenePanel.offset.y);
-        mousePos.y = ACTIVE_SCENE.getFrameBuffer().getHeight() - mousePos.y;
+        mousePos.y = SceneRenderer.getInstance().getFrameBuffer().getHeight() - mousePos.y;
         glReadBuffer(GL_COLOR_ATTACHMENT1);
         int[] entityID = new int[1];
         glReadPixels((int) mousePos.x, (int) mousePos.y, 1, 1, GL_RED_INTEGER, GL_INT, entityID);

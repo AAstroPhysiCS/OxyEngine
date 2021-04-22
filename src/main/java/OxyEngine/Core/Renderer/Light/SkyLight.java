@@ -1,17 +1,19 @@
 package OxyEngine.Core.Renderer.Light;
 
-import OxyEngine.Core.Layers.SceneLayer;
-import OxyEngine.Core.Renderer.Shader.OxyShader;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
+import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Scene.Objects.Native.NativeObjectFactory;
+import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.SceneRenderer;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.type.ImString;
 import org.lwjgl.stb.STBImage;
 
-import static OxyEngine.Scene.Objects.SkyLightFactory.skyboxVertices;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.logger;
@@ -20,13 +22,8 @@ import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class SkyLight extends Light {
 
-    public static final int[] indices = new int[skyboxVertices.length];
-
-    static {
-        for (int i = 0; i < skyboxVertices.length; i++) {
-            indices[i] = i;
-        }
-    }
+    public static final NativeObjectMeshOpenGL skyLightMesh =
+            new NativeObjectMeshOpenGL(SceneRenderer.getInstance().getHDRPipeline());
 
     private boolean primary;
 
@@ -53,7 +50,7 @@ public class SkyLight extends Light {
         }
 
         if (hdrTexture != null) hdrTexture.dispose();
-        hdrTexture = OxyTexture.loadHDRTexture(pathToHDR, SceneLayer.getInstance().getHDRPipeline());
+        hdrTexture = OxyTexture.loadHDRTexture(pathToHDR);
     }
 
     @Override
@@ -82,6 +79,73 @@ public class SkyLight extends Light {
 
     public void setPrimary(boolean primary) {
         this.primary = primary;
+    }
+
+    public static final class Factory implements NativeObjectFactory {
+
+        private static final float[] skyboxVertices = {
+                -1.0f, -1.0f, -1.0f,
+                1.0f, 1.0f, -1.0f,
+                1.0f, -1.0f, -1.0f,
+                1.0f, 1.0f, -1.0f,
+                -1.0f, -1.0f, -1.0f,
+                -1.0f, 1.0f, -1.0f,
+                // front face
+                -1.0f, -1.0f, 1.0f,
+                1.0f, -1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, 1.0f,
+                -1.0f, 1.0f, 1.0f,
+                -1.0f, -1.0f, 1.0f,
+                // left face
+                -1.0f, 1.0f, 1.0f,
+                -1.0f, 1.0f, -1.0f,
+                -1.0f, -1.0f, -1.0f,
+                -1.0f, -1.0f, -1.0f,
+                -1.0f, -1.0f, 1.0f,
+                -1.0f, 1.0f, 1.0f,
+                // right face
+                1.0f, 1.0f, 1.0f,
+                1.0f, -1.0f, -1.0f,
+                1.0f, 1.0f, -1.0f,
+                1.0f, -1.0f, -1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, -1.0f, 1.0f,
+                // bottom face
+                -1.0f, -1.0f, -1.0f,
+                1.0f, -1.0f, -1.0f,
+                1.0f, -1.0f, 1.0f,
+                1.0f, -1.0f, 1.0f,
+                -1.0f, -1.0f, 1.0f,
+                -1.0f, -1.0f, -1.0f,
+                // top face
+                -1.0f, 1.0f, -1.0f,
+                1.0f, 1.0f, 1.0f,
+                1.0f, 1.0f, -1.0f,
+                1.0f, 1.0f, 1.0f,
+                -1.0f, 1.0f, -1.0f,
+                -1.0f, 1.0f, 1.0f,
+        };
+
+        private static final int[] indices = new int[skyboxVertices.length];
+
+        static {
+            for (int i = 0; i < skyboxVertices.length; i++) {
+                indices[i] = i;
+            }
+        }
+
+        @Override
+        public void constructData(OxyNativeObject e, int size) {
+            if (e.vertices == null) {
+                e.vertices = skyboxVertices;
+            }
+        }
+
+        public void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh) {
+            e.indices = indices;
+            mesh.addToBuffer(SceneRenderer.getInstance().getHDRPipeline());
+        }
     }
 
     public static final GUINode guiNode = () -> {

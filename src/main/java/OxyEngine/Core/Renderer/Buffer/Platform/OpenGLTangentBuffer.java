@@ -1,18 +1,15 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Buffer.TangentBuffer;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 
 import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public class OpenGLTangentBuffer extends TangentBuffer {
 
-    OpenGLTangentBuffer(BufferLayoutConstructor.BufferLayoutImpl template) {
-        super(template);
+    OpenGLTangentBuffer(OxyPipeline.Layout layout) {
+        super(layout);
     }
 
     @Override
@@ -20,17 +17,24 @@ public class OpenGLTangentBuffer extends TangentBuffer {
         if (bufferId == 0) bufferId = glCreateBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, bufferId);
         glBufferData(GL_ARRAY_BUFFER, biAndTangent, GL_STATIC_DRAW);
-
-        BufferLayoutAttributes[] attribPointers = implementation.getAttribPointers();
-        for (BufferLayoutAttributes ptr : attribPointers) {
-            glEnableVertexAttribArray(ptr.index());
-            glVertexAttribPointer(ptr.index(), ptr.size(), ptr.type(), ptr.normalized(), ptr.stride(), ptr.pointer());
-        }
     }
 
+    public void setBiAndTangent(float[] tangents, float[] biTangents) {
+        biAndTangent = new float[tangents.length + biTangents.length];
+        int tangentPtr = 0, biTangentPtr = 0;
+        for (int i = 0; i < biAndTangent.length; ) {
+            biAndTangent[i++] = tangents[tangentPtr++];
+            biAndTangent[i++] = tangents[tangentPtr++];
+            biAndTangent[i++] = tangents[tangentPtr++];
+            biAndTangent[i++] = biTangents[biTangentPtr++];
+            biAndTangent[i++] = biTangents[biTangentPtr++];
+            biAndTangent[i++] = biTangents[biTangentPtr++];
+        }
+    }
 
     @Override
     public void dispose() {
         glDeleteBuffers(bufferId);
+        bufferId = 0;
     }
 }

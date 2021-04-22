@@ -1,7 +1,7 @@
 package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.OxyMaterialIndex;
-import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
@@ -117,50 +117,50 @@ public class OxyMaterial implements OxyDisposable {
         if (emissiveTexture != null) glBindTextureUnit(emissiveTexture.getTextureSlot(), emissiveTexture.getTextureId());
     }
 
-    public void push(OxyPipeline pipeline) {
-        pipeline.begin();
+    public void push(OxyShader shader) {
+        shader.begin();
         bindTextures();
 
         if (albedoColor != null) {
-            pipeline.setUniformVec3("material.diffuse", albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]);
+            shader.setUniformVec3("material.diffuse", albedoColor.getNumbers()[0], albedoColor.getNumbers()[1], albedoColor.getNumbers()[2]);
         }
         if(albedoTexture != null){
-            pipeline.setUniform1i("albedoMapSlot", albedoTexture.getTextureSlot());
+            shader.setUniform1i("albedoMapSlot", albedoTexture.getTextureSlot());
         } else {
-            pipeline.setUniform1i("albedoMapSlot", 0);
+            shader.setUniform1i("albedoMapSlot", 0);
         }
 
         if (normalTexture != null) {
-            pipeline.setUniform1i("normalMapSlot", normalTexture.getTextureSlot());
-            pipeline.setUniform1f("normalMapStrength", normalStrength[0]);
+            shader.setUniform1i("normalMapSlot", normalTexture.getTextureSlot());
+            shader.setUniform1f("normalMapStrength", normalStrength[0]);
         } else {
-            pipeline.setUniform1i("normalMapSlot", 0);
+            shader.setUniform1i("normalMapSlot", 0);
         }
         if (metallicTexture != null) {
-            pipeline.setUniform1i("metallicSlot", metallicTexture.getTextureSlot());
+            shader.setUniform1i("metallicSlot", metallicTexture.getTextureSlot());
         } else {
-            pipeline.setUniform1i("metallicSlot", 0);
-            pipeline.setUniform1f("metallicStrength", metalness[0]);
+            shader.setUniform1i("metallicSlot", 0);
+            shader.setUniform1f("metallicStrength", metalness[0]);
         }
         if (aoTexture != null) {
-            pipeline.setUniform1i("aoSlot", aoTexture.getTextureSlot());
+            shader.setUniform1i("aoSlot", aoTexture.getTextureSlot());
         } else {
-            pipeline.setUniform1f("aoStrength", aoStrength[0]);
-            pipeline.setUniform1i("aoSlot", 0);
+            shader.setUniform1f("aoStrength", aoStrength[0]);
+            shader.setUniform1i("aoSlot", 0);
         }
         if (roughnessTexture != null) {
-            pipeline.setUniform1i("roughnessSlot", roughnessTexture.getTextureSlot());
+            shader.setUniform1i("roughnessSlot", roughnessTexture.getTextureSlot());
         } else {
-            pipeline.setUniform1f("roughnessStrength", roughness[0]);
-            pipeline.setUniform1i("roughnessSlot", 0);
+            shader.setUniform1f("roughnessStrength", roughness[0]);
+            shader.setUniform1i("roughnessSlot", 0);
         }
         if(emissiveTexture != null){
-            pipeline.setUniform1f("emissiveStrength", emissiveStrength[0]);
-            pipeline.setUniform1i("emissiveSlot", emissiveTexture.getTextureSlot());
+            shader.setUniform1f("emissiveStrength", emissiveStrength[0]);
+            shader.setUniform1i("emissiveSlot", emissiveTexture.getTextureSlot());
         } else {
-            pipeline.setUniform1i("emissiveSlot", 0);
+            shader.setUniform1i("emissiveSlot", 0);
         }
-        pipeline.end();
+        shader.end();
     }
 
     private static String currentItem = "No Material";

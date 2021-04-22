@@ -1,35 +1,24 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutAttributes;
-import OxyEngine.Core.Renderer.Buffer.BufferLayoutConstructor;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
+import OxyEngine.Core.Renderer.Mesh.MeshUsage;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
 import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.glVertexAttribIPointer;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public final class OpenGLVertexBuffer extends VertexBuffer {
 
-    OpenGLVertexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl) {
-        super(impl);
+    protected OpenGLVertexBuffer(OxyPipeline.Layout layout, MeshUsage usage) {
+        super(layout, usage);
     }
 
     @Override
     public void load() {
         if (bufferId == 0) bufferId = glCreateBuffers();
-
-        if (impl.getUsage() == BufferLayoutConstructor.Usage.STATIC) loadStatically();
+        if (usage == MeshUsage.STATIC) loadStatically();
         else loadDynamically();
-
-        BufferLayoutAttributes[] attribPointers = impl.getAttribPointers();
-        for (BufferLayoutAttributes ptr : attribPointers) {
-            glEnableVertexAttribArray(ptr.index());
-            if (ptr.type() == GL_INT || ptr.type() == GL_UNSIGNED_INT)
-                glVertexAttribIPointer(ptr.index(), ptr.size(), ptr.type(), ptr.stride(), ptr.pointer());
-            else
-                glVertexAttribPointer(ptr.index(), ptr.size(), ptr.type(), ptr.normalized(), ptr.stride(), ptr.pointer());
-        }
     }
 
     private void loadStatically() {
@@ -79,5 +68,6 @@ public final class OpenGLVertexBuffer extends VertexBuffer {
         vertices = null;
         dataToUpdate = null;
         glDeleteBuffers(bufferId);
+        bufferId = 0;
     }
 }

@@ -1,4 +1,4 @@
-package OxyEngine.Core.Renderer.Shader;
+package OxyEngine.Core.Renderer.Pipeline;
 
 import java.util.ArrayList;
 import java.util.List;

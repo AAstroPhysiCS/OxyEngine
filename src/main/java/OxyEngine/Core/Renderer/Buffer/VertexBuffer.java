@@ -1,13 +1,19 @@
 package OxyEngine.Core.Renderer.Buffer;
 
+import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLVertexBuffer;
+import OxyEngine.Core.Renderer.Context.OpenGLRendererAPI;
+import OxyEngine.Core.Renderer.Mesh.MeshUsage;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 
+import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.System.OxySystem.oxyAssert;
 
 public abstract class VertexBuffer extends Buffer {
 
     protected float[] vertices = new float[0];
-    protected final BufferLayoutConstructor.BufferLayoutImpl impl;
+    protected final OxyPipeline.Layout layout;
+    protected final MeshUsage usage;
 
     public int offsetToUpdate = -1;
     protected float[] dataToUpdate;
@@ -16,18 +22,32 @@ public abstract class VertexBuffer extends Buffer {
         return dataToUpdate;
     }
 
-    public VertexBuffer(BufferLayoutConstructor.BufferLayoutImpl impl) {
-        this.impl = impl;
+    protected VertexBuffer(OxyPipeline.Layout layout, MeshUsage usage) {
+        this.layout = layout;
+        this.usage = usage;
+        assert usage != null : oxyAssert("Some Implementation arguments are null");
+    }
 
-        assert impl.getUsage() != null && impl.getAttribPointers() != null : oxyAssert("Some Implementation arguments are null");
+    public static <T extends VertexBuffer> T create(OxyPipeline pipeline, MeshUsage usage){
+        if(rendererAPI instanceof OpenGLRendererAPI) {
+            var layout = pipeline.getLayout(VertexBuffer.class);
+            try {
+                var constructor = OpenGLVertexBuffer.class.getDeclaredConstructor(OxyPipeline.Layout.class, MeshUsage.class);
+                constructor.setAccessible(true);
+                return (T) constructor.newInstance(layout, usage);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        throw new IllegalStateException("API not supported yet!");
     }
 
     public abstract void updateSingleEntityData(int pos, float[] newVertices);
 
     protected abstract void copy(float[] m_Vertices);
 
-    public BufferLayoutConstructor.BufferLayoutImpl getImplementation() {
-        return impl;
+    public MeshUsage getUsage() {
+        return usage;
     }
 
     public float[] getVertices() {

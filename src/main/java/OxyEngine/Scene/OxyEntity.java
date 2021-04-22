@@ -214,15 +214,6 @@ public abstract class OxyEntity {
         return guiNodes;
     }
 
-    public Object clone() {
-        try {
-            return super.clone();
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public boolean familyHasRoot() {
         return getFamily().root() != null;
     }

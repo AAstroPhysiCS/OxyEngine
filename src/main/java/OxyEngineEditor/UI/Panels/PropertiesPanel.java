@@ -3,7 +3,6 @@ package OxyEngineEditor.UI.Panels;
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
@@ -11,6 +10,7 @@ import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Texture.ImageTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
@@ -250,7 +250,7 @@ public class PropertiesPanel extends Panel {
                             entityContext.addComponent(new SceneCamera());
                             if (!entityContext.getGUINodes().contains(OxyCamera.guiNode))
                                 entityContext.getGUINodes().add(OxyCamera.guiNode);
-                            SceneLayer.getInstance().updateCameraEntities();
+                            SceneRenderer.getInstance().updateCameraEntities();
                         }
                     }
 
@@ -269,7 +269,7 @@ public class PropertiesPanel extends Panel {
                             if (!entityContext.getGUINodes().contains(OxyMaterial.guiNode))
                                 entityContext.getGUINodes().add(OxyMaterial.guiNode);
                             entityContext.getGUINodes().add(PointLight.guiNode);
-                            SceneLayer.getInstance().updateModelEntities();
+                            SceneRenderer.getInstance().updateModelEntities();
                         }
                         //error or hint that lights are single instanced. TODO
                     }
@@ -279,7 +279,7 @@ public class PropertiesPanel extends Panel {
                             int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
                             entityContext.addComponent(directionalLight, new OxyMaterialIndex(index));
                             entityContext.getGUINodes().add(DirectionalLight.guiNode);
-                            SceneLayer.getInstance().updateModelEntities();
+                            SceneRenderer.getInstance().updateModelEntities();
                         }
                         //error or hint that lights are single instanced. TODO
                     }
@@ -288,7 +288,7 @@ public class PropertiesPanel extends Panel {
                         if (!entityContext.has(Light.class)) {
                             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
                             OxyNativeObject skyLightEnt = ACTIVE_SCENE.createSkyLight();
-                            SceneLayer.getInstance().updateModelEntities();
+                            SceneRenderer.getInstance().updateModelEntities();
                             entityContext = skyLightEnt;
                         }
                         //error or hint that lights are single instanced. TODO
