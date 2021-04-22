@@ -1,5 +1,6 @@
 package OxyEngine.Core.Renderer.Texture;
 
+import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.Scene.SceneRenderer;
@@ -9,8 +10,8 @@ import org.joml.Matrix4f;
 import java.nio.FloatBuffer;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
-import static OxyEngine.Core.Renderer.Light.SkyLight.skyLightMesh;
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 import static org.lwjgl.stb.STBImage.*;
@@ -96,6 +97,8 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
         hdrShader.setUniform1i("u_hdrTexture", 0);
         hdrShader.setUniformMatrix4fv("u_projectionHDR", captureProjection, true);
         hdrShader.end();
+
+        OpenGLMesh skyLightMesh = entityContext.get(OpenGLMesh.class);
 
         if(skyLightMesh.empty())
             skyLightMesh.load(hdrPipeline);
@@ -197,7 +200,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                         GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, 0);
                 rendererAPI.clearBuffer();
-                skyLightMesh.render();
+                entityContext.get(OpenGLMesh.class).render();
                 shader.end();
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -250,7 +253,7 @@ public class HDRTexture extends OxyTexture.AbstractTexture {
                     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
                             GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, textureId, mip);
                     rendererAPI.clearBuffer();
-                    skyLightMesh.render();
+                    entityContext.get(OpenGLMesh.class).render();
                     shader.end();
                 }
             }

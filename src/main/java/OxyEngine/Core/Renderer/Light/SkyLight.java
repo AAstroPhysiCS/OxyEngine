@@ -22,9 +22,6 @@ import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class SkyLight extends Light {
 
-    public static final NativeObjectMeshOpenGL skyLightMesh =
-            new NativeObjectMeshOpenGL(SceneRenderer.getInstance().getHDRPipeline());
-
     private boolean primary;
 
     private HDRTexture hdrTexture;

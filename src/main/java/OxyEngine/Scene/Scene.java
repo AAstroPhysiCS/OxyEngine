@@ -8,6 +8,7 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
@@ -24,7 +25,6 @@ import java.util.*;
 
 import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
 import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
-import static OxyEngine.Core.Renderer.Light.SkyLight.skyLightMesh;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Scene.SceneSerializer.fileExtension;
@@ -95,7 +95,7 @@ public final class Scene implements OxyDisposable {
         skyLightEnt.setFactory(new SkyLight.Factory());
         if (entityContext != null) skyLightEnt.setFamily(new EntityFamily(entityContext.getFamily()));
         skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight());
-        skyLightEnt.addComponent(skyLightMesh);
+        skyLightEnt.addComponent(new NativeObjectMeshOpenGL(SceneRenderer.getInstance().getHDRPipeline()));
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
             skyLightEnt.getGUINodes().add(SkyLight.guiNode);
         skyLightEnt.initData();
