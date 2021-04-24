@@ -33,19 +33,7 @@ public class ShadowRender {
     public static final int NUMBER_CASCADES = 4;
     private static final int FRUSTUM_CORNERS = 8;
 
-    private static final OpenGLFrameBuffer shadowFrameBuffer = FrameBuffer.create(1024, 1024,
-            OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
-                    .setAttachmentIndex(0)
-                    .setTextureCount(NUMBER_CASCADES)
-                        .setSizeForTextures(0, 4096, 4096)
-                        .setSizeForTextures(1, 2048, 2048)
-                        .setSizeForTextures(2, 1024, 1024)
-                        .setSizeForTextures(3, 512, 512)
-                    .setFormats(FrameBufferTextureFormat.DEPTHCOMPONENT32)
-                    .setFilter(GL_NEAREST, GL_NEAREST)
-                    .wrapSTR(GL_REPEAT, GL_REPEAT, -1)
-                    .disableReadWriteBuffer(true)
-    );
+    private static OpenGLFrameBuffer shadowFrameBuffer = null;
 
     private static final ShadowMapCamera[] cascadedCamArr = new ShadowMapCamera[NUMBER_CASCADES];
     private static final float[] cascadeSplit = new float[NUMBER_CASCADES];
@@ -80,7 +68,21 @@ public class ShadowRender {
 
     }
 
-    public static void initPipeline(){
+    public static void initPipeline() {
+        shadowFrameBuffer = FrameBuffer.create(1024, 1024,
+                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                        .setAttachmentIndex(0)
+                        .setTextureCount(NUMBER_CASCADES)
+                        .setSizeForTextures(0, 4096, 4096)
+                        .setSizeForTextures(1, 2048, 2048)
+                        .setSizeForTextures(2, 1024, 1024)
+                        .setSizeForTextures(3, 512, 512)
+                        .setFormats(FrameBufferTextureFormat.DEPTHCOMPONENT32)
+                        .setFilter(GL_NEAREST, GL_NEAREST)
+                        .wrapSTR(GL_REPEAT, GL_REPEAT, -1)
+                        .disableReadWriteBuffer(true)
+        );
+
         shadowMapPipeline = OxyPipeline.createNewPipeline(OxyPipeline.createNewSpecification()
                 .setRenderPass(OxyRenderPass.createBuilder(shadowFrameBuffer)
                         .setCullFace(CullMode.BACK)
@@ -112,13 +114,13 @@ public class ShadowRender {
                     cam.finalizeCamera(SceneRuntime.TS);
 
                     /*
-                    * so in order to properly render shadows, we have to render the next split too,
-                    * because then it would be a horrible thing for a scene like sponza (model that is very big in size)
-                    */
+                     * so in order to properly render shadows, we have to render the next split too,
+                     * because then it would be a horrible thing for a scene like sponza (model that is very big in size)
+                     */
                     if (i != NUMBER_CASCADES - 1) {
                         cascadedCamArr[i + 1].finalizeCamera(SceneRuntime.TS);
                     }
-                    if(i != 0) {
+                    if (i != 0) {
                         cascadedCamArr[i - 1].finalizeCamera(SceneRuntime.TS);
                     }
                     break;
@@ -147,14 +149,14 @@ public class ShadowRender {
 
             OxyRenderer.renderMesh(shadowMapPipeline, mesh);
 
-            if(camIndex != NUMBER_CASCADES - 1){
+            if (camIndex != NUMBER_CASCADES - 1) {
                 shadowFrameBuffer.bindDepthAttachment(0, camIndex + 1);
                 shadowMapDepthShader.begin();
                 shadowMapDepthShader.setUniformMatrix4fv("lightSpaceMatrix", cascadedCamArr[camIndex + 1].getViewMatrix(), false);
                 shadowMapDepthShader.end();
                 OxyRenderer.renderMesh(shadowMapPipeline, mesh);
             }
-            if(camIndex != 0) {
+            if (camIndex != 0) {
                 shadowFrameBuffer.bindDepthAttachment(0, camIndex - 1);
                 shadowMapDepthShader.begin();
                 shadowMapDepthShader.setUniformMatrix4fv("lightSpaceMatrix", cascadedCamArr[camIndex - 1].getViewMatrix(), false);

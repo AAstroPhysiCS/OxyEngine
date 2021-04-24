@@ -8,7 +8,6 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
@@ -16,6 +15,7 @@ import OxyEngine.Scene.Objects.Importer.ImporterType;
 import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
 import OxyEngine.Scene.Objects.Model.*;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scripting.ScriptEngine;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
@@ -297,7 +297,7 @@ public final class Scene implements OxyDisposable {
         }
 
         for (var scripts : e.getScripts()) {
-            if (scripts.getProvider() != null) SceneRuntime.scriptThread.getProviders().remove(scripts.getProvider());
+            if (scripts.getProvider() != null) ScriptEngine.removeProvider(scripts.getProvider());
         }
         var value = registry.entityList.remove(e);
         assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");
@@ -439,7 +439,7 @@ public final class Scene implements OxyDisposable {
     public static void openScene() {
         String openScene = openDialog(extensionName, null);
         if (openScene != null) {
-            SceneRuntime.clearProviders();
+            ScriptEngine.clearProviders();
             SceneRuntime.stop();
             ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene);
             SceneRenderer.getInstance().initScene();
@@ -452,7 +452,7 @@ public final class Scene implements OxyDisposable {
     }
 
     public static void newScene() {
-        SceneRuntime.clearProviders();
+        ScriptEngine.clearProviders();
         SceneRuntime.stop();
         OxySelectHandler.entityContext = null;
         Scene oldScene = ACTIVE_SCENE;

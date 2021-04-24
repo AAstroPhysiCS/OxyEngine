@@ -3,6 +3,7 @@ package OxyEngineEditor;
 import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
+import OxyEngine.Core.Renderer.ShadowRender.DebugPanel;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
@@ -11,7 +12,6 @@ import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
 import org.lwjgl.glfw.GLFW;
-import OxyEngine.Core.Renderer.ShadowRender.DebugPanel;
 
 import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererContext;
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;

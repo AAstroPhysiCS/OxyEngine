@@ -29,5 +29,10 @@ public abstract class ScriptableEntity {
 
     public abstract void onCreate();
 
+    void updateScript(float ts){
+        onUpdate(ts);
+        updateData();
+    }
+
     public abstract void onUpdate(float ts);
 }

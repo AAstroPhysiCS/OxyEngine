@@ -6,28 +6,16 @@ import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.OxyApplication;
-import OxyEngine.OxyEngine;
-import org.lwjgl.glfw.GLFW;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
-import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.*;
 
 public final class OxyRenderer {
 
-    private static final Thread renderThread = new Thread(run(), "Oxy Renderer - OpenGL Thread");
-    static {
-        renderThread.start();
+    private OxyRenderer() {
     }
 
-    private OxyRenderer(){}
-
-    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera){
+    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera) {
         pipeline.updatePipelineShader();
         pipeline.getShader().begin();
         pipeline.setCameraUniforms(camera);
@@ -37,7 +25,7 @@ public final class OxyRenderer {
         pipeline.getShader().end();
     }
 
-    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera, OxyShader shader){
+    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera, OxyShader shader) {
         pipeline.updatePipelineShader();
         shader.begin();
         pipeline.setCameraUniforms(shader, camera);
@@ -47,7 +35,7 @@ public final class OxyRenderer {
         shader.end();
     }
 
-    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh){
+    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh) {
         pipeline.updatePipelineShader();
         pipeline.getShader().begin();
         pipeline.setCameraUniforms(currentBoundedCamera);
@@ -57,15 +45,33 @@ public final class OxyRenderer {
         pipeline.getShader().end();
     }
 
-    public static Runnable run(){
-        return () -> {
-            while(!glfwWindowShouldClose(OxyEngine.getWindowHandle().getPointer())){
-                if (keyEventDispatcher.getKeys()[GLFW.GLFW_KEY_ESCAPE]) break;
+    /*private static final record RenderQueue() {
 
-                RenderQueue.runQueue();
+        private static final List<RenderFunc> renderFuncs = new ArrayList<>();
+
+        private static void submit(RenderFunc func) {
+            renderFuncs.add(func);
+        }
+
+        private static void runQueue() {
+            for (RenderFunc f : renderFuncs) {
+                f.func();
             }
-        };
+        }
+
+        private static void flush() {
+            renderFuncs.clear();
+        }
     }
+
+    public static synchronized void submit(RenderFunc func) {
+        RenderQueue.submit(func);
+    }
+
+    public static synchronized void run() {
+        RenderQueue.runQueue();
+        RenderQueue.flush();
+    }*/
 
     public static record Stats() {
 

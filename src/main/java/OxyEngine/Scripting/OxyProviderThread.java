@@ -1,4 +1,4 @@
-package OxyEngine.Core.Threading;
+package OxyEngine.Scripting;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
 

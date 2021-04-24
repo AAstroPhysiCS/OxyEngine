@@ -1,11 +1,10 @@
 package OxyEngine.Scripting;
 
 import OxyEngine.Components.UUIDComponent;
-import OxyEngine.Core.Threading.OxyProvider;
-import OxyEngine.System.OxySystem;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.System.OxySystem;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -20,7 +19,6 @@ import java.util.Objects;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngine.Scene.SceneRuntime.scriptThread;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
@@ -66,7 +64,7 @@ public class OxyScript {
         return null;
     }
 
-    public static class EntityInfoProvider extends OxyProvider {
+    public static final class EntityInfoProvider implements OxyProvider {
 
         private final ScriptableEntity obj;
 
@@ -81,14 +79,13 @@ public class OxyScript {
 
         @Override
         public void invokeCreate() {
-            setReadyState(true);
             obj.onCreate();
         }
 
         @Override
         public void invokeUpdate(float ts) {
-            if(!ACTIVE_SCENE.isValid(obj.entity)) return;
-            obj.onUpdate(ts);
+            if (!ACTIVE_SCENE.isValid(obj.entity)) return;
+            obj.updateScript(ts);
         }
     }
 
@@ -99,19 +96,19 @@ public class OxyScript {
 
     public void loadAssembly() {
         if (provider != null) {
-            scriptThread.removeProvider(provider);
+            ScriptEngine.removeProvider(provider);
             provider = null;
         }
         if (path == null) return;
         if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
             provider = new EntityInfoProvider(obj);
-            scriptThread.addProvider(provider);
+            ScriptEngine.addProvider(provider);
         } else oxyAssert("The script must extend ScriptableEntity class!");
     }
 
     private final ImString bufferPath = new ImString(100);
     public final GUINode guiNode = () -> {
-        if(entityContext == null) return;
+        if (entityContext == null) return;
 
         bufferPath.set(Objects.requireNonNullElse(path, ""));
         final int hashCode = entityContext.hashCode();
