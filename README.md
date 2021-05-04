@@ -1,5 +1,5 @@
 # OxyEngine
-OxyEngine is primarily a rendering engine for all platforms. Currently, this engine is still in a experimental state and is being developed by me!
+OxyEngine is primarily a rendering engine for all platforms. Currently, this engine is still in an experimental state and is being developed by me!
 
 ## Pictures in Engine (Last update 22.04.2021)
 

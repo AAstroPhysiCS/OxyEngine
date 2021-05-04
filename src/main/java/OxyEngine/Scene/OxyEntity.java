@@ -3,6 +3,7 @@ package OxyEngine.Scene;
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngineEditor.UI.Panels.GUINode;
@@ -52,10 +53,6 @@ public abstract class OxyEntity {
         }
     }
 
-    public boolean nullData(){
-        return vertices == null;
-    }
-
     public void setFamily(EntityFamily component) {
         this.family = component;
     }
@@ -83,8 +80,7 @@ public abstract class OxyEntity {
         if (root != null)
             c.transform.mulLocal(root.get(TransformComponent.class).transform);
 
-        TransformComponent t = get(TransformComponent.class);
-        t.transform.getTranslation(t.worldSpacePosition);
+        c.transform.getTranslation(c.worldSpacePosition);
     }
 
     public void addComponent(EntityComponent... component) {
@@ -123,6 +119,8 @@ public abstract class OxyEntity {
         if (relatedEntities.size() == 0) return;
         for (OxyEntity m : relatedEntities) {
             m.transformLocally();
+            if(m.has(OxyPhysXComponent.class))
+                m.get(OxyPhysXComponent.class).getActor().setGlobalPose(m.get(TransformComponent.class).transform);
             addParentTransformToChildren(m);
         }
     }

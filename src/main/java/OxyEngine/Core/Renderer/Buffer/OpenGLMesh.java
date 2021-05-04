@@ -133,15 +133,17 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
                 }
             }
 
-            if(layout.getTargetBuffer().equals(VertexBuffer.class)){
+            Class<? extends Buffer> targetBuffer = layout.getTargetBuffer();
+
+            if(targetBuffer.equals(VertexBuffer.class)){
                 glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.bufferId);
-            } else if(layout.getTargetBuffer().equals(IndexBuffer.class)){
+            } else if(targetBuffer.equals(IndexBuffer.class)){
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.bufferId);
-            } else if(layout.getTargetBuffer().equals(TextureBuffer.class)){
+            } else if(targetBuffer.equals(TextureBuffer.class)){
                 glBindBuffer(GL_ARRAY_BUFFER, textureBuffer.bufferId);
-            } else if(layout.getTargetBuffer().equals(NormalsBuffer.class)){
+            } else if(targetBuffer.equals(NormalsBuffer.class)){
                 glBindBuffer(GL_ARRAY_BUFFER, normalsBuffer.bufferId);
-            } else if(layout.getTargetBuffer().equals(TangentBuffer.class)){
+            } else if(targetBuffer.equals(TangentBuffer.class)){
                 glBindBuffer(GL_ARRAY_BUFFER, tangentBuffer.bufferId);
             }
 

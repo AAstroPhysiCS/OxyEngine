@@ -18,7 +18,7 @@ import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderPass;
 import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Pipeline.*;
-import OxyEngine.Core.Renderer.ShadowRender;
+import OxyEngine.Core.Renderer.ShadowRenderer;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OxyEngine;
@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Set;
 
 import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
-import static OxyEngine.Core.Renderer.ShadowRender.NUMBER_CASCADES;
+import static OxyEngine.Core.Renderer.ShadowRenderer.NUMBER_CASCADES;
 import static OxyEngine.Scene.SceneRuntime.*;
 import static OxyEngineEditor.UI.Panels.ScenePanel.editorCameraEntity;
 import static org.lwjgl.opengl.GL30.*;
@@ -144,7 +144,7 @@ public final class SceneRenderer {
                 .setShader(hdrShader));
 
         OxySelectHandler.initRenderPass(frameBuffer.getWidth(), frameBuffer.getHeight());
-        ShadowRender.initPipeline();
+        ShadowRenderer.initPipeline();
     }
 
     public void initScene() {
@@ -325,19 +325,19 @@ public final class SceneRenderer {
                     pbrShader.setUniform1f("exposure", 1.0f);
                 }
 
-                boolean castShadows = ShadowRender.castShadows();
+                boolean castShadows = ShadowRenderer.castShadows();
                 pbrShader.setUniform1i("castShadows", castShadows ? 1 : 0);
                 if (castShadows) {
-                    if (ShadowRender.cascadeIndicatorToggle)
+                    if (ShadowRenderer.cascadeIndicatorToggle)
                         pbrShader.setUniform1i("cascadeIndicatorToggle", 1);
                     else pbrShader.setUniform1i("cascadeIndicatorToggle", 0);
 
                     for (int i = 0; i < NUMBER_CASCADES; i++) {
-                        if (ShadowRender.ready(i)) {
-                            glBindTextureUnit(TextureSlot.CSM.getValue() + i, ShadowRender.getShadowMap(i));
+                        if (ShadowRenderer.ready(i)) {
+                            glBindTextureUnit(TextureSlot.CSM.getValue() + i, ShadowRenderer.getShadowMap(i));
                             pbrShader.setUniform1i("shadowMap[" + i + "]", TextureSlot.CSM.getValue() + i);
-                            pbrShader.setUniformMatrix4fv("lightSpaceMatrix[" + i + "]", ShadowRender.getShadowViewMatrix(i), false);
-                            pbrShader.setUniform1f("cascadeSplits[" + i + "]", ShadowRender.getCascadeSplits(i));
+                            pbrShader.setUniformMatrix4fv("lightSpaceMatrix[" + i + "]", ShadowRenderer.getShadowViewMatrix(i), false);
+                            pbrShader.setUniform1f("cascadeSplits[" + i + "]", ShadowRenderer.getCascadeSplits(i));
                         }
                     }
                 }
@@ -424,7 +424,7 @@ public final class SceneRenderer {
         for (OxyEntity e : cachedLightEntities) {
             //TODO: Change this, make this dynamic
             if (e.get(Light.class) instanceof DirectionalLight d && d.isCastingShadows()) {
-                ShadowRender.shadowPass(d);
+                ShadowRenderer.shadowPass(d);
                 break;
             }
         }

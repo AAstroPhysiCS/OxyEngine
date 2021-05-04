@@ -3,10 +3,10 @@ package OxyEngine.Scene.Objects.Model;
 import OxyEngine.System.OxySystem;
 
 public enum DefaultModelType {
-    Plane(OxySystem.FileSystem.getResourceByPath("/models/plane.obj")),
-    Sphere(OxySystem.FileSystem.getResourceByPath("/models/sphere.obj")),
-    Cone(OxySystem.FileSystem.getResourceByPath("/models/cone.obj")),
-    Cube(OxySystem.FileSystem.getResourceByPath("/models/cube.obj"));
+    Plane(OxySystem.FileSystem.getResourceByPath("/models/plane.fbx")),
+    Sphere(OxySystem.FileSystem.getResourceByPath("/models/sphere.fbx")),
+    Cone(OxySystem.FileSystem.getResourceByPath("/models/cone.fbx")),
+    Cube(OxySystem.FileSystem.getResourceByPath("/models/cube.fbx"));
 
     private final String path;
 

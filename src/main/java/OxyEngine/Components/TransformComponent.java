@@ -49,6 +49,23 @@ public class TransformComponent implements EntityComponent {
         this(position, rotation, new Vector3f(scale, scale, scale));
     }
 
+    public TransformComponent(Vector3f position, Quaternionf rotation, Vector3f scale) {
+        this.position = new Vector3f(position);
+        this.rotation = new Vector3f();
+        this.scale = new Vector3f(scale);
+        rotation.getEulerAnglesXYZ(this.rotation);
+        this.rotation.mul((float) (180 / Math.PI));
+        this.transform = new Matrix4f();
+    }
+
+    public void set(Vector3f position, Quaternionf rotation, Vector3f scale){
+        this.position.set(position);
+        this.scale.set(scale);
+        rotation.getEulerAnglesXYZ(this.rotation);
+        this.rotation.mul((float) (180 / Math.PI));
+        this.transform = new Matrix4f();
+    }
+
     public TransformComponent(Matrix4f t){
         this.transform = t;
         this.position = new Vector3f();

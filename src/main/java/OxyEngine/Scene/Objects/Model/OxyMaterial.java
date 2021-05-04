@@ -28,11 +28,10 @@ public class OxyMaterial implements OxyDisposable {
 
     public String name = "Unnamed Material";
 
-    public float[] metalness;
-    public float[] roughness;
-    public float[] aoStrength;
+    public float[] metalness, roughness, aoStrength, emissiveStrength;
     public final float[] normalStrength;
-    public float[] emissiveStrength;
+
+    public final float[] dynamicFriction = new float[]{0.5f}, staticFriction = new float[]{0.5f}, restitution = new float[]{0.5f};
 
     public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture, ImageTexture emissiveTexture,
                        OxyColor albedoColor) {

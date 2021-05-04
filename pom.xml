@@ -41,6 +41,13 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>de.fabmax</groupId>
+            <artifactId>physx-jni</artifactId>
+            <version>0.4.5</version>
+        </dependency>
+
         <dependency>
             <groupId>org.joml</groupId>
             <artifactId>joml</artifactId>

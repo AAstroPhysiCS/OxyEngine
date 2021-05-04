@@ -1,11 +1,15 @@
 package OxyEngine.Scripting;
 
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class OxyProviderThread<T extends OxyProvider> {
 
     private Thread worker;
     private final ConcurrentLinkedDeque<T> providers = new ConcurrentLinkedDeque<>();
+    final Object stopLock = new Object();
+    final AtomicBoolean stop = new AtomicBoolean();
+    final AtomicBoolean dispose = new AtomicBoolean();
 
     public OxyProviderThread(Runnable r, String name) {
         worker = new Thread(r, name);
@@ -22,14 +26,12 @@ public class OxyProviderThread<T extends OxyProvider> {
         worker.start();
     }
 
-    //** FOR STOP(), SUSPEND(), RESUME() METHODS **
-    //deprecated, should not be used... it is being used because you cannot directly kill a thread immediately with wait(), notify() methods.
-    //with methods wait() and notify() you can stop a thread but the implementation would be horrible for long action processes (for example 3 for loops).
-
-    @SuppressWarnings("deprecation")
     public void shutdown() {
-        worker.checkAccess();
-        worker.stop();
+        stop.set(false);
+        synchronized (stopLock) {
+            stopLock.notifyAll();
+        }
+        dispose.set(true);
         try {
             worker.join();
         } catch (InterruptedException e) {
@@ -37,16 +39,15 @@ public class OxyProviderThread<T extends OxyProvider> {
         }
     }
 
-    @SuppressWarnings("removal")
     public void restart() {
-        worker.checkAccess();
-        worker.resume();
+        stop.set(false);
+        synchronized (stopLock) {
+            stopLock.notify();
+        }
     }
 
-    @SuppressWarnings("removal")
     public void stop() {
-        worker.checkAccess();
-        worker.suspend();
+        stop.set(true);
     }
 
     public ConcurrentLinkedDeque<T> getProviders() {
@@ -54,10 +55,10 @@ public class OxyProviderThread<T extends OxyProvider> {
     }
 
     public void addProvider(T provider) {
-        if(!providers.contains(provider)) providers.add(provider);
+        if (!providers.contains(provider)) providers.add(provider);
     }
 
-    public void removeProvider(T provider){
+    public void removeProvider(T provider) {
         providers.remove(provider);
     }
 

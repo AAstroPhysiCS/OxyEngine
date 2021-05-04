@@ -28,7 +28,7 @@ import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
 
-public class ShadowRender {
+public class ShadowRenderer {
 
     public static final int NUMBER_CASCADES = 4;
     private static final int FRUSTUM_CORNERS = 8;
@@ -64,7 +64,7 @@ public class ShadowRender {
         }
     }
 
-    private ShadowRender() {
+    private ShadowRenderer() {
 
     }
 
@@ -172,10 +172,10 @@ public class ShadowRender {
         private static DebugPanel INSTANCE = null;
 
         static final float[] cascadeSplit = new float[]{
-                ShadowRender.cascadeSplit[0], ShadowRender.cascadeSplit[1], ShadowRender.cascadeSplit[2], ShadowRender.cascadeSplit[3]
+                ShadowRenderer.cascadeSplit[0], ShadowRenderer.cascadeSplit[1], ShadowRenderer.cascadeSplit[2], ShadowRenderer.cascadeSplit[3]
         };
         static final float[] nearPlaneOffset = new float[]{
-                ShadowRender.nearPlaneOffset
+                ShadowRenderer.nearPlaneOffset
         };
         static final int[] shadowMapIndex = new int[]{0};
 
@@ -210,12 +210,12 @@ public class ShadowRender {
                 cascadeIndicatorToggle = !cascadeIndicatorToggle;
             }
 
-            ShadowRender.cascadeSplit[0] = cascadeSplit[0];
-            ShadowRender.cascadeSplit[1] = cascadeSplit[1];
-            ShadowRender.cascadeSplit[2] = cascadeSplit[2];
-            ShadowRender.cascadeSplit[3] = cascadeSplit[3];
+            ShadowRenderer.cascadeSplit[0] = cascadeSplit[0];
+            ShadowRenderer.cascadeSplit[1] = cascadeSplit[1];
+            ShadowRenderer.cascadeSplit[2] = cascadeSplit[2];
+            ShadowRenderer.cascadeSplit[3] = cascadeSplit[3];
 
-            ShadowRender.nearPlaneOffset = nearPlaneOffset[0];
+            ShadowRenderer.nearPlaneOffset = nearPlaneOffset[0];
 
             ImGui.end();
         }

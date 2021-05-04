@@ -5,17 +5,25 @@ import static OxyEngine.Scene.SceneRuntime.TS;
 public final class ScriptEngine {
 
     public static OxyProviderThread<OxyScript.EntityInfoProvider> scriptThread = new OxyProviderThread<>();
-    private static final Object lock = new Object();
+    private static final Object runtimeLock = new Object();
 
     static {
         scriptThread.setTarget(() -> {
-            //noinspection InfiniteLoopStatement
-            while (true) {
-                synchronized (lock) {
+            while (!scriptThread.dispose.get()) {
+                synchronized (runtimeLock) {
                     try {
-                        lock.wait();
+                        runtimeLock.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    }
+                }
+                if(scriptThread.stop.get()) {
+                    synchronized (scriptThread.stopLock) {
+                        try {
+                            scriptThread.stopLock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 for (var providerF : scriptThread.getProviders()) {
@@ -31,8 +39,8 @@ public final class ScriptEngine {
 
     public static synchronized void notifyLock() {
         if (scriptThread.getProviders().size() == 0) return;
-        synchronized (lock) {
-            lock.notify();
+        synchronized (runtimeLock) {
+            runtimeLock.notify();
         }
     }
 
@@ -65,8 +73,13 @@ public final class ScriptEngine {
 
     public static void dispose() {
         if (scriptThread != null) {
-            clearProviders();
+            //cant call locknotify method bcs it checks if there's any active script running
+            //but for a clean thread shutdown, i shouldn't consider if there's any script running (otherwise, no clean shutdown)
+            synchronized (runtimeLock) {
+                runtimeLock.notify();
+            }
             scriptThread.shutdown();
+            clearProviders();
             scriptThread = null;
         }
     }

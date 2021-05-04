@@ -11,6 +11,7 @@ import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
+import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.Scene.Objects.Importer.ImporterType;
 import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
 import OxyEngine.Scene.Objects.Model.*;
@@ -147,6 +148,10 @@ public final class Scene implements OxyDisposable {
 
     public final List<OxyModel> createModelEntities(DefaultModelType type) {
         return createModelEntities(type.getPath(), false);
+    }
+
+    public final OxyModel createModelEntity(DefaultModelType type) {
+        return createModelEntity(type.getPath(), 0, 0);
     }
 
     public final OxyModel createEmptyModel() {
@@ -289,6 +294,8 @@ public final class Scene implements OxyDisposable {
         }
 
         int index = e.get(OxyMaterialIndex.class) != null ? e.get(OxyMaterialIndex.class).index() : -1;
+
+        if (e.has(OxyPhysXComponent.class)) e.get(OxyPhysXComponent.class).dispose();
 
         if (e.has(ModelMeshOpenGL.class)) e.get(ModelMeshOpenGL.class).dispose();
         if (e.has(SkyLight.class)) {

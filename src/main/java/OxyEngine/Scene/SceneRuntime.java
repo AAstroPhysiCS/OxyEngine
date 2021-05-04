@@ -2,6 +2,7 @@ package OxyEngine.Scene;
 
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.PhysX.OxyPhysX;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scripting.OxyScript;
@@ -73,6 +74,7 @@ public final class SceneRuntime {
         ScriptEngine.stop();
         System.gc();
         loadSceneState();
+        OxyPhysX.getInstance().resetSimulation();
     }
 
     public static void resume() {
@@ -82,6 +84,7 @@ public final class SceneRuntime {
     }
 
     public static void dispose() {
+        OxyPhysX.getInstance().dispose();
         ACTIVE_SCENE.STATE = SceneState.TERMINATED;
         ScriptEngine.dispose();
         ACTIVE_SCENE.dispose();

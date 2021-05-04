@@ -6,6 +6,8 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderPass;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRenderer;
@@ -58,6 +60,13 @@ public class OxyModel extends OxyEntity {
                 new SelectedComponent(false)
         );
 
+        if (this.has(OxyPhysXComponent.class)) {
+            OxyPhysXComponent physXComponent = new OxyPhysXComponent(this.get(OxyPhysXComponent.class), e);
+            e.addComponent(physXComponent);
+            physXComponent.getGeometry().build();
+            physXComponent.getActor().build();
+        }
+
         e.setFamily(new EntityFamily(this.getFamily().root()));
 
         if (this.has(PointLight.class)) e.addComponent(this.get(PointLight.class));
@@ -69,7 +78,7 @@ public class OxyModel extends OxyEntity {
         for (OxyScript s : this.getScripts()) e.addScript(new OxyScript(s.getPath()));
 
         //adding all the parent gui nodes (except OxyScript, bcs that gui node is instance dependent)
-        e.getGUINodes().addAll(this.getGUINodes().stream().filter(c -> c instanceof OxyScript).collect(Collectors.toList()));
+        e.getGUINodes().addAll(this.getGUINodes().stream().filter(c -> !(c instanceof OxyScript)).collect(Collectors.toList()));
 
         SceneRuntime.stop();
 
@@ -91,8 +100,9 @@ public class OxyModel extends OxyEntity {
         assert factory != null : oxyAssert("Models should have a Model Template");
         transformLocally();
         factory.constructData(this);
-        OxyRenderPass geometryRenderPass = SceneRenderer.getInstance().getGeometryPipeline().getRenderPass();
-        addComponent(new ModelMeshOpenGL(SceneRenderer.getInstance().getGeometryPipeline(), meshPath, geometryRenderPass.getMeshRenderingMode(),
+        OxyPipeline geometryPipeline = SceneRenderer.getInstance().getGeometryPipeline();
+        OxyRenderPass geometryRenderPass = geometryPipeline.getRenderPass();
+        addComponent(new ModelMeshOpenGL(geometryPipeline, meshPath, geometryRenderPass.getMeshRenderingMode(),
                 vertices, indices, tcs, normals, tangents, biTangents));
     }
 

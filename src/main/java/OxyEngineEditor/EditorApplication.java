@@ -3,7 +3,7 @@ package OxyEngineEditor;
 import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
-import OxyEngine.Core.Renderer.ShadowRender.DebugPanel;
+import OxyEngine.Core.Renderer.ShadowRenderer.DebugPanel;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
@@ -40,9 +40,9 @@ public class EditorApplication extends OxyApplication {
         SceneLayer sceneLayer = SceneLayer.getInstance();
         UILayer uiLayer = UILayer.getInstance();
 
+        uiLayer.addPanel(ProjectPanel.getInstance());
         uiLayer.addPanel(StatsPanel.getInstance());
         uiLayer.addPanel(ToolbarPanel.getInstance());
-        uiLayer.addPanel(ProjectPanel.getInstance());
         uiLayer.addPanel(ScenePanel.getInstance());
         uiLayer.addPanel(SceneRuntime.getPanel());
         uiLayer.addPanel(SceneHierarchyPanel.getInstance());
