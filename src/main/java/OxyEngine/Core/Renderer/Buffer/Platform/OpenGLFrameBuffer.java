@@ -1,6 +1,7 @@
 package OxyEngine.Core.Renderer.Buffer.Platform;
 
 import OxyEngine.Core.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.OxyEngine;
 import OxyEngineEditor.UI.Panels.Panel;
 
@@ -8,21 +9,11 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL45.*;
 
 public class OpenGLFrameBuffer extends FrameBuffer {
-
-    public static <T> T createNewSpec(Class<T> tClass) {
-        try {
-            return tClass.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        throw new IllegalStateException("Spec Builder should not be empty!");
-    }
 
     private final FrameBufferSpecification[] specs;
 
@@ -228,7 +219,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
 
     public void flush() {
         bind();
-        rendererAPI.clearBuffer();
-        rendererAPI.clearColor(Panel.bgC[0], Panel.bgC[1], Panel.bgC[2], Panel.bgC[3]);
+        OxyRenderer.clearBuffer();
+        OxyRenderer.clearColor(Panel.bgC[0], Panel.bgC[1], Panel.bgC[2], Panel.bgC[3]);
     }
 }

@@ -1,80 +1,33 @@
 package OxyEngine.Core.Renderer.Texture;
 
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
+import OxyEngine.Core.Renderer.Mesh.NativeMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderPass;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
-import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRenderer;
-import OxyEngine.TextureSlot;
 
 import java.io.File;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
 
-import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-import static org.lwjgl.stb.STBImage.*;
+import static org.lwjgl.stb.STBImage.stbi_image_free;
 
-public class CubemapTexture extends OxyTexture.AbstractTexture {
-
-    private static final float[] skyboxVertices = {
-            -1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, 1.0f, -1.0f,
-            // front face
-            -1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, -1.0f, 1.0f,
-            // left face
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            // right face
-            1.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            // bottom face
-            -1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, -1.0f,
-            // top face
-            -1.0f, 1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, 1.0f, 1.0f,
-    };
+public class OpenGLCubeTexture extends CubeTexture {
 
     private final Scene scene;
     private OxyShader shader;
-    private static final List<String> fileStructure = Arrays.asList("right", "left", "bottom", "top", "front", "back");
-    private static final List<String> totalFiles = new ArrayList<>();
 
-    CubemapTexture(TextureSlot slot, String path, Scene scene) {
+    OpenGLCubeTexture(TextureSlot slot, String path, Scene scene) {
         super(slot, path);
         this.scene = scene;
 
@@ -94,21 +47,10 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
         }
 
         assert totalFiles.size() == 6 : oxyAssert("Cubemap directory needs to only have the texture files. Directory length: " + files.length);
-        stbi_set_flip_vertically_on_load(true);
         for (int i = 0; i < totalFiles.size(); i++) {
-            int[] width = new int[1];
-            int[] height = new int[1];
-            int[] channels = new int[1];
-            ByteBuffer buffer = stbi_load(totalFiles.get(i), width, height, channels, 0);
-            if (buffer == null) {
-                logger.warning("Texture: " + path + " could not be loaded!");
-                return;
-            }
-            int alFormat = GL_RGBA;
-            if (channels[0] == 3)
-                alFormat = GL_RGB;
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, alFormat, width[0], height[0], 0, alFormat, GL_UNSIGNED_BYTE, buffer);
-            stbi_image_free(buffer);
+            loadAsByteBuffer(totalFiles.get(i));
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, alFormat, width, height, 0, alFormat, GL_UNSIGNED_BYTE, (ByteBuffer) textureBuffer);
+            stbi_image_free((ByteBuffer) textureBuffer);
         }
 
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -118,6 +60,7 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
+    @Override
     public void init(Set<OxyPipeline> allOtherPipelines) {
 
         for (OxyPipeline s : allOtherPipelines) {
@@ -141,16 +84,13 @@ public class CubemapTexture extends OxyTexture.AbstractTexture {
             shader.setUniform1i("skyBoxTexture", textureSlot.getValue());
             shader.end();
 
-            NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL(skyBoxPipeline);
-            OxyNativeObject cube = scene.createNativeObjectEntity();
-            cube.vertices = skyboxVertices;
+            NativeMeshOpenGL mesh = new NativeMeshOpenGL(skyBoxPipeline);
             int[] indices = new int[skyboxVertices.length];
-            for (int i = 0; i < skyboxVertices.length; i++) {
+            for (int i = 0; i < skyboxVertices.length; i++)
                 indices[i] = i;
-            }
-            cube.indices = indices;
+            OxyNativeObject cube = scene.createNativeObjectEntity(skyboxVertices, indices);
             cube.addComponent(mesh);
-            mesh.addToBuffer(skyBoxPipeline);
+            mesh.load(skyBoxPipeline);
         }
     }
 }

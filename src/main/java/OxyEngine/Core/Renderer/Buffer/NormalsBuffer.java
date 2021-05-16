@@ -1,10 +1,9 @@
 package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLNormalsBuffer;
-import OxyEngine.Core.Renderer.Context.OpenGLRendererAPI;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
+import OxyEngine.TargetPlatform;
 
 public abstract class NormalsBuffer extends Buffer {
 
@@ -25,7 +24,7 @@ public abstract class NormalsBuffer extends Buffer {
     }
 
     public static <T extends NormalsBuffer> T create(OxyPipeline pipeline){
-        if(rendererAPI instanceof OpenGLRendererAPI) {
+        if(OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             var layout = pipeline.getLayout(NormalsBuffer.class);
             try {
                 var constructor = OpenGLNormalsBuffer.class.getDeclaredConstructor(OxyPipeline.Layout.class);

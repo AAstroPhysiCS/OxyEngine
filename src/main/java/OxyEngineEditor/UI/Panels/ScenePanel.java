@@ -9,7 +9,7 @@ import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyModel;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
@@ -67,7 +67,7 @@ public class ScenePanel extends Panel {
         ImGui.getCursorScreenPos(offsetScreenPos);
 
         if (editorCameraEntity == null) { //editor camera init
-            editorCameraEntity = ACTIVE_SCENE.createNativeObjectEntity();
+            editorCameraEntity = ACTIVE_SCENE.createNativeObjectEntity(null, null);
             EditorCamera editorCamera = new EditorCamera(true, 45f, ScenePanel.windowSize.x / ScenePanel.windowSize.y, 1f, 10000f, true);
             editorCameraEntity.addComponent(new TransformComponent(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f)), editorCamera, new TagComponent("Editor Camera"));
             currentBoundedCamera = editorCamera;
@@ -94,7 +94,6 @@ public class ScenePanel extends Panel {
                         List<OxyModel> eList = ACTIVE_SCENE.createModelEntities(fPath);
                         for (OxyModel e : eList) {
                             e.addComponent(new SelectedComponent(false));
-                            e.constructData();
                             e.getGUINodes().add(ModelMeshOpenGL.guiNode);
                             if (!e.getGUINodes().contains(OxyMaterial.guiNode))
                                 e.getGUINodes().add(OxyMaterial.guiNode);

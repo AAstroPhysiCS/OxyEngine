@@ -1,8 +1,6 @@
 package OxyEngine;
 
-import OxyEngine.Core.Renderer.Context.OxyRenderCommand;
-import OxyEngine.Core.Renderer.Context.RendererAPI;
-import OxyEngine.Core.Renderer.Context.RendererContext;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxyDisposable;
@@ -26,6 +24,8 @@ public class OxyEngine implements OxyDisposable {
 
     private final Thread thread;
 
+    private final TargetPlatform targetPlatform;
+
     private static final float[][] LOADED_THEME = UIThemeLoader.getInstance().load();
 
     public OxyEngine(Supplier<Runnable> supplier, WindowHandle windowHandle, Antialiasing antialiasing, boolean vSync, boolean debug, TargetPlatform targetPlatform) {
@@ -33,9 +33,8 @@ public class OxyEngine implements OxyDisposable {
         OxyEngine.windowHandle = windowHandle;
         this.vSync = vSync;
         this.debug = debug;
+        this.targetPlatform = targetPlatform;
         OxyEngine.antialiasing = antialiasing;
-
-        OxyRenderCommand.getInstance(RendererContext.getContext(targetPlatform), RendererAPI.getContext(targetPlatform));
     }
 
     public enum Antialiasing {
@@ -75,7 +74,7 @@ public class OxyEngine implements OxyDisposable {
         });
         windowHandle.init();
         glfwSwapInterval(vSync ? 1 : 0);
-        OxyRenderCommand.init(debug);
+        OxyRenderer.init(targetPlatform, debug);
     }
 
     @Override
@@ -88,10 +87,6 @@ public class OxyEngine implements OxyDisposable {
 
     public static Antialiasing getAntialiasing() {
         return antialiasing;
-    }
-
-    public Thread getMainThread() {
-        return thread;
     }
 
     public static float[][] getLoadedTheme() {

@@ -3,6 +3,7 @@ package OxyEngineEditor;
 import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Layers.SceneLayer;
 import OxyEngine.Core.Layers.UILayer;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.ShadowRenderer.DebugPanel;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
@@ -13,7 +14,6 @@ import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
 import org.lwjgl.glfw.GLFW;
 
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererContext;
 import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
@@ -66,8 +66,8 @@ public class EditorApplication extends OxyApplication {
         for (Layer l : layerStack.getLayerStack())
             l.render(ts);
 
-        rendererContext.swapBuffer(windowHandle);
-        rendererContext.pollEvents();
+        OxyRenderer.swapBuffers();
+        OxyRenderer.pollEvents();
     }
 
     protected Runnable run() {
@@ -79,7 +79,7 @@ public class EditorApplication extends OxyApplication {
             long timeMillis = System.currentTimeMillis();
             double frames = 0;
 
-            while (oxyEngine.getMainThread().isAlive() && !glfwWindowShouldClose(windowHandle.getPointer())) {
+            while (Thread.currentThread().isAlive() && !glfwWindowShouldClose(windowHandle.getPointer())) {
                 if (keyEventDispatcher.getKeys()[GLFW.GLFW_KEY_ESCAPE]) break;
 
                 final float currentTime = (float) glfwGetTime();
@@ -92,8 +92,8 @@ public class EditorApplication extends OxyApplication {
 
                 if (System.currentTimeMillis() - timeMillis > 1000) {
                     timeMillis += 1000;
-                    FRAME_TIME = (float) (1000 / frames);
-                    FPS = (int) frames;
+                    SceneRuntime.FRAME_TIME = (float) (1000 / frames);
+                    SceneRuntime.FPS = (int) frames;
                     frames = 0;
                 }
 

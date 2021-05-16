@@ -236,7 +236,7 @@ public class AnimationComponent implements EntityComponent {
         return currentTime;
     }
 
-    public void setCurrentTime(float currentTime) {
+    public void setTime(float currentTime) {
         this.currentTime = currentTime;
     }
 

@@ -1,10 +1,9 @@
 package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLTextureBuffer;
-import OxyEngine.Core.Renderer.Context.OpenGLRendererAPI;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
+import OxyEngine.TargetPlatform;
 
 public abstract class TextureBuffer extends Buffer {
 
@@ -18,7 +17,7 @@ public abstract class TextureBuffer extends Buffer {
     }
 
     public static <T extends TextureBuffer> T create(OxyPipeline pipeline){
-        if(rendererAPI instanceof OpenGLRendererAPI) {
+        if(OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             var layout = pipeline.getLayout(TextureBuffer.class);
             try {
                 var constructor = OpenGLTextureBuffer.class.getDeclaredConstructor(OxyPipeline.Layout.class);

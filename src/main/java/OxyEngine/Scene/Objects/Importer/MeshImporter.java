@@ -167,10 +167,10 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
         String textPathNormals = pathNormals.dataString();
         pathNormals.clear();
 
-        AIString pathRoughness = AIString.calloc();
-        aiGetMaterialTexture(aiMaterial, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, 0, pathRoughness, (IntBuffer) null, null, null, null, null, null);
-        String textPathRoughness = pathRoughness.dataString();
-        pathRoughness.clear();
+        AIString pathMetallicAndRoughness = AIString.calloc();
+        aiGetMaterialTexture(aiMaterial, AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, 0, pathMetallicAndRoughness, (IntBuffer) null, null, null, null, null, null);
+        String textPathRoughness = pathMetallicAndRoughness.dataString();
+        pathMetallicAndRoughness.clear();
 
         AIString pathMetallic = AIString.calloc();
         aiGetMaterialTexture(aiMaterial, aiTextureType_UNKNOWN, 0, pathMetallic, (IntBuffer) null, null, null, null, null, null);

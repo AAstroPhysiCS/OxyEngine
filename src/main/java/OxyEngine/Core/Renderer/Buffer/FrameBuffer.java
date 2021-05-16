@@ -2,9 +2,8 @@ package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Renderer.Context.OpenGLRendererAPI;
-
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
+import OxyEngine.Core.Renderer.OxyRenderer;
+import OxyEngine.TargetPlatform;
 
 public abstract class FrameBuffer extends Buffer {
 
@@ -36,8 +35,8 @@ public abstract class FrameBuffer extends Buffer {
         return height;
     }
 
-    public static <T extends FrameBuffer> T create(int width, int height, FrameBufferSpecification... specBuilders){
-        if(rendererAPI instanceof OpenGLRendererAPI) {
+    public static <T extends FrameBuffer> T create(int width, int height, FrameBufferSpecification... specBuilders) {
+        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             try {
                 var constructor = OpenGLFrameBuffer.class.getDeclaredConstructor(int.class, int.class, specBuilders.getClass());
                 constructor.setAccessible(true);
@@ -47,5 +46,14 @@ public abstract class FrameBuffer extends Buffer {
             }
         }
         throw new IllegalStateException("API not supported yet!");
+    }
+
+    public static <T> T createNewSpec(Class<T> tClass) {
+        try {
+            return tClass.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        throw new IllegalStateException("Spec Builder should not be empty!");
     }
 }

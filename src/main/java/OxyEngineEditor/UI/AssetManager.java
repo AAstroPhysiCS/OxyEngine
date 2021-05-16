@@ -1,8 +1,8 @@
 package OxyEngineEditor.UI;
 
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.TextureSlot;
+import OxyEngine.Core.Renderer.Texture.TextureSlot;
 
 import java.io.File;
 import java.util.*;
@@ -12,7 +12,7 @@ import static OxyEngine.System.OxySystem.removeFileExtension;
 
 public class AssetManager {
 
-    private final Map<String, ImageTexture> assets = new HashMap<>();
+    private final Map<String, Image2DTexture> assets = new HashMap<>();
 
     private static AssetManager INSTANCE = null;
 
@@ -49,7 +49,7 @@ public class AssetManager {
         assets.put(name, OxyTexture.loadImage(TextureSlot.UITEXTURE, path));
     }
 
-    public ImageTexture getAsset(String imageName) {
+    public Image2DTexture getAsset(String imageName) {
         return assets.get(imageName);
     }
 }

@@ -14,7 +14,7 @@ import static OxyEngine.System.OxySystem.logger;
 public final class OxyPipeline {
 
     private OxyShader shader;
-    private final String debugName;
+    private final String debugName; //TODO: Do something with the debug name
     private final List<Layout> layouts;
     private final OxyRenderPass renderPass;
 
@@ -131,8 +131,8 @@ public final class OxyPipeline {
     }
 
     public static OxyPipeline createNewPipeline(PipelineSpecification builder) {
-        if(builder.renderPass == null) throw new IllegalStateException("RenderPass is null!");
-        if(builder.shader == null) throw new IllegalStateException("Shader is null!");
+        if (builder.renderPass == null) throw new IllegalStateException("RenderPass is null!");
+        if (builder.shader == null) throw new IllegalStateException("Shader is null!");
         return new OxyPipeline(builder);
     }
 

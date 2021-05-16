@@ -15,7 +15,6 @@ import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.Scene.Objects.Importer.ImporterType;
 import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
 import OxyEngine.Scene.Objects.Model.*;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scripting.ScriptEngine;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
@@ -53,12 +52,10 @@ public final class Scene implements OxyDisposable {
         registry.entityList.put(e, new LinkedHashSet<>(allEntityComponentChildClasses.size()));
     }
 
-    public final OxyNativeObject createNativeObjectEntity() {
-        return createNativeObjectEntity(1);
-    }
-
-    public final OxyNativeObject createNativeObjectEntity(int size) {
-        OxyNativeObject e = new OxyNativeObject(this, size);
+    public final OxyNativeObject createNativeObjectEntity(float[] vertices, int[] indices) {
+        OxyNativeObject e = new OxyNativeObject(this);
+        e.vertices = vertices;
+        e.indices = indices;
         e.importedFromFile = false;
         put(e);
         e.addComponent(
@@ -92,14 +89,12 @@ public final class Scene implements OxyDisposable {
     }
 
     public OxyNativeObject createSkyLight() {
-        OxyNativeObject skyLightEnt = createNativeObjectEntity();
-        skyLightEnt.setFactory(new SkyLight.Factory());
+        OxyNativeObject skyLightEnt = createNativeObjectEntity(SkyLight.skyboxVertices, SkyLight.indices);
         if (entityContext != null) skyLightEnt.setFamily(new EntityFamily(entityContext.getFamily()));
         skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight());
         skyLightEnt.addComponent(SkyLight.mesh);
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
             skyLightEnt.getGUINodes().add(SkyLight.guiNode);
-        skyLightEnt.initData();
         SceneRenderer.getInstance().updateLightEntities();
         SceneRenderer.getInstance().updateNativeEntities();
         return skyLightEnt;
@@ -192,10 +187,9 @@ public final class Scene implements OxyDisposable {
         for (int i = 0; i < modelImporter.getMeshSize(); i++) {
             int materialIndex = modelImporter.getMaterialIndex(i);
             int index = OxyMaterialPool.addMaterial(modelImporter.getMaterialName(materialIndex), materialIndex, modelImporter.getMaterialPaths(materialIndex));
-            OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
+            OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER, modelImporter.getVertexList(i), modelImporter.getFaces(i));
             e.importedFromFile = importedFromFile;
             put(e);
-            e.factory = new ModelFactory(modelImporter.getVertexList(i), modelImporter.getFaces(i));
             e.setFamily(new EntityFamily(modelImporter.getRootEntity(i).getFamily()));
             e.addComponent(
                     new UUIDComponent(UUID.randomUUID()),
@@ -213,7 +207,7 @@ public final class Scene implements OxyDisposable {
                 e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
                 System.gc();
             }
-            e.initData(path);
+            e.initMesh(path);
             models.add(e);
             pos++;
         }
@@ -229,9 +223,8 @@ public final class Scene implements OxyDisposable {
         OxyMaterialPool.newBatch();
         int materialIndex = modelImporter.getMaterialIndex(i);
         int index = OxyMaterialPool.addMaterial(modelImporter.getMaterialName(materialIndex), materialIndex, modelImporter.getMaterialPaths(materialIndex));
-        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
+        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER, modelImporter.getVertexList(i), modelImporter.getFaces(i));
         put(e);
-        e.factory = new ModelFactory(modelImporter.getVertexList(i), modelImporter.getFaces(i));
         e.setFamily(new EntityFamily(modelImporter.getRootEntity(i).getFamily()));
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
@@ -249,7 +242,7 @@ public final class Scene implements OxyDisposable {
             e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
             System.gc();
         }
-        e.initData(path);
+        e.initMesh(path);
         return e;
     }
 
@@ -261,9 +254,8 @@ public final class Scene implements OxyDisposable {
             Scene.optimization_Path = path;
         }
         OxyMaterialPool.newBatch();
-        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
+        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER, modelImporter.getVertexList(i), modelImporter.getFaces(i));
         put(e);
-        e.factory = new ModelFactory(modelImporter.getVertexList(i), modelImporter.getFaces(i));
         e.addComponent(
                 new UUIDComponent(UUID.randomUUID()),
                 new BoundingBoxComponent(
@@ -280,7 +272,7 @@ public final class Scene implements OxyDisposable {
             e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
             System.gc();
         }
-        e.initData(path);
+        e.initMesh(path);
         return e;
     }
 
@@ -436,11 +428,7 @@ public final class Scene implements OxyDisposable {
     @Override
     public void dispose() {
         OxyMaterialPool.clear();
-        Iterator<OxyEntity> it = registry.entityList.keySet().iterator();
-        while (it.hasNext()) {
-            if (it.next() != null) it.remove();
-        }
-        assert !it.hasNext() : oxyAssert("Scene dispose failed");
+        registry.entityList.keySet().removeIf(Objects::nonNull); //removing all objects that aren't null
     }
 
     public static void openScene() {

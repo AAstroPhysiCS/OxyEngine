@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
 import OxyEngine.System.OxyFontSystem;
 import OxyEngine.System.OxyLogger;
 import OxyEngineEditor.UI.AssetManager;
@@ -42,10 +42,10 @@ public class ProjectPanel extends Panel {
     private static final ImString searchImString = new ImString(1000);
 
     private static final float buttonColorOffsetHovered = 0.09f, buttonColorOffsetActive = 0.15f;
-    private static ImageTexture objAsset, fbxAsset, gltfAsset;
-    private static ImageTexture fileAsset, pngAsset, jpgAsset, blendAsset;
-    public static ImageTexture dirAsset;
-    public static ImageTexture dirAssetGrey;
+    private static Image2DTexture objAsset, fbxAsset, gltfAsset;
+    private static Image2DTexture fileAsset, pngAsset, jpgAsset, blendAsset;
+    public static Image2DTexture dirAsset;
+    public static Image2DTexture dirAssetGrey;
 
     private static final float[] bg = new float[]{48 / 255f, 46 / 255f, 48 / 255f, 1.0f};
 

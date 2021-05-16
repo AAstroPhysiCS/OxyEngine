@@ -1,13 +1,11 @@
-package OxyEngine.Scene.Objects.Native;
+package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.RenderableComponent;
 import OxyEngine.Components.RenderingMode;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
 import OxyEngine.Core.Renderer.Mesh.OxyVertex;
-import OxyEngine.Scene.Objects.Model.DefaultModelType;
 import OxyEngine.Scene.Objects.Importer.ImporterType;
 import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
 import OxyEngine.Scene.OxyEntity;
@@ -17,28 +15,28 @@ import org.joml.Vector4f;
 import java.util.List;
 import java.util.UUID;
 
-import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngine.Utils.copy;
 
 public class OxyNativeObject extends OxyEntity {
 
-    final int size;
-    public NativeObjectFactory factory;
-
-    public OxyNativeObject(Scene scene, int size) {
+    public OxyNativeObject(Scene scene) {
         super(scene);
-        this.size = size;
     }
 
-    public void pushVertexData(TransformComponent t) {
-        TransformComponent tOld = get(TransformComponent.class);
-        tOld.set(t);
-        initData();
+    public void pushVertexData(float[] vertices) {
+        if(this.vertices.length == 0){
+            this.vertices = vertices;
+            return;
+        }
+        for(int i = 0; i < this.vertices.length; i++){
+            this.vertices = copy(this.vertices, vertices);
+        }
     }
 
     public void pushVertexData(DefaultModelType type){
         OxyModelImporter loader = new OxyModelImporter(type.getPath(), ImporterType.MeshImporter); //JUST IMPORTING MESH FOR NOW
         List<OxyVertex> modelVertices = loader.getVertexList(0);
-        vertices = new float[modelVertices.size() * 3];
+        float[] vertices = new float[modelVertices.size() * 3];
         int vertPtr = 0;
         TransformComponent c = get(TransformComponent.class);
         for (OxyVertex o : modelVertices) {
@@ -47,38 +45,28 @@ public class OxyNativeObject extends OxyEntity {
             vertices[vertPtr++] = transformed.y;
             vertices[vertPtr++] = transformed.z;
         }
-        initData();
+        this.vertices = copy(this.vertices, vertices);
     }
 
     @Override
     public OxyEntity copyMe() {
-        OxyNativeObject e = new OxyNativeObject(scene, size);
+        OxyNativeObject e = new OxyNativeObject(scene);
         e.addToScene();
         e.addComponent(new UUIDComponent(UUID.randomUUID()), new TransformComponent(), new RenderableComponent(RenderingMode.Normal));
         return e;
     }
 
-    public void initData() {
-        assert has(OpenGLMesh.class) : oxyAssert("Game object need to have a template and a Mesh!");
-
-        OpenGLMesh mesh = get(OpenGLMesh.class);
-
-        factory.constructData(this, size);
-        assert mesh instanceof NativeObjectMeshOpenGL : oxyAssert("Native Object needs to have a NativeObjectMesh");
-        factory.initData(this, (NativeObjectMeshOpenGL) mesh);
-    }
-
     @Override
-    public void constructData() {
-        if(factory == null) return;
-        factory.constructData(this, size);
-    }
-
-    public void setFactory(NativeObjectFactory factory) {
-        this.factory = factory;
-    }
-
-    public int getSize() {
-        return size;
+    public void updateData() {
+        transformLocally();
+        TransformComponent c = get(TransformComponent.class);
+        int vertPtr = 0;
+        for (int i = 0; i < vertices.length; i++) {
+            Vector4f transformed = new Vector4f(vertices[i++], vertices[i++], vertices[i++], 1.0f).mul(c.transform);
+            vertices[vertPtr++] = transformed.x;
+            vertices[vertPtr++] = transformed.y;
+            vertices[vertPtr++] = transformed.z;
+        }
+        if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 }

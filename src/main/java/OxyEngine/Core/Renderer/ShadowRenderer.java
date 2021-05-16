@@ -23,11 +23,11 @@ import org.joml.Vector4f;
 
 import java.util.List;
 
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
 import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
 
+//TODO: Delete this class and integrate with some class
 public class ShadowRenderer {
 
     public static final int NUMBER_CASCADES = 4;
@@ -99,7 +99,7 @@ public class ShadowRenderer {
             cascadedCamArr[i].setDirectionalLight(d);
             cascadedCamArr[i].prepare((PerspectiveCamera) currentBoundedCamera, cascadeSplit[i]);
             shadowFrameBuffer.bindDepthAttachment(0, i);
-            rendererAPI.clearBuffer();
+            OxyRenderer.clearBuffer();
         }
 
         for (OxyEntity e : SceneRenderer.getInstance().allModelEntities) {

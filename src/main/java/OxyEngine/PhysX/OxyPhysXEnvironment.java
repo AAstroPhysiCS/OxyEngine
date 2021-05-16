@@ -5,6 +5,8 @@ import OxyEngine.System.OxyDisposable;
 import org.lwjgl.system.MemoryStack;
 import physx.PxTopLevelFunctions;
 import physx.common.*;
+import physx.cooking.PxCooking;
+import physx.cooking.PxCookingParams;
 import physx.extensions.PxDefaultAllocator;
 import physx.physics.*;
 
@@ -28,6 +30,9 @@ public final class OxyPhysXEnvironment implements OxyDisposable {
     private final PxFoundation foundation;
     PxPhysics pxPhysics;
 
+    PxCooking pxCooking;
+    private final PxCookingParams cookingParams;
+
     private PxScene scene;
     private final PxTolerancesScale tolerances;
 
@@ -42,10 +47,16 @@ public final class OxyPhysXEnvironment implements OxyDisposable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         allocator = new PxDefaultAllocator();
         foundation = PxTopLevelFunctions.CreateFoundation(PHYSX_VERSION, allocator, errorCallback);
+
         tolerances = new PxTolerancesScale();
         pxPhysics = PxTopLevelFunctions.CreatePhysics(PHYSX_VERSION, foundation, tolerances);
+
+        cookingParams = new PxCookingParams(tolerances);
+        pxCooking = PxTopLevelFunctions.CreateCooking(PHYSX_VERSION, foundation, cookingParams);
+
         create(builder);
     }
 
@@ -161,7 +172,9 @@ public final class OxyPhysXEnvironment implements OxyDisposable {
     }
 
     public void removeActor(OxyPhysXComponent comp) {
-        PxActor pxActor = comp.getActor().pxActor;
+        var oxyActor = comp.getActor();
+        if (oxyActor == null) return;
+        PxActor pxActor = oxyActor.pxActor;
         if (pxActor == null) return;
         if (scene != null) scene.removeActor(pxActor);
     }
@@ -200,6 +213,8 @@ public final class OxyPhysXEnvironment implements OxyDisposable {
         }
 //       TODO: invalid operation error
 //        foundation.release();
+        cookingParams.destroy();
+        pxCooking.release();
         tolerances.destroy();
         scene.release();
         scene = null;

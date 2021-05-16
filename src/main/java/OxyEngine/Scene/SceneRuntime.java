@@ -4,7 +4,7 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.PhysX.OxyPhysX;
 import OxyEngine.Scene.Objects.Model.OxyModel;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scripting.ScriptEngine;
 import OxyEngineEditor.EntryPoint;
@@ -21,6 +21,8 @@ public final class SceneRuntime {
     public static OxyNativeObject currentBoundedSkyLight;
     public static Scene ACTIVE_SCENE;
 
+    public static float FPS = 0;
+    public static float FRAME_TIME = 0;
     public static float TS = 0;
 
     private SceneRuntime() {

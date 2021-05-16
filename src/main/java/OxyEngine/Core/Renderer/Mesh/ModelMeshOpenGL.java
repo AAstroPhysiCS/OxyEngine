@@ -94,7 +94,7 @@ public class ModelMeshOpenGL extends OpenGLMesh {
                                 e.getGUINodes().add(ModelMeshOpenGL.guiNode);
                                 if (!e.getGUINodes().contains(OxyMaterial.guiNode))
                                     e.getGUINodes().add(OxyMaterial.guiNode);
-                                e.constructData();
+                                e.updateData();
                             }
 
                             cRoot.transform.mulLocal(c.transform);

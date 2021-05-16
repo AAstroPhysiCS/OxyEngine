@@ -2,7 +2,7 @@ package OxyEngine;
 
 import java.util.List;
 
-public interface Globals {
+public interface Utils {
 
     static float normalizeColor(float number) {
         return number / 255;
@@ -22,5 +22,12 @@ public interface Globals {
         int[] buffer = new int[list.size()];
         for(int i = 0; i < buffer.length; i++) buffer[i] = list.get(i);
         return buffer;
+    }
+
+    static float[] copy(float[] src, float[] dest) {
+        float[] newObjVert = new float[src.length + dest.length];
+        System.arraycopy(src, 0, newObjVert, 0, src.length);
+        System.arraycopy(dest, 0, newObjVert, src.length, dest.length);
+        return newObjVert;
     }
 }

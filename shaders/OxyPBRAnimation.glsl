@@ -170,7 +170,7 @@ float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
     float currentDepth = projCoords.z;
 
     vec3 normal = norm;
-    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.002);
+    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.003);
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(shadowMap[index], 0);
@@ -195,7 +195,7 @@ float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
 }
 
 vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
-    const float MAX_REFLECTION_LOD = 4.0;
+    const float MAX_REFLECTION_LOD =  8.0;
     vec3 albedo, emissive;
     float metallicMap, roughnessMap, aoMap;
 
@@ -244,7 +244,7 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
         float shadowCalc = 0.0f;
 
         if(bool(castShadows)){
-            for(int j = 0; j < NUMBER_CASCADES; j++){
+            for(int j = 0; j < NUMBER_CASCADES; j++) {
                 if(clipSpacePosZ <= cascadeSplits[j]) {
                    shadowCalc = ShadowCalculation(norm, inVar.lightSpacePos[j], lightDir, j);
                    if (j == 0)
@@ -263,7 +263,7 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
         Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0) * (1.0 - shadowCalc);
     }
 
-    for(int i = 0; i < p_Light.length; i++){
+    for(int i = 0; i < p_Light.length; i++) {
         if(p_Light[i].activeState == 0) continue;
         vec3 lightPos = p_Light[i].position;
 
@@ -284,7 +284,7 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
 
     vec3 R = reflect(-viewDir, norm);
     vec3 prefilteredColor = textureLod(prefilterMap, R, roughnessMap * MAX_REFLECTION_LOD).rgb;
-    vec2 envBRDF  = texture(brdfLUT, vec2(max(dot(norm, viewDir), 0.0), roughnessMap)).rg;
+    vec2 envBRDF = texture(brdfLUT, vec2(max(dot(norm, viewDir), 0.0), roughnessMap)).rg;
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
     vec3 ambient = (kD * diffuseMap + specular) * aoMap * hdrIntensity;
 

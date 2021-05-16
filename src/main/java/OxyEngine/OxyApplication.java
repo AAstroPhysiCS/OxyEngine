@@ -16,9 +16,6 @@ public abstract class OxyApplication implements OxyDisposable {
         layerStack = new LayerStack();
     }
 
-    public static int FPS = 0;
-    public static float FRAME_TIME = 0;
-
     public abstract void init();
 
     public abstract void update(float ts);

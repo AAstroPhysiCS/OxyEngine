@@ -19,5 +19,5 @@ public abstract class RendererAPI {
 
     public abstract void clearBuffer();
 
-    abstract void init(boolean debug);
+    public abstract void init(boolean debug);
 }

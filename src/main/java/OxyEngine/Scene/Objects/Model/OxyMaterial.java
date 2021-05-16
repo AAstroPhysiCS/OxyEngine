@@ -2,11 +2,11 @@ package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.System.OxyDisposable;
-import OxyEngine.TextureSlot;
+import OxyEngine.Core.Renderer.Texture.TextureSlot;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -23,17 +23,17 @@ public class OxyMaterial implements OxyDisposable {
 
     public int assimpIndex, index;
 
-    public ImageTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, emissiveTexture;
+    public Image2DTexture albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, emissiveTexture;
     public final OxyColor albedoColor;
 
-    public String name = "Unnamed Material";
+    public String name;
 
     public float[] metalness, roughness, aoStrength, emissiveStrength;
     public final float[] normalStrength;
 
     public final float[] dynamicFriction = new float[]{0.5f}, staticFriction = new float[]{0.5f}, restitution = new float[]{0.5f};
 
-    public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture, ImageTexture emissiveTexture,
+    public OxyMaterial(String name, Image2DTexture albedoTexture, Image2DTexture normalTexture, Image2DTexture roughnessTexture, Image2DTexture metallicTexture, Image2DTexture aoTexture, Image2DTexture emissiveTexture,
                        OxyColor albedoColor) {
         this(name, albedoTexture, normalTexture, roughnessTexture, metallicTexture, aoTexture, emissiveTexture, albedoColor, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
     }
@@ -53,7 +53,7 @@ public class OxyMaterial implements OxyDisposable {
                 1.0f, 1.0f, 1.0f, 0.0f, 1.0f);
     }
 
-    public OxyMaterial(String name, ImageTexture albedoTexture, ImageTexture normalTexture, ImageTexture roughnessTexture, ImageTexture metallicTexture, ImageTexture aoTexture, ImageTexture emissiveTexture,
+    public OxyMaterial(String name, Image2DTexture albedoTexture, Image2DTexture normalTexture, Image2DTexture roughnessTexture, Image2DTexture metallicTexture, Image2DTexture aoTexture, Image2DTexture emissiveTexture,
                        OxyColor albedoColor, float m_normalStrength, float m_aoStrength, float m_roughness, float m_metalness, float m_emissiveStrength) {
         this.name = name;
         this.albedoTexture = albedoTexture;
@@ -73,15 +73,15 @@ public class OxyMaterial implements OxyDisposable {
     private static int UNKNOWN_MATERIAL_COUNT = 0;
 
     public OxyMaterial(Vector4f albedoColor) {
-        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null, null, new OxyColor(albedoColor));
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (Image2DTexture) null, null, null, null, null, null, new OxyColor(albedoColor));
     }
 
     public OxyMaterial(float r, float g, float b, float a) {
-        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null,null, new OxyColor(new Vector4f(r, g, b, a)));
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (Image2DTexture) null, null, null, null, null,null, new OxyColor(new Vector4f(r, g, b, a)));
     }
 
     public OxyMaterial(Vector4f albedoColor, float metalness, float roughness, float aoStrength, float emissiveStrength) {
-        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (ImageTexture) null, null, null, null, null,null, new OxyColor(albedoColor));
+        this("Material (%s)".formatted(UNKNOWN_MATERIAL_COUNT++), (Image2DTexture) null, null, null, null, null,null, new OxyColor(albedoColor));
         this.metalness = new float[]{metalness};
         this.roughness = new float[]{roughness};
         this.aoStrength = new float[]{aoStrength};
@@ -89,13 +89,14 @@ public class OxyMaterial implements OxyDisposable {
     }
 
     public OxyMaterial(OxyMaterial other) {
-        if (other.roughnessTexture != null) this.roughnessTexture = new ImageTexture(other.roughnessTexture);
-        if (other.aoTexture != null) this.aoTexture = new ImageTexture(other.aoTexture);
-        if (other.normalTexture != null) this.normalTexture = new ImageTexture(other.normalTexture);
-        if (other.albedoTexture != null) this.albedoTexture = new ImageTexture(other.albedoTexture);
-        if (other.metallicTexture != null) this.metallicTexture = new ImageTexture(other.metallicTexture);
-        if (other.emissiveTexture != null) this.emissiveTexture = new ImageTexture(other.emissiveTexture);
+        if (other.roughnessTexture != null) this.roughnessTexture = OxyTexture.loadImage(other.roughnessTexture);
+        if (other.aoTexture != null) this.aoTexture = OxyTexture.loadImage(other.aoTexture);
+        if (other.normalTexture != null) this.normalTexture = OxyTexture.loadImage(other.normalTexture);
+        if (other.albedoTexture != null) this.albedoTexture = OxyTexture.loadImage(other.albedoTexture);
+        if (other.metallicTexture != null) this.metallicTexture = OxyTexture.loadImage(other.metallicTexture);
+        if (other.emissiveTexture != null) this.emissiveTexture = OxyTexture.loadImage(other.emissiveTexture);
         this.albedoColor = new OxyColor(other.albedoColor.getNumbers().clone());
+        this.name = other.name + " Copy";
         this.metalness = other.metalness.clone();
         this.roughness = other.roughness.clone();
         this.aoStrength = other.aoStrength.clone();

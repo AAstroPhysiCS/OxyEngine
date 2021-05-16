@@ -10,9 +10,6 @@ import OxyEngine.Core.Renderer.Pipeline.ShaderType;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.lwjgl.opengl.GL45.*;
 
 //TODO: Make a Mesh class that this class will inherit from, as well as the VulkanMesh class.
@@ -80,18 +77,9 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         OxyRenderer.Stats.totalIndicesCount += indexBuffer.getIndices().length;
     }
 
-    private final List<OxyEntity> entities = new ArrayList<>();
-
     public void addToList(OxyEntity e) {
-        entities.add(e);
-    }
-
-    public void addToBuffer(OxyPipeline pipeline) {
-        vertexBuffer.addToBuffer(OxyEntity.sumAllVertices(entities));
-        indexBuffer.addToBuffer(OxyEntity.sumAllIndices(entities));
-
-        load(pipeline);
-        entities.clear();
+        vertexBuffer.addToBuffer(e.getVertices());
+        indexBuffer.addToBuffer(e.getIndices());
     }
 
     public void render() {
@@ -106,7 +94,6 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
 
     @Override
     public void dispose() {
-        entities.clear();
         vertexBuffer.dispose();
         if (indexBuffer != null) indexBuffer.dispose();
         if (textureBuffer != null) textureBuffer.dispose();

@@ -53,7 +53,7 @@ public final class OxyPhysX implements OxyDisposable {
         @Override
         public void reportError(int code, String message, String file, int line) {
             String codeName = codeNames.getOrDefault(code, "code: " + code);
-            logger.severe(String.format("[%s] %s (%s:%d)\n", codeName, message, file, line));
+            logger.severe(String.format("Nvidia PhysX: [%s] %s (%s:%d)\n", codeName, message, file, line));
         }
     }
 
@@ -98,7 +98,10 @@ public final class OxyPhysX implements OxyDisposable {
             actualEntityMatrix.getTranslation(posDest);
             actualEntityMatrix.getUnnormalizedRotation(rotDest);
 
-            physXEntities.get(TransformComponent.class).set(posDest, rotDest, scale);
+            Vector3f scaleDest = new Vector3f();
+            actualEntityMatrix.getScale(scaleDest);
+
+            physXEntities.get(TransformComponent.class).set(posDest, rotDest, scaleDest);
             physXEntities.transformLocally();
         }
     }

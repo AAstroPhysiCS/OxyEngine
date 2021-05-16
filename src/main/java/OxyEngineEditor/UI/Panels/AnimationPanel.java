@@ -1,7 +1,7 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.AnimationComponent;
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
 import OxyEngineEditor.UI.AssetManager;
 import imgui.ImGui;
 import imgui.flag.ImGuiStyleVar;
@@ -11,8 +11,8 @@ import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public class AnimationPanel extends Panel {
 
-    private static final ImageTexture playTexture = AssetManager.getInstance().getAsset("UI PLAY");
-    private static final ImageTexture stopTexture = AssetManager.getInstance().getAsset("UI STOP");
+    private static final Image2DTexture playTexture = AssetManager.getInstance().getAsset("UI PLAY");
+    private static final Image2DTexture stopTexture = AssetManager.getInstance().getAsset("UI STOP");
 
     private static final float[] animationController = new float[1];
 
@@ -71,7 +71,7 @@ public class AnimationPanel extends Panel {
         ImGui.pushStyleVar(ImGuiStyleVar.GrabRounding, 12);
         animationController[0] = animComponent.getCurrentTime();
         ImGui.sliderFloat("##hideLabel AnimationController", animationController, 1, 250f);
-        animComponent.setCurrentTime(animationController[0]);
+        animComponent.setTime(animationController[0]);
         ImGui.popStyleVar(2);
         ImGui.popItemWidth();
 

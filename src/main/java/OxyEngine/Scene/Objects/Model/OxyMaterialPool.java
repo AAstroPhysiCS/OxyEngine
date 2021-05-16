@@ -4,7 +4,7 @@ import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.Scene.OxyEntity;
-import OxyEngine.TextureSlot;
+import OxyEngine.Core.Renderer.Texture.TextureSlot;
 
 import java.util.ArrayList;
 import java.util.Arrays;

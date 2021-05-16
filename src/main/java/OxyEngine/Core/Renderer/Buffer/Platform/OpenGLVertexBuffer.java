@@ -3,7 +3,7 @@ package OxyEngine.Core.Renderer.Buffer.Platform;
 import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
 import OxyEngine.Core.Renderer.Mesh.MeshUsage;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
@@ -42,16 +42,9 @@ public final class OpenGLVertexBuffer extends VertexBuffer {
             vertices = m_Vertices;
             return;
         }
-        copy(m_Vertices);
+        vertices = copy(vertices, m_Vertices);
     }
 
-    @Override
-    protected void copy(float[] m_Vertices) {
-        float[] newObjVert = new float[vertices.length + m_Vertices.length];
-        System.arraycopy(vertices, 0, newObjVert, 0, vertices.length);
-        System.arraycopy(m_Vertices, 0, newObjVert, vertices.length, m_Vertices.length);
-        this.vertices = newObjVert;
-    }
 
     @Override
     public void updateSingleEntityData(int pos, float[] newVertices) {

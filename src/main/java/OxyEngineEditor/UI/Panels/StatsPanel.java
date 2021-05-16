@@ -5,7 +5,7 @@ import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImBoolean;
 
-import static OxyEngine.Globals.normalizeColor;
+import static OxyEngine.Utils.normalizeColor;
 
 public class StatsPanel extends Panel {
 

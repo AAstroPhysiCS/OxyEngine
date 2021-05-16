@@ -1,11 +1,9 @@
 package OxyEngine.Core.Renderer.Light;
 
-import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
+import OxyEngine.Core.Renderer.Mesh.NativeMeshOpenGL;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Scene.Objects.Native.NativeObjectFactory;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.SceneRenderer;
 import OxyEngineEditor.UI.Panels.GUINode;
@@ -22,9 +20,61 @@ import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class SkyLight extends Light {
 
+    public static final float[] skyboxVertices = {
+            -1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
+            // front face
+            -1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
+            // left face
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            // right face
+            1.0f, 1.0f, 1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            // bottom face
+            -1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
+            -1.0f, -1.0f, -1.0f,
+            // top face
+            -1.0f, 1.0f, -1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, 1.0f,
+    };
+
+    public static final int[] indices = new int[skyboxVertices.length];
+
+    static {
+        for (int i = 0; i < skyboxVertices.length; i++) {
+            indices[i] = i;
+        }
+    }
+
     private boolean primary;
 
-    public static final NativeObjectMeshOpenGL mesh = new NativeObjectMeshOpenGL(SceneRenderer.getInstance().getHDRPipeline());
+    public static final NativeMeshOpenGL mesh = new NativeMeshOpenGL(SceneRenderer.getInstance().getHDRPipeline());
 
     private HDRTexture hdrTexture;
 
@@ -36,7 +86,7 @@ public class SkyLight extends Light {
     public float[] exposure = new float[]{1.0f};
 
     public float[] intensity = new float[]{1.0f};
-    public float[] mipLevelStrength = new float[]{0.0f};
+    public float[] mipLevelStrength = new float[]{1.0f};
 
     public SkyLight() {
     }
@@ -78,73 +128,6 @@ public class SkyLight extends Light {
 
     public void setPrimary(boolean primary) {
         this.primary = primary;
-    }
-
-    public static final class Factory implements NativeObjectFactory {
-
-        private static final float[] skyboxVertices = {
-                -1.0f, -1.0f, -1.0f,
-                1.0f, 1.0f, -1.0f,
-                1.0f, -1.0f, -1.0f,
-                1.0f, 1.0f, -1.0f,
-                -1.0f, -1.0f, -1.0f,
-                -1.0f, 1.0f, -1.0f,
-                // front face
-                -1.0f, -1.0f, 1.0f,
-                1.0f, -1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f, 1.0f,
-                -1.0f, 1.0f, 1.0f,
-                -1.0f, -1.0f, 1.0f,
-                // left face
-                -1.0f, 1.0f, 1.0f,
-                -1.0f, 1.0f, -1.0f,
-                -1.0f, -1.0f, -1.0f,
-                -1.0f, -1.0f, -1.0f,
-                -1.0f, -1.0f, 1.0f,
-                -1.0f, 1.0f, 1.0f,
-                // right face
-                1.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, -1.0f,
-                1.0f, 1.0f, -1.0f,
-                1.0f, -1.0f, -1.0f,
-                1.0f, 1.0f, 1.0f,
-                1.0f, -1.0f, 1.0f,
-                // bottom face
-                -1.0f, -1.0f, -1.0f,
-                1.0f, -1.0f, -1.0f,
-                1.0f, -1.0f, 1.0f,
-                1.0f, -1.0f, 1.0f,
-                -1.0f, -1.0f, 1.0f,
-                -1.0f, -1.0f, -1.0f,
-                // top face
-                -1.0f, 1.0f, -1.0f,
-                1.0f, 1.0f, 1.0f,
-                1.0f, 1.0f, -1.0f,
-                1.0f, 1.0f, 1.0f,
-                -1.0f, 1.0f, -1.0f,
-                -1.0f, 1.0f, 1.0f,
-        };
-
-        private static final int[] indices = new int[skyboxVertices.length];
-
-        static {
-            for (int i = 0; i < skyboxVertices.length; i++) {
-                indices[i] = i;
-            }
-        }
-
-        @Override
-        public void constructData(OxyNativeObject e, int size) {
-            if (e.vertices == null) {
-                e.vertices = skyboxVertices;
-            }
-        }
-
-        public void initData(OxyNativeObject e, NativeObjectMeshOpenGL mesh) {
-            e.indices = indices;
-            mesh.addToBuffer(SceneRenderer.getInstance().getHDRPipeline());
-        }
     }
 
     public static final GUINode guiNode = () -> {

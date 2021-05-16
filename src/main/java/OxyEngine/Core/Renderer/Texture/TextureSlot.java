@@ -1,4 +1,4 @@
-package OxyEngine;
+package OxyEngine.Core.Renderer.Texture;
 
 public enum TextureSlot {
     UITEXTURE(-1),
@@ -19,6 +19,13 @@ public enum TextureSlot {
 
     TextureSlot(int value) {
         this.value = value;
+    }
+
+    public static TextureSlot find(int textureSlot) {
+        for(TextureSlot t : TextureSlot.values()){
+            if(t.getValue() == textureSlot) return t;
+        }
+        throw new IllegalStateException("Texture slot not defined!");
     }
 
     public int getValue() {

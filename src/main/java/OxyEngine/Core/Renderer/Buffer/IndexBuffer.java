@@ -1,11 +1,10 @@
 package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLIndexBuffer;
-import OxyEngine.Core.Renderer.Context.OpenGLRendererAPI;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
-
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
+import OxyEngine.TargetPlatform;
 
 public abstract class IndexBuffer extends Buffer {
 
@@ -40,8 +39,8 @@ public abstract class IndexBuffer extends Buffer {
         return indices == null;
     }
 
-    public static <T extends IndexBuffer> T create(OxyPipeline pipeline){
-        if(rendererAPI instanceof OpenGLRendererAPI) {
+    public static <T extends IndexBuffer> T create(OxyPipeline pipeline) {
+        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             var layout = pipeline.getLayout(IndexBuffer.class);
             try {
                 var constructor = OpenGLIndexBuffer.class.getDeclaredConstructor(OxyPipeline.Layout.class);

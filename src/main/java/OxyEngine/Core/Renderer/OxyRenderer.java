@@ -5,12 +5,19 @@ import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Renderer.Pipeline.OxyShader;
-import OxyEngine.OxyApplication;
+import OxyEngine.OxyEngine;
+import OxyEngine.TargetPlatform;
 
-import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
+import static OxyEngine.Core.Renderer.OxyRenderCommand.targetPlatform;
+import static OxyEngine.Scene.SceneRuntime.*;
+import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.opengl.GL11.*;
 
 public final class OxyRenderer {
+
+    private static boolean INIT = false;
+
+    private static OxyRenderCommand renderCommand;
 
     private OxyRenderer() {
     }
@@ -43,6 +50,36 @@ public final class OxyRenderer {
             mesh.load(pipeline);
         mesh.render();
         pipeline.getShader().end();
+    }
+
+    public static void init(TargetPlatform targetPlatform, boolean debug) {
+        if (INIT) {
+            logger.warning("Renderer already initiated!");
+            return;
+        }
+        INIT = true;
+        renderCommand = OxyRenderCommand.getInstance(targetPlatform);
+        renderCommand.init(debug);
+    }
+
+    public static void clearBuffer() {
+        renderCommand.getRendererAPI().clearBuffer();
+    }
+
+    public static void clearColor(float r, float g, float b, float a) {
+        renderCommand.getRendererAPI().clearColor(r, g, b, a);
+    }
+
+    public static void pollEvents() {
+        renderCommand.getRendererContext().pollEvents();
+    }
+
+    public static void swapBuffers() {
+        renderCommand.getRendererContext().swapBuffer(OxyEngine.getWindowHandle());
+    }
+
+    public static TargetPlatform getCurrentTargetPlatform() {
+        return targetPlatform;
     }
 
     /*private static final record RenderQueue() {
@@ -85,7 +122,7 @@ public final class OxyRenderer {
         }
 
         public static String getStats() {
-            if (currentBoundedCamera == null) return "FPS: %s, No Camera".formatted(OxyApplication.FPS);
+            if (currentBoundedCamera == null) return "FPS: %s, No Camera".formatted(FPS);
             String s = """
                     Frame Time: %.02f ms
                     FPS: %s
@@ -111,8 +148,8 @@ public final class OxyRenderer {
                         Y: %s,
                         Z: %s
                     Zoom: %s
-                    """.formatted(OxyApplication.FRAME_TIME,
-                    OxyApplication.FPS,
+                    """.formatted(FRAME_TIME,
+                    FPS,
                     drawCalls,
                     totalShapeCount,
                     totalVertexCount,

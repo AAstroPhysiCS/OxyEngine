@@ -37,7 +37,7 @@ public final class ScriptEngine {
     private ScriptEngine() {
     }
 
-    public static synchronized void notifyLock() {
+    public static synchronized void run() {
         if (scriptThread.getProviders().size() == 0) return;
         synchronized (runtimeLock) {
             runtimeLock.notify();

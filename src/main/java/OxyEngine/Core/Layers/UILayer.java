@@ -1,5 +1,6 @@
 package OxyEngine.Core.Layers;
 
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.OxyEngine;
 import OxyEngine.System.OxyFontSystem;
 import OxyEngine.System.OxyUISystem;
@@ -10,8 +11,6 @@ import imgui.flag.*;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 
 public class UILayer extends Layer {
 
@@ -48,8 +47,8 @@ public class UILayer extends Layer {
 
     @Override
     public void render(float ts) {
-        rendererAPI.clearBuffer();
-        rendererAPI.clearColor(0, 0, 0, 1.0f);
+        OxyRenderer.clearBuffer();
+        OxyRenderer.clearColor(0, 0, 0, 1.0f);
 
         uiSystem.newFrameGLFW();
         ImGui.newFrame();

@@ -11,7 +11,7 @@ import OxyEngine.Core.Renderer.Texture.OxyColor;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
@@ -245,7 +245,6 @@ public final class SceneSerializer {
                 OxyEntity childEntity = readFields(ent, scene);
                 childEntity.setFamily(childFamilyComponent);
                 childEntity.transformLocally();
-                childEntity.constructData();
 
                 readAllInnerObjects(ent, scene, childEntity);
             }

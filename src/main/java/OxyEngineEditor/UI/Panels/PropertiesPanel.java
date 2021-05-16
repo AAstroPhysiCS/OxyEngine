@@ -10,20 +10,20 @@ import OxyEngine.Core.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.PointLight;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Texture.ImageTexture;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Renderer.Texture.TextureSlot;
 import OxyEngine.PhysX.OxyPhysXActor;
 import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.PhysX.OxyPhysXGeometry;
 import OxyEngine.PhysX.PhysXRigidBodyMode;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxyFontSystem;
-import OxyEngine.TextureSlot;
 import imgui.ImFont;
 import imgui.ImGui;
 import imgui.flag.*;
@@ -124,7 +124,7 @@ public class PropertiesPanel extends Panel {
         ImGui.popID();
     }
 
-    private void renderPreviewImage(ImageTexture t, float offsetY) {
+    private void renderPreviewImage(Image2DTexture t, float offsetY) {
         if (t != null) {
             float oldCursorPosY = ImGui.getCursorPosY();
             ImGui.setCursorPosY(oldCursorPosY + offsetY);
@@ -248,6 +248,17 @@ public class PropertiesPanel extends Panel {
                 }
                 if (ImGui.beginMenu("Physics")) {
                     if (ImGui.beginMenu("Colliders")) {
+
+                        if (ImGui.menuItem("Mesh Collider")){
+                            if (!entityContext.has(OxyPhysXComponent.class))
+                                entityContext.addComponent(new OxyPhysXComponent());
+                            //TODO: ConvexMesh must also be a thing
+                            OxyPhysXGeometry meshGeometry = new OxyPhysXGeometry.TriangleMesh(entityContext);
+                            meshGeometry.build();
+                            entityContext.get(OxyPhysXComponent.class).setGeometryAs(meshGeometry);
+                            entityContext.getGUINodes().add(OxyPhysXGeometry.TriangleMesh.guiNode);
+                        }
+
                         if (ImGui.menuItem("Box Collider")) {
                             if (!entityContext.has(OxyPhysXComponent.class))
                                 entityContext.addComponent(new OxyPhysXComponent());
@@ -357,7 +368,7 @@ public class PropertiesPanel extends Panel {
             if (ImGui.beginChild("MasterMaterialCard", ImGui.getContentRegionAvailX(), ImGui.getContentRegionAvailY())) {
                 ImGui.spacing();
 
-                if (ImGui.treeNodeEx("PhysX Properties")) {
+                if (ImGui.treeNodeEx("PhysX Properties", ImGuiTreeNodeFlags.DefaultOpen)) {
                     ImGui.text("Dynamic Friction");
                     ImGui.sameLine();
                     ImGui.dragFloat("##hideLabelPhysXDynamicFriction", m.dynamicFriction);
@@ -426,7 +437,7 @@ public class PropertiesPanel extends Panel {
                                     }
                                 }
                                 ImGui.popItemWidth();
-                                ImageTexture imgText = acceptTexturePayload(TextureSlot.ALBEDO);
+                                Image2DTexture imgText = acceptTexturePayload(TextureSlot.ALBEDO);
                                 if (imgText != null) m.albedoTexture = imgText;
 
                                 ImGui.sameLine();
@@ -447,7 +458,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.ALBEDO);
+                                Image2DTexture imgButton = acceptTexturePayload(TextureSlot.ALBEDO);
                                 if (imgButton != null) m.albedoTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
@@ -502,7 +513,7 @@ public class PropertiesPanel extends Panel {
                                     }
                                 }
                                 ImGui.popItemWidth();
-                                ImageTexture imgText = acceptTexturePayload(TextureSlot.NORMAL);
+                                Image2DTexture imgText = acceptTexturePayload(TextureSlot.NORMAL);
                                 if (imgText != null) m.normalTexture = imgText;
 
                                 ImGui.sameLine();
@@ -522,7 +533,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.NORMAL);
+                                Image2DTexture imgButton = acceptTexturePayload(TextureSlot.NORMAL);
                                 if (imgButton != null) m.normalTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
@@ -583,7 +594,7 @@ public class PropertiesPanel extends Panel {
                                 }
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgText = acceptTexturePayload(TextureSlot.METALLIC);
+                                Image2DTexture imgText = acceptTexturePayload(TextureSlot.METALLIC);
                                 if (imgText != null) m.metallicTexture = imgText;
 
                                 ImGui.sameLine();
@@ -603,7 +614,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.METALLIC);
+                                Image2DTexture imgButton = acceptTexturePayload(TextureSlot.METALLIC);
                                 if (imgButton != null) m.metallicTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
@@ -664,7 +675,7 @@ public class PropertiesPanel extends Panel {
                                 }
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgText = acceptTexturePayload(TextureSlot.ROUGHNESS);
+                                Image2DTexture imgText = acceptTexturePayload(TextureSlot.ROUGHNESS);
                                 if (imgText != null) m.roughnessTexture = imgText;
 
                                 ImGui.sameLine();
@@ -684,7 +695,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.ROUGHNESS);
+                                Image2DTexture imgButton = acceptTexturePayload(TextureSlot.ROUGHNESS);
                                 if (imgButton != null) m.roughnessTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
@@ -744,7 +755,7 @@ public class PropertiesPanel extends Panel {
                                 }
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgText = acceptTexturePayload(TextureSlot.AO);
+                                Image2DTexture imgText = acceptTexturePayload(TextureSlot.AO);
                                 if (imgText != null) m.aoTexture = imgText;
 
                                 ImGui.sameLine();
@@ -764,7 +775,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.AO);
+                                Image2DTexture imgButton = acceptTexturePayload(TextureSlot.AO);
                                 if (imgButton != null) m.aoTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
@@ -824,7 +835,7 @@ public class PropertiesPanel extends Panel {
                                 }
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgText = acceptTexturePayload(TextureSlot.EMISSIVE);
+                                Image2DTexture imgText = acceptTexturePayload(TextureSlot.EMISSIVE);
                                 if (imgText != null) m.emissiveTexture = imgText;
 
                                 ImGui.sameLine();
@@ -844,7 +855,7 @@ public class PropertiesPanel extends Panel {
                                 ImGui.popStyleColor(3);
                                 ImGui.popItemWidth();
 
-                                ImageTexture imgButton = acceptTexturePayload(TextureSlot.EMISSIVE);
+                                Image2DTexture imgButton = acceptTexturePayload(TextureSlot.EMISSIVE);
                                 if (imgButton != null) m.emissiveTexture = imgButton;
 
                                 ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
@@ -878,7 +889,7 @@ public class PropertiesPanel extends Panel {
         ImGui.end();
     }
 
-    private ImageTexture acceptTexturePayload(TextureSlot slot) {
+    private Image2DTexture acceptTexturePayload(TextureSlot slot) {
         if (ImGui.beginDragDropTarget()) {
             File f = ImGui.acceptDragDropPayload("projectPanelFile");
             if (f != null) {

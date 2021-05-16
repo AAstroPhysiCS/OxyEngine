@@ -19,7 +19,7 @@ public abstract class RendererContext {
         return null;
     }
 
-    abstract void init();
+    public abstract void init();
 
     public abstract void swapBuffer(WindowHandle handle);
 

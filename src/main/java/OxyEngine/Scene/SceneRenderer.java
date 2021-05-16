@@ -14,20 +14,22 @@ import OxyEngine.Core.Renderer.Light.Light;
 import OxyEngine.Core.Renderer.Light.SkyLight;
 import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Mesh.NativeObjectMeshOpenGL;
+import OxyEngine.Core.Renderer.Mesh.NativeMeshOpenGL;
 import OxyEngine.Core.Renderer.OxyRenderPass;
 import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.Core.Renderer.Pipeline.*;
+import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Renderer.Pipeline.ShaderLibrary;
+import OxyEngine.Core.Renderer.Pipeline.ShaderType;
 import OxyEngine.Core.Renderer.ShadowRenderer;
 import OxyEngine.Core.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Renderer.Texture.OxyTexture;
 import OxyEngine.OxyEngine;
 import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngine.Scene.Objects.Model.OxyModel;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scene.Objects.WorldGrid;
-import OxyEngine.TextureSlot;
+import OxyEngine.Core.Renderer.Texture.TextureSlot;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.GUINode;
 import org.joml.Matrix4f;
@@ -69,7 +71,7 @@ public final class SceneRenderer {
     public void initPipelines() {
 
         frameBuffer = FrameBuffer.create(OxyEngine.getWindowHandle().getWidth(), OxyEngine.getWindowHandle().getHeight(),
-                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                FrameBuffer.createNewSpec(FrameBufferSpecification.class)
                         .setTextureCount(1)
                         .setAttachmentIndex(0)
                         .setMultiSampled(true)
@@ -77,7 +79,7 @@ public final class SceneRenderer {
                         .useRenderBuffer(true));
 
         blittedFrameBuffer = FrameBuffer.create(frameBuffer.getWidth(), frameBuffer.getHeight(),
-                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                FrameBuffer.createNewSpec(FrameBufferSpecification.class)
                         .setTextureCount(1)
                         .setAttachmentIndex(0)
                         .setFormats(FrameBufferTextureFormat.RGBA8)
@@ -87,7 +89,7 @@ public final class SceneRenderer {
 
         OxyRenderPass geometryRenderPass = OxyRenderPass.createBuilder(frameBuffer)
                 .renderingMode(MeshRenderMode.TRIANGLES)
-                .setCullFace(CullMode.BACK)
+                .setCullFace(CullMode.DISABLED)
                 .create();
 
         geometryPipeline = OxyPipeline.createNewPipeline(OxyPipeline.createNewSpecification()
@@ -143,13 +145,13 @@ public final class SceneRenderer {
                 )
                 .setShader(hdrShader));
 
-        OxySelectHandler.initRenderPass(frameBuffer.getWidth(), frameBuffer.getHeight());
+        OxySelectHandler.init(frameBuffer.getWidth(), frameBuffer.getHeight());
         ShadowRenderer.initPipeline();
     }
 
     public void initScene() {
 
-        cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
+        cachedNativeMeshes = ACTIVE_SCENE.view(NativeMeshOpenGL.class);
         cachedCameraComponents = ACTIVE_SCENE.view(OxyCamera.class);
         updateModelEntities();
 
@@ -163,7 +165,6 @@ public final class SceneRenderer {
     private void fillPropertyEntries() {
         for (OxyEntity entity : allModelEntities) {
             if (entity instanceof OxyNativeObject) continue;
-            if (((OxyModel) entity).factory == null) continue;
             for (Class<? extends EntityComponent> component : EntityComponent.allEntityComponentChildClasses) {
                 if (component == null) continue;
                 if (!entity.has(component)) continue;
@@ -203,7 +204,7 @@ public final class SceneRenderer {
     }
 
     public void updateNativeEntities() {
-        cachedNativeMeshes = ACTIVE_SCENE.view(NativeObjectMeshOpenGL.class);
+        cachedNativeMeshes = ACTIVE_SCENE.view(NativeMeshOpenGL.class);
     }
 
     public void updateCurrentBoundedCamera(float ts) {
@@ -295,13 +296,15 @@ public final class SceneRenderer {
                 //ANIMATION UPDATE
                 pbrShader.setUniform1i("animatedModel", 0);
                 if (e.has(AnimationComponent.class)) {
-                    pbrShader.setUniform1i("animatedModel", 1);
                     AnimationComponent animComp = e.get(AnimationComponent.class);
-                    animComp.updateAnimation(ts);
-                    List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
-                    for (int j = 0; j < matrix4fList.size(); j++) {
-                        pbrShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
-                    }
+                    if (ACTIVE_SCENE.STATE == SceneState.RUNNING) {
+                        pbrShader.setUniform1i("animatedModel", 1);
+                        animComp.updateAnimation(ts);
+                        List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
+                        for (int j = 0; j < matrix4fList.size(); j++) {
+                            pbrShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                        }
+                    } else animComp.setTime(0);
                 }
 
                 pbrShader.setUniformMatrix4fv("model", c.transform, false);
@@ -390,7 +393,7 @@ public final class SceneRenderer {
                     skyBoxShader.begin(); //first render it to the skybox shader
                     if (skyLightComp.mipLevelStrength[0] > 0)
                         skyBoxShader.setUniform1i("u_skyBoxTexture", hdrTexture.getPrefilterSlot());
-                    else skyBoxShader.setUniform1i("u_skyBoxTexture", hdrTexture.getTextureSlot());
+                    else skyBoxShader.setUniform1i("u_skyBoxTexture", hdrTexture.getHDRSlot());
                     skyBoxShader.setUniform1f("u_mipLevel", skyLightComp.mipLevelStrength[0]);
                     skyBoxShader.setUniform1f("u_exposure", skyLightComp.exposure[0]);
                     skyBoxShader.setUniform1f("u_gamma", skyLightComp.gammaStrength[0]);

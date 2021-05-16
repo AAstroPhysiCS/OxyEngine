@@ -57,7 +57,7 @@ public class Registry {
     }
 
     /*
-     * gets all the entities associated with these classes
+     * gets all the entities associated with this class
      */
     public Set<OxyEntity> view(Class<? extends EntityComponent> destClass) {
         Set<OxyEntity> list = new LinkedHashSet<>();

@@ -12,8 +12,8 @@ import org.joml.Matrix4f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.Globals.toPrimitiveFloat;
-import static OxyEngine.Globals.toPrimitiveInteger;
+import static OxyEngine.Utils.toPrimitiveFloat;
+import static OxyEngine.Utils.toPrimitiveInteger;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public abstract class OxyEntity {
@@ -23,8 +23,8 @@ public abstract class OxyEntity {
 
     private EntityFamily family = new EntityFamily();
 
-    public float[] vertices, tcs, normals, tangents, biTangents;
-    public int[] indices;
+    protected float[] vertices, tcs, normals, tangents, biTangents;
+    protected int[] indices;
 
     protected final Scene scene;
 
@@ -45,6 +45,8 @@ public abstract class OxyEntity {
         this.indices = other.indices.clone();
     }
 
+    public abstract void updateData();
+
     public abstract OxyEntity copyMe();
 
     public void unbindTextures() {
@@ -64,8 +66,6 @@ public abstract class OxyEntity {
     protected void addToScene() {
         scene.put(this);
     }
-
-    public abstract void constructData();
 
     public void transformLocally() {
         TransformComponent c = get(TransformComponent.class);

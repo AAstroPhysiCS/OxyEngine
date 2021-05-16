@@ -10,6 +10,8 @@ public class SceneLayer extends Layer {
 
     private final OxyPhysX oxyPhysics = OxyPhysX.getInstance();
 
+    private final SceneRenderer sceneRenderer = SceneRenderer.getInstance();
+
     public static SceneLayer getInstance() {
         if (INSTANCE == null) INSTANCE = new SceneLayer();
         return INSTANCE;
@@ -21,19 +23,19 @@ public class SceneLayer extends Layer {
     @Override
     public void build() {
         oxyPhysics.init();
-        SceneRenderer.getInstance().initPipelines();
-        SceneRenderer.getInstance().initScene();
+        sceneRenderer.initPipelines();
+        sceneRenderer.initScene();
     }
 
     @Override
     public void update(float ts) {
-        SceneRenderer.getInstance().updateScene(ts);
-        ScriptEngine.notifyLock(); //running script engine
+        sceneRenderer.updateScene(ts);
+        ScriptEngine.run();
         oxyPhysics.simulate();
     }
 
     @Override
     public void render(float ts) {
-        SceneRenderer.getInstance().renderScene(ts);
+        sceneRenderer.renderScene(ts);
     }
 }

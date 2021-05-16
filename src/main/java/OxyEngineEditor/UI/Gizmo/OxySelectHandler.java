@@ -31,7 +31,7 @@ public class OxySelectHandler {
     private static OpenGLFrameBuffer pickingFrameBuffer;
     private static OxyRenderPass pickingRenderPass;
 
-    public static void initRenderPass(int width, int height){
+    public static void init(int width, int height){
         pickingFrameBuffer = FrameBuffer.create(width, height,
                 OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
                         .setTextureCount(1)

@@ -1,12 +1,12 @@
 package OxyEngine.Core.Renderer.Buffer;
 
 import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLVertexBuffer;
-import OxyEngine.Core.Renderer.Context.OpenGLRendererAPI;
 import OxyEngine.Core.Renderer.Mesh.MeshUsage;
+import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.Objects.Native.OxyNativeObject;
+import OxyEngine.Scene.Objects.Model.OxyNativeObject;
+import OxyEngine.TargetPlatform;
 
-import static OxyEngine.Core.Renderer.Context.OxyRenderCommand.rendererAPI;
 import static OxyEngine.System.OxySystem.oxyAssert;
 
 public abstract class VertexBuffer extends Buffer {
@@ -28,8 +28,8 @@ public abstract class VertexBuffer extends Buffer {
         assert usage != null : oxyAssert("Some Implementation arguments are null");
     }
 
-    public static <T extends VertexBuffer> T create(OxyPipeline pipeline, MeshUsage usage){
-        if(rendererAPI instanceof OpenGLRendererAPI) {
+    public static <T extends VertexBuffer> T create(OxyPipeline pipeline, MeshUsage usage) {
+        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             var layout = pipeline.getLayout(VertexBuffer.class);
             try {
                 var constructor = OpenGLVertexBuffer.class.getDeclaredConstructor(OxyPipeline.Layout.class, MeshUsage.class);
@@ -43,8 +43,6 @@ public abstract class VertexBuffer extends Buffer {
     }
 
     public abstract void updateSingleEntityData(int pos, float[] newVertices);
-
-    protected abstract void copy(float[] m_Vertices);
 
     public MeshUsage getUsage() {
         return usage;
