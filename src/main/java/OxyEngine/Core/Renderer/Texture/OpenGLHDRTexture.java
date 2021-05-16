@@ -57,8 +57,8 @@ public class OpenGLHDRTexture extends HDRTexture {
 
         stbi_image_free((FloatBuffer) textureBuffer);
 
-        hdrTextureId = glGenTextures();
-        glBindTexture(GL_TEXTURE_CUBE_MAP, hdrTextureId);
+        finalTextureId = glGenTextures();
+        glBindTexture(GL_TEXTURE_CUBE_MAP, finalTextureId);
         for (int i = 0; i < 6; ++i) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB32F,
                     1920, 1920, 0, GL_RGB, GL_FLOAT, (FloatBuffer) null);
@@ -85,18 +85,18 @@ public class OpenGLHDRTexture extends HDRTexture {
             hdrShader.begin();
             hdrShader.setUniformMatrix4fv("u_viewHDR", captureViews[i], true);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, hdrTextureId, 0);
+                    GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, finalTextureId, 0);
             OxyRenderer.clearBuffer();
             SkyLight.mesh.render();
             hdrShader.end();
         }
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, hdrTextureId);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, finalTextureId);
         glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-        irradianceTexture = new IrradianceTexture(path, hdrTextureId, captureFBO, captureRBO);
-        prefilterTexture = new PrefilterTexture(path, hdrTextureId, captureFBO, captureRBO);
+        irradianceTexture = new IrradianceTexture(path, finalTextureId, captureFBO, captureRBO);
+        prefilterTexture = new PrefilterTexture(path, finalTextureId, captureFBO, captureRBO);
         bdrf = new BDRF(path, captureFBO, captureRBO);
 
         OxyTexture.unbindAllTextures();
@@ -123,7 +123,7 @@ public class OpenGLHDRTexture extends HDRTexture {
         if (prefilterTexture != null) glBindTextureUnit(prefilterSlot.getValue(), prefilterTexture.prefilterTextureId);
         if (irradianceTexture != null)
             glBindTextureUnit(radianceSlot.getValue(), irradianceTexture.irradianceTextureId);
-        if (this.hdrTextureId != 0) glBindTextureUnit(hdrSlot.getValue(), this.hdrTextureId);
+        if (this.hdrTextureId != 0) glBindTextureUnit(finalTextureHdrSlot.getValue(), this.hdrTextureId);
     }
 
     static class IrradianceTexture extends Texture {

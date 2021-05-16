@@ -5,6 +5,7 @@ import OxyEngine.System.OxyDisposable;
 import java.nio.Buffer;
 
 import static OxyEngine.System.OxySystem.logger;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.stb.STBImage.*;
 
 public abstract class Texture implements OxyDisposable {
@@ -42,6 +43,12 @@ public abstract class Texture implements OxyDisposable {
         width = widthBuffer[0];
         height = heightBuffer[0];
         channel = channelBuffer[0];
+        if(channel == 1)
+            alFormat = GL_RED;
+        else if(channel == 3)
+            alFormat = GL_RGB;
+        else if(channel == 4)
+            alFormat = GL_RGBA;
     }
 
     public void loadAsFloatBuffer() {

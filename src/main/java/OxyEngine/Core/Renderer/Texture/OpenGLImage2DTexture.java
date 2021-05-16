@@ -19,13 +19,6 @@ public class OpenGLImage2DTexture extends Image2DTexture {
 
         loadAsByteBuffer();
 
-        if(channel == 1)
-            alFormat = GL_RED;
-        else if(channel == 3)
-            alFormat = GL_RGB;
-        else if(channel == 4)
-            alFormat = GL_RGBA;
-
         assert alFormat != -1 : oxyAssert("Format not supported!");
 
         textureId = glGenTextures();

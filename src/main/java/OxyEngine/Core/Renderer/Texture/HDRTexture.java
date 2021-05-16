@@ -25,12 +25,13 @@ public abstract class HDRTexture extends Texture {
 
     protected static final Matrix4f captureProjection = new Matrix4f().setPerspective((float) Math.toRadians(90), 1.0f, 0.4768f, 10.0f);
 
-    protected final TextureSlot hdrSlot, prefilterSlot, radianceSlot, bdrfSlot;
+    protected final TextureSlot finalTextureHdrSlot, prefilterSlot, radianceSlot, bdrfSlot;
     protected int hdrTextureId;
+    protected int finalTextureId;
 
     protected HDRTexture(TextureSlot hdr, TextureSlot prefilter, TextureSlot radiance, TextureSlot bdrf, String path) {
         super(path);
-        this.hdrSlot = hdr;
+        this.finalTextureHdrSlot = hdr;
         this.prefilterSlot = prefilter;
         this.radianceSlot = radiance;
         this.bdrfSlot = bdrf;
@@ -56,7 +57,7 @@ public abstract class HDRTexture extends Texture {
     }
 
     public int getHDRSlot() {
-        return hdrSlot.getValue();
+        return finalTextureHdrSlot.getValue();
     }
 
     public abstract void bindAll();
