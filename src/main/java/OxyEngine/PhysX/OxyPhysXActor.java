@@ -61,9 +61,7 @@ public final class OxyPhysXActor implements OxyDisposable {
             OxyPhysX.getInstance().getPhysXEnv().addActor(pxActor);
         }
         OxyPhysXGeometry oxyPhysXGeometry = eReference.get(OxyPhysXComponent.class).getGeometry();
-        if(oxyPhysXGeometry != null){
-            if(oxyPhysXGeometry.shape != null) pxActor.attachShape(oxyPhysXGeometry.shape);
-        }
+        if(oxyPhysXGeometry != null && oxyPhysXGeometry.shape != null) pxActor.attachShape(oxyPhysXGeometry.shape);
     }
 
     public static final GUINode guiNode = () -> {
