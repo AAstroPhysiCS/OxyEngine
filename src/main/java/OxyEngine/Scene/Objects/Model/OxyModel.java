@@ -1,13 +1,13 @@
 package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Renderer.Light.PointLight;
-import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Mesh.OxyVertex;
-import OxyEngine.Core.Renderer.OxyRenderPass;
-import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Context.Renderer.Light.PointLight;
+import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
+import OxyEngine.Core.Context.OxyRenderPass;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
@@ -36,7 +36,7 @@ public class OxyModel extends OxyEntity {
         this.faces = faces;
     }
 
-    public OxyModel(Scene scene, int id){
+    public OxyModel(Scene scene, int id) {
         super(scene);
         this.objectID = id;
     }
@@ -94,7 +94,7 @@ public class OxyModel extends OxyEntity {
 
         SceneRuntime.stop();
 
-        if (has(OpenGLMesh.class)) e.initMesh(get(OpenGLMesh.class).getPath());
+        if (has(OpenGLMesh.class)) e.constructCopy(get(OpenGLMesh.class).getPath(), this);
 
         copyChildRecursive(e);
 
@@ -122,18 +122,44 @@ public class OxyModel extends OxyEntity {
     @Override
     public void updateData() {
         transformLocally();
-        construct();
         if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
     }
 
-    private void construct(){
+    private void constructCopy(String meshPath, OxyEntity copiedFrom) {
         OxyModel e = this;
+        if (copiedFrom instanceof OxyModel model) {
+            e.transformLocally();
+            OxyPipeline geometryPipeline = SceneRenderer.getInstance().getGeometryPipeline();
+            OxyRenderPass geometryRenderPass = geometryPipeline.getRenderPass();
+            // if its being copied, you can literally just copy the copied entity data
+            e.vertices = model.vertices.clone();
+            for(int i = 3; i < e.vertices.length; i += 12) e.vertices[i] = e.getObjectId();
+            e.normals = model.normals.clone();
+            e.tcs = model.tcs.clone();
+            e.tangents = model.tangents.clone();
+            e.biTangents = model.biTangents.clone();
+            e.indices = model.indices.clone();
+            e.addComponent(new ModelMeshOpenGL(geometryPipeline, meshPath, geometryRenderPass.getMeshRenderingMode(),
+                    vertices, indices, tcs, normals, tangents, biTangents));
+        }
+    }
+
+    private void construct() {
+        OxyModel e = this;
+
         e.vertices = new float[vertexList.size() * 12];
         e.normals = new float[vertexList.size() * 3];
         e.tcs = new float[vertexList.size() * 2];
         e.tangents = new float[vertexList.size() * 3];
         e.biTangents = new float[vertexList.size() * 3];
+
         List<Integer> indicesArr = new ArrayList<>();
+        for (int[] face : faces) {
+            for (int i : face) {
+                indicesArr.add(i);
+            }
+        }
+        e.indices = toPrimitiveInteger(indicesArr);
 
         int vertPtr = 0;
         int nPtr = 0;
@@ -175,12 +201,5 @@ public class OxyModel extends OxyEntity {
             e.biTangents[biTangentPtr++] = biTangents.y;
             e.biTangents[biTangentPtr++] = biTangents.z;
         }
-
-        for (int[] face : faces) {
-            for (int i : face) {
-                indicesArr.add(i);
-            }
-        }
-        e.indices = toPrimitiveInteger(indicesArr);
     }
 }

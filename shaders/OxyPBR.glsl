@@ -1,18 +1,18 @@
 //#type fragment
 #version 460 core
 
+#define NUMBER_CASCADES 4 //TODO: convert this and many things into uniform buffer objects
+
 layout(location = 0) out vec4 color;
 layout(location = 1) out int o_IDBuffer;
 
 in OUT_VARIABLES {
     vec2 texCoordsOut;
-    float textureSlotOut;
-    vec4 colorOut;
     vec3 normalsOut;
-
     vec3 vertexPos;
 
-    //NORMAL MAPPING
+    vec4 lightSpacePos[NUMBER_CASCADES];
+
     mat3 TBN;
 } inVar;
 
@@ -20,9 +20,9 @@ uniform sampler2D tex[32];
 uniform samplerCube skyBoxTexture;
 uniform vec3 cameraPos;
 
-in float v_ObjectID;
+flat in int v_ObjectID;
 
-struct Material{
+struct Material {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -59,9 +59,12 @@ uniform DirectionalLight d_Light[4];
 uniform int normalMapSlot = -1;
 uniform float normalMapStrength;
 vec3 normalMap;
+
 //GAMMA
 uniform float gamma;
+
 //PBR
+uniform int albedoMapSlot;
 uniform int metallicSlot;
 uniform float metallicStrength;
 uniform int roughnessSlot;
@@ -70,19 +73,29 @@ uniform int aoSlot;
 uniform float aoStrength;
 uniform int emissiveSlot;
 uniform float emissiveStrength;
+
 //PBR FILTERING
 uniform samplerCube prefilterMap;
 uniform sampler2D brdfLUT;
+
 //irradiance
 uniform samplerCube iblMap;
+
 //hdr
 uniform float exposure;
 uniform float hdrIntensity;
 
+//shadows
+uniform sampler2D shadowMap[NUMBER_CASCADES];
+uniform vec3 lightShadowDirPos[NUMBER_CASCADES];
+uniform float cascadeSplits[NUMBER_CASCADES];
+in float clipSpacePosZ;
+uniform int castShadows;
+uniform int cascadeIndicatorToggle;
+
 #define PI 3.14159265358979323
 
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
+float DistributionGGX(vec3 N, vec3 H, float roughness) {
     float a = roughness*roughness;
     float a2 = a*a;
     float NdotH = max(dot(N, H), 0.0);
@@ -95,8 +108,7 @@ float DistributionGGX(vec3 N, vec3 H, float roughness)
     return nom / max(denom, 0.001); // prevent divide by zero for roughness=0.0 and NdotH=1.0
 }
 
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
+float GeometrySchlickGGX(float NdotV, float roughness) {
     float r = (roughness + 1.0);
     float k = (r*r) / 8.0;
 
@@ -106,8 +118,7 @@ float GeometrySchlickGGX(float NdotV, float roughness)
     return nom / denom;
 }
 
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
+float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness) {
     float NdotV = max(dot(N, V), 0.0);
     float NdotL = max(dot(N, L), 0.0);
     float ggx2 = GeometrySchlickGGX(NdotV, roughness);
@@ -116,13 +127,11 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
     return ggx1 * ggx2;
 }
 
-vec3 fresnelSchlick(float cosTheta, vec3 F0)
-{
+vec3 fresnelSchlick(float cosTheta, vec3 F0) {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
-{
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness) {
     return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
@@ -137,30 +146,57 @@ vec3 calcPBR(vec3 L, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec
      vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);
 
      vec3 nominator    = NDF * G * F;
-     float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; // 0.001 to prevent divide by zero.
+     float denominator = 4 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001;
      vec3 specular     = nominator / denominator;
 
-     // kS is equal to Fresnel
      vec3 kS = F;
-     // for energy conservation, the diffuse and specular light can't
-     // be above 1.0 (unless the surface emits light); to preserve this
-     // relationship the diffuse component (kD) should equal 1.0 - kS.
      vec3 kD = vec3(1.0) - kS;
-     // multiply kD by the inverse metalness such that only non-metals
-     // have diffuse lighting, or a linear blend if partly metal (pure metals
-     // have no diffuse light).
+
      kD *= 1.0 - metallic;
 
-     // scale light by NdotL
      float NdotL = max(dot(N, L), 0.0);
 
-     // add to outgoing radiance Lo
-     return (kD * albedo / PI + specular) * radiance * NdotL;  // note that we already multiplied the BRDF by the Fresnel (kS) so we won't multiply by kS again
+     return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
-vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
-    const float MAX_REFLECTION_LOD = 4.0;
-    vec3 albedo;
+float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
+{
+    vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
+
+    projCoords = projCoords * 0.5 + 0.5;
+
+    float closestDepth = texture(shadowMap[index], projCoords.xy).r;
+
+    float currentDepth = projCoords.z;
+
+    vec3 normal = norm;
+    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.003);
+
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(shadowMap[index], 0);
+
+    int pcfSample = 4;
+
+    for(int x = -pcfSample; x <= pcfSample; ++x)
+    {
+        for(int y = -pcfSample; y <= pcfSample; ++y)
+        {
+            float pcfDepth = texture(shadowMap[index], projCoords.xy + vec2(x, y) * texelSize).r;
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+        }
+    }
+
+    shadow /= pow((pcfSample * 2.0 + 1.0), 2);
+
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+
+    return shadow;
+}
+
+vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
+    const float MAX_REFLECTION_LOD = 8.0;
+    vec3 albedo, emissive;
     float metallicMap, roughnessMap, aoMap;
 
     if(metallicSlot == 0){
@@ -181,27 +217,54 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
        aoMap = texture(tex[aoSlot], inVar.texCoordsOut).r;
     }
 
-    if(int(round(inVar.textureSlotOut)) == 0){
+    if(albedoMapSlot == 0){
        albedo = pow(vec3(material.diffuse), vec3(gamma));
     } else {
-       vec4 texture = texture(tex[int(round(inVar.textureSlotOut))], texCoordsOut).rgba;
-       if(texture.w < 0.1f) discard;
+       vec4 texture = texture(tex[albedoMapSlot], texCoordsOut).rgba;
+       if(texture.a < 0.5f) discard;
        albedo = pow(texture.rgb, vec3(gamma));
     }
 
+    if(emissiveSlot != 0)
+        emissive = texture(tex[emissiveSlot], inVar.texCoordsOut).rgb * emissiveStrength;
+
     vec3 IBL = texture(iblMap, norm).rgb;
     if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL = vec3(0.05f, 0.05f, 0.05f);
-    vec3 Lo;
+
+    vec3 Lo = vec3(0f);
     vec3 F0 = vec3(0.04);
+
+    vec4 cascadeIndicator = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
     F0 = mix(F0, albedo, metallicMap);
+
     for(int i = 0; i < d_Light.length; i++){
         if(d_Light[i].activeState == 0) continue;
-        vec3 lightDir = normalize(-d_Light[i].direction);
+        vec3 lightDir = d_Light[i].direction;
 
-        Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0);
+        float shadowCalc = 0.0f;
+
+        if(bool(castShadows)){
+            for(int j = 0; j < NUMBER_CASCADES; j++) {
+                if(clipSpacePosZ <= cascadeSplits[j]) {
+                   shadowCalc = ShadowCalculation(norm, inVar.lightSpacePos[j], lightDir, j);
+                   if (j == 0)
+                       cascadeIndicator = vec4(0.1, 0.0, 0.0, 0.0);
+                   else if (j == 1)
+                       cascadeIndicator = vec4(0.0, 0.1, 0.0, 0.0);
+                   else if (j == 2)
+                       cascadeIndicator = vec4(0.0, 0.0, 0.1, 0.0);
+                   else if(j == 3)
+                       cascadeIndicator = vec4(0.0, 0.5, 0.5, 0.0);
+                   break;
+                }
+            }
+        }
+
+        Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0) * (1.0 - shadowCalc);
     }
 
-    for(int i = 0; i < p_Light.length; i++){
+    for(int i = 0; i < p_Light.length; i++) {
         if(p_Light[i].activeState == 0) continue;
         vec3 lightPos = p_Light[i].position;
 
@@ -222,29 +285,29 @@ vec4 startPBR(vec3 vertexPos, vec3 cameraPosVec3, vec2 texCoordsOut, vec3 viewDi
 
     vec3 R = reflect(-viewDir, norm);
     vec3 prefilteredColor = textureLod(prefilterMap, R, roughnessMap * MAX_REFLECTION_LOD).rgb;
-    vec2 envBRDF  = texture(brdfLUT, vec2(max(dot(norm, viewDir), 0.0), roughnessMap)).rg;
+    vec2 envBRDF = texture(brdfLUT, vec2(max(dot(norm, viewDir), 0.0), roughnessMap)).rg;
     vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
     vec3 ambient = (kD * diffuseMap + specular) * aoMap * hdrIntensity;
-
-    vec3 emissive = texture(tex[emissiveSlot], inVar.texCoordsOut).rgb * emissiveStrength;
 
     vec3 result = ambient + Lo + emissive;
     result = result / (result + vec3(1.0));
     result = vec3(1.0) - exp(-result * exposure);
     result = pow(result, vec3(1f / gamma));
 
+    if(bool(cascadeIndicatorToggle))
+        result += cascadeIndicator.xyz;
+
     return vec4(result, 1.0f);
 }
 
 void main(){
 
-    o_IDBuffer = int(round(v_ObjectID));
+    o_IDBuffer = v_ObjectID;
 
     vec3 vertexPos = inVar.vertexPos;
-    vec3 cameraPosVec3 = cameraPos;
     vec2 texCoordsOut = inVar.texCoordsOut;
 
-    vec3 viewDir = normalize(cameraPosVec3 - vertexPos);
+    vec3 viewDir = normalize(cameraPos - vertexPos);
 
     vec3 norm;
     if(normalMapSlot != 0 && normalMapStrength != 0.0f){
@@ -255,7 +318,7 @@ void main(){
         norm = vec3(normalize(inVar.normalsOut));
     }
 
-    vec4 result = startPBR(vertexPos, cameraPosVec3, texCoordsOut, viewDir, norm);
+    vec4 result = startPBR(vertexPos, texCoordsOut, viewDir, norm);
     color = vec4(result.xyz, 1.0f);
 }
 
@@ -264,45 +327,77 @@ void main(){
 
 layout(location = 0) in vec3 pos;
 layout(location = 1) in vec2 tcs;
-layout(location = 2) in float textureSlot;
-layout(location = 3) in vec4 color;
-layout(location = 4) in vec3 normals;
-layout(location = 5) in vec3 biTangent;
-layout(location = 6) in vec3 tangent;
-layout(location = 7) in float objectID;
+layout(location = 2) in vec3 normals;
+layout(location = 3) in vec3 biTangent;
+layout(location = 4) in vec3 tangent;
+layout(location = 5) in float objectID;
+layout(location = 6) in vec4 boneIds;
+layout(location = 7) in vec4 weights;
 
 uniform mat4 v_Matrix;
 uniform mat4 model;
 
-out float v_ObjectID;
+#define NUMBER_CASCADES 4
+
+uniform mat4 lightSpaceMatrix[NUMBER_CASCADES];
+
+flat out int v_ObjectID;
+out float clipSpacePosZ;
 
 out OUT_VARIABLES {
     vec2 texCoordsOut;
-    float textureSlotOut;
-    vec4 colorOut;
     vec3 normalsOut;
     vec3 vertexPos;
+
+    vec4 lightSpacePos[NUMBER_CASCADES];
 
     //NORMAL MAPPING
     mat3 TBN;
 } outVar;
 
+const int MAX_BONES = 100;
+uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform int animatedModel;
+
 void main(){
-    v_ObjectID = objectID;
 
-    outVar.textureSlotOut = textureSlot;
+    v_ObjectID = int(objectID);
     outVar.texCoordsOut = tcs;
-    outVar.colorOut = color;
 
-    outVar.vertexPos = pos.xyz; //dont need model bcs it is already translated
-    outVar.normalsOut = mat3(model) * normals;
+    ivec4 boneIDInt = ivec4(boneIds);
+    vec4 totalPos = vec4(pos, 1.0f);
+    vec4 totalNorm = vec4(normals, 1.0f);
+    vec4 finalTangent = vec4(tangent, 1.0f);
+    vec4 finalBiTangent = vec4(biTangent, 1.0f);
 
-    vec3 T = normalize(mat3(model) * tangent);
-    vec3 B = normalize(mat3(model) * biTangent);
-    vec3 N = normalize(mat3(model) * normals);
+    if(bool(animatedModel)){
+        //mesh has animations
+        mat4 transform = finalBonesMatrices[boneIDInt[0]] * weights[0];
+             transform += finalBonesMatrices[boneIDInt[1]] * weights[1];
+             transform += finalBonesMatrices[boneIDInt[2]] * weights[2];
+             transform += finalBonesMatrices[boneIDInt[3]] * weights[3];
+
+        totalPos = transform * vec4(pos, 1.0f);
+        totalNorm = transform * vec4(normals, 0.0f);
+        finalTangent = transform * vec4(tangent, 0.0f);
+        finalBiTangent = transform * vec4(biTangent, 0.0f);
+    }
+
+    outVar.vertexPos = (model * totalPos).xyz;
+    outVar.normalsOut = mat3(model) * totalNorm.xyz;
+
+    for(int i = 0; i < NUMBER_CASCADES; i++){
+        outVar.lightSpacePos[i] = lightSpaceMatrix[i] * model * vec4(pos, 1.0f);
+    }
+
+    vec3 T = normalize(mat3(model) * finalTangent.xyz);
+    vec3 B = normalize(mat3(model) * finalBiTangent.xyz);
+    vec3 N = normalize(mat3(model) * totalNorm.xyz);
 
     mat3 TBN = mat3(T, B, N);
     outVar.TBN = TBN;
 
-    gl_Position = vec4(pos, 1.0) * v_Matrix;
+    vec4 modelPos = model * totalPos;
+    gl_Position = modelPos * v_Matrix;
+    clipSpacePosZ = gl_Position.z;
 }

@@ -3,48 +3,48 @@ package OxyEngine.Scene;
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
-import OxyEngine.Core.Layers.UILayer;
-import OxyEngine.Core.Renderer.Buffer.*;
-import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferSpecification;
-import OxyEngine.Core.Renderer.Buffer.Platform.FrameBufferTextureFormat;
-import OxyEngine.Core.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Renderer.CullMode;
-import OxyEngine.Core.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Renderer.Light.Light;
-import OxyEngine.Core.Renderer.Light.SkyLight;
-import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
-import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Mesh.NativeMeshOpenGL;
-import OxyEngine.Core.Renderer.OxyRenderPass;
-import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Core.Renderer.Pipeline.OxyShader;
-import OxyEngine.Core.Renderer.Pipeline.ShaderLibrary;
-import OxyEngine.Core.Renderer.Pipeline.ShaderType;
-import OxyEngine.Core.Renderer.ShadowRenderer;
-import OxyEngine.Core.Renderer.Texture.HDRTexture;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Context.CullMode;
+import OxyEngine.Core.Context.OxyRenderPass;
+import OxyEngine.Core.Context.OxyRenderer;
+import OxyEngine.Core.Context.Renderer.Buffer.*;
+import OxyEngine.Core.Context.Renderer.Buffer.Platform.FrameBufferSpecification;
+import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLFrameBuffer;
+import OxyEngine.Core.Context.Renderer.Buffer.Platform.TextureFormat;
+import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Context.Renderer.Light.Light;
+import OxyEngine.Core.Context.Renderer.Light.SkyLight;
+import OxyEngine.Core.Context.Renderer.Mesh.MeshRenderMode;
+import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Context.Renderer.Mesh.NativeMeshOpenGL;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
+import OxyEngine.Core.Context.Renderer.Pipeline.ShaderType;
+import OxyEngine.Core.Context.Renderer.ShadowRenderer;
+import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
+import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyEngine;
-import OxyEngine.Scene.Objects.Model.OxyMaterial;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scene.Objects.WorldGrid;
-import OxyEngine.Core.Renderer.Texture.TextureSlot;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.GUINode;
+import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Matrix4f;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
-import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
-import static OxyEngine.Core.Renderer.ShadowRenderer.NUMBER_CASCADES;
+import static OxyEngine.Core.Context.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.Scene.SceneRuntime.*;
+import static OxyEngine.System.OxyEventSystem.mouseButtonDispatcher;
 import static OxyEngineEditor.UI.Panels.ScenePanel.editorCameraEntity;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
-import static org.lwjgl.opengl.GL45.glBindTextureUnit;
+import static org.lwjgl.opengl.GL44.glClearTexImage;
 
 public final class SceneRenderer {
 
@@ -54,8 +54,6 @@ public final class SceneRenderer {
     public Set<OxyEntity> cachedCameraComponents;
     public Set<OxyEntity> allModelEntities;
 
-    public OxyCamera mainCamera;
-
     public static SceneRenderer getInstance() {
         if (INSTANCE == null) INSTANCE = new SceneRenderer();
         return INSTANCE;
@@ -63,33 +61,51 @@ public final class SceneRenderer {
 
     private OxyPipeline geometryPipeline, hdrPipeline;
 
-    private OpenGLFrameBuffer frameBuffer, blittedFrameBuffer;
+    private OpenGLFrameBuffer mainFrameBuffer;
+
+    static OpenGLFrameBuffer pickingFrameBuffer;
+    static OxyRenderPass pickingRenderPass;
 
     private SceneRenderer() {
     }
 
-    public void initPipelines() {
+    public void initShaders(){
+        OxyShader.createShader("OxyPBR", "shaders/OxyPBR.glsl");
+        OxyShader.createShader("OxyHDR", "shaders/OxyHDR.glsl");
+        OxyShader.createShader("OxySkybox", "shaders/OxySkybox.glsl");
+        OxyShader.createShader("OxyDepthMap", "shaders/OxyDepthMap.glsl");
+        OxyShader.createShader("OxyIBL", "shaders/OxyIBL.glsl");
+        OxyShader.createShader("OxyPrefiltering", "shaders/OxyPrefiltering.glsl");
+        OxyShader.createShader("OxyBDRF", "shaders/OxyBDRF.glsl");
+        OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
+    }
 
-        frameBuffer = FrameBuffer.create(OxyEngine.getWindowHandle().getWidth(), OxyEngine.getWindowHandle().getHeight(),
+    public void initPipelines() {
+        initShaders();
+
+        WindowHandle windowHandle = OxyEngine.getWindowHandle();
+
+        RenderBuffer mainRenderBuffer = RenderBuffer.create(TextureFormat.DEPTH24STENCIL8, windowHandle.getWidth(), windowHandle.getHeight());
+        mainFrameBuffer = FrameBuffer.create(windowHandle.getWidth(), windowHandle.getHeight(), new OxyColor(0f, 0f, 0f, 1f),
                 FrameBuffer.createNewSpec(FrameBufferSpecification.class)
                         .setTextureCount(1)
                         .setAttachmentIndex(0)
                         .setMultiSampled(true)
-                        .setFormats(FrameBufferTextureFormat.RGBA8, FrameBufferTextureFormat.DEPTH24STENCIL8)
-                        .useRenderBuffer(true));
+                        .setFormat(TextureFormat.RGBA8)
+                        .useRenderBuffer(mainRenderBuffer));
 
-        blittedFrameBuffer = FrameBuffer.create(frameBuffer.getWidth(), frameBuffer.getHeight(),
-                FrameBuffer.createNewSpec(FrameBufferSpecification.class)
-                        .setTextureCount(1)
-                        .setAttachmentIndex(0)
-                        .setFormats(FrameBufferTextureFormat.RGBA8)
-                        .setFilter(GL_LINEAR, GL_LINEAR));
+        mainFrameBuffer.createBlittingFrameBuffer(FrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                .setTextureCount(1)
+                .setAttachmentIndex(0)
+                .setFormat(TextureFormat.RGBA8)
+                .setFilter(GL_LINEAR, GL_LINEAR));
 
-        OxyShader pbrShader = OxyShader.createShader("OxyPBRAnimation", "shaders/OxyPBRAnimation.glsl");
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
 
-        OxyRenderPass geometryRenderPass = OxyRenderPass.createBuilder(frameBuffer)
+        OxyRenderPass geometryRenderPass = OxyRenderPass.createBuilder(mainFrameBuffer)
                 .renderingMode(MeshRenderMode.TRIANGLES)
                 .setCullFace(CullMode.DISABLED)
+                .enableBlending()
                 .create();
 
         geometryPipeline = OxyPipeline.createNewPipeline(OxyPipeline.createNewSpecification()
@@ -127,12 +143,12 @@ public final class SceneRenderer {
         pbrShader.setUniform1iv("tex", samplers);
         pbrShader.end();
 
-        OxyRenderPass hdrRenderPass = OxyRenderPass.createBuilder(frameBuffer)
+        OxyRenderPass hdrRenderPass = OxyRenderPass.createBuilder(mainFrameBuffer)
                 .renderingMode(MeshRenderMode.TRIANGLES)
                 .setCullFace(CullMode.FRONT)
                 .create();
 
-        OxyShader hdrShader = OxyShader.createShader("OxyHDR", "shaders/OxyHDR.glsl");
+        OxyShader hdrShader = ShaderLibrary.get("OxyHDR");
         hdrPipeline = OxyPipeline.createNewPipeline(OxyPipeline.createNewSpecification()
                 .setDebugName("HDR Pipeline")
                 .setRenderPass(hdrRenderPass)
@@ -145,7 +161,23 @@ public final class SceneRenderer {
                 )
                 .setShader(hdrShader));
 
-        OxySelectHandler.init(frameBuffer.getWidth(), frameBuffer.getHeight());
+        pickingFrameBuffer = FrameBuffer.create(mainFrameBuffer.getWidth(), mainFrameBuffer.getHeight(), new OxyColor(0f, 0f, 0f, 1.0f),
+                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                        .setTextureCount(1)
+                        .setAttachmentIndex(0)
+                        .setFormat(TextureFormat.RGBA8)
+                        .setFilter(GL_LINEAR, GL_LINEAR),
+                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                        .setTextureCount(1)
+                        .setAttachmentIndex(1)
+                        .setFormat(TextureFormat.R32I)
+                        .setFilter(GL_NEAREST, GL_NEAREST),
+                OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
+                        .setTextureCount(1)
+                        .setStorage(true, 1));
+        pickingFrameBuffer.drawBuffers(0, 1);
+        pickingRenderPass = OxyRenderPass.createBuilder(pickingFrameBuffer).create();
+
         ShadowRenderer.initPipeline();
     }
 
@@ -214,19 +246,17 @@ public final class SceneRenderer {
             if (ACTIVE_SCENE.STATE == SceneState.RUNNING && !camera.equals(editorCamera)) {
                 editorCamera.setPrimary(false);
                 camera.setPrimary(true);
-                mainCamera = camera;
-                SceneRuntime.currentBoundedCamera = mainCamera;
+                SceneRuntime.currentBoundedCamera = camera;
             } else if (ACTIVE_SCENE.STATE != SceneState.RUNNING) {
-                if (mainCamera != null) mainCamera.setPrimary(false);
+                camera.setPrimary(false);
                 editorCamera.setPrimary(true);
-                mainCamera = editorCamera;
-                SceneRuntime.currentBoundedCamera = mainCamera;
+                SceneRuntime.currentBoundedCamera = camera;
             }
         }
 
-        if (mainCamera != null) {
-            mainCamera.finalizeCamera(ts);
-            if (mainCamera instanceof PerspectiveCamera c) c.setViewMatrixNoTranslation();
+        if (currentBoundedCamera != null) {
+            currentBoundedCamera.finalizeCamera(ts);
+            if (currentBoundedCamera instanceof PerspectiveCamera c) c.setViewMatrixNoTranslation();
         }
     }
 
@@ -240,7 +270,7 @@ public final class SceneRenderer {
         if (currentBoundedCamera == null) return;
 
         //RESET ALL THE LIGHT STATES
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
         for (int i = 0; i < LIGHT_SIZE; i++) {
             pbrShader.begin();
             pbrShader.setUniform1i("p_Light[" + i + "].activeState", 0);
@@ -255,7 +285,6 @@ public final class SceneRenderer {
             Light l = e.get(Light.class);
             l.update(e, i++);
 
-
             SkyLight comp;
             if (((comp = e.get(SkyLight.class)) != null && comp.isPrimary())) {
                 currentBoundedSkyLight = (OxyNativeObject) e;
@@ -263,130 +292,57 @@ public final class SceneRenderer {
         }
     }
 
-    private void geometryPass(float ts) {
+    private void geometryPass() {
         if (ACTIVE_SCENE == null) return;
         if (currentBoundedCamera == null) return;
-
-        HDRTexture hdrTexture = null;
-        SkyLight skyLightComp = null;
-        if (currentBoundedSkyLight != null) {
-            skyLightComp = currentBoundedSkyLight.get(SkyLight.class);
-            if (skyLightComp != null) hdrTexture = skyLightComp.getHDRTexture();
-        }
-
-        OpenGLFrameBuffer.blit(frameBuffer, blittedFrameBuffer);
-        frameBuffer.flush();
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
         {
-            OxyShader pbrShader = geometryPipeline.getShader();
             OxyRenderPass geometryRenderPass = geometryPipeline.getRenderPass();
-            geometryRenderPass.beginRenderPass();
+            OxyRenderer.beginRenderPass(geometryRenderPass);
 
             for (OxyEntity e : allModelEntities) {
                 if (!e.has(SelectedComponent.class)) continue;
                 RenderableComponent renderableComponent = e.get(RenderableComponent.class);
                 if (renderableComponent.mode != RenderingMode.Normal) continue;
-                ModelMeshOpenGL modelMesh = e.get(ModelMeshOpenGL.class);
-                OxyMaterial material = null;
-                if (e.has(OxyMaterialIndex.class)) material = OxyMaterialPool.getMaterial(e);
-                TransformComponent c = e.get(TransformComponent.class);
-
-                pbrShader.begin();
-
-                //ANIMATION UPDATE
-                pbrShader.setUniform1i("animatedModel", 0);
-                if (e.has(AnimationComponent.class)) {
-                    AnimationComponent animComp = e.get(AnimationComponent.class);
-                    if (ACTIVE_SCENE.STATE == SceneState.RUNNING) {
-                        pbrShader.setUniform1i("animatedModel", 1);
-                        animComp.updateAnimation(ts);
-                        List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
-                        for (int j = 0; j < matrix4fList.size(); j++) {
-                            pbrShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
-                        }
-                    } else animComp.setTime(0);
-                }
-
-                pbrShader.setUniformMatrix4fv("model", c.transform, false);
-                int iblSlot = TextureSlot.UNUSED.getValue(), prefilterSlot = TextureSlot.UNUSED.getValue(), brdfLUTSlot = TextureSlot.UNUSED.getValue();
-                if (hdrTexture != null) {
-                    iblSlot = hdrTexture.getIBLSlot();
-                    prefilterSlot = hdrTexture.getPrefilterSlot();
-                    brdfLUTSlot = hdrTexture.getBDRFSlot();
-                    hdrTexture.bindAll();
-                }
-                pbrShader.setUniform1i("iblMap", iblSlot);
-                pbrShader.setUniform1i("prefilterMap", prefilterSlot);
-                pbrShader.setUniform1i("brdfLUT", brdfLUTSlot);
-                if (skyLightComp != null) {
-                    pbrShader.setUniform1f("hdrIntensity", skyLightComp.intensity[0]);
-                    pbrShader.setUniform1f("gamma", skyLightComp.gammaStrength[0]);
-                    pbrShader.setUniform1f("exposure", skyLightComp.exposure[0]);
-                } else {
-                    pbrShader.setUniform1f("hdrIntensity", 1.0f);
-                    pbrShader.setUniform1f("gamma", 2.2f);
-                    pbrShader.setUniform1f("exposure", 1.0f);
-                }
-
-                boolean castShadows = ShadowRenderer.castShadows();
-                pbrShader.setUniform1i("castShadows", castShadows ? 1 : 0);
-                if (castShadows) {
-                    if (ShadowRenderer.cascadeIndicatorToggle)
-                        pbrShader.setUniform1i("cascadeIndicatorToggle", 1);
-                    else pbrShader.setUniform1i("cascadeIndicatorToggle", 0);
-
-                    for (int i = 0; i < NUMBER_CASCADES; i++) {
-                        if (ShadowRenderer.ready(i)) {
-                            glBindTextureUnit(TextureSlot.CSM.getValue() + i, ShadowRenderer.getShadowMap(i));
-                            pbrShader.setUniform1i("shadowMap[" + i + "]", TextureSlot.CSM.getValue() + i);
-                            pbrShader.setUniformMatrix4fv("lightSpaceMatrix[" + i + "]", ShadowRenderer.getShadowViewMatrix(i), false);
-                            pbrShader.setUniform1f("cascadeSplits[" + i + "]", ShadowRenderer.getCascadeSplits(i));
-                        }
-                    }
-                }
-
-                pbrShader.end();
-                if (material != null) material.push(pbrShader);
-                OxyRenderer.renderMesh(geometryPipeline, modelMesh, mainCamera);
+                OpenGLMesh modelMesh = e.get(OpenGLMesh.class);
+                e.update();
+                OxyRenderer.renderMesh(geometryPipeline, modelMesh, currentBoundedCamera);
             }
-            /*for (OxyEntity e : cachedNativeMeshes) {
-                OpenGLMesh mesh = e.get(OpenGLMesh.class);
-                if (e.has(SkyLight.class)) continue; //DO NOT RENDER THE SKYLIGHT HERE
 
-                if (e.has(OxyMaterialIndex.class)) {
-                    OxyMaterial m = OxyMaterialPool.getMaterial(e);
-                    if (m != null) {
-                        m.push(pbrShader);
-                        OxyRenderer.renderMesh(geometryPipeline, mesh, mainCamera);
-                    }
-                }
-            }*/
-            geometryRenderPass.endRenderPass();
+            OxyRenderer.endRenderPass();
         }
 
         {
             if (WorldGrid.grid != null) {
                 OxyPipeline gridPipeline = WorldGrid.getPipeline();
-                OxyRenderPass gridRenderPass = gridPipeline.getRenderPass();
-                gridRenderPass.beginRenderPass();
+
+                OxyRenderPass gridPass = gridPipeline.getRenderPass();
+                OxyRenderer.beginRenderPass(gridPass);
+
                 OxyShader gridShader = gridPipeline.getShader();
                 gridShader.begin();
-                gridShader.setUniformMatrix4fv("v_Matrix", mainCamera.getViewMatrix(), mainCamera.isTranspose());
+                gridShader.setUniformMatrix4fv("v_Matrix", currentBoundedCamera.getViewMatrix(), currentBoundedCamera.isTranspose());
                 gridShader.end();
-                OxyRenderer.renderMesh(gridPipeline, WorldGrid.grid.get(OpenGLMesh.class), mainCamera);
-                gridRenderPass.endRenderPass();
+                OxyRenderer.renderMesh(gridPipeline, WorldGrid.grid.get(OpenGLMesh.class), currentBoundedCamera);
+
+                OxyRenderer.endRenderPass();
             }
         }
 
         {
             if (currentBoundedSkyLight != null) {
+
+                HDRTexture hdrTexture = null;
+                SkyLight skyLightComp = currentBoundedSkyLight.get(SkyLight.class);
+                if (skyLightComp != null) hdrTexture = skyLightComp.getHDRTexture();
+
                 if (hdrTexture != null) {
 
                     OxyRenderPass hdrRenderPass = hdrPipeline.getRenderPass();
-                    hdrRenderPass.beginRenderPass();
+                    OxyRenderer.beginRenderPass(hdrRenderPass);
 
                     hdrTexture.bindAll();
-                    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
                     OxyShader skyBoxShader = ShaderLibrary.get("OxySkybox");
 
@@ -399,27 +355,65 @@ public final class SceneRenderer {
                     skyBoxShader.setUniform1f("u_gamma", skyLightComp.gammaStrength[0]);
                     skyBoxShader.end();
 
-                    OxyRenderer.renderMesh(hdrPipeline, currentBoundedSkyLight.get(OpenGLMesh.class), mainCamera, skyBoxShader);
+                    OxyRenderer.renderMesh(hdrPipeline, currentBoundedSkyLight.get(OpenGLMesh.class), currentBoundedCamera, skyBoxShader);
 
-                    glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-                    hdrRenderPass.endRenderPass();
+                    OxyRenderer.endRenderPass();
                 }
             }
         }
-
+        glDisable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
     }
 
-    public void renderScene(float ts) {
-        geometryPass(ts);
+    public void idPass() {
+
+        int[] clearValue = {-1};
+
+        OxyRenderer.beginRenderPass(pickingRenderPass);
+
+        OxyPipeline geometryPipeline = SceneRenderer.getInstance().getGeometryPipeline();
+        OxyShader pbrShader = geometryPipeline.getShader();
+
+        glClearTexImage(pickingFrameBuffer.getColorAttachmentTexture(1)[0], 0, pickingFrameBuffer.getTextureFormat(1).getStorageFormat(), GL_INT, clearValue);
+
+        for (OxyEntity e : allModelEntities) {
+            if (!e.has(SelectedComponent.class)) continue;
+            RenderableComponent renderableComponent = e.get(RenderableComponent.class);
+            if (renderableComponent.mode != RenderingMode.Normal) continue;
+            pbrShader.begin();
+            //ANIMATION UPDATE
+            pbrShader.setUniform1i("animatedModel", 0);
+            if (e.has(AnimationComponent.class)) {
+                pbrShader.setUniform1i("animatedModel", 1);
+                AnimationComponent animComp = e.get(AnimationComponent.class);
+                List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
+                for (int j = 0; j < matrix4fList.size(); j++) {
+                    pbrShader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                }
+            }
+            pbrShader.setUniformMatrix4fv("model", e.get(TransformComponent.class).transform, false);
+            pbrShader.end();
+            OxyRenderer.renderMesh(geometryPipeline, e.get(OpenGLMesh.class));
+        }
+
+        OxyRenderer.endRenderPass();
+    }
+
+    public void renderScene() {
+        mainFrameBuffer.blit();
+        if (mouseButtonDispatcher.getButtonState(GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && ScenePanel.hoveredWindow
+                && SceneRuntime.currentBoundedCamera.equals(editorCameraEntity.get(OxyCamera.class))) {
+            idPass();
+            OxySelectHandler.startPicking();
+        }
+        geometryPass();
         shadowPass();
 
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        OxyTexture.unbindAllTextures();
+        //TODO: Transfer this to EndScene() method in the future
+        mainFrameBuffer.resetFlush();
+        pickingFrameBuffer.resetFlush();
+        ShadowRenderer.getFrameBuffer().resetFlush();
 
-        UILayer.uiSystem.dispatchNativeEvents();
         OxyRenderer.Stats.totalShapeCount = ACTIVE_SCENE.getShapeCount();
     }
 
@@ -434,16 +428,8 @@ public final class SceneRenderer {
     }
 
     public void recompileGeometryShader() {
-        OxyShader pbrShaderOld = ShaderLibrary.get("OxyPBRAnimation");
-        pbrShaderOld.dispose();
-        OxyShader pbrShader = OxyShader.createShader("OxyPBRAnimation", "shaders/OxyPBRAnimation.glsl");
-
-        int[] samplers = new int[32];
-        for (int i = 0; i < samplers.length; i++) samplers[i] = i;
-
-        pbrShader.begin();
-        pbrShader.setUniform1iv("tex", samplers);
-        pbrShader.end();
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
+        pbrShader.recompile();
     }
 
     public void clear() {
@@ -452,12 +438,12 @@ public final class SceneRenderer {
         allModelEntities.clear();
     }
 
-    public OpenGLFrameBuffer getFrameBuffer() {
-        return frameBuffer;
+    public OpenGLFrameBuffer getMainFrameBuffer() {
+        return mainFrameBuffer;
     }
 
-    public OpenGLFrameBuffer getBlittedFrameBuffer() {
-        return blittedFrameBuffer;
+    public OpenGLFrameBuffer getPickingFrameBuffer() {
+        return pickingFrameBuffer;
     }
 
     public OxyPipeline getGeometryPipeline() {

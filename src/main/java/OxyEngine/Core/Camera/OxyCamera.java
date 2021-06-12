@@ -48,6 +48,18 @@ public abstract class OxyCamera implements EntityComponent {
         return viewMatrix;
     }
 
+    public float[] getModelMatrixAsFloatArray(){
+        float[] buffer = new float[4 * 4];
+        modelMatrix.get(buffer);
+        return buffer;
+    }
+
+    public float[] getProjectionMatrixAsFloatArray(){
+        float[] buffer = new float[4 * 4];
+        projectionMatrix.get(buffer);
+        return buffer;
+    }
+
     public Matrix4f getViewMatrixNoTranslation() {
         return viewMatrixNoTranslation;
     }

@@ -1,15 +1,16 @@
 package OxyEngine.Scene.Objects;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Renderer.Buffer.IndexBuffer;
-import OxyEngine.Core.Renderer.Buffer.VertexBuffer;
-import OxyEngine.Core.Renderer.CullMode;
-import OxyEngine.Core.Renderer.Mesh.MeshRenderMode;
-import OxyEngine.Core.Renderer.Mesh.NativeMeshOpenGL;
-import OxyEngine.Core.Renderer.OxyRenderPass;
-import OxyEngine.Core.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Core.Renderer.Pipeline.OxyShader;
-import OxyEngine.Core.Renderer.Pipeline.ShaderType;
+import OxyEngine.Core.Context.Renderer.Buffer.IndexBuffer;
+import OxyEngine.Core.Context.Renderer.Buffer.VertexBuffer;
+import OxyEngine.Core.Context.CullMode;
+import OxyEngine.Core.Context.Renderer.Mesh.MeshRenderMode;
+import OxyEngine.Core.Context.Renderer.Mesh.NativeMeshOpenGL;
+import OxyEngine.Core.Context.OxyRenderPass;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
+import OxyEngine.Core.Context.Renderer.Pipeline.ShaderType;
 import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRenderer;
@@ -28,9 +29,9 @@ public class WorldGrid {
     }
 
     public static void initPipeline() {
-        OxyShader gridShader = OxyShader.createShader("OxyGrid", "shaders/OxyGrid.glsl");
+        OxyShader gridShader = ShaderLibrary.get("OxyGrid");
 
-        OxyRenderPass gridRenderPass = OxyRenderPass.createBuilder(SceneRenderer.getInstance().getFrameBuffer())
+        OxyRenderPass gridRenderPass = OxyRenderPass.createBuilder(SceneRenderer.getInstance().getMainFrameBuffer())
                 .renderingMode(MeshRenderMode.LINES)
                 .setCullFace(CullMode.BACK)
                 .create();

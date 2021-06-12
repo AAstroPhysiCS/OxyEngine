@@ -1,7 +1,7 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.AnimationComponent;
-import OxyEngine.Core.Renderer.Texture.Image2DTexture;
+import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
 import OxyEngineEditor.UI.AssetManager;
 import imgui.ImGui;
 import imgui.flag.ImGuiStyleVar;

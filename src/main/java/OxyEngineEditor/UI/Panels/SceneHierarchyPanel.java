@@ -2,11 +2,11 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Renderer.Light.Light;
-import OxyEngine.Core.Renderer.Light.SkyLight;
-import OxyEngine.Core.Renderer.Texture.Image2DTexture;
-import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Light.Light;
+import OxyEngine.Core.Context.Renderer.Light.SkyLight;
+import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
+import OxyEngine.Scene.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.OxyEntity;

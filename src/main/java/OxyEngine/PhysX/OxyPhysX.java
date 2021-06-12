@@ -33,7 +33,6 @@ public final class OxyPhysX implements OxyDisposable {
     }
 
     private OxyPhysX() {
-
     }
 
     //From the PhysX example
@@ -95,10 +94,10 @@ public final class OxyPhysX implements OxyDisposable {
 
             Vector3f posDest = new Vector3f();
             Quaternionf rotDest = new Quaternionf();
+            Vector3f scaleDest = new Vector3f();
+
             actualEntityMatrix.getTranslation(posDest);
             actualEntityMatrix.getUnnormalizedRotation(rotDest);
-
-            Vector3f scaleDest = new Vector3f();
             actualEntityMatrix.getScale(scaleDest);
 
             physXEntities.get(TransformComponent.class).set(posDest, rotDest, scaleDest);

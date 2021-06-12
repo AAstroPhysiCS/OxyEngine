@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Renderer.Texture.Image2DTexture;
+import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scene.SceneState;
 import OxyEngineEditor.UI.AssetManager;

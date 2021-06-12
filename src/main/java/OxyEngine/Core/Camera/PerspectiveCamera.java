@@ -13,7 +13,7 @@ public abstract class PerspectiveCamera extends OxyCamera {
     protected static final float zoomSpeed = 250f;
 
     public PerspectiveCamera() {
-        this(0.05f, 7f, 7f, false, 45, (float) SceneRenderer.getInstance().getFrameBuffer().getWidth() / SceneRenderer.getInstance().getFrameBuffer().getHeight(), 1f, 10000f, true);
+        this(0.05f, 7f, 7f, false, 45, (float) SceneRenderer.getInstance().getMainFrameBuffer().getWidth() / SceneRenderer.getInstance().getMainFrameBuffer().getHeight(), 1f, 10000f, true);
     }
 
     public PerspectiveCamera(float mouseSpeed, float horizontalSpeed, float verticalSpeed, boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {

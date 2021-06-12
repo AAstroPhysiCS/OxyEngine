@@ -5,7 +5,7 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.PhysX.OxyPhysXGeometry.Box;
 import OxyEngine.PhysX.OxyPhysXGeometry.Sphere;
 import OxyEngine.PhysX.OxyPhysXGeometry.TriangleMesh;
-import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Scene.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
@@ -203,16 +203,20 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
             if (entityContext == null) return;
             if (!entityContext.has(OxyPhysXComponent.class)) return;
 
+            OxyPhysXGeometry geometry = entityContext.get(OxyPhysXComponent.class).getGeometry();
+
             if (ImGui.treeNodeEx("Box Collider", ImGuiTreeNodeFlags.DefaultOpen)) {
-                Vector3f halfScalar = ((Box) entityContext.get(OxyPhysXComponent.class).getGeometry()).getPxHalfScalar();
-                halfScalarArr[0] = halfScalar.x;
-                halfScalarArr[1] = halfScalar.y;
-                halfScalarArr[2] = halfScalar.z;
-                ImGui.text("Size:");
-                ImGui.sameLine();
-                ImGui.dragFloat3("BoxColliderScale", halfScalarArr);
-                halfScalar.set(halfScalarArr[0], halfScalarArr[1], halfScalarArr[2]);
-                ImGui.treePop();
+                if(geometry instanceof Box b){
+                    Vector3f halfScalar = b.getPxHalfScalar();
+                    halfScalarArr[0] = halfScalar.x;
+                    halfScalarArr[1] = halfScalar.y;
+                    halfScalarArr[2] = halfScalar.z;
+                    ImGui.text("Size:");
+                    ImGui.sameLine();
+                    ImGui.dragFloat3("BoxColliderScale", halfScalarArr);
+                    halfScalar.set(halfScalarArr[0], halfScalarArr[1], halfScalarArr[2]);
+                    ImGui.treePop();
+                }
             }
         };
 

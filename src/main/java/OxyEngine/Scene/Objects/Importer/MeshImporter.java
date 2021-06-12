@@ -1,7 +1,7 @@
 package OxyEngine.Scene.Objects.Importer;
 
 import OxyEngine.Components.TagComponent;
-import OxyEngine.Core.Renderer.Mesh.OxyVertex;
+import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
 import OxyEngine.Scene.OxyEntity;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -24,7 +24,7 @@ import static org.lwjgl.assimp.Assimp.*;
 
 public non-sealed class MeshImporter implements ModelImporterFactory {
 
-    static class AssimpMesh {
+    static final class AssimpMesh {
         public List<OxyVertex> vertexList;
         public List<int[]> faces;
 
@@ -47,7 +47,7 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
         }
     }
 
-    static record AssimpMaterial(String name, String textPath, String textPathMetallic,
+    static final record AssimpMaterial(String name, String textPath, String textPathMetallic,
                                  String textPathRoughness, String textPathNormals,
                                  String textPathAO, String textPathEmissive, Vector4f diffuse) {
     }

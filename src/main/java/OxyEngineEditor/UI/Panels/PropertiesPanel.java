@@ -6,20 +6,24 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Renderer.Light.Light;
-import OxyEngine.Core.Renderer.Light.PointLight;
-import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Texture.Image2DTexture;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
-import OxyEngine.Core.Renderer.Texture.TextureSlot;
+import OxyEngine.Core.Context.Renderer.Buffer.Platform.TextureFormat;
+import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Context.Renderer.Light.Light;
+import OxyEngine.Core.Context.Renderer.Light.PointLight;
+import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
+import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
+import OxyEngine.Core.Context.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Context.Renderer.Texture.TexturePixelType;
+import OxyEngine.Core.Context.Renderer.Texture.TextureSlot;
 import OxyEngine.PhysX.OxyPhysXActor;
 import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.PhysX.OxyPhysXGeometry;
 import OxyEngine.PhysX.PhysXRigidBodyMode;
-import OxyEngine.Scene.Objects.Model.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyNativeObject;
+import OxyEngine.Scene.OxyMaterial;
 import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scripting.OxyScript;
@@ -31,12 +35,14 @@ import imgui.type.ImString;
 import org.joml.Vector4f;
 
 import java.io.File;
+import java.util.List;
 
 import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedTextureFile;
+import static OxyEngineEditor.UI.AssetManager.DEFAULT_TEXTURE_PARAMETER;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.materialContext;
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
@@ -50,6 +56,8 @@ public class PropertiesPanel extends Panel {
         if (INSTANCE == null) INSTANCE = new PropertiesPanel();
         return INSTANCE;
     }
+
+    private static final double DEGREES_TO_RADIANS = 0.017453292519943295;
 
     public static boolean focusedWindow = false;
 
@@ -157,6 +165,8 @@ public class PropertiesPanel extends Panel {
         if (entityContext != null) {
             name = new ImString(entityContext.get(TagComponent.class).tag(), 100);
 
+            List<GUINode> nodeList = entityContext.getGUINodes();
+
             ImGui.alignTextToFramePadding();
             ImGui.text("Name: ");
             ImGui.sameLine();
@@ -188,9 +198,9 @@ public class PropertiesPanel extends Panel {
                 float[] translationY = new float[]{t.position.y};
                 float[] translationZ = new float[]{t.position.z};
 
-                float[] rotationX = new float[]{t.rotation.x};
-                float[] rotationY = new float[]{t.rotation.y};
-                float[] rotationZ = new float[]{t.rotation.z};
+                float[] rotationX = new float[]{(float) Math.toDegrees(t.rotation.x)};
+                float[] rotationY = new float[]{(float) Math.toDegrees(t.rotation.y)};
+                float[] rotationZ = new float[]{(float) Math.toDegrees(t.rotation.z)};
 
                 float[] scaleX = new float[]{t.scale.x};
                 float[] scaleY = new float[]{t.scale.y};
@@ -199,6 +209,10 @@ public class PropertiesPanel extends Panel {
                 renderTransformControl("Translation Control", translationX, translationY, translationZ, 0.0f, 0.1f);
                 renderTransformControl("Rotation Control", rotationX, rotationY, rotationZ, 0.0f, 0.1f);
                 renderTransformControl("Scale Control", scaleX, scaleY, scaleZ, 1.0f, 0.1f);
+
+                rotationX[0] *= DEGREES_TO_RADIANS;
+                rotationY[0] *= DEGREES_TO_RADIANS;
+                rotationZ[0] *= DEGREES_TO_RADIANS;
 
                 if (!t.position.equals(translationX[0], translationY[0], translationZ[0]) ||
                         !t.rotation.equals(rotationX[0], rotationY[0], rotationZ[0]) ||
@@ -209,7 +223,7 @@ public class PropertiesPanel extends Panel {
                     t.scale.set(scaleX[0], scaleY[0], scaleZ[0]);
                     entityContext.transformLocally();
 
-                    if(entityContext.has(OxyPhysXComponent.class)){
+                    if (entityContext.has(OxyPhysXComponent.class)) {
                         OxyPhysXComponent physXComponent = entityContext.get(OxyPhysXComponent.class);
                         physXComponent.update();
                     }
@@ -229,13 +243,13 @@ public class PropertiesPanel extends Panel {
                 ImGui.inputText("##hidelabel comp_popup_search", searchAddComponent);
                 if (ImGui.beginMenu("Mesh")) {
                     if (ImGui.menuItem("Mesh Renderer"))
-                        if (!entityContext.getGUINodes().contains(ModelMeshOpenGL.guiNode))
-                            entityContext.getGUINodes().add(ModelMeshOpenGL.guiNode);
+                        if (!nodeList.contains(ModelMeshOpenGL.guiNode))
+                            nodeList.add(ModelMeshOpenGL.guiNode);
                     if (ImGui.menuItem("Material"))
-                        if (!entityContext.getGUINodes().contains(OxyMaterial.guiNode)) {
-                            int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 1.0f, 1.0f, 1.0f));
+                        if (!nodeList.contains(OxyMaterial.guiNode)) {
+                            int index = OxyMaterialPool.addMaterial(new OxyMaterial(ShaderLibrary.get("OxyPBR"), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 1.0f, 1.0f, 1.0f));
                             entityContext.addComponent(new OxyMaterialIndex(index));
-                            entityContext.getGUINodes().add(OxyMaterial.guiNode);
+                            nodeList.add(OxyMaterial.guiNode);
                         }
                     ImGui.endMenu();
                 }
@@ -249,14 +263,14 @@ public class PropertiesPanel extends Panel {
                 if (ImGui.beginMenu("Physics")) {
                     if (ImGui.beginMenu("Colliders")) {
 
-                        if (ImGui.menuItem("Mesh Collider")){
+                        if (ImGui.menuItem("Mesh Collider")) {
                             if (!entityContext.has(OxyPhysXComponent.class))
                                 entityContext.addComponent(new OxyPhysXComponent());
                             //TODO: ConvexMesh must also be a thing
                             OxyPhysXGeometry meshGeometry = new OxyPhysXGeometry.TriangleMesh(entityContext);
                             meshGeometry.build();
                             entityContext.get(OxyPhysXComponent.class).setGeometryAs(meshGeometry);
-                            entityContext.getGUINodes().add(OxyPhysXGeometry.TriangleMesh.guiNode);
+                            nodeList.add(OxyPhysXGeometry.TriangleMesh.guiNode);
                         }
 
                         if (ImGui.menuItem("Box Collider")) {
@@ -265,16 +279,16 @@ public class PropertiesPanel extends Panel {
                             OxyPhysXGeometry boxGeometry = new OxyPhysXGeometry.Box();
                             boxGeometry.build();
                             entityContext.get(OxyPhysXComponent.class).setGeometryAs(boxGeometry);
-                            entityContext.getGUINodes().add(OxyPhysXGeometry.Box.guiNode);
+                            nodeList.add(OxyPhysXGeometry.Box.guiNode);
                         }
 
-                        if (ImGui.menuItem("Sphere Collider")){
+                        if (ImGui.menuItem("Sphere Collider")) {
                             if (!entityContext.has(OxyPhysXComponent.class))
                                 entityContext.addComponent(new OxyPhysXComponent());
                             OxyPhysXGeometry sphereGeometry = new OxyPhysXGeometry.Sphere();
                             sphereGeometry.build();
                             entityContext.get(OxyPhysXComponent.class).setGeometryAs(sphereGeometry);
-                            entityContext.getGUINodes().add(OxyPhysXGeometry.Sphere.guiNode);
+                            nodeList.add(OxyPhysXGeometry.Sphere.guiNode);
                         }
 
                         ImGui.endMenu();
@@ -286,7 +300,7 @@ public class PropertiesPanel extends Panel {
                         OxyPhysXActor actor = new OxyPhysXActor(PhysXRigidBodyMode.Static);
                         actor.build();
                         entityContext.get(OxyPhysXComponent.class).setRigidBodyAs(actor);
-                        entityContext.getGUINodes().add(OxyPhysXActor.guiNode);
+                        nodeList.add(OxyPhysXActor.guiNode);
                     }
                     ImGui.endMenu();
                 }
@@ -300,8 +314,8 @@ public class PropertiesPanel extends Panel {
                     if (ImGui.menuItem("Perspective Camera")) {
                         if (!entityContext.has(OxyCamera.class)) {
                             entityContext.addComponent(new SceneCamera());
-                            if (!entityContext.getGUINodes().contains(OxyCamera.guiNode))
-                                entityContext.getGUINodes().add(OxyCamera.guiNode);
+                            if (!nodeList.contains(OxyCamera.guiNode))
+                                nodeList.add(OxyCamera.guiNode);
                             SceneRenderer.getInstance().updateCameraEntities();
                         }
                     }
@@ -316,11 +330,12 @@ public class PropertiesPanel extends Panel {
                     if (ImGui.menuItem("Point Light")) {
                         if (!entityContext.has(Light.class)) {
                             PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
-                            int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
+                            OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
+                            int index = OxyMaterialPool.addMaterial(new OxyMaterial(pbrShader, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
                             entityContext.addComponent(pointLight, new OxyMaterialIndex(index));
-                            if (!entityContext.getGUINodes().contains(OxyMaterial.guiNode))
-                                entityContext.getGUINodes().add(OxyMaterial.guiNode);
-                            entityContext.getGUINodes().add(PointLight.guiNode);
+                            if (!nodeList.contains(OxyMaterial.guiNode))
+                                nodeList.add(OxyMaterial.guiNode);
+                            nodeList.add(PointLight.guiNode);
                             SceneRenderer.getInstance().updateModelEntities();
                         }
                         //error or hint that lights are single instanced. TODO
@@ -328,9 +343,13 @@ public class PropertiesPanel extends Panel {
                     if (ImGui.menuItem("Directional Light")) {
                         if (!entityContext.has(Light.class)) {
                             DirectionalLight directionalLight = new DirectionalLight();
-                            int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
-                            entityContext.addComponent(directionalLight, new OxyMaterialIndex(index));
-                            entityContext.getGUINodes().add(DirectionalLight.guiNode);
+                            if (!entityContext.hasMaterial()) {
+                                OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
+                                int index = OxyMaterialPool.addMaterial(new OxyMaterial(pbrShader, new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
+                                entityContext.addComponent(new OxyMaterialIndex(index));
+                            }
+                            entityContext.addComponent(directionalLight);
+                            nodeList.add(DirectionalLight.guiNode);
                             SceneRenderer.getInstance().updateModelEntities();
                         }
                         //error or hint that lights are single instanced. TODO
@@ -433,7 +452,7 @@ public class PropertiesPanel extends Panel {
                                     String path = albedoInputBuffer.get();
                                     if (path != null) {
                                         if (m.albedoTexture != null) m.albedoTexture.dispose();
-                                        m.albedoTexture = OxyTexture.loadImage(TextureSlot.ALBEDO, path);
+                                        m.albedoTexture = OxyTexture.loadImage(TextureSlot.ALBEDO, path, TexturePixelType.UByte, TextureFormat.RGBA, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -451,7 +470,7 @@ public class PropertiesPanel extends Panel {
                                     albedoInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.albedoTexture != null) m.albedoTexture.dispose();
-                                        m.albedoTexture = OxyTexture.loadImage(TextureSlot.ALBEDO, path);
+                                        m.albedoTexture = OxyTexture.loadImage(TextureSlot.ALBEDO, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
 
@@ -509,7 +528,7 @@ public class PropertiesPanel extends Panel {
                                     normalInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.normalTexture != null) m.normalTexture.dispose();
-                                        m.normalTexture = OxyTexture.loadImage(TextureSlot.NORMAL, path);
+                                        m.normalTexture = OxyTexture.loadImage(TextureSlot.NORMAL, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -526,7 +545,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.normalTexture != null) m.normalTexture.dispose();
-                                        m.normalTexture = OxyTexture.loadImage(TextureSlot.NORMAL, path);
+                                        m.normalTexture = OxyTexture.loadImage(TextureSlot.NORMAL, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
 
@@ -589,7 +608,7 @@ public class PropertiesPanel extends Panel {
                                     metalnessInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.metallicTexture != null) m.metallicTexture.dispose();
-                                        m.metallicTexture = OxyTexture.loadImage(TextureSlot.METALLIC, path);
+                                        m.metallicTexture = OxyTexture.loadImage(TextureSlot.METALLIC, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -607,7 +626,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.metallicTexture != null) m.metallicTexture.dispose();
-                                        m.metallicTexture = OxyTexture.loadImage(TextureSlot.METALLIC, path);
+                                        m.metallicTexture = OxyTexture.loadImage(TextureSlot.METALLIC, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
 
@@ -670,7 +689,7 @@ public class PropertiesPanel extends Panel {
                                     roughnessInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.roughnessTexture != null) m.roughnessTexture.dispose();
-                                        m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path);
+                                        m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -688,7 +707,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.roughnessTexture != null) m.roughnessTexture.dispose();
-                                        m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path);
+                                        m.roughnessTexture = OxyTexture.loadImage(TextureSlot.ROUGHNESS, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
 
@@ -750,7 +769,7 @@ public class PropertiesPanel extends Panel {
                                     aoInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.aoTexture != null) m.aoTexture.dispose();
-                                        m.aoTexture = OxyTexture.loadImage(TextureSlot.AO, path);
+                                        m.aoTexture = OxyTexture.loadImage(TextureSlot.AO, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -768,7 +787,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.aoTexture != null) m.aoTexture.dispose();
-                                        m.aoTexture = OxyTexture.loadImage(TextureSlot.AO, path);
+                                        m.aoTexture = OxyTexture.loadImage(TextureSlot.AO, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
 
@@ -830,7 +849,7 @@ public class PropertiesPanel extends Panel {
                                     emissiveInputBuffer.set(path);
                                     if (path != null) {
                                         if (m.emissiveTexture != null) m.emissiveTexture.dispose();
-                                        m.emissiveTexture = OxyTexture.loadImage(TextureSlot.EMISSIVE, path);
+                                        m.emissiveTexture = OxyTexture.loadImage(TextureSlot.EMISSIVE, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
                                 ImGui.popItemWidth();
@@ -848,7 +867,7 @@ public class PropertiesPanel extends Panel {
                                     String path = openDialog("", null);
                                     if (path != null) {
                                         if (m.emissiveTexture != null) m.emissiveTexture.dispose();
-                                        m.emissiveTexture = OxyTexture.loadImage(TextureSlot.EMISSIVE, path);
+                                        m.emissiveTexture = OxyTexture.loadImage(TextureSlot.EMISSIVE, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                                     }
                                 }
 
@@ -895,7 +914,7 @@ public class PropertiesPanel extends Panel {
             if (f != null) {
                 String fPath = f.getPath();
                 if (isSupportedTextureFile(getExtension(fPath))) {
-                    return OxyTexture.loadImage(slot, fPath);
+                    return OxyTexture.loadImage(slot, fPath, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
                 }
             }
             ImGui.endDragDropTarget();

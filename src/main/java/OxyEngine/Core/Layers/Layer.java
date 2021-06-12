@@ -6,5 +6,5 @@ public abstract class Layer {
 
     public abstract void update(float ts);
 
-    public abstract void render(float ts);
+    public abstract void render();
 }

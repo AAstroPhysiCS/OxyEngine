@@ -21,7 +21,7 @@ public final class OxyPhysXEnvironment implements OxyDisposable {
     private static final int PHYSX_VERSION = PxTopLevelFunctions.getPHYSICS_VERSION();
 
     static {
-        logger.info("PhysX init: Version: " + PHYSX_VERSION);
+        logger.info("PhysX init version: " + PHYSX_VERSION);
     }
 
     private final PxDefaultAllocator allocator;

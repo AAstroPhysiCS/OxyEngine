@@ -5,7 +5,7 @@ public abstract class OxyEvent {
     private final String name;
 
     public enum EventType {
-        KeyEvent, MouseEvent
+        KeyEvent, MouseEvent, ResizeEvent
     }
 
     public OxyEvent(String name){

@@ -8,9 +8,12 @@ import org.lwjgl.assimp.AINode;
 import org.lwjgl.assimp.AINodeAnim;
 import org.lwjgl.assimp.AIScene;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static OxyEngine.Core.Renderer.Mesh.OxyVertex.MAX_BONES;
+import static OxyEngine.Core.Context.Renderer.Mesh.OxyVertex.MAX_BONES;
 import static OxyEngine.Scene.Objects.Importer.OxyModelImporter.*;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.assimp.Assimp.aiReleaseImport;
@@ -34,6 +37,7 @@ public class AnimationComponent implements EntityComponent {
         for (int i = 0; i < MAX_BONES; i++) finalBoneMatrices.add(new Matrix4f().identity());
         nodeAnimMap = new HashMap<>(MAX_BONES);
         animations = new ArrayList<>(scene.mNumAnimations());
+        init();
     }
 
     public AnimationComponent(AnimationComponent other) {
@@ -41,12 +45,30 @@ public class AnimationComponent implements EntityComponent {
         for (Matrix4f otherMatrix : other.finalBoneMatrices) {
             finalBoneMatrices.add(new Matrix4f(otherMatrix));
         }
-        this.boneInfoMap = Map.copyOf(other.boneInfoMap);
-        this.nodeAnimMap = Map.copyOf(other.nodeAnimMap);
-        this.animations = List.copyOf(other.animations);
+        this.stop = other.stop;
+        this.boneInfoMap = new HashMap<>(other.boneInfoMap);
+        this.nodeAnimMap = new HashMap<>(other.nodeAnimMap);
+        this.animations = new ArrayList<>(other.animations);
         this.rootNode = other.rootNode;
         this.currentAIScene = other.currentAIScene;
         this.currentTime = other.currentTime;
+        init();
+    }
+
+    //Runs one time
+    private void init() {
+        for (int i = 0; i < currentAIScene.mNumAnimations(); i++) {
+            animations.add(new OxyAnimation(AIAnimation.create(currentAIScene.mAnimations().get(i))));
+            for (String nodeName : boneInfoMap.keySet())
+                nodeAnimMap.put(nodeName, findNodeAnim(animations.get(i), nodeName));
+        }
+        AINode aiNode = currentAIScene.mRootNode();
+        if(aiNode != null) {
+            rootNode = new OxyNode(aiNode.mName().dataString(), convertAIMatrixToJOMLMatrix(aiNode.mTransformation()), aiNode.mNumChildren(), new ArrayList<>());
+            addAllNodeChildren(aiNode, rootNode); //reading all the aiNodes and saving them to the oxyNode (begins with rootnode and recursively adds...)
+            //Dont need the AiScene anymore, because we fetched all the necessary animation data and saved them to java objects
+            aiReleaseImport(currentAIScene);
+        }
     }
 
     public void stopAnimation(boolean stop) {
@@ -210,19 +232,6 @@ public class AnimationComponent implements EntityComponent {
 
     public void updateAnimation(float dt) {
         if (stop) return;
-        //Runs one time
-        if (animations.size() == 0) {
-            for (int i = 0; i < currentAIScene.mNumAnimations(); i++) {
-                animations.add(new OxyAnimation(AIAnimation.create(currentAIScene.mAnimations().get(i))));
-                for (String nodeName : boneInfoMap.keySet())
-                    nodeAnimMap.put(nodeName, findNodeAnim(animations.get(i), nodeName));
-            }
-            AINode aiNode = currentAIScene.mRootNode();
-            rootNode = new OxyNode(aiNode.mName().dataString(), convertAIMatrixToJOMLMatrix(aiNode.mTransformation()), aiNode.mNumChildren(), new ArrayList<>());
-            addAllNodeChildren(aiNode, rootNode); //reading all the aiNodes and saving them to the oxyNode (begins with rootnode and recursively adds...)
-            //Dont need the AiScene anymore, because we fetched all the necessary animation data and saved them to java objects
-            aiReleaseImport(currentAIScene);
-        }
         currentTime += animations.get(0).tickPerSecond * dt;
         currentTime = (float) (currentTime % animations.get(0).duration);
         readNodeHierarchy(currentTime, rootNode, new Matrix4f());

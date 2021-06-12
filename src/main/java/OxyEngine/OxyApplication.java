@@ -20,7 +20,7 @@ public abstract class OxyApplication implements OxyDisposable {
 
     public abstract void update(float ts);
 
-    public abstract void render(float ts);
+    public abstract void render();
 
     protected abstract Runnable run();
 }

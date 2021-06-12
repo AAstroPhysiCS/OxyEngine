@@ -2,16 +2,25 @@ package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Light.SkyLight;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Context.Renderer.ShadowRenderer;
+import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
+import OxyEngine.Core.Context.Renderer.Texture.TextureSlot;
 import OxyEngine.PhysX.OxyPhysXComponent;
-import OxyEngine.Scripting.OxyScript;
+import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.UI.Panels.GUINode;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static OxyEngine.Core.Context.Renderer.ShadowRenderer.NUMBER_CASCADES;
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.currentBoundedSkyLight;
 import static OxyEngine.Utils.toPrimitiveFloat;
 import static OxyEngine.Utils.toPrimitiveInteger;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
@@ -71,9 +80,9 @@ public abstract class OxyEntity {
         TransformComponent c = get(TransformComponent.class);
         c.transform = new Matrix4f()
                 .translate(c.position)
-                .rotateX((float) Math.toRadians(c.rotation.x))
-                .rotateY((float) Math.toRadians(c.rotation.y))
-                .rotateZ((float) Math.toRadians(c.rotation.z))
+                .rotateX(c.rotation.x)
+                .rotateY(c.rotation.y)
+                .rotateZ(c.rotation.z)
                 .scale(c.scale);
 
         var root = getRoot();
@@ -119,7 +128,7 @@ public abstract class OxyEntity {
         if (relatedEntities.size() == 0) return;
         for (OxyEntity m : relatedEntities) {
             m.transformLocally();
-            if(m.has(OxyPhysXComponent.class))
+            if (m.has(OxyPhysXComponent.class))
                 m.get(OxyPhysXComponent.class).getActor().setGlobalPose(m.get(TransformComponent.class).transform);
             addParentTransformToChildren(m);
         }
@@ -218,5 +227,81 @@ public abstract class OxyEntity {
 
     public List<OxyScript> getScripts() {
         return scripts;
+    }
+
+    public boolean hasMaterial() {
+        return get(OxyMaterialIndex.class).index() != -1;
+    }
+
+    public void update() {
+        OxyMaterial material = null;
+        if (has(OxyMaterialIndex.class)) material = OxyMaterialPool.getMaterial(this);
+
+        if (material == null)
+            throw new IllegalStateException("Material is null. Entities that does not have any material should not be allowed to render!");
+
+        OxyShader shader = material.getShader();
+        shader.begin();
+
+        //ANIMATION UPDATE
+        shader.setUniform1i("animatedModel", 0);
+        if (has(AnimationComponent.class)) {
+            AnimationComponent animComp = get(AnimationComponent.class);
+            if (ACTIVE_SCENE.STATE == SceneState.RUNNING) {
+                shader.setUniform1i("animatedModel", 1);
+                animComp.updateAnimation(SceneRuntime.TS);
+                List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
+                for (int j = 0; j < matrix4fList.size(); j++) {
+                    shader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                }
+            } else animComp.setTime(0);
+        }
+
+        TransformComponent c = get(TransformComponent.class);
+        shader.setUniformMatrix4fv("model", c.transform, false);
+        int iblSlot = TextureSlot.UNUSED.getValue(), prefilterSlot = TextureSlot.UNUSED.getValue(), brdfLUTSlot = TextureSlot.UNUSED.getValue();
+
+        shader.setUniform1f("hdrIntensity", 1.0f);
+        shader.setUniform1f("gamma", 2.2f);
+        shader.setUniform1f("exposure", 1.0f);
+
+        if (currentBoundedSkyLight != null) {
+            SkyLight skyLightComp = currentBoundedSkyLight.get(SkyLight.class);
+            HDRTexture hdrTexture = null;
+            if (skyLightComp != null) {
+                shader.setUniform1f("hdrIntensity", skyLightComp.intensity[0]);
+                shader.setUniform1f("gamma", skyLightComp.gammaStrength[0]);
+                shader.setUniform1f("exposure", skyLightComp.exposure[0]);
+                hdrTexture = skyLightComp.getHDRTexture();
+            }
+            if (hdrTexture != null) {
+                iblSlot = hdrTexture.getIBLSlot();
+                prefilterSlot = hdrTexture.getPrefilterSlot();
+                brdfLUTSlot = hdrTexture.getBDRFSlot();
+            }
+        }
+
+        shader.setUniform1i("iblMap", iblSlot);
+        shader.setUniform1i("prefilterMap", prefilterSlot);
+        shader.setUniform1i("brdfLUT", brdfLUTSlot);
+
+        boolean castShadows = ShadowRenderer.castShadows();
+        shader.setUniform1i("castShadows", castShadows ? 1 : 0);
+        if (castShadows) {
+            if (ShadowRenderer.cascadeIndicatorToggle)
+                shader.setUniform1i("cascadeIndicatorToggle", 1);
+            else shader.setUniform1i("cascadeIndicatorToggle", 0);
+
+            for (int i = 0; i < NUMBER_CASCADES; i++) {
+                if (ShadowRenderer.ready(i)) {
+                    glBindTextureUnit(TextureSlot.CSM.getValue() + i, ShadowRenderer.getShadowMap(i));
+                    shader.setUniform1i("shadowMap[" + i + "]", TextureSlot.CSM.getValue() + i);
+                    shader.setUniformMatrix4fv("lightSpaceMatrix[" + i + "]", ShadowRenderer.getShadowViewMatrix(i), false);
+                    shader.setUniform1f("cascadeSplits[" + i + "]", ShadowRenderer.getCascadeSplits(i));
+                }
+            }
+        }
+        material.push(shader);
+        shader.end();
     }
 }

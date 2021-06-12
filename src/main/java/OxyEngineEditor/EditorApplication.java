@@ -1,10 +1,9 @@
 package OxyEngineEditor;
 
 import OxyEngine.Core.Layers.Layer;
-import OxyEngine.Core.Layers.SceneLayer;
+import OxyEngine.Core.Layers.EditorLayer;
 import OxyEngine.Core.Layers.UILayer;
-import OxyEngine.Core.Renderer.OxyRenderer;
-import OxyEngine.Core.Renderer.ShadowRenderer.DebugPanel;
+import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
@@ -37,7 +36,7 @@ public class EditorApplication extends OxyApplication {
 
         SceneRuntime.ACTIVE_SCENE = scene;
 
-        SceneLayer sceneLayer = SceneLayer.getInstance();
+        EditorLayer editorLayer = EditorLayer.getInstance();
         UILayer uiLayer = UILayer.getInstance();
 
         uiLayer.addPanel(ProjectPanel.getInstance());
@@ -48,9 +47,9 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(SceneHierarchyPanel.getInstance());
         uiLayer.addPanel(PropertiesPanel.getInstance());
         uiLayer.addPanel(AnimationPanel.getInstance());
-        uiLayer.addPanel(DebugPanel.getInstance());
+//        uiLayer.addPanel(ShadowRenderer.DebugPanel.getInstance());
 
-        layerStack.pushLayer(sceneLayer, uiLayer);
+        layerStack.pushLayer(uiLayer, editorLayer);
         for (Layer l : layerStack.getLayerStack())
             l.build();
     }
@@ -62,9 +61,11 @@ public class EditorApplication extends OxyApplication {
     }
 
     @Override
-    public void render(float ts) {
+    public void render() {
+        OxyRenderer.clearBuffer(); //clearing the buffer for the default framebuffer
+
         for (Layer l : layerStack.getLayerStack())
-            l.render(ts);
+            l.render();
 
         OxyRenderer.swapBuffers();
         OxyRenderer.pollEvents();
@@ -86,7 +87,7 @@ public class EditorApplication extends OxyApplication {
                 final float ts = (float) (currentTime - time);
                 time = currentTime;
                 update(ts);
-                render(ts);
+                render();
 
                 frames++;
 

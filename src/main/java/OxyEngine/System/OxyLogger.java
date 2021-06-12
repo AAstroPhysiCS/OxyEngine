@@ -1,6 +1,6 @@
 package OxyEngine.System;
 
-import OxyEngine.Core.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

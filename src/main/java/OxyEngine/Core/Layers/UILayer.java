@@ -1,12 +1,13 @@
 package OxyEngine.Core.Layers;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
 import OxyEngine.OxyEngine;
+import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.System.OxyFontSystem;
 import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
 import imgui.ImGuiViewport;
+import imgui.extension.imguizmo.ImGuizmo;
 import imgui.flag.*;
 
 import java.util.ArrayList;
@@ -20,12 +21,12 @@ public class UILayer extends Layer {
 
     private static UILayer INSTANCE = null;
 
-    public static UILayer getInstance(){
-        if(INSTANCE == null) INSTANCE = new UILayer();
+    public static UILayer getInstance() {
+        if (INSTANCE == null) INSTANCE = new UILayer();
         return INSTANCE;
     }
 
-    private UILayer(){
+    private UILayer() {
         uiSystem = new OxyUISystem(OxyEngine.getWindowHandle());
     }
 
@@ -43,29 +44,26 @@ public class UILayer extends Layer {
     @Override
     public void update(float ts) {
         OxyEngine.getWindowHandle().update();
+        UILayer.uiSystem.dispatchNativeEvents();
     }
 
     @Override
-    public void render(float ts) {
-        OxyRenderer.clearBuffer();
-        OxyRenderer.clearColor(0, 0, 0, 1.0f);
-
+    public void render() {
         uiSystem.newFrameGLFW();
         ImGui.newFrame();
+        ImGuizmo.beginFrame();
 
         final ImGuiViewport viewport = ImGui.getMainViewport();
         ImGui.setNextWindowPos(viewport.getWorkPosX(), viewport.getWorkPosY(), ImGuiCond.Always);
         ImGui.setNextWindowSize(viewport.getWorkSizeX(), viewport.getWorkSizeY(), ImGuiCond.Always);
 
-        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 4, 8);
-        ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 3);
-        ImGui.pushStyleColor(ImGuiCol.TableHeaderBg, Panel.childCardBgC[0], Panel.childCardBgC[1], Panel.childCardBgC[2], Panel.childCardBgC[3]);
-        ImGui.pushStyleColor(ImGuiCol.TableBorderLight, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
-        ImGui.pushStyleColor(ImGuiCol.FrameBg, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
         ImGui.pushFont(OxyFontSystem.getAllFonts().get(0));
 
-        ImGui.begin("Main", ImGuiWindowFlags.NoResize |
-                ImGuiWindowFlags.NoBackground |
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0, 0);
+        ImGui.begin("Main", ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse |
+                ImGuiWindowFlags.NoNavFocus |
                 ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoMove |
                 ImGuiWindowFlags.NoBringToFrontOnFocus |
@@ -73,15 +71,21 @@ public class UILayer extends Layer {
         int id = ImGui.getID("MyDockSpace");
         ImGui.dockSpace(id, 0, 0, ImGuiDockNodeFlags.PassthruCentralNode);
         ImGui.end();
+        ImGui.popStyleVar(3);
 
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 4, 8);
+        ImGui.pushStyleVar(ImGuiStyleVar.FrameRounding, 3);
+        ImGui.pushStyleColor(ImGuiCol.TableHeaderBg, Panel.childCardBgC[0], Panel.childCardBgC[1], Panel.childCardBgC[2], Panel.childCardBgC[3]);
+        ImGui.pushStyleColor(ImGuiCol.TableBorderLight, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
+        ImGui.pushStyleColor(ImGuiCol.FrameBg, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
         for (Panel panel : panelList)
             panel.renderPanel();
-
-        ImGui.popFont();
         ImGui.popStyleVar(2);
         ImGui.popStyleColor(3);
 
-        uiSystem.updateImGuiContext(ts);
+        ImGui.popFont();
+
+        uiSystem.updateImGuiContext(SceneRuntime.TS);
         ImGui.render();
         uiSystem.renderDrawData();
     }

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static OxyEngine.Core.Renderer.Mesh.OxyVertex.MAX_BONE_INFLUENCE;
+import static OxyEngine.Core.Context.Renderer.Mesh.OxyVertex.MAX_BONE_INFLUENCE;
 import static OxyEngine.Scene.Objects.Importer.OxyModelImporter.convertAIMatrixToJOMLMatrix;
 
 public non-sealed class AnimationImporter implements ModelImporterFactory {

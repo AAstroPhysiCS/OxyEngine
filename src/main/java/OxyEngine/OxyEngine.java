@@ -1,6 +1,6 @@
 package OxyEngine;
 
-import OxyEngine.Core.Renderer.OxyRenderer;
+import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.Core.Window.WindowHandle;
 import OxyEngine.System.OxyDisposable;

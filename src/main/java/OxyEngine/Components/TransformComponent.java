@@ -54,7 +54,6 @@ public class TransformComponent implements EntityComponent {
         this.rotation = new Vector3f();
         this.scale = new Vector3f(scale);
         rotation.getEulerAnglesXYZ(this.rotation);
-        this.rotation.mul((float) (180 / Math.PI));
         this.transform = new Matrix4f();
     }
 
@@ -62,7 +61,6 @@ public class TransformComponent implements EntityComponent {
         this.position.set(position);
         this.scale.set(scale);
         rotation.getEulerAnglesXYZ(this.rotation);
-        this.rotation.mul((float) (180 / Math.PI));
         this.transform = new Matrix4f();
     }
 
@@ -75,14 +73,14 @@ public class TransformComponent implements EntityComponent {
         transform.getTranslation(position);
         transform.getUnnormalizedRotation(rot);
         transform.getScale(scale);
-        //TODO: Could function or could not function idk.
+        //Could function or could not function idk.
         if(scale.x < 0.01f && scale.y < 0.01f && scale.z < 0.01f) scale.set(1);
         else {
             scale.mul(0.01f);
             position.mul(0.01f);
         }
         rot.getEulerAnglesXYZ(this.rotation);
-        this.rotation.mul((float) (180 / Math.PI));
+//        this.rotation.mul((float) (180 / Math.PI));
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation) {

@@ -1,14 +1,13 @@
 package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Renderer.Light.Light;
-import OxyEngine.Core.Renderer.Light.PointLight;
-import OxyEngine.Core.Renderer.Light.SkyLight;
-import OxyEngine.Core.Renderer.Texture.HDRTexture;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Context.Renderer.Light.Light;
+import OxyEngine.Core.Context.Renderer.Light.PointLight;
+import OxyEngine.Core.Context.Renderer.Light.SkyLight;
+import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
+import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scene.Objects.Model.OxyNativeObject;

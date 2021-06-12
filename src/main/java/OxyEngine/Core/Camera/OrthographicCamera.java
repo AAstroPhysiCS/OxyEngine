@@ -2,7 +2,6 @@ package OxyEngine.Core.Camera;
 
 import org.joml.Vector3f;
 
-//TODO: Write this class
 public abstract class OrthographicCamera extends OxyCamera {
 
     public float left, right, bottom, top, zNear, zFar;

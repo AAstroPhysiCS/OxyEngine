@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Renderer.Texture.Image2DTexture;
+import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
 import OxyEngine.System.OxyFontSystem;
 import OxyEngine.System.OxyLogger;
 import OxyEngineEditor.UI.AssetManager;
@@ -55,15 +55,16 @@ public class ProjectPanel extends Panel {
 
     @Override
     public void preload() {
-        fileAsset = AssetManager.getInstance().getAsset("UI FILEASSET2");
-        objAsset = AssetManager.getInstance().getAsset("UI OBJFILEASSET");
-        fbxAsset = AssetManager.getInstance().getAsset("UI FBXFILEASSET");
-        gltfAsset = AssetManager.getInstance().getAsset("UI GLTFFILEASSET");
-        dirAsset = AssetManager.getInstance().getAsset("UI DIRASSET");
-        dirAssetGrey = AssetManager.getInstance().getAsset("UI DIRASSET-GREY");
-        pngAsset = AssetManager.getInstance().getAsset("UI PNGFILEASSET");
-        jpgAsset = AssetManager.getInstance().getAsset("UI JPGFILEASSET");
-        blendAsset = AssetManager.getInstance().getAsset("UI BLENDFILEASSET");
+        var instance = AssetManager.getInstance();
+        fileAsset = instance.getAsset("UI FILEASSET2");
+        objAsset = instance.getAsset("UI OBJFILEASSET");
+        fbxAsset = instance.getAsset("UI FBXFILEASSET");
+        gltfAsset = instance.getAsset("UI GLTFFILEASSET");
+        dirAsset = instance.getAsset("UI DIRASSET");
+        dirAssetGrey = instance.getAsset("UI DIRASSET-GREY");
+        pngAsset = instance.getAsset("UI PNGFILEASSET");
+        jpgAsset = instance.getAsset("UI JPGFILEASSET");
+        blendAsset = instance.getAsset("UI BLENDFILEASSET");
     }
 
     @Override

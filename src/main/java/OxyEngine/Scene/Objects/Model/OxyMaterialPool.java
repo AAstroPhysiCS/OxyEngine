@@ -1,14 +1,19 @@
 package OxyEngine.Scene.Objects.Model;
 
 import OxyEngine.Components.OxyMaterialIndex;
-import OxyEngine.Core.Renderer.Texture.OxyColor;
-import OxyEngine.Core.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
+import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Context.Renderer.Texture.OxyTexture;
+import OxyEngine.Core.Context.Renderer.Texture.TexturePixelType;
 import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Core.Renderer.Texture.TextureSlot;
+import OxyEngine.Core.Context.Renderer.Texture.TextureSlot;
+import OxyEngine.Scene.OxyMaterial;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static OxyEngineEditor.UI.AssetManager.DEFAULT_TEXTURE_PARAMETER;
 
 public class OxyMaterialPool {
 
@@ -117,9 +122,9 @@ public class OxyMaterialPool {
                 return pooled.index;
         }
 
-        OxyMaterial material = new OxyMaterial(name, OxyTexture.loadImage(TextureSlot.ALBEDO, albedoTexture), OxyTexture.loadImage(TextureSlot.NORMAL, normalTexture),
-                OxyTexture.loadImage(TextureSlot.ROUGHNESS, roughnessTexture), OxyTexture.loadImage(TextureSlot.METALLIC, metallicTexture),
-                OxyTexture.loadImage(TextureSlot.AO, aoTexture), OxyTexture.loadImage(TextureSlot.EMISSIVE, emissiveTexture),
+        OxyMaterial material = new OxyMaterial(name, ShaderLibrary.get("OxyPBR"), OxyTexture.loadImage(TextureSlot.ALBEDO, albedoTexture, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER), OxyTexture.loadImage(TextureSlot.NORMAL, normalTexture, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER),
+                OxyTexture.loadImage(TextureSlot.ROUGHNESS, roughnessTexture, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER), OxyTexture.loadImage(TextureSlot.METALLIC, metallicTexture, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER),
+                OxyTexture.loadImage(TextureSlot.AO, aoTexture, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER), OxyTexture.loadImage(TextureSlot.EMISSIVE, emissiveTexture, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER),
                 albedoColor, m_normalStrength, m_aoStrength, m_roughness, m_metalness, m_emissive);
         materialPool.add(material);
         int latest = getLatestSlot();
@@ -128,7 +133,7 @@ public class OxyMaterialPool {
 
     public static int addMaterial(String name, int meshMaterialIndex, String... assimpMaterialPaths) {
         for (OxyMaterial oxyM : materialPool) if (oxyM.assimpIndex == meshMaterialIndex) return oxyM.index;
-        OxyMaterial material = new OxyMaterial(name, assimpMaterialPaths);
+        OxyMaterial material = new OxyMaterial(name, ShaderLibrary.get("OxyPBR"), assimpMaterialPaths);
         material.assimpIndex = meshMaterialIndex;
         materialPool.add(material);
         int latest = getLatestSlot();

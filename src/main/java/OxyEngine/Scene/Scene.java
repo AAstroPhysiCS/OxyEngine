@@ -3,14 +3,14 @@ package OxyEngine.Scene;
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Renderer.Light.PointLight;
-import OxyEngine.Core.Renderer.Light.SkyLight;
-import OxyEngine.Core.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Renderer.Pipeline.OxyShader;
-import OxyEngine.Core.Renderer.Pipeline.ShaderLibrary;
-import OxyEngine.Core.Renderer.Texture.HDRTexture;
+import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Context.Renderer.Light.PointLight;
+import OxyEngine.Core.Context.Renderer.Light.SkyLight;
+import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
+import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
 import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.Scene.Objects.Importer.ImporterType;
 import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
@@ -24,7 +24,7 @@ import org.joml.Vector4f;
 import java.util.*;
 
 import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
-import static OxyEngine.Core.Renderer.Light.Light.LIGHT_SIZE;
+import static OxyEngine.Core.Context.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Scene.SceneSerializer.fileExtension;
@@ -106,7 +106,7 @@ public final class Scene implements OxyDisposable {
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
 
         PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
-        int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
+        int index = OxyMaterialPool.addMaterial(new OxyMaterial(ShaderLibrary.get("OxyPBR"), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
         model.addComponent(pointLight, new OxyMaterialIndex(index), new TagComponent("Point Light"));
 
         if (!model.getGUINodes().contains(OxyMaterial.guiNode))
@@ -119,7 +119,7 @@ public final class Scene implements OxyDisposable {
     public void createDirectionalLight() {
         OxyModel model = ACTIVE_SCENE.createEmptyModel();
         if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
-        int index = OxyMaterialPool.addMaterial(new OxyMaterial(new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
+        int index = OxyMaterialPool.addMaterial(new OxyMaterial(ShaderLibrary.get("OxyPBR"), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
         model.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f));
         model.addComponent(new OxyMaterialIndex(index));
         model.getGUINodes().add(DirectionalLight.guiNode);
@@ -409,7 +409,7 @@ public final class Scene implements OxyDisposable {
                 it.remove();
             }
         }
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBRAnimation");
+        OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
         for (int i = 0; i < LIGHT_SIZE; i++) {
             pbrShader.begin();
             pbrShader.setUniformVec3("p_Light[" + i + "].position", 0, 0, 0);

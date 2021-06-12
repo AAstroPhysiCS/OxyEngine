@@ -2,7 +2,7 @@ package Scripts;
 
 import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Scripting.ScriptableEntity;
-import OxyEngine.Scene.Objects.Model.OxyMaterial;
+import OxyEngine.Scene.OxyMaterial;
 import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;

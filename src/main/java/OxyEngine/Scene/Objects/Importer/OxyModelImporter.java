@@ -2,7 +2,7 @@ package OxyEngine.Scene.Objects.Importer;
 
 import OxyEngine.Components.AnimationComponent;
 import OxyEngine.Components.TagComponent;
-import OxyEngine.Core.Renderer.Mesh.OxyVertex;
+import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
 import OxyEngine.Scene.OxyEntity;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -32,7 +32,7 @@ public class OxyModelImporter {
             aiProcess_Triangulate |
             aiProcess_GenUVCoords |
             aiProcess_FlipUVs |
-//            aiProcess_PreTransformVertices |
+//            aiProcess_PreTransformVertices | (animations wouldn't work, if you enable this)
 //            aiProcess_SplitLargeMeshes |
             aiProcess_FindInvalidData |
             aiProcess_OptimizeMeshes;

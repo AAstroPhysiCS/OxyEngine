@@ -23,7 +23,7 @@
 
     <properties>
         <lwjgl.version>3.2.3</lwjgl.version>
-        <imgui.java.version>1.82.1</imgui.java.version>
+        <imgui.java.version>1.83.0</imgui.java.version>
         <maven.compiler.source>1.16</maven.compiler.source>
         <maven.compiler.target>1.16</maven.compiler.target>
     </properties>
