@@ -61,15 +61,20 @@ public class OpenGLImage2DTexture extends Image2DTexture {
             }
         } else throw new IllegalStateException("Pixel Type must be given!");
 
-        if(parameter.minFilterParameter != null) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, parameter.minFilterParameter.apiValue);
-        if(parameter.magFilterParameter != null) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, parameter.magFilterParameter.apiValue);
-        if(parameter.wrapSParameter != null) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, parameter.wrapSParameter.apiValue);
-        if(parameter.wrapRParameter != null) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, parameter.wrapRParameter.apiValue);
-        if(parameter.wrapTParameter != null) glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, parameter.wrapTParameter.apiValue);
-        if(parameter.lodBias != -1) glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, parameter.lodBias);
-        if(parameter.generateMipMap) glGenerateMipmap(GL_TEXTURE_2D);
+        if (parameter.minFilterParameter != null)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, parameter.minFilterParameter.apiValue);
+        if (parameter.magFilterParameter != null)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, parameter.magFilterParameter.apiValue);
+        if (parameter.wrapSParameter != null)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, parameter.wrapSParameter.apiValue);
+        if (parameter.wrapRParameter != null)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, parameter.wrapRParameter.apiValue);
+        if (parameter.wrapTParameter != null)
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, parameter.wrapTParameter.apiValue);
+        if (parameter.lodBias != -1) glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, parameter.lodBias);
+        if (parameter.generateMipMap) glGenerateMipmap(GL_TEXTURE_2D);
 
-        if(textureBuffer != null) {
+        if (textureBuffer != null) {
             switch (pixelType) {
                 case Float -> stbi_image_free((FloatBuffer) textureBuffer);
                 case UByte -> stbi_image_free((ByteBuffer) textureBuffer);

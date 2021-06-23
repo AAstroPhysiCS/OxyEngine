@@ -7,7 +7,8 @@ import imgui.ImGui;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
+
 
 public class AnimationPanel extends Panel {
 

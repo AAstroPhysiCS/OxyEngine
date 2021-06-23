@@ -1,8 +1,9 @@
 package OxyEngine.Core.Layers;
 
+import OxyEngine.Core.Window.OxyEvent;
 import OxyEngine.OxyEngine;
 import OxyEngine.Scene.SceneRuntime;
-import OxyEngine.System.OxyFontSystem;
+import OxyEngine.System.OxySystem;
 import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
@@ -42,9 +43,13 @@ public class UILayer extends Layer {
     }
 
     @Override
+    public void onEvent(OxyEvent event) {
+
+    }
+
+    @Override
     public void update(float ts) {
         OxyEngine.getWindowHandle().update();
-        UILayer.uiSystem.dispatchNativeEvents();
     }
 
     @Override
@@ -57,7 +62,7 @@ public class UILayer extends Layer {
         ImGui.setNextWindowPos(viewport.getWorkPosX(), viewport.getWorkPosY(), ImGuiCond.Always);
         ImGui.setNextWindowSize(viewport.getWorkSizeX(), viewport.getWorkSizeY(), ImGuiCond.Always);
 
-        ImGui.pushFont(OxyFontSystem.getAllFonts().get(0));
+        ImGui.pushFont(OxySystem.Font.allFonts.get(0));
 
         ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0);
@@ -80,6 +85,7 @@ public class UILayer extends Layer {
         ImGui.pushStyleColor(ImGuiCol.FrameBg, Panel.frameBgC[0], Panel.frameBgC[1], Panel.frameBgC[2], Panel.frameBgC[3]);
         for (Panel panel : panelList)
             panel.renderPanel();
+
         ImGui.popStyleVar(2);
         ImGui.popStyleColor(3);
 

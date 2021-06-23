@@ -7,11 +7,10 @@ import OxyEngine.Core.Camera.EditorCamera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Scene.Objects.Model.OxyModel;
-import OxyEngine.Scene.Objects.Model.OxyNativeObject;
+import OxyEngine.Scene.OxyModel;
+import OxyEngine.Scene.OxyNativeObject;
 import OxyEngine.Scene.OxyMaterial;
 import OxyEngine.Scene.SceneRenderer;
-import OxyEngine.Scene.SceneRuntime;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
@@ -26,8 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngine.Scene.SceneRuntime.currentBoundedCamera;
+import static OxyEngine.Scene.SceneRuntime.*;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedModelFileExtension;
 import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.*;
@@ -80,8 +78,9 @@ public class ScenePanel extends Panel {
             editorCameraEntity.addComponent(new TransformComponent(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f)), editorCamera, new TagComponent("Editor Camera"));
             currentBoundedCamera = editorCamera;
 
-            currentBoundedCamera.finalizeCamera(SceneRuntime.TS);
-            if (currentBoundedCamera instanceof PerspectiveCamera c) c.setViewMatrixNoTranslation();
+            //just first frame update
+            currentBoundedCamera.update();
+            if (currentBoundedCamera instanceof PerspectiveCamera c) c.calcViewMatrixNoTranslation();
         }
 
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
@@ -161,6 +160,8 @@ public class ScenePanel extends Panel {
 
                     addParentTransformToChildren(entityContext);
                 }
+
+
             }
         }
 

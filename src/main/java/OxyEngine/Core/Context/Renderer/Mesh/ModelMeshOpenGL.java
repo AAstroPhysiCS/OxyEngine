@@ -6,7 +6,7 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Context.Renderer.Buffer.*;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.OxyModel;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
@@ -18,9 +18,10 @@ import imgui.type.ImString;
 
 import java.util.List;
 
+import static OxyEngine.Scene.SceneRuntime.entityContext;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class ModelMeshOpenGL extends OpenGLMesh {

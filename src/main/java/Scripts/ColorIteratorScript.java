@@ -3,7 +3,7 @@ package Scripts;
 import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Scripting.ScriptableEntity;
 import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
 
@@ -17,7 +17,8 @@ public class ColorIteratorScript extends ScriptableEntity {
 
     @Override
     public void onCreate() {
-        material = OxyMaterialPool.getMaterial(getComponent(OxyMaterialIndex.class).index());
+        //noinspection OptionalGetWithoutIsPresent
+        material = OxyMaterialPool.getMaterial(getComponent(OxyMaterialIndex.class).index()).get();
     }
 
     @Override

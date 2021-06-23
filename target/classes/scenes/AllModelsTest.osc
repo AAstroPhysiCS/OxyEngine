@@ -1,0 +1,1023 @@
+Registry [
+	RootNode: {
+		ID: 7a0491d9-a880-4662-ba97-86737d9df65f
+		Mesh Position: 0
+		Name: RootNode
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Script: {
+		}
+	}
+	Sky Light: {
+		ID: c6cb2de3-a4be-453e-9b88-35097ef8b587
+		Mesh Position: -1
+		Name: Sky Light
+		Emitting: true
+		Emitting Type: SkyLight
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Light Attributes: {
+			Intensity: 1.0
+			Environment Map: D:\programming\Java\OxyEngine\src\main\resources\hdr\pink_sunrise_4k.hdr
+			Environment LOD: 1.0
+			Environment Intensity: 1.0
+			Environment Primary: true
+		}
+		Script: {
+		}
+	}
+	RootNode: {
+		ID: c47aac03-8dfe-42ea-9d88-d1a5175f351b
+		Mesh Position: 0
+		Name: RootNode
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0  1.250E+1 -1.600E+1)
+		Rotation: (-1.571E+0  0.000E+0  0.000E+0)
+		Scale: ( 2.614E+1  2.614E+1  2.614E+1)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Script: {
+		}
+		Cerberus00_Fixed: {
+			ID: 44be969b-f051-4bab-8d9c-2eb114692b15
+			Mesh Position: 0
+			Name: Cerberus00_Fixed
+			Emitting: false
+			Emitting Type: null
+			Position: (-2.104E-1 -6.313E-1 -1.848E-5)
+			Rotation: ( 0.000E+0  0.000E+0  1.571E+0)
+			Scale: ( 6.900E-3  6.900E-3  6.900E-3)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: 08 - Default
+			Color: [0.5882, 0.5882, 0.5882, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Cerberus_by_Andrew_Maximov\Textures\Cerberus_A.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Cerberus_by_Andrew_Maximov\Textures\Cerberus_N.tga
+			Normal Map Strength: 1.541
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Cerberus_by_Andrew_Maximov\Textures\Cerberus_R.tga
+			Roughness Map Strength: 1.0
+			AO Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Cerberus_by_Andrew_Maximov\Textures\Raw\Cerberus_AO.tga
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Cerberus_by_Andrew_Maximov\Textures\Cerberus_M.tga
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Cerberus_by_Andrew_Maximov\Cerberus_LP.FBX
+			Script: {
+			}
+		}
+	}
+	RootNode: {
+		ID: 5182b047-3c7b-41d4-b0fc-7bbf911c3b3c
+		Mesh Position: 0
+		Name: RootNode
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Script: {
+		}
+		Mesh: {
+			ID: bccf6cd4-1c83-4184-8c75-76f12017af45
+			Mesh Position: 0
+			Name: Mesh
+			Emitting: false
+			Emitting Type: null
+			Position: (-2.300E+1  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: DefaultMaterial
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\pilot\textures\Material.002_Base_Color.png
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\pilot\textures\Material.002_Normal_OpenGL.png
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\pilot\textures\Material.002_Roughness.png
+			Roughness Map Strength: 1.0
+			AO Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\pilot\textures\Material.002_Mixed_AO.png
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\pilot\textures\Material.002_Metallic.png
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\pilot\source\Pilot_LP_Animated.fbx
+			Script: {
+			}
+		}
+	}
+	RootNode: {
+		ID: 7b3254ee-6e32-42ea-83d1-aab94eeed64d
+		Mesh Position: 0
+		Name: RootNode
+		Emitting: false
+		Emitting Type: null
+		Position: ( 1.700E+1  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 4.275E+1  4.275E+1  4.275E+1)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Script: {
+		}
+		Stormtroopermesh: {
+			ID: ecda4c22-a636-4cf1-83a6-12efd3f07498
+			Mesh Position: 0
+			Name: Stormtroopermesh
+			Emitting: false
+			Emitting Type: null
+			Position: ( 1.640E-1  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Stormtroopermat
+			Color: [0.64, 0.64, 0.64, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\dancing-stormtrooper\textures\Stormtrooper_D.png
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 0.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\dancing-stormtrooper\source\silly_dancing.fbx
+			Script: {
+			}
+		}
+	}
+	nodes_0: {
+		ID: 4adf3b82-5a47-4566-9fd5-8bb24e5b1664
+		Mesh Position: 0
+		Name: nodes_0
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0  0.000E+0 -4.079E+1)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.311E-2  1.311E-2  1.311E-2)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Script: {
+		}
+		meshes_0-53.meshes_0-0: {
+			ID: adadc307-6dea-47ec-b87b-4a76ce31ce66
+			Mesh Position: 0
+			Name: meshes_0-53.meshes_0-0
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (0)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\5061699253647017043.png
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8773302468495022225.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\11872827283454512094.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\11872827283454512094.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-81.meshes_0-83.meshes_0-85.meshes_0-87.meshes_0-89.meshes_0-91.meshes_0-93.meshes_0-1: {
+			ID: 463f5fd6-ae56-4ead-9614-bba939fcc277
+			Mesh Position: 1
+			Name: meshes_0-81.meshes_0-83.meshes_0-85.meshes_0-87.meshes_0-89.meshes_0-91.meshes_0-93.meshes_0-1
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (1)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8006627369776289000.png
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\12501374198249454378.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\715093869573992647.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\715093869573992647.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-82.meshes_0-94.meshes_0-84.meshes_0-92.meshes_0-86.meshes_0-90.meshes_0-88.meshes_0-2: {
+			ID: b420b67a-7c9b-4cf4-bf18-0b564396bd6f
+			Mesh Position: 2
+			Name: meshes_0-82.meshes_0-94.meshes_0-84.meshes_0-92.meshes_0-86.meshes_0-90.meshes_0-88.meshes_0-2
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (2)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7268504077753552595.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\4477655471536070370.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8503262930880235456.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8503262930880235456.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-99.meshes_0-97.meshes_0-3: {
+			ID: b54d6930-9c35-4d7f-9ec1-f98c76ff5181
+			Mesh Position: 3
+			Name: meshes_0-99.meshes_0-97.meshes_0-3
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (3)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8750083169368950601.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\13982482287905699490.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\16885566240357350108.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\16885566240357350108.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-13.meshes_0-15.meshes_0-35.meshes_0-100.meshes_0-37.meshes_0-43.meshes_0-45.meshes_0-51.meshes_0-102.meshes_0-4: {
+			ID: 6e7461f0-dcf7-465d-ad22-ee3916fe7b5f
+			Mesh Position: 4
+			Name: meshes_0-13.meshes_0-15.meshes_0-35.meshes_0-100.meshes_0-37.meshes_0-43.meshes_0-45.meshes_0-51.meshes_0-102.meshes_0-4
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (4)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\5792855332885324923.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\16299174074766089871.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\11968150294050148237.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\11968150294050148237.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-8.meshes_0-11.meshes_0-16.meshes_0-18.meshes_0-20.meshes_0-22.meshes_0-24.meshes_0-26.meshes_0-28.meshes_0-30.meshes_0-32.meshes_0-34.meshes_0-36.meshes_0-48.meshes_0-5: {
+			ID: a97f9a69-3246-4765-b796-7ace7e2231a9
+			Mesh Position: 5
+			Name: meshes_0-8.meshes_0-11.meshes_0-16.meshes_0-18.meshes_0-20.meshes_0-22.meshes_0-24.meshes_0-26.meshes_0-28.meshes_0-30.meshes_0-32.meshes_0-34.meshes_0-36.meshes_0-48.meshes_0-5
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (5)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\14650633544276105767.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\2051777328469649772.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\4871783166746854860.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\4871783166746854860.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-10.meshes_0-14.meshes_0-17.meshes_0-19.meshes_0-21.meshes_0-23.meshes_0-25.meshes_0-27.meshes_0-29.meshes_0-31.meshes_0-33.meshes_0-6: {
+			ID: 66df0e52-a6be-4b48-a0ea-cb53eccedfc5
+			Mesh Position: 6
+			Name: meshes_0-10.meshes_0-14.meshes_0-17.meshes_0-19.meshes_0-21.meshes_0-23.meshes_0-25.meshes_0-27.meshes_0-29.meshes_0-31.meshes_0-33.meshes_0-6
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (6)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\15295713303328085182.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\10388182081421875623.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\9916269861720640319.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\9916269861720640319.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-47.meshes_0-7: {
+			ID: ab6993de-c297-40bf-9b5e-156a98a0eba8
+			Mesh Position: 7
+			Name: meshes_0-47.meshes_0-7
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (7)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\6047387724914829168.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\15722799267630235092.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8051790464816141987.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8051790464816141987.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-74.meshes_0-80.meshes_0-78.meshes_0-76: {
+			ID: 6b433e74-83ca-4cfc-bce9-3375efe541d6
+			Mesh Position: 8
+			Name: meshes_0-74.meshes_0-80.meshes_0-78.meshes_0-76
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (8)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\755318871556304029.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\3827035219084910048.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\2411100444841994089.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\2411100444841994089.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-9: {
+			ID: 24a1ad33-b0bb-4dd5-a75d-c6522ad223ed
+			Mesh Position: 9
+			Name: meshes_0-9
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (9)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\5823059166183034438.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\14267839433702832875.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\13824894030729245199.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\13824894030729245199.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-52.meshes_0-62: {
+			ID: e7c439c1-2f2c-4882-b1bc-1821ac526b2a
+			Mesh Position: 10
+			Name: meshes_0-52.meshes_0-62
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (10)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\4975155472559461469.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\2299742237651021498.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\3371964815757888145.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\3371964815757888145.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-73.meshes_0-77.meshes_0-79.meshes_0-75: {
+			ID: c4f582b1-86a6-4764-8f8d-2bb47ff03b4e
+			Mesh Position: 11
+			Name: meshes_0-73.meshes_0-77.meshes_0-79.meshes_0-75
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (11)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\16275776544635328252.png
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\14170708867020035030.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\1219024358953944284.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\1219024358953944284.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-44.meshes_0-12: {
+			ID: ce66afea-0348-4ace-9791-edde80843373
+			Mesh Position: 12
+			Name: meshes_0-44.meshes_0-12
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (12)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7441062115984513793.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\6667038893015345571.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8114461559286000061.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8114461559286000061.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-96.meshes_0-98: {
+			ID: e1d79a63-1891-4620-bf8f-f62413bbfa0d
+			Mesh Position: 13
+			Name: meshes_0-96.meshes_0-98
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (13)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\6772804448157695701.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\759203620573749278.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\13196865903111448057.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\13196865903111448057.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-58.meshes_0-55.meshes_0-61: {
+			ID: 33d199ee-2e41-4bec-9118-67029e9ce0d3
+			Mesh Position: 14
+			Name: meshes_0-58.meshes_0-55.meshes_0-61
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (14)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\2775690330959970771.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\2374361008830720677.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7815564343179553343.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7815564343179553343.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-40.meshes_0-38.meshes_0-42: {
+			ID: 713f6881-e539-4cb0-af06-31d68fd2d3d6
+			Mesh Position: 15
+			Name: meshes_0-40.meshes_0-38.meshes_0-42
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (15)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\11490520546946913238.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\3628158980083700836.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\3455394979645218238.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\3455394979645218238.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-50: {
+			ID: cae9a34d-49e1-4e15-848f-6dc96a2d3eae
+			Mesh Position: 16
+			Name: meshes_0-50
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (16)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\white.png
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-56.meshes_0-60: {
+			ID: 2675d7d7-7511-44ee-8f2a-8c25eb055ccd
+			Mesh Position: 17
+			Name: meshes_0-56.meshes_0-60
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (17)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\2185409758123873465.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\332936164838540657.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7815564343179553343.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7815564343179553343.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-46: {
+			ID: fbd8fd5c-97de-4fb7-a9e2-4b705d9ff0db
+			Mesh Position: 18
+			Name: meshes_0-46
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (9)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\5823059166183034438.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\14267839433702832875.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\13824894030729245199.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\13824894030729245199.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-57.meshes_0-54.meshes_0-59: {
+			ID: 320277b8-e1d3-47ee-8785-5f31da7dad15
+			Mesh Position: 19
+			Name: meshes_0-57.meshes_0-54.meshes_0-59
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (18)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\4675343432951571524.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7056944414013900257.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7815564343179553343.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7815564343179553343.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-69.meshes_0-63.meshes_0-72: {
+			ID: 692ff968-b829-433b-aac7-9ada302194b5
+			Mesh Position: 20
+			Name: meshes_0-69.meshes_0-63.meshes_0-72
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (19)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\17876391417123941155.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\6593109234861095314.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\466164707995436622.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\466164707995436622.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-39.meshes_0-41: {
+			ID: ed7e1e93-e0a2-4431-ade1-609220c53d70
+			Mesh Position: 21
+			Name: meshes_0-39.meshes_0-41
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (4)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\5792855332885324923.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\16299174074766089871.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\11968150294050148237.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\11968150294050148237.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-64.meshes_0-66.meshes_0-68.meshes_0-71: {
+			ID: 1f893e46-d09f-49f4-a931-d6f1354b6c72
+			Mesh Position: 22
+			Name: meshes_0-64.meshes_0-66.meshes_0-68.meshes_0-71
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (20)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\11474523244911310074.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\4601176305987539675.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\466164707995436622.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\466164707995436622.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-49: {
+			ID: c9562062-377e-470e-b23d-e6b91a3e8d79
+			Mesh Position: 23
+			Name: meshes_0-49
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (21)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\6151467286084645207.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\7645212358685992005.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8783994986360286082.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8783994986360286082.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-65.meshes_0-67.meshes_0-70: {
+			ID: ad2c46e6-806c-4552-b877-991ff803eeeb
+			Mesh Position: 24
+			Name: meshes_0-65.meshes_0-67.meshes_0-70
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (22)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\9288698199695299068.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\4910669866631290573.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\466164707995436622.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\466164707995436622.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-101: {
+			ID: 658fad6f-3596-4934-99a7-aaf275b35dfe
+			Mesh Position: 25
+			Name: meshes_0-101
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (23)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\2969916736137545357.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\14118779221266351425.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8747919177698443163.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8747919177698443163.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+		meshes_0-95: {
+			ID: 5fe56202-4bca-4972-a9f8-787e7766ac24
+			Mesh Position: 26
+			Name: meshes_0-95
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material (24)
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\8481240838833932244.jpg
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\10381718147657362067.jpg
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\17556969131407844942.jpg
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\17556969131407844942.jpg
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\Sponza\Sponza.gltf
+			Script: {
+			}
+		}
+	}
+]
+Scene: {
+	Scene Name: AllModelsTest
+	Scene Working Directory: D:\programming\Java\OxyEngine\src\main\resources\scenes
+	Scene Gamma Strength: 2.2
+    Scene Exposure: 1.0
+}

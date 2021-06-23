@@ -40,7 +40,10 @@ public final class SceneRuntimeControlPanel extends Panel {
             SceneRuntime.onCreate();
         }
         ImGui.sameLine(0, 15);
-        if (ImGui.imageButton(stopTexture.getTextureId(), size, size, 0, 1, 1, 0, 1)) SceneRuntime.stop();
+        if (ImGui.imageButton(stopTexture.getTextureId(), size, size, 0, 1, 1, 0, 1)) {
+            SceneRuntime.stop();
+            ACTIVE_SCENE.STATE = SceneState.IDLE;
+        }
         ImGui.popStyleColor(4);
         ImGui.end();
     }

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static OxyEngine.Core.Context.Renderer.Mesh.OxyVertex.MAX_BONES;
-import static OxyEngine.Scene.Objects.Importer.OxyModelImporter.*;
+import static OxyEngine.Scene.OxyModelImporter.*;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.assimp.Assimp.aiReleaseImport;
 

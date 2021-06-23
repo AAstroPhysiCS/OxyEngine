@@ -6,14 +6,17 @@ import OxyEngine.Core.Context.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
+import OxyEngine.Core.Context.Renderer.ShadowRenderer;
 import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
 import OxyEngine.OxyEngine;
+import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.TargetPlatform;
 
 import static OxyEngine.Core.Context.OxyRenderCommand.targetPlatform;
 import static OxyEngine.Scene.SceneRuntime.*;
 import static OxyEngine.System.OxySystem.logger;
+import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.*;
 
 public final class OxyRenderer {
@@ -85,6 +88,20 @@ public final class OxyRenderer {
                 p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
         }
         renderCommand.getRendererAPI().beginRenderPass(renderPass);
+    }
+
+    public static void beginScene() {
+        assert ACTIVE_SCENE != null : oxyAssert("Active scene is somehow null!");
+        SceneRenderer.getInstance().getMainFrameBuffer().blit();
+    }
+
+    public static void endScene(){
+        assert ACTIVE_SCENE != null : oxyAssert("Active scene is somehow null!");
+
+        SceneRenderer.getInstance().getMainFrameBuffer().resetFlush();
+        SceneRenderer.getInstance().getPickingFrameBuffer().resetFlush();
+        ShadowRenderer.resetFlush();
+        OxyRenderer.Stats.totalShapeCount = ACTIVE_SCENE.getShapeCount();
     }
 
     public static void endRenderPass() {

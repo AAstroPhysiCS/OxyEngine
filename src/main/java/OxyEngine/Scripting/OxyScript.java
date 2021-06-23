@@ -4,6 +4,7 @@ import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.Scene.SceneState;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -17,9 +18,10 @@ import java.lang.reflect.Modifier;
 import java.util.Objects;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class OxyScript {
@@ -126,6 +128,7 @@ public class OxyScript {
                     this.path = pathDialog;
                     loadAssembly();
                     SceneRuntime.stop();
+                    ACTIVE_SCENE.STATE = SceneState.IDLE;
                     bufferPath.set(pathDialog);
                 }
             }

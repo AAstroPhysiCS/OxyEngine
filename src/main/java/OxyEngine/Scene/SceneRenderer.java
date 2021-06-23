@@ -23,10 +23,10 @@ import OxyEngine.Core.Context.Renderer.Pipeline.ShaderType;
 import OxyEngine.Core.Context.Renderer.ShadowRenderer;
 import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
-import OxyEngine.Core.Window.WindowHandle;
+import OxyEngine.Core.Window.Input;
+import OxyEngine.Core.Window.MouseCode;
+import OxyEngine.Core.Window.OxyWindow;
 import OxyEngine.OxyEngine;
-import OxyEngine.Scene.Objects.Model.OxyNativeObject;
-import OxyEngine.Scene.Objects.WorldGrid;
 import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import OxyEngineEditor.UI.Panels.GUINode;
 import OxyEngineEditor.UI.Panels.ScenePanel;
@@ -38,10 +38,7 @@ import java.util.Set;
 
 import static OxyEngine.Core.Context.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.Scene.SceneRuntime.*;
-import static OxyEngine.System.OxyEventSystem.mouseButtonDispatcher;
 import static OxyEngineEditor.UI.Panels.ScenePanel.editorCameraEntity;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 import static org.lwjgl.opengl.GL44.glClearTexImage;
@@ -69,7 +66,7 @@ public final class SceneRenderer {
     private SceneRenderer() {
     }
 
-    public void initShaders(){
+    public void initShaders() {
         OxyShader.createShader("OxyPBR", "shaders/OxyPBR.glsl");
         OxyShader.createShader("OxyHDR", "shaders/OxyHDR.glsl");
         OxyShader.createShader("OxySkybox", "shaders/OxySkybox.glsl");
@@ -83,10 +80,10 @@ public final class SceneRenderer {
     public void initPipelines() {
         initShaders();
 
-        WindowHandle windowHandle = OxyEngine.getWindowHandle();
+        OxyWindow oxyWindow = OxyEngine.getWindowHandle();
 
-        RenderBuffer mainRenderBuffer = RenderBuffer.create(TextureFormat.DEPTH24STENCIL8, windowHandle.getWidth(), windowHandle.getHeight());
-        mainFrameBuffer = FrameBuffer.create(windowHandle.getWidth(), windowHandle.getHeight(), new OxyColor(0f, 0f, 0f, 1f),
+        RenderBuffer mainRenderBuffer = RenderBuffer.create(TextureFormat.DEPTH24STENCIL8, oxyWindow.getWidth(), oxyWindow.getHeight());
+        mainFrameBuffer = FrameBuffer.create(oxyWindow.getWidth(), oxyWindow.getHeight(), new OxyColor(0f, 0f, 0f, 1f),
                 FrameBuffer.createNewSpec(FrameBufferSpecification.class)
                         .setTextureCount(1)
                         .setAttachmentIndex(0)
@@ -189,9 +186,9 @@ public final class SceneRenderer {
 
         fillPropertyEntries();
 
-        updateCurrentBoundedCamera(0);
+        updateCurrentBoundedCamera();
 
-        new WorldGrid(ACTIVE_SCENE, 10);
+        if (WorldGrid.grid == null) new WorldGrid(ACTIVE_SCENE, 10);
     }
 
     private void fillPropertyEntries() {
@@ -239,7 +236,7 @@ public final class SceneRenderer {
         cachedNativeMeshes = ACTIVE_SCENE.view(NativeMeshOpenGL.class);
     }
 
-    public void updateCurrentBoundedCamera(float ts) {
+    public void updateCurrentBoundedCamera() {
         for (OxyEntity e : cachedCameraComponents) {
             OxyCamera camera = e.get(OxyCamera.class);
             OxyCamera editorCamera = editorCameraEntity.get(OxyCamera.class);
@@ -255,8 +252,9 @@ public final class SceneRenderer {
         }
 
         if (currentBoundedCamera != null) {
-            currentBoundedCamera.finalizeCamera(ts);
-            if (currentBoundedCamera instanceof PerspectiveCamera c) c.setViewMatrixNoTranslation();
+            currentBoundedCamera.update();
+            if (currentBoundedCamera instanceof PerspectiveCamera c)
+                c.calcViewMatrixNoTranslation();
         }
     }
 
@@ -265,7 +263,7 @@ public final class SceneRenderer {
         SceneRuntime.onUpdate(ts);
 
         //Camera
-        updateCurrentBoundedCamera(ts);
+        updateCurrentBoundedCamera();
 
         if (currentBoundedCamera == null) return;
 
@@ -351,8 +349,8 @@ public final class SceneRenderer {
                         skyBoxShader.setUniform1i("u_skyBoxTexture", hdrTexture.getPrefilterSlot());
                     else skyBoxShader.setUniform1i("u_skyBoxTexture", hdrTexture.getHDRSlot());
                     skyBoxShader.setUniform1f("u_mipLevel", skyLightComp.mipLevelStrength[0]);
-                    skyBoxShader.setUniform1f("u_exposure", skyLightComp.exposure[0]);
-                    skyBoxShader.setUniform1f("u_gamma", skyLightComp.gammaStrength[0]);
+                    skyBoxShader.setUniform1f("u_exposure", ACTIVE_SCENE.exposure);
+                    skyBoxShader.setUniform1f("u_gamma", ACTIVE_SCENE.gammaStrength);
                     skyBoxShader.end();
 
                     OxyRenderer.renderMesh(hdrPipeline, currentBoundedSkyLight.get(OpenGLMesh.class), currentBoundedCamera, skyBoxShader);
@@ -381,7 +379,6 @@ public final class SceneRenderer {
             RenderableComponent renderableComponent = e.get(RenderableComponent.class);
             if (renderableComponent.mode != RenderingMode.Normal) continue;
             pbrShader.begin();
-            //ANIMATION UPDATE
             pbrShader.setUniform1i("animatedModel", 0);
             if (e.has(AnimationComponent.class)) {
                 pbrShader.setUniform1i("animatedModel", 1);
@@ -400,21 +397,17 @@ public final class SceneRenderer {
     }
 
     public void renderScene() {
-        mainFrameBuffer.blit();
-        if (mouseButtonDispatcher.getButtonState(GLFW_MOUSE_BUTTON_1) == GLFW_PRESS && ScenePanel.hoveredWindow
-                && SceneRuntime.currentBoundedCamera.equals(editorCameraEntity.get(OxyCamera.class))) {
+        OxyRenderer.beginScene();
+
+        geometryPass();
+        shadowPass();
+        if (Input.isMouseButtonPressed(MouseCode.GLFW_MOUSE_BUTTON_1) && ScenePanel.hoveredWindow
+                && SceneRuntime.currentBoundedCamera.equals(editorCameraEntity.get(OxyCamera.class)) && !OxySelectHandler.isOverAnyGizmo()) {
             idPass();
             OxySelectHandler.startPicking();
         }
-        geometryPass();
-        shadowPass();
 
-        //TODO: Transfer this to EndScene() method in the future
-        mainFrameBuffer.resetFlush();
-        pickingFrameBuffer.resetFlush();
-        ShadowRenderer.getFrameBuffer().resetFlush();
-
-        OxyRenderer.Stats.totalShapeCount = ACTIVE_SCENE.getShapeCount();
+        OxyRenderer.endScene();
     }
 
     public void shadowPass() {

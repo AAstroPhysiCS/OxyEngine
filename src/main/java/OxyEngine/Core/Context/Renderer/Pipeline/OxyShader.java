@@ -27,7 +27,7 @@ public final class OxyShader implements OxyDisposable {
     private final int program;
     private final String name, glslPath;
 
-    protected final Map<String, ? super Number> parameterLocations = new HashMap<>();
+    protected final Map<String, Number> parameterLocations = new HashMap<>();
     private static final FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
 
     public static OxyShader createShader(String name, String glslPath){

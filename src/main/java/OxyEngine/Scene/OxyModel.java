@@ -1,0 +1,199 @@
+package OxyEngine.Scene;
+
+import OxyEngine.Components.*;
+import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Context.Renderer.Light.PointLight;
+import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
+import OxyEngine.Core.Context.OxyRenderPass;
+import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
+import OxyEngine.PhysX.OxyPhysXComponent;
+import OxyEngine.Scripting.OxyScript;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static OxyEngine.Utils.toPrimitiveInteger;
+
+public class OxyModel extends OxyEntity {
+
+    List<OxyVertex> vertexList;
+    List<int[]> faces;
+
+    OxyModel(Scene scene, int id, List<OxyVertex> vertexList, List<int[]> faces) {
+        super(scene);
+        this.objectID = id;
+        this.vertexList = vertexList;
+        this.faces = faces;
+    }
+
+    OxyModel(Scene scene, int id) {
+        super(scene);
+        this.objectID = id;
+    }
+
+    OxyModel(OxyModel other, int id) {
+        super(other.scene);
+        if (other.tangents != null) this.tangents = other.tangents.clone();
+        if (other.biTangents != null) this.biTangents = other.biTangents.clone();
+        if (other.normals != null) this.normals = other.normals.clone();
+        if (other.vertices != null) this.vertices = other.vertices.clone();
+        if (other.tcs != null) this.tcs = other.tcs.clone();
+        if (other.indices != null) this.indices = other.indices.clone();
+        this.objectID = id;
+    }
+
+    @Override
+    public OxyEntity copyMe() {
+        OxyModel e = new OxyModel(this, ++Scene.OBJECT_ID_COUNTER);
+        e.addToScene();
+        e.importedFromFile = this.importedFromFile;
+        if (this.has(BoundingBoxComponent.class)) {
+            var boundingBox = get(BoundingBoxComponent.class);
+            e.addComponent(new BoundingBoxComponent(boundingBox.min(), boundingBox.max()));
+        }
+
+        e.addComponent(
+                new TransformComponent(this.get(TransformComponent.class)),
+                new MeshPosition(get(MeshPosition.class).meshPos()),
+                new TagComponent(get(TagComponent.class).tag() == null ? "Unnamed" : get(TagComponent.class).tag()),
+                new RenderableComponent(RenderingMode.Normal),
+                get(OxyMaterialIndex.class),
+                new SelectedComponent(false)
+        );
+
+        if (this.has(OxyPhysXComponent.class)) {
+            OxyPhysXComponent physXComponent = new OxyPhysXComponent(this.get(OxyPhysXComponent.class), e);
+            e.addComponent(physXComponent);
+            physXComponent.getGeometry().build();
+            physXComponent.getActor().build();
+        }
+
+        e.setFamily(new EntityFamily(this.getFamily().root()));
+
+        if (this.has(PointLight.class)) e.addComponent(this.get(PointLight.class));
+        if (this.has(DirectionalLight.class)) e.addComponent(this.get(DirectionalLight.class));
+        if (this.has(AnimationComponent.class))
+            e.addComponent(new AnimationComponent(this.get(AnimationComponent.class)));
+
+        //SCRIPTS (with GUINode-Script)
+        for (OxyScript s : this.getScripts()) e.addScript(new OxyScript(s.getPath()));
+
+        //adding all the parent gui nodes (except OxyScript, bcs that gui node is instance dependent)
+        e.getGUINodes().addAll(this.getGUINodes().stream().filter(c -> !(c instanceof OxyScript)).collect(Collectors.toList()));
+
+        SceneRuntime.stop();
+
+        if (has(OpenGLMesh.class)) e.constructCopy(get(OpenGLMesh.class).getPath(), this);
+
+        copyChildRecursive(e);
+
+        return e;
+    }
+
+    private void copyChildRecursive(OxyEntity parent) {
+        for (OxyEntity child : getEntitiesRelatedTo()) {
+            OxyEntity copy = child.copyMe();
+            copy.setFamily(new EntityFamily(parent.getFamily()));
+        }
+    }
+
+    public void initMesh(String meshPath) {
+        transformLocally();
+        construct();
+        OxyPipeline geometryPipeline = SceneRenderer.getInstance().getGeometryPipeline();
+        OxyRenderPass geometryRenderPass = geometryPipeline.getRenderPass();
+        addComponent(new ModelMeshOpenGL(geometryPipeline, meshPath, geometryRenderPass.getMeshRenderingMode(),
+                vertices, indices, tcs, normals, tangents, biTangents));
+        vertexList.clear();
+        faces.clear();
+    }
+
+    @Override
+    public void updateData() {
+        transformLocally();
+        if (has(OpenGLMesh.class)) get(OpenGLMesh.class).updateSingleEntityData(0, vertices);
+    }
+
+    private void constructCopy(String meshPath, OxyEntity copiedFrom) {
+        OxyModel e = this;
+        if (copiedFrom instanceof OxyModel model) {
+            e.transformLocally();
+            OxyPipeline geometryPipeline = SceneRenderer.getInstance().getGeometryPipeline();
+            OxyRenderPass geometryRenderPass = geometryPipeline.getRenderPass();
+            // if its being copied, you can literally just copy the copied entity data
+            e.vertices = model.vertices.clone();
+            for(int i = 3; i < e.vertices.length; i += 12) e.vertices[i] = e.getObjectId();
+            e.normals = model.normals.clone();
+            e.tcs = model.tcs.clone();
+            e.tangents = model.tangents.clone();
+            e.biTangents = model.biTangents.clone();
+            e.indices = model.indices.clone();
+            e.addComponent(new ModelMeshOpenGL(geometryPipeline, meshPath, geometryRenderPass.getMeshRenderingMode(),
+                    vertices, indices, tcs, normals, tangents, biTangents));
+        }
+    }
+
+    private void construct() {
+        OxyModel e = this;
+
+        e.vertices = new float[vertexList.size() * 12];
+        e.normals = new float[vertexList.size() * 3];
+        e.tcs = new float[vertexList.size() * 2];
+        e.tangents = new float[vertexList.size() * 3];
+        e.biTangents = new float[vertexList.size() * 3];
+
+        List<Integer> indicesArr = new ArrayList<>();
+        for (int[] face : faces) {
+            for (int i : face) {
+                indicesArr.add(i);
+            }
+        }
+        e.indices = toPrimitiveInteger(indicesArr);
+
+        int vertPtr = 0;
+        int nPtr = 0;
+        int tcsPtr = 0;
+        int tangentPtr = 0;
+        int biTangentPtr = 0;
+        for (OxyVertex o : vertexList) {
+            e.vertices[vertPtr++] = o.vertices.x;
+            e.vertices[vertPtr++] = o.vertices.y;
+            e.vertices[vertPtr++] = o.vertices.z;
+            e.vertices[vertPtr++] = e.getObjectId();
+
+            e.vertices[vertPtr++] = o.boneIDs[0];
+            e.vertices[vertPtr++] = o.boneIDs[1];
+            e.vertices[vertPtr++] = o.boneIDs[2];
+            e.vertices[vertPtr++] = o.boneIDs[3];
+
+            e.vertices[vertPtr++] = o.weights[0];
+            e.vertices[vertPtr++] = o.weights[1];
+            e.vertices[vertPtr++] = o.weights[2];
+            e.vertices[vertPtr++] = o.weights[3];
+
+            Vector3f normals = o.normals;
+            e.normals[nPtr++] = normals.x;
+            e.normals[nPtr++] = normals.y;
+            e.normals[nPtr++] = normals.z;
+
+            Vector2f textureCoords = o.textureCoords;
+            e.tcs[tcsPtr++] = textureCoords.x;
+            e.tcs[tcsPtr++] = textureCoords.y;
+
+            Vector3f tangents = o.tangents;
+            e.tangents[tangentPtr++] = tangents.x;
+            e.tangents[tangentPtr++] = tangents.y;
+            e.tangents[tangentPtr++] = tangents.z;
+
+            Vector3f biTangents = o.biTangents;
+            e.biTangents[biTangentPtr++] = biTangents.x;
+            e.biTangents[biTangentPtr++] = biTangents.y;
+            e.biTangents[biTangentPtr++] = biTangents.z;
+        }
+    }
+}

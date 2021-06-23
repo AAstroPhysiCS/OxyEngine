@@ -1,11 +1,7 @@
 package OxyEngine.System;
 
-import OxyEngine.Core.Window.WindowHandle;
-import OxyEngine.Events.GLFW.GLFWEventDispatcher;
-import OxyEngine.Events.GLFW.GLFWEventType;
-import OxyEngine.Events.OxyEventDispatcher;
-import OxyEngine.Events.OxyKeyEvent;
-import OxyEngine.Events.OxyMouseEvent;
+import OxyEngine.Core.Window.OxyWindow;
+import OxyEngine.Core.Window.Input;
 import OxyEngine.OxyEngine;
 import imgui.ImGui;
 import imgui.ImGuiIO;
@@ -22,7 +18,6 @@ import imgui.glfw.ImGuiImplGlfw;
 import java.io.File;
 import java.util.Objects;
 
-import static OxyEngine.System.OxyEventSystem.*;
 import static OxyEngine.System.OxySystem.gl_Version;
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -32,15 +27,14 @@ public class OxyUISystem {
 
     private final ImGuiImplGl3 imGuiRenderer;
     private final ImGuiImplGlfw imGuiGlfw;
-    private final WindowHandle windowHandle;
+    private final OxyWindow oxyWindow;
 
     private final long[] mouseCursors = new long[ImGuiMouseCursor.COUNT];
 
-    public OxyUISystem(WindowHandle windowHandle) {
-        this.windowHandle = windowHandle;
+    public OxyUISystem(OxyWindow oxyWindow) {
+        this.oxyWindow = oxyWindow;
         imGuiRenderer = new ImGuiImplGl3();
         imGuiGlfw = new ImGuiImplGlfw();
-        dispatcher = new OxyEventDispatcher();
         init();
     }
 
@@ -57,17 +51,7 @@ public class OxyUISystem {
         io.setConfigViewportsNoTaskBarIcon(true);
         setKeymap();
 
-        mouseButtonDispatcher = (GLFWEventDispatcher.MouseEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseEvent, io);
-        mouseCursorPosDispatcher = (GLFWEventDispatcher.MouseCursorPosEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseCursorPosEvent, io);
-        keyEventDispatcher = (GLFWEventDispatcher.KeyEvent) GLFWEventDispatcher.getInstance(GLFWEventType.KeyEvent, io);
-        mouseScrollDispatcher = (GLFWEventDispatcher.MouseScrollEvent) GLFWEventDispatcher.getInstance(GLFWEventType.MouseScrollEvent, io);
-
-        final long winPtr = windowHandle.getPointer();
-        glfwSetMouseButtonCallback(winPtr, mouseButtonDispatcher);
-        glfwSetKeyCallback(winPtr, keyEventDispatcher);
-        glfwSetScrollCallback(winPtr, mouseScrollDispatcher);
-        glfwSetCursorPosCallback(winPtr, mouseCursorPosDispatcher);
-
+        final long winPtr = oxyWindow.getPointer();
         io.setSetClipboardTextFn(new ImStrConsumer() {
             @Override
             public void accept(final String s) {
@@ -86,12 +70,12 @@ public class OxyUISystem {
         File[] file = new File(OxySystem.FileSystem.getResourceByPath("/fonts/")).listFiles();
         assert file != null;
         for (File f : file) {
-            OxyFontSystem.load(io, f.getPath(), 16, f.getName().split("\\.")[0]);
-            OxyFontSystem.load(io, f.getPath(), 19, f.getName().split("\\.")[0]);
+            OxySystem.Font.load(io, f.getPath(), 16, f.getName().split("\\.")[0]);
+            OxySystem.Font.load(io, f.getPath(), 19, f.getName().split("\\.")[0]);
         }
 
         imGuiRenderer.init(gl_Version);
-        imGuiGlfw.init(windowHandle.getPointer(), true);
+        imGuiGlfw.init(oxyWindow.getPointer(), true);
 
         if (io.hasConfigFlags(ImGuiConfigFlags.ViewportsEnable)) {
             final ImGuiStyle style = ImGui.getStyle();
@@ -103,21 +87,16 @@ public class OxyUISystem {
     public void updateImGuiContext(float deltaTime) {
         int[] fbWidth = new int[1];
         int[] fbHeight = new int[1];
-        glfwGetFramebufferSize(windowHandle.getPointer(), fbWidth, fbHeight);
+        glfwGetFramebufferSize(oxyWindow.getPointer(), fbWidth, fbHeight);
 
-        io.setDisplaySize(windowHandle.getWidth(), windowHandle.getHeight());
-        io.setDisplayFramebufferScale((float) fbWidth[0] / windowHandle.getWidth(), (float) fbHeight[0] / windowHandle.getHeight());
-        io.setMousePos((float) OxyEventSystem.mouseCursorPosDispatcher.getXPos(), (float) OxyEventSystem.mouseCursorPosDispatcher.getYPos());
+        io.setDisplaySize(oxyWindow.getWidth(), oxyWindow.getHeight());
+        io.setDisplayFramebufferScale((float) fbWidth[0] / oxyWindow.getWidth(), (float) fbHeight[0] / oxyWindow.getHeight());
+        io.setMousePos(Input.getMouseX(), Input.getMouseY());
         io.setDeltaTime(deltaTime);
 
         final int imguiCursor = ImGui.getMouseCursor();
-        glfwSetCursor(windowHandle.getPointer(), mouseCursors[imguiCursor]);
-        glfwSetInputMode(windowHandle.getPointer(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    }
-
-    public void dispatchNativeEvents() {
-        dispatcher.dispatch(OxyKeyEvent.class);
-        dispatcher.dispatch(OxyMouseEvent.class);
+        glfwSetCursor(oxyWindow.getPointer(), mouseCursors[imguiCursor]);
+        glfwSetInputMode(oxyWindow.getPointer(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
     public void newFrameGLFW() {

@@ -12,31 +12,33 @@ import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
 import OxyEngine.PhysX.OxyPhysXComponent;
-import OxyEngine.Scene.Objects.Importer.ImporterType;
-import OxyEngine.Scene.Objects.Importer.OxyModelImporter;
-import OxyEngine.Scene.Objects.Model.*;
 import OxyEngine.Scripting.ScriptEngine;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.io.File;
 import java.util.*;
 
 import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
 import static OxyEngine.Core.Context.Renderer.Light.Light.LIGHT_SIZE;
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
 import static OxyEngine.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Scene.SceneSerializer.fileExtension;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
+import static OxyEngine.System.OxySystem.FileSystem.saveDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
 
 public final class Scene implements OxyDisposable {
 
     private final Registry registry = new Registry();
 
-    private final String sceneName;
+    private String workingDirectory;
+    private String sceneName;
+
+    public float gammaStrength = 2.2f;
+    public float exposure = 1.0f;
 
     public static int OBJECT_ID_COUNTER = 0;
 
@@ -44,12 +46,14 @@ public final class Scene implements OxyDisposable {
 
     private OxyModelImporter modelImporter;
 
-    public Scene(String sceneName) {
+    public Scene(String sceneName, String workingDirectory) {
         this.sceneName = sceneName;
+        this.workingDirectory = workingDirectory;
     }
 
     public final void put(OxyEntity e) {
         registry.entityList.put(e, new LinkedHashSet<>(allEntityComponentChildClasses.size()));
+        e.addComponent(new UUIDComponent(UUID.randomUUID()));
     }
 
     public final OxyNativeObject createNativeObjectEntity(float[] vertices, int[] indices) {
@@ -61,9 +65,7 @@ public final class Scene implements OxyDisposable {
         e.addComponent(
                 new TransformComponent(),
                 new SelectedComponent(false),
-                new RenderableComponent(RenderingMode.Normal),
-                new UUIDComponent(UUID.randomUUID())
-        );
+                new RenderableComponent(RenderingMode.Normal));
         return e;
     }
 
@@ -154,7 +156,6 @@ public final class Scene implements OxyDisposable {
         e.importedFromFile = false;
         put(e);
         e.addComponent(
-                new UUIDComponent(UUID.randomUUID()),
                 new TransformComponent(new Vector3f(0, 0, 0)),
                 new TagComponent("Empty Group"),
                 new MeshPosition(0),
@@ -168,7 +169,6 @@ public final class Scene implements OxyDisposable {
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
         put(e);
         e.addComponent(
-                new UUIDComponent(UUID.randomUUID()),
                 new TransformComponent(new Vector3f(0, 0, 0)),
                 new TagComponent("Empty Group"),
                 new MeshPosition(i),
@@ -257,7 +257,6 @@ public final class Scene implements OxyDisposable {
         OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER, modelImporter.getVertexList(i), modelImporter.getFaces(i));
         put(e);
         e.addComponent(
-                new UUIDComponent(UUID.randomUUID()),
                 new BoundingBoxComponent(
                         modelImporter.getBoundingBoxMin(i),
                         modelImporter.getBoundingBoxMax(i)
@@ -308,9 +307,10 @@ public final class Scene implements OxyDisposable {
                 .map(entity -> entity.get(OxyMaterialIndex.class).index())
                 .noneMatch(integer -> index == integer) && index != -1) {
             //if there's no entity that is using this material => dispose it
-            OxyMaterial m = OxyMaterialPool.getMaterial(index);
-            OxyMaterialPool.removeMaterial(m);
-            m.dispose();
+            OxyMaterialPool.getMaterial(index).ifPresent((m) -> {
+                OxyMaterialPool.removeMaterial(m);
+                m.dispose();
+            });
         }
     }
 
@@ -323,6 +323,10 @@ public final class Scene implements OxyDisposable {
             i++;
         }
         return null;
+    }
+
+    public final OxyEntity getEntityByUUID(UUIDComponent uuidComponent) {
+        return registry.getEntityByUUID(uuidComponent);
     }
 
     public final boolean isValid(OxyEntity entity) {
@@ -391,13 +395,12 @@ public final class Scene implements OxyDisposable {
             if (e instanceof OxyModel) {
                 if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
                 if (e.has(OxyMaterialIndex.class)) {
-                    OxyMaterial m = OxyMaterialPool.getMaterial(e);
-                    if (m != null) {
+                    OxyMaterialPool.getMaterial(e).ifPresent((m) -> {
                         if (m.index != -1) {
                             OxyMaterialPool.removeMaterial(m);
                             m.dispose();
                         }
-                    }
+                    });
                 }
                 it.remove();
             }
@@ -432,7 +435,7 @@ public final class Scene implements OxyDisposable {
     }
 
     public static void openScene() {
-        String openScene = openDialog(extensionName, null);
+        String openScene = openDialog(extensionName, ACTIVE_SCENE.getWorkingDirectory());
         if (openScene != null) {
             ScriptEngine.clearProviders();
             SceneRuntime.stop();
@@ -443,24 +446,40 @@ public final class Scene implements OxyDisposable {
 
     public static void saveScene() {
         SceneRuntime.stop();
-        SceneSerializer.serializeScene(ACTIVE_SCENE.getSceneName() + fileExtension);
+        if (ACTIVE_SCENE.workingDirectory == null || ACTIVE_SCENE.workingDirectory.equals("null")) {
+            String s = saveDialog(extensionName, null);
+            if (s == null) return;
+            File f = new File(s);
+            ACTIVE_SCENE.workingDirectory = f.getParent();
+            ACTIVE_SCENE.sceneName = f.getName();
+        }
+        SceneSerializer.serializeScene(ACTIVE_SCENE.workingDirectory + "//" + ACTIVE_SCENE.getSceneName() + fileExtension);
+    }
+
+    public static void saveAs() {
+        SceneRuntime.stop();
+        String saveAs = saveDialog(extensionName, null);
+        if (saveAs != null) SceneSerializer.serializeScene(saveAs + fileExtension);
     }
 
     public static void newScene() {
         ScriptEngine.clearProviders();
         SceneRuntime.stop();
-        OxySelectHandler.entityContext = null;
+        SceneRuntime.entityContext = null;
         Scene oldScene = ACTIVE_SCENE;
         oldScene.disposeAllModels();
 
-        Scene scene = new Scene("Test Scene 1");
+        Scene scene = new Scene("Test Scene 1", null);
         for (var n : oldScene.getEntityEntrySet()) {
             scene.put(n.getKey());
             scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
         }
         ACTIVE_SCENE = scene;
-//        if(scene.skyLightEntity != null) scene.skyLightEntity.get(SkyLight.class).getHDRTexture().dispose();
         SceneRenderer.getInstance().initScene();
+    }
+
+    public String getWorkingDirectory() {
+        return workingDirectory;
     }
 
     public OxyEntity getRoot(OxyEntity entity) {

@@ -1,20 +1,21 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Components.EntityComponent;
-import OxyEngine.Scene.Objects.Model.OxyModel;
+import OxyEngine.Core.Window.OxyEvent;
+import OxyEngine.Scene.OxyModel;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
 
 public abstract class OxyCamera implements EntityComponent {
 
     protected final boolean transpose;
     protected boolean primary;
-    protected Matrix4f viewMatrix, modelMatrix, projectionMatrix, viewMatrixNoTranslation = new Matrix4f();
+    protected Matrix4f viewMatrix, modelMatrix, projectionMatrix, viewMatrixNoTranslation;
 
     protected Vector3f rotationRef;
     protected Vector3f positionRef;
@@ -30,11 +31,9 @@ public abstract class OxyCamera implements EntityComponent {
         this.verticalSpeed = verticalSpeed;
     }
 
-    public abstract Matrix4f setProjectionMatrix();
+    public abstract void update();
 
-    public abstract Matrix4f setModelMatrix();
-
-    public abstract void finalizeCamera(float ts);
+    public abstract void onEvent(OxyEvent event);
 
     public boolean isTranspose() {
         return transpose;
@@ -91,8 +90,8 @@ public abstract class OxyCamera implements EntityComponent {
     public float getMouseSpeed() {
         return mouseSpeed;
     }
-
     private static final String[] selection = {"Perspective Camera", "Orthographic Camera"};
+
     private static String currentItem = selection[0];
 
     public void setPrimary(boolean primary){

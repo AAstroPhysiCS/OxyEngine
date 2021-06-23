@@ -3,7 +3,7 @@ package OxyEngine.Core.Context.Renderer.Buffer;
 import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLIndexBuffer;
 import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.Objects.Model.OxyNativeObject;
+import OxyEngine.Scene.OxyNativeObject;
 import OxyEngine.TargetPlatform;
 
 public abstract class IndexBuffer extends Buffer {

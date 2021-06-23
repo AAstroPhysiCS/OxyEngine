@@ -1,7 +1,7 @@
 package OxyEngine.Core.Context;
 
 import OxyEngine.TargetPlatform;
-import OxyEngine.Core.Window.WindowHandle;
+import OxyEngine.Core.Window.OxyWindow;
 
 import static OxyEngine.System.OxySystem.logger;
 
@@ -21,7 +21,7 @@ public abstract class RendererContext {
 
     public abstract void init();
 
-    public abstract void swapBuffer(WindowHandle handle);
+    public abstract void swapBuffer(OxyWindow handle);
 
     public abstract void pollEvents();
 }

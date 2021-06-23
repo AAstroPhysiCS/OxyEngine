@@ -1,0 +1,691 @@
+Registry [
+	RootNode: {
+		ID: c1c47808-f1f6-4b08-8486-b32310b600e2
+		Mesh Position: 0
+		Name: RootNode
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Script: {
+		}
+		sponza_382: {
+			ID: c36d4134-477e-40b3-9d32-7a796cd5c1cc
+			Mesh Position: 0
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: bricks
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Bricks_a_Albedo.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Bricks_a_Normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: a79d3208-fafb-49dd-b9a4-52f3209fcf5b
+			Mesh Position: 1
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: details
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Details_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Details_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: c3bca990-73c3-4ea8-ad1a-12c2d4cc2453
+			Mesh Position: 2
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: flagpole
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_FlagPole_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_FlagPole_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 1c270ab4-dc3c-4536-94d7-893f69c81ed3
+			Mesh Position: 3
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: column_b
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Column_b_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Column_b_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: ff9d02e5-7b38-4da3-8e0c-9d0bea589ac7
+			Mesh Position: 4
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: ceiling
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Ceiling_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Ceiling_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 9a766062-f46b-4a0b-8d42-22a1595ab55f
+			Mesh Position: 5
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: arch
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Arch_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Arch_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: dba1044a-4415-40f1-822e-de1973c4e427
+			Mesh Position: 6
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: column_c
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Column_c_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Column_c_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: dd16c6d7-0fe7-40bd-9079-4654cbe23bfe
+			Mesh Position: 7
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: column_a
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Column_a_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Column_a_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 838857d6-74a7-4411-bcaa-f1eeaad2d385
+			Mesh Position: 8
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material__25
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Lion_Albedo.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Lion_Normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: df46ea47-acf6-4564-ae14-141a38c636bc
+			Mesh Position: 9
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material__298
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Background_Albedo.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Background_Normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 7bbc361b-9d7d-4a27-a945-8b0a34eacbd2
+			Mesh Position: 10
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: Material__47
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 2c85645f-2e39-4c23-8fcd-10f9f63204e8
+			Mesh Position: 11
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: fabric_d
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Fabric_Blue_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Fabric_Blue_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: a34cca93-9f92-4124-8dff-465a7494e998
+			Mesh Position: 12
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: fabric_e
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Fabric_Green_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Fabric_Green_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 04736cc2-0549-4068-9ae9-0c32c79d7bd0
+			Mesh Position: 13
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: roof
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Roof_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Roof_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 243dcf95-ae8d-4f8e-b7fa-8e35f3cf3442
+			Mesh Position: 14
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: fabric_a
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Fabric_Red_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Fabric_Red_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 4043a895-b620-404f-9aaf-d0909762a4c7
+			Mesh Position: 15
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: vase
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Vase_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Vase_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 66a0eb16-9f11-4b38-8c96-ccee3e83d299
+			Mesh Position: 16
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: fabric_f
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Curtain_Green_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Curtain_Green_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: b3027c92-91e4-4f53-9ab9-f313b4c81a8b
+			Mesh Position: 17
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: fabric_c
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Curtain_Red_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Curtain_Red_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 74004835-0f49-4ad6-b3ff-bc7b299b5626
+			Mesh Position: 18
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: fabric_g
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Curtain_Blue_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Curtain_Blue_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 0d471a73-e100-4588-b6de-7a8f79e2cb0a
+			Mesh Position: 19
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: floor.001
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Marble_tiles_02_4K_Base_Color.png
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Marble_tiles_02_4K_Normal.png
+			Normal Map Strength: 1.0
+			Roughness Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Marble_tiles_02_4K_Roughness.png
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+		sponza_382: {
+			ID: 912a425b-a036-44e9-9c83-c08dab02fba1
+			Mesh Position: 20
+			Name: sponza_382
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+			Scale: ( 1.000E-1  1.000E-1  1.000E-1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: floor
+			Color: [0.588, 0.588, 0.588, 1.0]
+			Albedo Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Floor_diffuse.tga
+			Normal Map Texture: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\Sponza PRB Texture Set\Sponza_Floor_normal.tga
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\SponzaNew\SponzaNewFBX.fbx
+			Script: {
+			}
+		}
+	}
+	Sky Light: {
+		ID: 9c89b11d-b2fc-430f-8696-ce6dcf12fd12
+		Mesh Position: -1
+		Name: Sky Light
+		Emitting: true
+		Emitting Type: SkyLight
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Light Attributes: {
+			Intensity: 1.0
+			Environment Map: D:\programming\Java\OxyEngine\src\main\resources\hdr\fireplace_4k.hdr
+			Environment LOD: 1.0
+			Environment Intensity: 1.0
+			Environment Primary: true
+		}
+		Script: {
+		}
+	}
+	Directional Light: {
+		ID: 8871d7b9-116d-4c37-aee6-cdbe14a6c9b9
+		Mesh Position: 0
+		Name: Directional Light
+		Emitting: true
+		Emitting Type: DirectionalLight
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 2.344E+0  7.206E-2  5.565E-1)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: Material (0)
+		Color: [1.0, 1.0, 1.0, 1.0]
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 1.0
+		Roughness Map Texture: null
+		Roughness Map Strength: 1.0
+		AO Map Texture: null
+		AO Map Strength: 1.0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0.0
+		Emissive Map Texture: null
+		Emissive Map Strength: 1.0
+		Mesh: null
+		Light Attributes: {
+			Intensity: 1.0
+			Direction: ( 2.344E+0  7.206E-2  5.565E-1)
+		}
+		Script: {
+		}
+	}
+]
+Scene: {
+	Scene Name: SponzaNew
+	Scene Working Directory: D:\programming\Java\OxyEngine\src\main\resources\scenes
+	Scene Gamma Strength: 2.2
+	Scene Exposure: 1.0
+}

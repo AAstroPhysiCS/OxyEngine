@@ -1,7 +1,14 @@
 package OxyEngine.System;
 
-import OxyEngineEditor.EntryPoint;
+import OxyEngine.OxyApplication;
 import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.Scene.SceneState;
+import OxyEngineEditor.EditorApplication;
+import OxyEngineEditor.EntryPoint;
+import imgui.ImFont;
+import imgui.ImFontAtlas;
+import imgui.ImFontConfig;
+import imgui.ImGuiIO;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
@@ -11,7 +18,10 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.nfd.NativeFileDialog;
 import org.reflections.Reflections;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,6 +30,8 @@ import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
+
+import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 
 public interface OxySystem {
 
@@ -49,10 +61,15 @@ public interface OxySystem {
         AIString extensionString = new AIString(ByteBuffer.allocateDirect(1032));
         Assimp.aiGetExtensionList(extensionString);
         String[] extensionArray = extensionString.dataString().split(";");
-        for(String s : extensionArray){
+        for (String s : extensionArray) {
             s = s.replace(".", "").replace("*", "");
             extensionList.add(s);
         }
+    }
+
+    static OxyApplication createOxyApplication() {
+        //returning just the editor application for now.
+        return new EditorApplication();
     }
 
     static String oxyAssert(String msg) {
@@ -66,6 +83,29 @@ public interface OxySystem {
 
     static boolean isValidPath(String path) {
         return new File(path).exists();
+    }
+
+    interface Font {
+
+        List<ImFont> allFonts = new ArrayList<>();
+
+        static void load(ImGuiIO io, String path, final int size, String name) {
+            ImFontAtlas atlas = io.getFonts();
+            ImFontConfig config = new ImFontConfig();
+
+            config.setGlyphRanges(atlas.getGlyphRangesCyrillic());
+            atlas.addFontDefault();
+
+            config.setMergeMode(false);
+            config.setPixelSnapH(false);
+
+            ImFont font = atlas.addFontFromFileTTF(path, size, config);
+
+            config.setName(name + ", " + size);
+            config.destroy();
+
+            allFonts.add(font);
+        }
     }
 
     interface FileSystem {
@@ -92,6 +132,7 @@ public interface OxySystem {
 
         static String openDialog(String filterList, String defaultPath) {
             SceneRuntime.stop();
+            ACTIVE_SCENE.STATE = SceneState.WAITING;
             String path = null;
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 PointerBuffer buffer = stack.mallocPointer(1);
@@ -100,11 +141,13 @@ public interface OxySystem {
                     path = buffer.getStringASCII();
                 }
             }
+            ACTIVE_SCENE.STATE = SceneState.IDLE;
             return path;
         }
 
         static String saveDialog(String filterList, String defaultPath) {
             SceneRuntime.stop();
+            ACTIVE_SCENE.STATE = SceneState.WAITING;
             String path = null;
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 PointerBuffer buffer = stack.mallocPointer(1);
@@ -113,6 +156,7 @@ public interface OxySystem {
                     path = buffer.getStringASCII();
                 }
             }
+            ACTIVE_SCENE.STATE = SceneState.IDLE;
             return path;
         }
     }
@@ -157,19 +201,19 @@ public interface OxySystem {
         return filename.replaceFirst("[.][^.]+$", "");
     }
 
-    static String getExtension(String filePath){
+    static String getExtension(String filePath) {
         String[] splitted = filePath.split("\\.");
         return splitted[splitted.length - 1];
     }
 
     static boolean isSupportedModelFileExtension(String extensionToSupport) {
         for (String extensions : extensionList) {
-            if(extensions.equalsIgnoreCase(extensionToSupport)) return true;
+            if (extensions.equalsIgnoreCase(extensionToSupport)) return true;
         }
         return false;
     }
 
-    static boolean isSupportedTextureFile(String extensionToSupport){
+    static boolean isSupportedTextureFile(String extensionToSupport) {
         return extensionToSupport.equalsIgnoreCase("jpg") ||
                 extensionToSupport.equalsIgnoreCase("png") ||
                 extensionToSupport.equalsIgnoreCase("jpeg") ||

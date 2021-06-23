@@ -6,20 +6,18 @@ import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Light.Light;
 import OxyEngine.Core.Context.Renderer.Light.SkyLight;
 import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
-import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngine.Scene.Objects.Model.OxyModel;
+import OxyEngine.Scene.OxyMaterialPool;
+import OxyEngine.Scene.OxyModel;
 import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Scene.OxyMaterial;
 import OxyEngineEditor.UI.AssetManager;
-import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import imgui.ImGui;
 import imgui.flag.*;
 
 import java.util.List;
 import java.util.Set;
 
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngine.Scene.SceneRuntime.*;
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class SceneHierarchyPanel extends Panel {
@@ -99,7 +97,7 @@ public class SceneHierarchyPanel extends Panel {
                 }
 
                 if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
-                    OxySelectHandler.materialContext = null;
+                    materialContext = null;
                     if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                     entityContext = e;
                     entityContext.get(SelectedComponent.class).selected = true;
@@ -111,7 +109,7 @@ public class SceneHierarchyPanel extends Panel {
                     ImGui.treePop();
                 } else {
                     if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
-                        OxySelectHandler.materialContext = null;
+                        materialContext = null;
                         if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                         entityContext = e;
                         entityContext.get(SelectedComponent.class).selected = true;
@@ -216,7 +214,7 @@ public class SceneHierarchyPanel extends Panel {
             }
 
             if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
-                OxySelectHandler.materialContext = null;
+                materialContext = null;
                 if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                 entityContext = e;
                 entityContext.get(SelectedComponent.class).selected = true;
@@ -228,7 +226,7 @@ public class SceneHierarchyPanel extends Panel {
                 ImGui.treePop();
             } else {
                 if (ImGui.isItemClicked(ImGuiMouseButton.Left)) {
-                    OxySelectHandler.materialContext = null;
+                    materialContext = null;
                     if (entityContext != null) entityContext.get(SelectedComponent.class).selected = false;
                     entityContext = e;
                     entityContext.get(SelectedComponent.class).selected = true;
@@ -248,7 +246,7 @@ public class SceneHierarchyPanel extends Panel {
             ImGui.sameLine();
             ImGui.setCursorPosY(ImGui.getCursorPosY() + 2);
             if (ImGui.selectable(m.name, false)) {
-                OxySelectHandler.materialContext = m;
+                materialContext = m;
                 entityContext = null;
             }
         }
@@ -264,7 +262,7 @@ public class SceneHierarchyPanel extends Panel {
 
         if (ImGui.isAnyMouseDown() && !ImGui.isAnyItemHovered() && ImGui.isWindowHovered()) {
             entityContext = null;
-            OxySelectHandler.materialContext = null;
+            materialContext = null;
         }
 
         ImGui.pushStyleVar(ImGuiStyleVar.CellPadding, 0, 2);

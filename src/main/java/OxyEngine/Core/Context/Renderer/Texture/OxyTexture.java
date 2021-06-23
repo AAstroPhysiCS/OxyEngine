@@ -16,7 +16,7 @@ public class OxyTexture {
         if (path.equals("null")) return false;
         if (path.isEmpty() || path.isBlank()) return false;
         if (!isValidPath(path)) {
-            logger.warning("Path not valid!");
+            logger.warning("Path: %s not valid!".formatted(path));
             return false;
         }
         return true;

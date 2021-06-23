@@ -1,0 +1,250 @@
+# Blender MTL File: 'None'
+# Material Count: 21
+
+newmtl Material__25
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Lion_Normal.tga
+map_Kd Sponza PRB Texture Set\\Lion_Albedo.tga
+
+newmtl Material__298
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Background_Normal.tga
+map_Kd Sponza PRB Texture Set\\Background_Albedo.tga
+
+newmtl Material__47
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+
+newmtl arch
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Arch_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Arch_diffuse.tga
+
+newmtl bricks
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Bricks_a_Normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Bricks_a_Albedo.tga
+
+newmtl ceiling
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Ceiling_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Ceiling_diffuse.tga
+
+newmtl column_a
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Column_a_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Column_a_diffuse.tga
+
+newmtl column_b
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Column_b_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Column_b_diffuse.tga
+
+newmtl column_c
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Column_c_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Column_c_diffuse.tga
+
+newmtl details
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Details_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Details_diffuse.tga
+
+newmtl fabric_a
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Fabric_Red_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Fabric_Red_diffuse.tga
+
+newmtl fabric_c
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Curtain_Red_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Curtain_Red_diffuse.tga
+
+newmtl fabric_d
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Fabric_Blue_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Fabric_Blue_diffuse.tga
+
+newmtl fabric_e
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Fabric_Green_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Fabric_Green_diffuse.tga
+
+newmtl fabric_f
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Curtain_Green_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Curtain_Green_diffuse.tga
+
+newmtl fabric_g
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Curtain_Blue_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Curtain_Blue_diffuse.tga
+
+newmtl flagpole
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_FlagPole_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_FlagPole_diffuse.tga
+
+newmtl floor
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Floor_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Floor_diffuse.tga
+
+newmtl floor.001
+Ns 323.999994
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+
+newmtl roof
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Sponza_Roof_normal.tga
+map_Kd Sponza PRB Texture Set\\Sponza_Roof_diffuse.tga
+
+newmtl vase
+Ns 10.000002
+Ka 1.000000 1.000000 1.000000
+Kd 0.588000 0.588000 0.588000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Bump Sponza PRB Texture Set\\Vase_normal.tga
+map_Kd Sponza PRB Texture Set\\Vase_diffuse.tga

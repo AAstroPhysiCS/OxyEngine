@@ -6,7 +6,7 @@ import OxyEngine.PhysX.OxyPhysXGeometry.Box;
 import OxyEngine.PhysX.OxyPhysXGeometry.Sphere;
 import OxyEngine.PhysX.OxyPhysXGeometry.TriangleMesh;
 import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Panels.GUINode;
@@ -29,7 +29,8 @@ import physx.physics.PxShapeFlags;
 import physx.support.Vector_PxU32;
 import physx.support.Vector_PxVec3;
 
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
+
 
 public sealed abstract class OxyPhysXGeometry implements OxyDisposable
         permits Box, Sphere, TriangleMesh {
@@ -66,8 +67,7 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
             if (eReference == null) return;
             if (!eReference.has(OxyPhysXComponent.class)) return;
 
-            OxyMaterial oxyMaterial = OxyMaterialPool.getMaterial(eReference);
-            if (oxyMaterial == null) throw new IllegalStateException("Geometry has no OxyMaterial");
+            OxyMaterial oxyMaterial = OxyMaterialPool.getMaterial(eReference).orElseThrow(() -> new IllegalStateException("Geometry has no OxyMaterial"));
 
             Vector_PxVec3 pxVertices = new Vector_PxVec3();
             Vector_PxU32 pxIndices = new Vector_PxU32();
@@ -169,7 +169,7 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
             if (!eReference.has(OxyPhysXComponent.class)) return;
             if (!eReference.has(MeshPosition.class)) return;
 
-            OxyMaterial oxyMaterial = OxyMaterialPool.getMaterial(eReference);
+            OxyMaterial oxyMaterial = OxyMaterialPool.getMaterial(eReference).orElseThrow(() -> new IllegalStateException("Geometry has no OxyMaterial"));
             if (oxyMaterial == null) throw new IllegalStateException("Geometry has no OxyMaterial");
 
             try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -248,7 +248,7 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
             if (eReference == null) return;
             if (!eReference.has(OxyPhysXComponent.class)) return;
 
-            OxyMaterial oxyMaterial = OxyMaterialPool.getMaterial(eReference);
+            OxyMaterial oxyMaterial = OxyMaterialPool.getMaterial(eReference).orElseThrow(() -> new IllegalStateException("Geometry has no OxyMaterial"));
             if (oxyMaterial == null) return;
 
             try (MemoryStack stack = MemoryStack.stackPush()) {

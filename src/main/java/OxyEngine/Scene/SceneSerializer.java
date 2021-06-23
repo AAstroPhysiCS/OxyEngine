@@ -8,18 +8,13 @@ import OxyEngine.Core.Context.Renderer.Light.PointLight;
 import OxyEngine.Core.Context.Renderer.Light.SkyLight;
 import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngine.Scene.Objects.Model.OxyModel;
-import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngineEditor.UI.Gizmo.OxySelectHandler;
 import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static OxyEngine.System.OxySystem.parseStringToFloatArray;
 import static OxyEngine.System.OxySystem.parseStringToVector3f;
@@ -48,7 +43,10 @@ public final class SceneSerializer {
             INSTANCE.openWritingStream()
                     .file(f)
                     .createOxyJSONObject("Scene")
-                    .putField("Scene Name", scene.getSceneName().split("\\.")[0])
+                    .putField("Scene Name", scene.getSceneName())
+                    .putField("Scene Working Directory", scene.getWorkingDirectory())
+                    .putField("Scene Gamma Strength", String.valueOf(scene.gammaStrength))
+                    .putField("Scene Exposure", String.valueOf(scene.exposure))
                     .separate();
 
             OxyJSON.OxyJSONWriterBuilder builder = INSTANCE.openWritingStream();
@@ -111,38 +109,41 @@ public final class SceneSerializer {
         private static void addCommonFields(OxyJSON.OxyJSONObject obj, boolean emitting, OxyEntity e) {
 
             TransformComponent transform = e.get(TransformComponent.class);
-            Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
-            String albedoColor = "null";
-            String albedoTexture = "null";
-            String normalTexture = "null", normalTextureStrength = "0";
-            String roughnessTexture = "null", roughnessTextureStrength = "0";
-            String metallicTexture = "null", metalnessTextureStrength = "0";
-            String aoTexture = "null", aoTextureStrength = "0";
-            String emissiveTexture = "null", emissiveTextureStrength = "0";
-            String mesh = "null";
-            String materialName = "null";
+            var ref = new Object() {
+                String albedoColor = "null";
+                String albedoTexture = "null";
+                String normalTexture = "null", normalTextureStrength = "0";
+                String roughnessTexture = "null", roughnessTextureStrength = "0";
+                String metallicTexture = "null", metalnessTextureStrength = "0";
+                String aoTexture = "null", aoTextureStrength = "0";
+                String emissiveTexture = "null", emissiveTextureStrength = "0";
+                String mesh = "null";
+                String materialName = "null";
+            };
 
+            Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
             if (e.has(BoundingBoxComponent.class)) {
                 minBound = e.get(BoundingBoxComponent.class).min();
                 maxBound = e.get(BoundingBoxComponent.class).max();
             }
             if (e.has(OxyMaterialIndex.class)) {
-                OxyMaterial m = OxyMaterialPool.getMaterial(e);
-                materialName = m.name;
-                if (m.albedoColor != null) albedoColor = Arrays.toString(m.albedoColor.getNumbers());
-                if (m.albedoTexture != null) albedoTexture = m.albedoTexture.getPath();
-                if (m.normalTexture != null) normalTexture = m.normalTexture.getPath();
-                normalTextureStrength = String.valueOf(m.normalStrength[0]);
-                if (m.roughnessTexture != null) roughnessTexture = m.roughnessTexture.getPath();
-                roughnessTextureStrength = String.valueOf(m.roughness[0]);
-                if (m.metallicTexture != null) metallicTexture = m.metallicTexture.getPath();
-                metalnessTextureStrength = String.valueOf(m.metalness[0]);
-                if (m.aoTexture != null) aoTexture = m.aoTexture.getPath();
-                aoTextureStrength = String.valueOf(m.aoStrength[0]);
-                if (m.emissiveTexture != null) emissiveTexture = m.emissiveTexture.getPath();
-                emissiveTextureStrength = String.valueOf(m.emissiveStrength[0]);
+                OxyMaterialPool.getMaterial(e).ifPresent((m) -> {
+                    ref.materialName = m.name;
+                    if (m.albedoColor != null) ref.albedoColor = Arrays.toString(m.albedoColor.getNumbers());
+                    if (m.albedoTexture != null) ref.albedoTexture = m.albedoTexture.getPath();
+                    if (m.normalTexture != null) ref.normalTexture = m.normalTexture.getPath();
+                    ref.normalTextureStrength = String.valueOf(m.normalStrength[0]);
+                    if (m.roughnessTexture != null) ref.roughnessTexture = m.roughnessTexture.getPath();
+                    ref.roughnessTextureStrength = String.valueOf(m.roughness[0]);
+                    if (m.metallicTexture != null) ref.metallicTexture = m.metallicTexture.getPath();
+                    ref.metalnessTextureStrength = String.valueOf(m.metalness[0]);
+                    if (m.aoTexture != null) ref.aoTexture = m.aoTexture.getPath();
+                    ref.aoTextureStrength = String.valueOf(m.aoStrength[0]);
+                    if (m.emissiveTexture != null) ref.emissiveTexture = m.emissiveTexture.getPath();
+                    ref.emissiveTextureStrength = String.valueOf(m.emissiveStrength[0]);
+                });
             }
-            if (e.has(OpenGLMesh.class)) mesh = e.get(OpenGLMesh.class).getPath();
+            if (e.has(OpenGLMesh.class)) ref.mesh = e.get(OpenGLMesh.class).getPath();
             if (e.has(Light.class)) emitting = true;
 
             if (emitting) {
@@ -159,9 +160,8 @@ public final class SceneSerializer {
                     HDRTexture hdrTexture = s.getHDRTexture();
                     if (hdrTexture != null) obj.putField("Environment Map", s.getHDRTexture().getPath());
                     else obj.putField("Environment Map", "null");
-                    obj.putField("Environment Gamma Strength", String.valueOf(s.gammaStrength[0]));
+
                     obj.putField("Environment LOD", String.valueOf(s.mipLevelStrength[0]));
-                    obj.putField("Environment Exposure", String.valueOf(s.exposure[0]));
                     obj.putField("Environment Intensity", String.valueOf(s.intensity[0]));
                     obj.putField("Environment Primary", String.valueOf(s.isPrimary()));
                 }
@@ -174,20 +174,20 @@ public final class SceneSerializer {
                     .putField("Scale", transform.scale.toString())
                     .putField("Bounds Min", minBound.toString())
                     .putField("Bounds Max", maxBound.toString())
-                    .putField("Material Name", materialName)
-                    .putField("Color", albedoColor)
-                    .putField("Albedo Texture", albedoTexture)
-                    .putField("Normal Map Texture", normalTexture)
-                    .putField("Normal Map Strength", normalTextureStrength)
-                    .putField("Roughness Map Texture", roughnessTexture)
-                    .putField("Roughness Map Strength", roughnessTextureStrength)
-                    .putField("AO Map Texture", aoTexture)
-                    .putField("AO Map Strength", aoTextureStrength)
-                    .putField("Metallic Map Texture", metallicTexture)
-                    .putField("Metallic Map Strength", metalnessTextureStrength)
-                    .putField("Emissive Map Texture", emissiveTexture)
-                    .putField("Emissive Map Strength", emissiveTextureStrength)
-                    .putField("Mesh", mesh)
+                    .putField("Material Name", ref.materialName)
+                    .putField("Color", ref.albedoColor)
+                    .putField("Albedo Texture", ref.albedoTexture)
+                    .putField("Normal Map Texture", ref.normalTexture)
+                    .putField("Normal Map Strength", ref.normalTextureStrength)
+                    .putField("Roughness Map Texture", ref.roughnessTexture)
+                    .putField("Roughness Map Strength", ref.roughnessTextureStrength)
+                    .putField("AO Map Texture", ref.aoTexture)
+                    .putField("AO Map Strength", ref.aoTextureStrength)
+                    .putField("Metallic Map Texture", ref.metallicTexture)
+                    .putField("Metallic Map Strength", ref.metalnessTextureStrength)
+                    .putField("Emissive Map Texture", ref.emissiveTexture)
+                    .putField("Emissive Map Strength", ref.emissiveTextureStrength)
+                    .putField("Mesh", ref.mesh)
                     .createInnerObject("Script");
             for (var scripts : e.getScripts()) obj.putField("Path", scripts.getPath());
         }
@@ -207,17 +207,22 @@ public final class SceneSerializer {
                     .getOxyJSONObject("Scene", sceneJSON);
 
             String sceneName = sceneJSON.getField("Scene Name").value();
+            String sceneWorkingDir = sceneJSON.getField("Scene Working Directory").value();
 
             Scene oldScene = SceneRuntime.ACTIVE_SCENE;
             oldScene.disposeAllModels();
 
-            Scene scene = new Scene(sceneName);
+            Scene scene = new Scene(sceneName, sceneWorkingDir);
+            scene.gammaStrength = Float.parseFloat(sceneJSON.getField("Scene Gamma Strength").value());
+            scene.exposure = Float.parseFloat(sceneJSON.getField("Scene Exposure").value());
+
             for (var n : oldScene.getEntityEntrySet()) {
                 OxyEntity key = n.getKey();
                 scene.put(key);
                 scene.addComponent(key, n.getValue().toArray(EntityComponent[]::new));
             }
-            OxySelectHandler.entityContext = null;
+            SceneRuntime.entityContext = null;
+            SceneRuntime.currentBoundedSkyLight = null;
             SceneRenderer.getInstance().clear();
 
             Scene.optimization_Path = "";
@@ -267,8 +272,7 @@ public final class SceneSerializer {
                     OxyNativeObject skyLightEnt = scene.createSkyLight();
                     SkyLight skyLightComp = skyLightEnt.get(SkyLight.class);
                     if (!path.equals("null")) skyLightComp.loadHDR(path);
-                    skyLightComp.gammaStrength = new float[]{Float.parseFloat(lightAttributes.getField("Environment Gamma Strength").value())};
-                    skyLightComp.exposure = new float[]{Float.parseFloat(lightAttributes.getField("Environment Exposure").value())};
+
                     skyLightComp.mipLevelStrength = new float[]{Float.parseFloat(lightAttributes.getField("Environment LOD").value())};
                     skyLightComp.intensity = new float[]{Float.parseFloat(lightAttributes.getField("Environment Intensity").value())};
                     skyLightComp.setPrimary(Boolean.parseBoolean(lightAttributes.getField("Environment Primary").value()));
@@ -334,7 +338,7 @@ public final class SceneSerializer {
 
             TransformComponent t = new TransformComponent(position, rot, scale);
             modelInstance.importedFromFile = true;
-            modelInstance.addComponent(new UUIDComponent(UUID.fromString(id)), new MeshPosition(meshPos), new TagComponent(name), t,
+            modelInstance.addComponent(new MeshPosition(meshPos), new TagComponent(name), t,
                     new SelectedComponent(false), new BoundingBoxComponent(minB, maxB));
 
             var scripts = ent.getInnerObjectByName("Script");

@@ -2,7 +2,7 @@ package OxyEngine.Core.Context.Renderer.Buffer.Platform;
 
 import OxyEngine.Core.Context.Renderer.Buffer.IndexBuffer;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.Objects.Model.OxyNativeObject;
+import OxyEngine.Scene.OxyNativeObject;
 
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;

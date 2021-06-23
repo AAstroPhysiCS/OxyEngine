@@ -1,19 +1,19 @@
 package OxyEngineEditor;
 
-import OxyEngine.Core.Layers.Layer;
-import OxyEngine.Core.Layers.EditorLayer;
-import OxyEngine.Core.Layers.UILayer;
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Window.WindowHandle;
+import OxyEngine.Core.Layers.EditorLayer;
+import OxyEngine.Core.Layers.Layer;
+import OxyEngine.Core.Layers.UILayer;
+import OxyEngine.Core.Window.Input;
+import OxyEngine.Core.Window.KeyCode;
+import OxyEngine.Core.Window.OxyEvent;
+import OxyEngine.Core.Window.OxyWindow;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
-import org.lwjgl.glfw.GLFW;
 
-import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
@@ -23,18 +23,19 @@ import static org.lwjgl.opengl.GL11.glGetError;
 public class EditorApplication extends OxyApplication {
 
     public EditorApplication() {
-        windowHandle = new WindowHandle("OxyEngine - Editor", 1366, 768, WindowHandle.WindowMode.WINDOWEDFULLSCREEN);
-        oxyEngine = new OxyEngine(this::run, windowHandle, OxyEngine.Antialiasing.ON, false, true, TargetPlatform.OpenGL);
+    }
+
+    @Override
+    public void start() {
+        oxyWindow = new OxyWindow("OxyEngine - Editor", 1366, 768, OxyWindow.WindowMode.WINDOWEDFULLSCREEN);
+        oxyEngine = new OxyEngine(this::run, oxyWindow, OxyEngine.Antialiasing.ON, false, true, TargetPlatform.OpenGL);
         oxyEngine.start();
     }
 
     @Override
-    public void init() {
+    protected void init() {
+
         oxyEngine.init();
-
-        scene = new Scene("Test Scene 1");
-
-        SceneRuntime.ACTIVE_SCENE = scene;
 
         EditorLayer editorLayer = EditorLayer.getInstance();
         UILayer uiLayer = UILayer.getInstance();
@@ -45,8 +46,9 @@ public class EditorApplication extends OxyApplication {
         uiLayer.addPanel(ScenePanel.getInstance());
         uiLayer.addPanel(SceneRuntime.getPanel());
         uiLayer.addPanel(SceneHierarchyPanel.getInstance());
-        uiLayer.addPanel(PropertiesPanel.getInstance());
         uiLayer.addPanel(AnimationPanel.getInstance());
+        uiLayer.addPanel(SettingsPanel.getInstance());
+        uiLayer.addPanel(PropertiesPanel.getInstance());
 //        uiLayer.addPanel(ShadowRenderer.DebugPanel.getInstance());
 
         layerStack.pushLayer(uiLayer, editorLayer);
@@ -55,13 +57,18 @@ public class EditorApplication extends OxyApplication {
     }
 
     @Override
-    public void update(float ts) {
+    protected void update(float ts) {
+        for(OxyEvent event : OxyWindow.getEventPool()) {
+            for (Layer l : layerStack.getLayerStack())
+                l.onEvent(event);
+        }
+
         for (Layer l : layerStack.getLayerStack())
             l.update(ts);
     }
 
     @Override
-    public void render() {
+    protected void render() {
         OxyRenderer.clearBuffer(); //clearing the buffer for the default framebuffer
 
         for (Layer l : layerStack.getLayerStack())
@@ -80,8 +87,8 @@ public class EditorApplication extends OxyApplication {
             long timeMillis = System.currentTimeMillis();
             double frames = 0;
 
-            while (Thread.currentThread().isAlive() && !glfwWindowShouldClose(windowHandle.getPointer())) {
-                if (keyEventDispatcher.getKeys()[GLFW.GLFW_KEY_ESCAPE]) break;
+            while (Thread.currentThread().isAlive() && !glfwWindowShouldClose(oxyWindow.getPointer())) {
+                if (Input.isKeyPressed(KeyCode.GLFW_KEY_ESCAPE)) break;
 
                 final float currentTime = (float) glfwGetTime();
                 final float ts = (float) (currentTime - time);
@@ -110,6 +117,5 @@ public class EditorApplication extends OxyApplication {
         oxyEngine.dispose();
         UILayer.uiSystem.dispose();
         SceneRuntime.dispose();
-        scene.dispose();
     }
 }

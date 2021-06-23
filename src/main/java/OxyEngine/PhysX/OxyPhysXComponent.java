@@ -6,21 +6,23 @@ import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 import org.joml.Vector3f;
 
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
+
 
 public final class OxyPhysXComponent implements EntityComponent, OxyDisposable {
 
     private OxyPhysXActor actor;
     private OxyPhysXGeometry geometry;
 
-    public OxyPhysXComponent(){
+    public OxyPhysXComponent() {
     }
 
-    public OxyPhysXComponent(OxyPhysXComponent other, OxyEntity newEntity){
-        if(other.actor == null || other.geometry == null) throw new IllegalStateException("Actor and/or geometry null");
-        if(other.geometry instanceof OxyPhysXGeometry.Box b)
+    public OxyPhysXComponent(OxyPhysXComponent other, OxyEntity newEntity) {
+        if (other.actor == null || other.geometry == null)
+            throw new IllegalStateException("Actor and/or geometry null");
+        if (other.geometry instanceof OxyPhysXGeometry.Box b)
             this.geometry = new OxyPhysXGeometry.Box(new Vector3f(b.getPxHalfScalar()), newEntity);
-        else if(other.geometry instanceof OxyPhysXGeometry.Sphere s)
+        else if (other.geometry instanceof OxyPhysXGeometry.Sphere s)
             this.geometry = new OxyPhysXGeometry.Sphere(s.getRadius(), newEntity);
         else throw new IllegalStateException("No copy implementation for the given geometry");
         this.actor = new OxyPhysXActor(other.actor.getPhysXRigidBodyMode(), newEntity);
@@ -36,11 +38,11 @@ public final class OxyPhysXComponent implements EntityComponent, OxyDisposable {
         this.geometry = geometry;
     }
 
-    public void setRigidBodyAs(OxyPhysXActor rigidBody){
+    public void setRigidBodyAs(OxyPhysXActor rigidBody) {
         this.actor = rigidBody;
     }
 
-    public OxyPhysXActor getActor(){
+    public OxyPhysXActor getActor() {
         return actor;
     }
 

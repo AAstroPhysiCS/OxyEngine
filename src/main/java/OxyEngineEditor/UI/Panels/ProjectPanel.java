@@ -1,7 +1,8 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
-import OxyEngine.System.OxyFontSystem;
+import OxyEngine.Core.Window.Input;
+import OxyEngine.Core.Window.MouseCode;
 import OxyEngine.System.OxyLogger;
 import OxyEngineEditor.UI.AssetManager;
 import imgui.ImGui;
@@ -16,9 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static OxyEngine.System.OxyEventSystem.mouseButtonDispatcher;
 import static OxyEngine.System.OxySystem.*;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 
 public class ProjectPanel extends Panel {
 
@@ -138,7 +137,7 @@ public class ProjectPanel extends Panel {
     }
 
     private void renderConsole() {
-        ImGui.pushFont(OxyFontSystem.getAllFonts().get(1));
+        ImGui.pushFont(Font.allFonts.get(1));
         String[] splitted = OxyLogger.getHistory().toString().split("\n");
         for (String s : splitted) {
             float[] colors = new float[]{1.0f, 1.0f, 1.0f, 1.0f};
@@ -184,7 +183,7 @@ public class ProjectPanel extends Panel {
                 ImGui.setCursorPosX(ImGui.getCursorPosX() - offsetX);
 
                 if (ImGui.treeNodeEx(name)) {
-                    if (ImGui.isItemHovered(ImGuiMouseButton.Left) && mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_1]) {
+                    if (ImGui.isItemHovered(ImGuiMouseButton.Left) && Input.isMouseButtonPressed(MouseCode.GLFW_MOUSE_BUTTON_1)) {
                         currentFile = f;
                         currentPathImString.set(currentFile.getPath());
                         searchImString.set("");
@@ -194,7 +193,7 @@ public class ProjectPanel extends Panel {
                     ImGui.setCursorPosY(ImGui.getCursorPosY() - 4); //because dummy takes a lill extra space
                     ImGui.treePop();
                 }
-                if (ImGui.isItemHovered(ImGuiMouseButton.Left) && mouseButtonDispatcher.getButtons()[GLFW_MOUSE_BUTTON_1]) {
+                if (ImGui.isItemHovered(ImGuiMouseButton.Left) && Input.isMouseButtonPressed(MouseCode.GLFW_MOUSE_BUTTON_1)) {
                     currentFile = f;
                     currentPathImString.set(currentFile.getPath());
                     searchImString.set("");

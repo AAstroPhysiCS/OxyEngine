@@ -4,7 +4,6 @@ import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.*;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -13,12 +12,10 @@ import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 import org.joml.Vector4f;
 
-import java.util.Objects;
-
+import static OxyEngine.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Scene.SceneRuntime.materialContext;
 import static OxyEngine.System.OxySystem.parseStringToVector4f;
 import static OxyEngineEditor.UI.AssetManager.DEFAULT_TEXTURE_PARAMETER;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.materialContext;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public class OxyMaterial implements OxyDisposable {
@@ -187,17 +184,14 @@ public class OxyMaterial implements OxyDisposable {
                     boolean isSelected = (currentShaderItem.equals(s));
                     if (ImGui.selectable(s, isSelected)) {
                         currentShaderItem = s;
-                        Objects.requireNonNull(OxyMaterialPool.getMaterial(entityContext)).shader = ShaderLibrary.get(currentShaderItem);
+                        OxyMaterialPool.getMaterial(entityContext).ifPresent((material) -> material.shader = ShaderLibrary.get(currentShaderItem));
                     }
                 }
                 ImGui.endCombo();
             }
             ImGui.popItemWidth();
 
-            assert entityContext != null;
-            OxyMaterial m = OxyMaterialPool.getMaterial(entityContext);
-
-            if (m != null) {
+            OxyMaterialPool.getMaterial(entityContext).ifPresent((m) -> {
                 final int imageButtonWidth = 85;
                 ImGui.columns(2);
                 ImGui.setColumnWidth(0, imageButtonWidth + 15);
@@ -206,7 +200,6 @@ public class OxyMaterial implements OxyDisposable {
                     entityContext = null;
                     materialContext = m;
                     //terminate
-                    ImGui.treePop();
                     return;
                 }
                 ImGui.nextColumn();
@@ -232,12 +225,12 @@ public class OxyMaterial implements OxyDisposable {
                     ImGui.endCombo();
                 }
                 ImGui.popItemWidth();
-            }
+            });
+
             ImGui.columns(1);
             ImGui.treePop();
             ImGui.spacing();
             ImGui.separator();
-
         }
     };
 

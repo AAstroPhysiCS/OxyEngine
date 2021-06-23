@@ -4,7 +4,7 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -12,7 +12,9 @@ import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Matrix3f;
 import org.joml.Vector3f;
 
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import java.util.Optional;
+
+import static OxyEngine.Scene.SceneRuntime.entityContext;
 
 public class DirectionalLight extends Light {
 
@@ -28,19 +30,21 @@ public class DirectionalLight extends Light {
 
     @Override
     public void update(OxyEntity e, int i) {
-        OxyMaterial material = OxyMaterialPool.getMaterial(e);
-        TransformComponent t = e.get(TransformComponent.class);
+        Optional<OxyMaterial> materialOpt = OxyMaterialPool.getMaterial(e);
+        materialOpt.ifPresent(material -> {
+            TransformComponent t = e.get(TransformComponent.class);
 
-        Matrix3f transform3x3 = new Matrix3f();
-        t.transform.normalize3x3(transform3x3);
-        dir = new Vector3f(transform3x3.transform(new Vector3f(1.0f))).negate();
+            Matrix3f transform3x3 = new Matrix3f();
+            t.transform.normalize3x3(transform3x3);
+            dir = new Vector3f(transform3x3.transform(new Vector3f(1.0f))).negate();
 
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
-        pbrShader.begin();
-        pbrShader.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
-        pbrShader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
-        pbrShader.setUniform1i("d_Light[" + i + "].activeState", 1);
-        pbrShader.end();
+            OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
+            pbrShader.begin();
+            pbrShader.setUniformVec3("d_Light[" + i + "].direction", dir.x, dir.y, dir.z);
+            pbrShader.setUniformVec3("d_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
+            pbrShader.setUniform1i("d_Light[" + i + "].activeState", 1);
+            pbrShader.end();
+        });
     }
 
     public Vector3f getDirection() {

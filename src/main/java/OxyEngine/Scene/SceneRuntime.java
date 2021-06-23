@@ -3,8 +3,6 @@ package OxyEngine.Scene;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.PhysX.OxyPhysX;
-import OxyEngine.Scene.Objects.Model.OxyModel;
-import OxyEngine.Scene.Objects.Model.OxyNativeObject;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scripting.ScriptEngine;
 import OxyEngineEditor.EntryPoint;
@@ -19,6 +17,9 @@ public final class SceneRuntime {
 
     public static OxyCamera currentBoundedCamera;
     public static OxyNativeObject currentBoundedSkyLight;
+
+    public static OxyEntity entityContext;
+    public static OxyMaterial materialContext;
     public static Scene ACTIVE_SCENE;
 
     public static float FPS = 0;
@@ -72,7 +73,7 @@ public final class SceneRuntime {
     }
 
     public static void stop() {
-        ACTIVE_SCENE.STATE = SceneState.STOPPED;
+        ACTIVE_SCENE.STATE = SceneState.IDLE;
         ScriptEngine.stop();
         System.gc();
         loadSceneState();

@@ -3,15 +3,15 @@ package OxyEngine.Core.Context.Renderer.Light;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
-import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
+import OxyEngine.Scene.OxyMaterialPool;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Vector3f;
 
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
+
 
 public class PointLight extends Light {
 
@@ -35,15 +35,16 @@ public class PointLight extends Light {
     @Override
     public void update(OxyEntity e, int i) {
         OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
-        OxyMaterial material = OxyMaterialPool.getMaterial(e);
-        pbrShader.begin();
-        pbrShader.setUniformVec3("p_Light[" + i + "].position", e.get(TransformComponent.class).worldSpacePosition);
-        pbrShader.setUniformVec3("p_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
-        pbrShader.setUniform1f("p_Light[" + i + "].constant", constant);
-        pbrShader.setUniform1f("p_Light[" + i + "].linear", linear);
-        pbrShader.setUniform1f("p_Light[" + i + "].quadratic", quadratic);
-        pbrShader.setUniform1i("p_Light[" + i + "].activeState", 1);
-        pbrShader.end();
+        OxyMaterialPool.getMaterial(e).ifPresent((material) -> {
+            pbrShader.begin();
+            pbrShader.setUniformVec3("p_Light[" + i + "].position", e.get(TransformComponent.class).worldSpacePosition);
+            pbrShader.setUniformVec3("p_Light[" + i + "].diffuse", new Vector3f(material.albedoColor.getNumbers()).mul(colorIntensity));
+            pbrShader.setUniform1f("p_Light[" + i + "].constant", constant);
+            pbrShader.setUniform1f("p_Light[" + i + "].linear", linear);
+            pbrShader.setUniform1f("p_Light[" + i + "].quadratic", quadratic);
+            pbrShader.setUniform1i("p_Light[" + i + "].activeState", 1);
+            pbrShader.end();
+        });
     }
 
     public float getConstantValue() {

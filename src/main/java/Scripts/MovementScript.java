@@ -1,13 +1,12 @@
 package Scripts;
 
 import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Window.Input;
+import OxyEngine.Core.Window.KeyCode;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scripting.ScriptableEntity;
 import org.joml.Vector3f;
-
-import static OxyEngine.System.OxyEventSystem.keyEventDispatcher;
-import static org.lwjgl.glfw.GLFW.*;
 
 public class MovementScript extends ScriptableEntity {
 
@@ -32,26 +31,26 @@ public class MovementScript extends ScriptableEntity {
 
         float angle90 = (float) (-rotationRef.y + (Math.PI / 2));
         float angle = -rotationRef.y;
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_W]) {
+        if (Input.isKeyPressed(KeyCode.GLFW_KEY_W)) {
             positionRef.x += Math.cos(angle90) * SpeedHorizontal * ts;
             positionRef.z += Math.sin(angle90) * SpeedHorizontal * ts;
         }
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_S]) {
+        if (Input.isKeyPressed(KeyCode.GLFW_KEY_S)) {
             positionRef.x -= Math.cos(angle90) * SpeedHorizontal * ts;
             positionRef.z -= Math.sin(angle90) * SpeedHorizontal * ts;
         }
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_D]) {
+        if (Input.isKeyPressed(KeyCode.GLFW_KEY_D)) {
             positionRef.x -= Math.cos(angle) * SpeedHorizontal * ts;
             positionRef.z -= Math.sin(angle) * SpeedHorizontal * ts;
         }
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_A]) {
+        if (Input.isKeyPressed(KeyCode.GLFW_KEY_A)) {
             positionRef.x += Math.cos(angle) * SpeedHorizontal * ts;
             positionRef.z += Math.sin(angle) * SpeedHorizontal * ts;
         }
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_SPACE]) {
+        if (Input.isKeyPressed(KeyCode.GLFW_KEY_SPACE)) {
             positionRef.y -= SpeedVertical * ts;
         }
-        if (keyEventDispatcher.getKeys()[GLFW_KEY_LEFT_SHIFT]) {
+        if (Input.isKeyPressed(KeyCode.GLFW_KEY_LEFT_SHIFT)) {
             positionRef.y += SpeedVertical * ts;
         }
     }

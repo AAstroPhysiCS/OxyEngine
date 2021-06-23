@@ -23,10 +23,10 @@ public abstract class PerspectiveCamera extends OxyCamera {
         this.aspect = aspect;
         this.zNear = zNear;
         this.zFar = zFar;
+        viewMatrixNoTranslation = new Matrix4f();
     }
 
-    public void setViewMatrixNoTranslation() {
-        viewMatrixNoTranslation = new Matrix4f();
+    public void calcViewMatrixNoTranslation() {
         viewMatrixNoTranslation.set(getProjectionMatrix());
         viewMatrixNoTranslation.rotateX(-this.getRotation().x);
         viewMatrixNoTranslation.rotateY(-this.getRotation().y);

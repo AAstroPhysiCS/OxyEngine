@@ -1,6 +1,6 @@
 package OxyEngine.Core.Context;
 
-import OxyEngine.Core.Window.WindowHandle;
+import OxyEngine.Core.Window.OxyWindow;
 
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -25,7 +25,7 @@ public class OpenGLContext extends RendererContext {
     }
 
     @Override
-    public void swapBuffer(WindowHandle handle) {
+    public void swapBuffer(OxyWindow handle) {
         glfwSwapBuffers(handle.getPointer());
     }
 

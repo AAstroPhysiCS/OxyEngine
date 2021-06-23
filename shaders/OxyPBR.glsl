@@ -195,9 +195,10 @@ float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
 }
 
 vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
-    const float MAX_REFLECTION_LOD = 8.0;
+    const float MAX_REFLECTION_LOD = 4.0;
     vec3 albedo, emissive;
     float metallicMap, roughnessMap, aoMap;
+    float alpha = 1.0f;
 
     if(metallicSlot == 0){
        metallicMap = metallicStrength;
@@ -220,16 +221,13 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
     if(albedoMapSlot == 0){
        albedo = pow(vec3(material.diffuse), vec3(gamma));
     } else {
-       vec4 texture = texture(tex[albedoMapSlot], texCoordsOut).rgba;
-       if(texture.a < 0.5f) discard;
-       albedo = pow(texture.rgb, vec3(gamma));
+       albedo = pow(texture(tex[albedoMapSlot], texCoordsOut).rgb, vec3(gamma));
+       alpha = texture(tex[albedoMapSlot], texCoordsOut).w;
     }
+    if(alpha < 0.1f) discard;
 
     if(emissiveSlot != 0)
         emissive = texture(tex[emissiveSlot], inVar.texCoordsOut).rgb * emissiveStrength;
-
-    vec3 IBL = texture(iblMap, norm).rgb;
-    if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL = vec3(0.05f, 0.05f, 0.05f);
 
     vec3 Lo = vec3(0f);
     vec3 F0 = vec3(0.04);
@@ -275,29 +273,30 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoordsOut, vec3 viewDir, vec3 norm){
         Lo += calcPBR(lightDir, p_Light[i].diffuse, norm, viewDir, vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);
     }
 
-    vec3 F = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
+    vec3 IBL = texture(iblMap, norm).rgb;
+    if(IBL.rgb == vec3(0.0f, 0.0f, 0.0f)) IBL = vec3(0.05f, 0.05f, 0.05f);
 
-    vec3 kS = F;
+    vec3 kS = fresnelSchlickRoughness(max(dot(norm, viewDir), 0.0), F0, roughnessMap);
     vec3 kD = 1.0 - kS;
     kD *= 1.0 - metallicMap;
 
-    vec3 diffuseMap = IBL * albedo;
+    vec3 diffuseMap = albedo * IBL;
 
     vec3 R = reflect(-viewDir, norm);
     vec3 prefilteredColor = textureLod(prefilterMap, R, roughnessMap * MAX_REFLECTION_LOD).rgb;
     vec2 envBRDF = texture(brdfLUT, vec2(max(dot(norm, viewDir), 0.0), roughnessMap)).rg;
-    vec3 specular = prefilteredColor * (F * envBRDF.x + envBRDF.y);
+    vec3 specular = prefilteredColor * (kS * envBRDF.x + envBRDF.y);
     vec3 ambient = (kD * diffuseMap + specular) * aoMap * hdrIntensity;
 
     vec3 result = ambient + Lo + emissive;
-    result = result / (result + vec3(1.0));
+    //result = result / (result + vec3(1.0));
     result = vec3(1.0) - exp(-result * exposure);
     result = pow(result, vec3(1f / gamma));
 
     if(bool(cascadeIndicatorToggle))
         result += cascadeIndicator.xyz;
 
-    return vec4(result, 1.0f);
+    return vec4(result, alpha);
 }
 
 void main(){
@@ -367,8 +366,6 @@ void main(){
     ivec4 boneIDInt = ivec4(boneIds);
     vec4 totalPos = vec4(pos, 1.0f);
     vec4 totalNorm = vec4(normals, 1.0f);
-    vec4 finalTangent = vec4(tangent, 1.0f);
-    vec4 finalBiTangent = vec4(biTangent, 1.0f);
 
     if(bool(animatedModel)){
         //mesh has animations
@@ -379,8 +376,6 @@ void main(){
 
         totalPos = transform * vec4(pos, 1.0f);
         totalNorm = transform * vec4(normals, 0.0f);
-        finalTangent = transform * vec4(tangent, 0.0f);
-        finalBiTangent = transform * vec4(biTangent, 0.0f);
     }
 
     outVar.vertexPos = (model * totalPos).xyz;
@@ -390,8 +385,8 @@ void main(){
         outVar.lightSpacePos[i] = lightSpaceMatrix[i] * model * vec4(pos, 1.0f);
     }
 
-    vec3 T = normalize(mat3(model) * finalTangent.xyz);
-    vec3 B = normalize(mat3(model) * finalBiTangent.xyz);
+    vec3 T = normalize(mat3(model) * tangent);
+    vec3 B = normalize(mat3(model) * biTangent);
     vec3 N = normalize(mat3(model) * totalNorm.xyz);
 
     mat3 TBN = mat3(T, B, N);

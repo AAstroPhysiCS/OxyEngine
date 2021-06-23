@@ -17,7 +17,8 @@ import physx.common.PxVec3;
 import physx.physics.PxRigidActor;
 
 import static OxyEngine.PhysX.OxyPhysX.matrix4fToPxTransform;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
+
 
 public final class OxyPhysXActor implements OxyDisposable {
 

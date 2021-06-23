@@ -2,6 +2,7 @@ package OxyEngine.Scene;
 
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Components.EntityFamily;
+import OxyEngine.Components.UUIDComponent;
 
 import java.util.*;
 
@@ -103,6 +104,13 @@ public class Registry {
         EntityFamily rootFamilyComponent = familyComponent.root();
         for (OxyEntity eList : entityList.keySet()) {
             if (eList.getFamily() == rootFamilyComponent) return eList;
+        }
+        return null;
+    }
+
+    public OxyEntity getEntityByUUID(UUIDComponent uuidComponent) {
+        for(OxyEntity e : entityList.keySet()){
+            if(e.get(UUIDComponent.class).id().equals(uuidComponent.id())) return e;
         }
         return null;
     }

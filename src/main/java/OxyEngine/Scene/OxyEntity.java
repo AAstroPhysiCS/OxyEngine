@@ -9,8 +9,6 @@ import OxyEngine.Core.Context.Renderer.ShadowRenderer;
 import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
 import OxyEngine.Core.Context.Renderer.Texture.TextureSlot;
 import OxyEngine.PhysX.OxyPhysXComponent;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngine.Scene.Objects.Model.OxyModel;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.UI.Panels.GUINode;
 import org.joml.Matrix4f;
@@ -38,13 +36,13 @@ public abstract class OxyEntity {
     protected final Scene scene;
 
     protected boolean importedFromFile;
-    protected int objectID; //for selection
+    protected int objectID = -10; //for selection
 
-    public OxyEntity(Scene scene) {
+    OxyEntity(Scene scene) {
         this.scene = scene;
     }
 
-    public OxyEntity(OxyModel other) {
+    OxyEntity(OxyModel other) {
         this(other.scene);
         this.tangents = other.tangents.clone();
         this.biTangents = other.biTangents.clone();
@@ -235,7 +233,8 @@ public abstract class OxyEntity {
 
     public void update() {
         OxyMaterial material = null;
-        if (has(OxyMaterialIndex.class)) material = OxyMaterialPool.getMaterial(this);
+        if (has(OxyMaterialIndex.class)) //noinspection OptionalGetWithoutIsPresent
+            material = OxyMaterialPool.getMaterial(this).get();
 
         if (material == null)
             throw new IllegalStateException("Material is null. Entities that does not have any material should not be allowed to render!");
@@ -262,16 +261,14 @@ public abstract class OxyEntity {
         int iblSlot = TextureSlot.UNUSED.getValue(), prefilterSlot = TextureSlot.UNUSED.getValue(), brdfLUTSlot = TextureSlot.UNUSED.getValue();
 
         shader.setUniform1f("hdrIntensity", 1.0f);
-        shader.setUniform1f("gamma", 2.2f);
-        shader.setUniform1f("exposure", 1.0f);
+        shader.setUniform1f("gamma", ACTIVE_SCENE.gammaStrength);
+        shader.setUniform1f("exposure", ACTIVE_SCENE.exposure);
 
         if (currentBoundedSkyLight != null) {
             SkyLight skyLightComp = currentBoundedSkyLight.get(SkyLight.class);
             HDRTexture hdrTexture = null;
             if (skyLightComp != null) {
                 shader.setUniform1f("hdrIntensity", skyLightComp.intensity[0]);
-                shader.setUniform1f("gamma", skyLightComp.gammaStrength[0]);
-                shader.setUniform1f("exposure", skyLightComp.exposure[0]);
                 hdrTexture = skyLightComp.getHDRTexture();
             }
             if (hdrTexture != null) {

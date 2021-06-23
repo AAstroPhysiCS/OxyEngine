@@ -21,13 +21,14 @@ import OxyEngine.PhysX.OxyPhysXActor;
 import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.PhysX.OxyPhysXGeometry;
 import OxyEngine.PhysX.PhysXRigidBodyMode;
-import OxyEngine.Scene.Objects.Model.OxyMaterialPool;
-import OxyEngine.Scene.Objects.Model.OxyNativeObject;
+import OxyEngine.Scene.OxyMaterialPool;
+import OxyEngine.Scene.OxyNativeObject;
 import OxyEngine.Scene.OxyMaterial;
 import OxyEngine.Scene.SceneRenderer;
 import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.Scene.SceneState;
 import OxyEngine.Scripting.OxyScript;
-import OxyEngine.System.OxyFontSystem;
+import OxyEngine.System.OxySystem;
 import imgui.ImFont;
 import imgui.ImGui;
 import imgui.flag.*;
@@ -38,13 +39,11 @@ import java.io.File;
 import java.util.List;
 
 import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.*;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedTextureFile;
 import static OxyEngineEditor.UI.AssetManager.DEFAULT_TEXTURE_PARAMETER;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.materialContext;
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 import static OxyEngineEditor.UI.Panels.SceneHierarchyPanel.materialPinkSphere;
 
@@ -80,7 +79,7 @@ public class PropertiesPanel extends Panel {
         ImGui.pushID(label);
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 4);
 
-        ImFont font = OxyFontSystem.getAllFonts().get(0);
+        ImFont font = OxySystem.Font.allFonts.get(0);
         float lineHeight = font.getFontSize() + ImGui.getStyle().getFramePaddingY() * 2.0f;
         float buttonWidth = lineHeight + 3.0f;
 
@@ -257,6 +256,7 @@ public class PropertiesPanel extends Panel {
                     if (ImGui.menuItem("Basic Script")) {
                         SceneRuntime.stop();
                         entityContext.addScript(new OxyScript(null));
+                        ACTIVE_SCENE.STATE = SceneState.IDLE;
                     }
                     ImGui.endMenu();
                 }
@@ -372,7 +372,7 @@ public class PropertiesPanel extends Panel {
                 guiNode.runEntry();
             ImGui.popStyleColor();
 
-        } else if (materialContext != null) {
+        } else {
 
             /*
              * NOTE: SINCE ALL THE SUB NODES NEED SEPARATE VALUES AND FIELDS, WE CANT SUM UP THESE NODES

@@ -104,6 +104,14 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         vao = 0;
     }
 
+    public static final class SubMesh {
+
+        public SubMesh(){
+
+        }
+
+    }
+
     public void setRenderingMode(MeshRenderMode mode) {
         this.mode = mode;
     }

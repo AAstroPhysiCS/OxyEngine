@@ -17,9 +17,9 @@ import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Window.OxyEvent;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.SceneRenderer;
-import OxyEngine.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.Panel;
 import imgui.ImGui;
 import org.joml.Matrix4f;
@@ -72,10 +72,10 @@ public class ShadowRenderer {
                 OpenGLFrameBuffer.createNewSpec(FrameBufferSpecification.class)
                         .setAttachmentIndex(0)
                         .setTextureCount(NUMBER_CASCADES)
-                            .setSizeForTextures(0, 2048, 2048)
-                            .setSizeForTextures(1, 2048, 2048)
-                            .setSizeForTextures(2, 1024, 1024)
-                            .setSizeForTextures(3, 512, 512)
+                        .setSizeForTextures(0, 2048, 2048)
+                        .setSizeForTextures(1, 2048, 2048)
+                        .setSizeForTextures(2, 1024, 1024)
+                        .setSizeForTextures(3, 512, 512)
                         .setFormat(TextureFormat.DEPTHCOMPONENT32COMPONENT)
                         .setFilter(GL_NEAREST, GL_NEAREST)
                         .wrapSTR(GL_REPEAT, GL_REPEAT, -1)
@@ -123,17 +123,17 @@ public class ShadowRenderer {
                 if (currentBoundedCamera.origin.distance(e.get(TransformComponent.class).position) - 20f < cascadeSplit[i]) {
                     cam = cascadedCamArr[i];
                     camIndex = i;
-                    cam.finalizeCamera(SceneRuntime.TS);
+                    cam.update();
 
                     /*
                      * so in order to properly render shadows, we have to render the next split too,
                      * because then it would be a horrible thing for a scene like sponza (model that is very big in size)
                      */
                     if (i != NUMBER_CASCADES - 1) {
-                        cascadedCamArr[i + 1].finalizeCamera(SceneRuntime.TS);
+                        cascadedCamArr[i + 1].update();
                     }
                     if (i != 0) {
-                        cascadedCamArr[i - 1].finalizeCamera(SceneRuntime.TS);
+                        cascadedCamArr[i - 1].update();
                     }
                     break;
                 }
@@ -241,7 +241,9 @@ public class ShadowRenderer {
 
         public ShadowMapCamera(float left, float right, float bottom, float top, float zNear, float zFar, boolean transpose) {
             super(left, right, bottom, top, zNear, zFar, transpose);
-
+            viewMatrix = new Matrix4f();
+            modelMatrix = new Matrix4f();
+            projectionMatrix = new Matrix4f();
         }
 
         void setDirectionalLight(DirectionalLight directionalLight) {
@@ -313,15 +315,12 @@ public class ShadowRenderer {
             camera.setProjectionMatrix();
         }
 
-        @Override
-        public Matrix4f setProjectionMatrix() {
-            projectionMatrix = new Matrix4f();
+        private void setProjectionMatrix() {
+            projectionMatrix.identity();
             projectionMatrix.setOrtho(left, right, bottom, top, zNear, zFar);
-            return projectionMatrix;
         }
 
-        @Override
-        public Matrix4f setModelMatrix() {
+        private void setModelMatrix() {
             Vector3f lightDirection = new Vector3f(directionalLight.getDirection());
             Vector3f lightPosInc = new Vector3f().set(lightDirection);
             float distance = maxZ - minZ;
@@ -333,21 +332,21 @@ public class ShadowRenderer {
             float lightAngleX = (float) Math.acos(lightDirection.z);
             float lightAngleY = (float) Math.asin(lightDirection.x);
 
-            modelMatrix = new Matrix4f()
+            modelMatrix.identity()
                     .rotateX(lightAngleX)
                     .rotateY(lightAngleY)
                     .translate(-lightPosition.x, -lightPosition.y, -lightPosition.z);
-
-            return modelMatrix;
         }
 
         @Override
-        public void finalizeCamera(float ts) {
-            projectionMatrix = setProjectionMatrix();
-            modelMatrix = setModelMatrix();
-
-            viewMatrix = new Matrix4f(projectionMatrix);
+        public void update() {
+            viewMatrix.set(projectionMatrix);
             viewMatrix.mul(modelMatrix);
+        }
+
+        @Override
+        public void onEvent(OxyEvent event) {
+            //does nothing
         }
     }
 
@@ -369,8 +368,8 @@ public class ShadowRenderer {
         return cascadedCamArr[0].directionalLight.isCastingShadows();
     }
 
-    public static OpenGLFrameBuffer getFrameBuffer() {
-        return shadowFrameBuffer;
+    public static void resetFlush(){
+        shadowFrameBuffer.resetFlush();
     }
 
     public static float getCascadeSplits(int index) {

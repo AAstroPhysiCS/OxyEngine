@@ -3,7 +3,7 @@ package OxyEngine.Core.Context.Renderer.Buffer.Platform;
 import OxyEngine.Core.Context.Renderer.Buffer.VertexBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.Objects.Model.OxyNativeObject;
+import OxyEngine.Scene.OxyNativeObject;
 
 import static OxyEngine.Utils.copy;
 import static org.lwjgl.opengl.GL20.*;

@@ -1,14 +1,10 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Scene.SceneSerializer;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiStyleVar;
 
-import static OxyEngine.System.OxySystem.FileSystem.saveDialog;
 import static OxyEngine.Scene.Scene.*;
-import static OxyEngine.Scene.SceneSerializer.extensionName;
-import static OxyEngine.Scene.SceneSerializer.fileExtension;
 
 public class ToolbarPanel extends Panel {
 
@@ -33,10 +29,7 @@ public class ToolbarPanel extends Panel {
                 if (ImGui.menuItem("New Scene")) newScene();
                 if (ImGui.menuItem("Open a scene", "Ctrl+O")) openScene();
                 if (ImGui.menuItem("Save the scene", "Ctrl+S")) saveScene();
-                if (ImGui.menuItem("Save As...")) {
-                    String saveAs = saveDialog(extensionName, null);
-                    if (saveAs != null) SceneSerializer.serializeScene(saveAs + fileExtension);
-                }
+                if (ImGui.menuItem("Save As...")) saveAs();
                 ImGui.endMenu();
             }
             ImGui.spacing();

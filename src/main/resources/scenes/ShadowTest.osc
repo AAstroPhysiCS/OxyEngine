@@ -1,0 +1,187 @@
+Registry [
+	RootNode: {
+		ID: 94e769b2-f200-4969-8d09-5ea20aa20f38
+		Mesh Position: 0
+		Name: RootNode
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0 -1.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Script: {
+		}
+		Plane.001: {
+			ID: 3534bf2b-0b6f-4f00-b71f-fd180087692b
+			Mesh Position: 0
+			Name: Plane.001
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  0.000E+0  0.000E+0)
+			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
+			Scale: ( 2.365E+1  2.365E+1  2.365E+1)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: DefaultMaterial
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\plane.fbx
+			Script: {
+			}
+		}
+	}
+	RootNode: {
+		ID: deceada0-a245-404d-8bbb-a3b2d8f6364c
+		Mesh Position: 0
+		Name: RootNode
+		Emitting: false
+		Emitting Type: null
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Script: {
+		}
+		Cube.002: {
+			ID: 34b8df59-c923-4a95-b4c5-d3a2795d78e4
+			Mesh Position: 0
+			Name: Cube.002
+			Emitting: false
+			Emitting Type: null
+			Position: ( 0.000E+0  5.000E+0  0.000E+0)
+			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
+			Scale: ( 4.280E+0  4.280E+0  4.280E+0)
+			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+			Material Name: DefaultMaterial
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
+			Script: {
+			}
+		}
+	}
+	Directional Light: {
+		ID: 29ed803e-676a-46a6-95a6-a7acd5ed16ed
+		Mesh Position: 0
+		Name: Directional Light
+		Emitting: true
+		Emitting Type: DirectionalLight
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 1.544E+0 -1.235E+0 -1.737E-1)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: Material (0)
+		Color: [1.0, 1.0, 1.0, 1.0]
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 1.0
+		Roughness Map Texture: null
+		Roughness Map Strength: 1.0
+		AO Map Texture: null
+		AO Map Strength: 1.0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0.0
+		Emissive Map Texture: null
+		Emissive Map Strength: 1.0
+		Mesh: null
+		Light Attributes: {
+			Intensity: 1.0
+			Direction: ( 1.544E+0 -1.235E+0 -1.737E-1)
+		}
+		Script: {
+		}
+	}
+	Sky Light: {
+		ID: 4ab95692-23d4-40d1-9cc4-e7c3e242536b
+		Mesh Position: -1
+		Name: Sky Light
+		Emitting: true
+		Emitting Type: SkyLight
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material Name: null
+		Color: null
+		Albedo Texture: null
+		Normal Map Texture: null
+		Normal Map Strength: 0
+		Roughness Map Texture: null
+		Roughness Map Strength: 0
+		AO Map Texture: null
+		AO Map Strength: 0
+		Metallic Map Texture: null
+		Metallic Map Strength: 0
+		Emissive Map Texture: null
+		Emissive Map Strength: 0
+		Mesh: null
+		Light Attributes: {
+			Intensity: 1.0
+			Environment Map: D:\programming\Java\OxyEngine\src\main\resources\hdr\pink_sunrise_4k.hdr
+			Environment LOD: 5.0
+			Environment Intensity: 0.0
+			Environment Primary: true
+		}
+		Script: {
+		}
+	}
+]
+Scene: {
+	Scene Name: Empty Scene
+	Scene Working Directory: null
+	Scene Gamma Strength: 2.2
+	Scene Exposure: 1.0
+}

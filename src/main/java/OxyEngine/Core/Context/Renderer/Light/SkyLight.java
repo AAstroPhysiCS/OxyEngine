@@ -12,9 +12,10 @@ import imgui.type.ImString;
 import org.lwjgl.stb.STBImage;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Scene.SceneRuntime.entityContext;
 import static OxyEngine.System.OxySystem.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.logger;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.entityContext;
+
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class SkyLight extends Light {
@@ -77,9 +78,6 @@ public class SkyLight extends Light {
 
     private HDRTexture hdrTexture;
 
-    public float[] gammaStrength = new float[]{2.2f};
-    public float[] exposure = new float[]{1.0f};
-
     public float[] intensity = new float[]{1.0f};
     public float[] mipLevelStrength = new float[]{1.0f};
 
@@ -92,11 +90,11 @@ public class SkyLight extends Light {
             logger.severe("Image is not HDR");
             return;
         }
-        guiNodePath.set(pathToHDR);
 
         if (hdrTexture != null)
             hdrTexture.dispose();
         hdrTexture = OxyTexture.loadHDRTexture(pathToHDR);
+        guiNodePath.set(pathToHDR);
     }
 
     @Override
@@ -130,8 +128,6 @@ public class SkyLight extends Light {
         if (entityContext == null) return;
         if (!entityContext.has(SkyLight.class)) return;
         SkyLight comp = entityContext.get(SkyLight.class);
-        HDRTexture hdrTexture = comp.getHDRTexture();
-//        if (hdrTexture != null) comp.guiNodePath.set(hdrTexture.getPath());
 
         ImGui.spacing();
         ImGui.alignTextToFramePadding();
@@ -153,17 +149,11 @@ public class SkyLight extends Light {
         ImGui.alignTextToFramePadding();
         ImGui.text("Intensity: ");
         ImGui.alignTextToFramePadding();
-        ImGui.text("Gamma strength:");
-        ImGui.alignTextToFramePadding();
         ImGui.text("Environment LOD:");
-        ImGui.alignTextToFramePadding();
-        ImGui.text("Exposure: ");
         ImGui.nextColumn();
         ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
         ImGui.sliderFloat("###hidelabel intensitySkyLight", comp.intensity, 0, 10);
-        ImGui.sliderFloat("###hidelabel g", comp.gammaStrength, 0, 10);
         ImGui.sliderFloat("###hidelabel lod", comp.mipLevelStrength, 0, 5);
-        ImGui.sliderFloat("###hidelabel exposure", comp.exposure, 0, 10);
         ImGui.popItemWidth();
         ImGui.columns(1);
 
