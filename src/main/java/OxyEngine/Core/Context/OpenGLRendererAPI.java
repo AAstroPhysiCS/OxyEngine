@@ -55,9 +55,6 @@ public class OpenGLRendererAPI extends RendererAPI {
         if (cullMode != CullMode.DISABLED) {
             glEnable(GL_CULL_FACE);
             glCullFace(cullMode.value);
-        } else {
-            glDisable(GL_CULL_FACE);
-            glCullFace(CullMode.BACK.value);
         }
         glPolygonMode(GL_FRONT_AND_BACK, renderPass.getPolygonMode().value);
 
@@ -72,8 +69,13 @@ public class OpenGLRendererAPI extends RendererAPI {
         if (onStackRenderPass == null) throw new IllegalStateException("On Stack RenderPass is null!");
         if (onStackRenderPass.isBlendingEnabled()) glDisable(GL_BLEND);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glDisable(GL_CULL_FACE);
-        glCullFace(CullMode.BACK.value);
+
+        CullMode cullMode = onStackRenderPass.getCullMode();
+        if (cullMode != CullMode.DISABLED) {
+            glDisable(GL_CULL_FACE);
+            glCullFace(CullMode.BACK.value);
+        }
+
         onStackRenderPass.getFrameBuffer().unbind();
         onStackRenderPass = null;
     }

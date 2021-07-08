@@ -40,7 +40,7 @@ import java.util.List;
 
 import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
 import static OxyEngine.Scene.SceneRuntime.*;
-import static OxyEngine.System.OxySystem.FileSystem.openDialog;
+import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedTextureFile;
 import static OxyEngineEditor.UI.AssetManager.DEFAULT_TEXTURE_PARAMETER;

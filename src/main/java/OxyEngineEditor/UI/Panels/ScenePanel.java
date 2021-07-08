@@ -1,15 +1,12 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.SelectedComponent;
-import OxyEngine.Components.TagComponent;
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Camera.EditorCamera;
-import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Scene.OxyMaterial;
 import OxyEngine.Scene.OxyModel;
 import OxyEngine.Scene.OxyNativeObject;
-import OxyEngine.Scene.OxyMaterial;
 import OxyEngine.Scene.SceneRenderer;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -18,7 +15,6 @@ import imgui.extension.imguizmo.flag.Operation;
 import imgui.flag.ImGuiStyleVar;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.Arrays;
@@ -28,7 +24,7 @@ import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
 import static OxyEngine.Scene.SceneRuntime.*;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedModelFileExtension;
-import static OxyEngineEditor.UI.Gizmo.OxySelectHandler.*;
+import static OxyEngineEditor.UI.OxySelectHandler.*;
 
 public class ScenePanel extends Panel {
 
@@ -71,23 +67,11 @@ public class ScenePanel extends Panel {
         ImGui.getMousePos(mousePos);
         ImGui.getCursorPos(offset);
         ImGui.getCursorScreenPos(offsetScreenPos);
-
-        if (editorCameraEntity == null) { //editor camera init
-            editorCameraEntity = ACTIVE_SCENE.createNativeObjectEntity(null, null);
-            EditorCamera editorCamera = new EditorCamera(true, 45f, ScenePanel.windowSize.x / ScenePanel.windowSize.y, 1f, 10000f, true);
-            editorCameraEntity.addComponent(new TransformComponent(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f)), editorCamera, new TagComponent("Editor Camera"));
-            currentBoundedCamera = editorCamera;
-
-            //just first frame update
-            currentBoundedCamera.update();
-            if (currentBoundedCamera instanceof PerspectiveCamera c) c.calcViewMatrixNoTranslation();
-        }
+        ImGui.getContentRegionAvail(availContentRegionSize);
 
         focusedWindowDragging = ImGui.isWindowFocused() && ImGui.isMouseDragging(2);
         focusedWindow = ImGui.isWindowFocused();
         hoveredWindow = ImGui.isWindowHovered();
-
-        ImGui.getContentRegionAvail(availContentRegionSize);
 
         OpenGLFrameBuffer blittedFrameBuffer = SceneRenderer.getInstance().getMainFrameBuffer().getBlittedFrameBuffer();
 

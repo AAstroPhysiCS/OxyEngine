@@ -30,9 +30,8 @@ public class OxyModelImporter {
             aiProcess_RemoveRedundantMaterials |
             aiProcess_Triangulate |
             aiProcess_GenUVCoords |
-            aiProcess_FlipUVs |
 //            aiProcess_PreTransformVertices | (animations wouldn't work, if you enable this)
-//            aiProcess_SplitLargeMeshes |
+            aiProcess_SplitLargeMeshes |
             aiProcess_FindInvalidData |
             aiProcess_OptimizeMeshes;
 
@@ -169,12 +168,12 @@ public class OxyModelImporter {
 
     public Vector3f getBoundingBoxMin(int index) {
         checkMeshImporter();
-        return meshImporter.meshes.get(index).min;
+        return meshImporter.meshes.get(index).minAABB;
     }
 
     public Vector3f getBoundingBoxMax(int index) {
         checkMeshImporter();
-        return meshImporter.meshes.get(index).max;
+        return meshImporter.meshes.get(index).maxAABB;
     }
 
     public Matrix4f getTransformation(int index) {

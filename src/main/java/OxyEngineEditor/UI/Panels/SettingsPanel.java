@@ -18,9 +18,6 @@ public final class SettingsPanel extends Panel {
 
     }
 
-    private static final float[] gammaStrengthBuffer = new float[1];
-    private static final float[] exposureBuffer = new float[1];
-
     @Override
     public void renderPanel() {
         ImGui.begin("Settings");
@@ -32,12 +29,8 @@ public final class SettingsPanel extends Panel {
         ImGui.text("Exposure: ");
         ImGui.nextColumn();
         ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
-        gammaStrengthBuffer[0] = ACTIVE_SCENE.gammaStrength;
-        exposureBuffer[0] = ACTIVE_SCENE.exposure;
-        ImGui.sliderFloat("###hidelabel g", gammaStrengthBuffer, 0, 10);
-        ImGui.sliderFloat("###hidelabel exposure", exposureBuffer, 0, 10);
-        ACTIVE_SCENE.exposure = exposureBuffer[0];
-        ACTIVE_SCENE.gammaStrength = gammaStrengthBuffer[0];
+        if(ImGui.sliderFloat("###hidelabel g", ACTIVE_SCENE.gammaStrength, 0, 10))
+        if(ImGui.sliderFloat("###hidelabel exposure", ACTIVE_SCENE.exposure, 0, 10))
         ImGui.popItemWidth();
         ImGui.columns(1);
         ImGui.end();

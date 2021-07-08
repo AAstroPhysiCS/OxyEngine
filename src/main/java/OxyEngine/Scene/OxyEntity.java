@@ -243,34 +243,28 @@ public abstract class OxyEntity {
         shader.begin();
 
         //ANIMATION UPDATE
-        shader.setUniform1i("animatedModel", 0);
+        shader.setUniform1i("Animation.animatedModel", 0);
         if (has(AnimationComponent.class)) {
             AnimationComponent animComp = get(AnimationComponent.class);
             if (ACTIVE_SCENE.STATE == SceneState.RUNNING) {
-                shader.setUniform1i("animatedModel", 1);
+                shader.setUniform1i("Animation.animatedModel", 1);
                 animComp.updateAnimation(SceneRuntime.TS);
                 List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
                 for (int j = 0; j < matrix4fList.size(); j++) {
-                    shader.setUniformMatrix4fv("finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                    shader.setUniformMatrix4fv("Animation.finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
                 }
             } else animComp.setTime(0);
         }
 
         TransformComponent c = get(TransformComponent.class);
-        shader.setUniformMatrix4fv("model", c.transform, false);
+        shader.setUniformMatrix4fv("Transforms.model", c.transform, false);
         int iblSlot = TextureSlot.UNUSED.getValue(), prefilterSlot = TextureSlot.UNUSED.getValue(), brdfLUTSlot = TextureSlot.UNUSED.getValue();
-
-        shader.setUniform1f("hdrIntensity", 1.0f);
-        shader.setUniform1f("gamma", ACTIVE_SCENE.gammaStrength);
-        shader.setUniform1f("exposure", ACTIVE_SCENE.exposure);
 
         if (currentBoundedSkyLight != null) {
             SkyLight skyLightComp = currentBoundedSkyLight.get(SkyLight.class);
             HDRTexture hdrTexture = null;
-            if (skyLightComp != null) {
-                shader.setUniform1f("hdrIntensity", skyLightComp.intensity[0]);
+            if (skyLightComp != null)
                 hdrTexture = skyLightComp.getHDRTexture();
-            }
             if (hdrTexture != null) {
                 iblSlot = hdrTexture.getIBLSlot();
                 prefilterSlot = hdrTexture.getPrefilterSlot();
@@ -278,23 +272,23 @@ public abstract class OxyEntity {
             }
         }
 
-        shader.setUniform1i("iblMap", iblSlot);
-        shader.setUniform1i("prefilterMap", prefilterSlot);
-        shader.setUniform1i("brdfLUT", brdfLUTSlot);
+        shader.setUniform1i("EnvironmentTex.iblMap", iblSlot);
+        shader.setUniform1i("EnvironmentTex.prefilterMap", prefilterSlot);
+        shader.setUniform1i("EnvironmentTex.brdfLUT", brdfLUTSlot);
 
         boolean castShadows = ShadowRenderer.castShadows();
-        shader.setUniform1i("castShadows", castShadows ? 1 : 0);
+        shader.setUniform1i("Shadows.castShadows", castShadows ? 1 : 0);
         if (castShadows) {
             if (ShadowRenderer.cascadeIndicatorToggle)
-                shader.setUniform1i("cascadeIndicatorToggle", 1);
-            else shader.setUniform1i("cascadeIndicatorToggle", 0);
+                shader.setUniform1i("Shadows.cascadeIndicatorToggle", 1);
+            else shader.setUniform1i("Shadows.cascadeIndicatorToggle", 0);
 
             for (int i = 0; i < NUMBER_CASCADES; i++) {
                 if (ShadowRenderer.ready(i)) {
                     glBindTextureUnit(TextureSlot.CSM.getValue() + i, ShadowRenderer.getShadowMap(i));
-                    shader.setUniform1i("shadowMap[" + i + "]", TextureSlot.CSM.getValue() + i);
+                    shader.setUniform1i("Shadows.shadowMap[" + i + "]", TextureSlot.CSM.getValue() + i);
                     shader.setUniformMatrix4fv("lightSpaceMatrix[" + i + "]", ShadowRenderer.getShadowViewMatrix(i), false);
-                    shader.setUniform1f("cascadeSplits[" + i + "]", ShadowRenderer.getCascadeSplits(i));
+                    shader.setUniform1f("Shadows.cascadeSplits[" + i + "]", ShadowRenderer.getCascadeSplits(i));
                 }
             }
         }

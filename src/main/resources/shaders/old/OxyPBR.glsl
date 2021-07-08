@@ -1,3 +1,80 @@
+
+//#type vertex
+#version 460 core
+
+layout(location = 0) in vec3 pos;
+layout(location = 1) in vec2 tcs;
+layout(location = 2) in vec3 normals;
+layout(location = 3) in vec3 biTangent;
+layout(location = 4) in vec3 tangent;
+layout(location = 5) in float objectID;
+layout(location = 6) in vec4 boneIds;
+layout(location = 7) in vec4 weights;
+
+uniform mat4 v_Matrix;
+uniform mat4 model;
+
+#define NUMBER_CASCADES 4
+
+uniform mat4 lightSpaceMatrix[NUMBER_CASCADES];
+
+flat out int v_ObjectID;
+out float clipSpacePosZ;
+
+out OUT_VARIABLES {
+    vec2 texCoordsOut;
+    vec3 normalsOut;
+    vec3 vertexPos;
+
+    vec4 lightSpacePos[NUMBER_CASCADES];
+
+    //NORMAL MAPPING
+    mat3 TBN;
+} outVar;
+
+const int MAX_BONES = 100;
+uniform mat4 finalBonesMatrices[MAX_BONES];
+uniform int animatedModel;
+
+void main(){
+
+    v_ObjectID = int(objectID);
+    outVar.texCoordsOut = tcs;
+
+    ivec4 boneIDInt = ivec4(boneIds);
+    vec4 totalPos = vec4(pos, 1.0f);
+    vec4 totalNorm = vec4(normals, 1.0f);
+
+    if(bool(animatedModel)){
+        //mesh has animations
+        mat4 transform = finalBonesMatrices[boneIDInt[0]] * weights[0];
+             transform += finalBonesMatrices[boneIDInt[1]] * weights[1];
+             transform += finalBonesMatrices[boneIDInt[2]] * weights[2];
+             transform += finalBonesMatrices[boneIDInt[3]] * weights[3];
+
+        totalPos = transform * vec4(pos, 1.0f);
+        totalNorm = transform * vec4(normals, 0.0f);
+    }
+
+    outVar.vertexPos = (model * totalPos).xyz;
+    outVar.normalsOut = mat3(model) * totalNorm.xyz;
+
+    for(int i = 0; i < NUMBER_CASCADES; i++){
+        outVar.lightSpacePos[i] = lightSpaceMatrix[i] * model * vec4(pos, 1.0f);
+    }
+
+    vec3 T = normalize(mat3(model) * tangent);
+    vec3 B = normalize(mat3(model) * biTangent);
+    vec3 N = normalize(mat3(model) * totalNorm.xyz);
+
+    mat3 TBN = mat3(T, B, N);
+    outVar.TBN = TBN;
+
+    vec4 modelPos = model * totalPos;
+    gl_Position = modelPos * v_Matrix;
+    clipSpacePosZ = gl_Position.z;
+}
+
 //#type fragment
 #version 460 core
 
@@ -319,80 +396,4 @@ void main(){
 
     vec4 result = startPBR(vertexPos, texCoordsOut, viewDir, norm);
     color = vec4(result.xyz, 1.0f);
-}
-
-//#type vertex
-#version 460 core
-
-layout(location = 0) in vec3 pos;
-layout(location = 1) in vec2 tcs;
-layout(location = 2) in vec3 normals;
-layout(location = 3) in vec3 biTangent;
-layout(location = 4) in vec3 tangent;
-layout(location = 5) in float objectID;
-layout(location = 6) in vec4 boneIds;
-layout(location = 7) in vec4 weights;
-
-uniform mat4 v_Matrix;
-uniform mat4 model;
-
-#define NUMBER_CASCADES 4
-
-uniform mat4 lightSpaceMatrix[NUMBER_CASCADES];
-
-flat out int v_ObjectID;
-out float clipSpacePosZ;
-
-out OUT_VARIABLES {
-    vec2 texCoordsOut;
-    vec3 normalsOut;
-    vec3 vertexPos;
-
-    vec4 lightSpacePos[NUMBER_CASCADES];
-
-    //NORMAL MAPPING
-    mat3 TBN;
-} outVar;
-
-const int MAX_BONES = 100;
-uniform mat4 finalBonesMatrices[MAX_BONES];
-uniform int animatedModel;
-
-void main(){
-
-    v_ObjectID = int(objectID);
-    outVar.texCoordsOut = tcs;
-
-    ivec4 boneIDInt = ivec4(boneIds);
-    vec4 totalPos = vec4(pos, 1.0f);
-    vec4 totalNorm = vec4(normals, 1.0f);
-
-    if(bool(animatedModel)){
-        //mesh has animations
-        mat4 transform = finalBonesMatrices[boneIDInt[0]] * weights[0];
-             transform += finalBonesMatrices[boneIDInt[1]] * weights[1];
-             transform += finalBonesMatrices[boneIDInt[2]] * weights[2];
-             transform += finalBonesMatrices[boneIDInt[3]] * weights[3];
-
-        totalPos = transform * vec4(pos, 1.0f);
-        totalNorm = transform * vec4(normals, 0.0f);
-    }
-
-    outVar.vertexPos = (model * totalPos).xyz;
-    outVar.normalsOut = mat3(model) * totalNorm.xyz;
-
-    for(int i = 0; i < NUMBER_CASCADES; i++){
-        outVar.lightSpacePos[i] = lightSpaceMatrix[i] * model * vec4(pos, 1.0f);
-    }
-
-    vec3 T = normalize(mat3(model) * tangent);
-    vec3 B = normalize(mat3(model) * biTangent);
-    vec3 N = normalize(mat3(model) * totalNorm.xyz);
-
-    mat3 TBN = mat3(T, B, N);
-    outVar.TBN = TBN;
-
-    vec4 modelPos = model * totalPos;
-    gl_Position = modelPos * v_Matrix;
-    clipSpacePosZ = gl_Position.z;
 }

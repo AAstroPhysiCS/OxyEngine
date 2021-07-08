@@ -18,11 +18,11 @@ import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.nfd.NativeFileDialog;
 import org.reflections.Reflections;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +32,7 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static org.lwjgl.BufferUtils.createByteBuffer;
 
 public interface OxySystem {
 
@@ -108,58 +109,6 @@ public interface OxySystem {
         }
     }
 
-    interface FileSystem {
-        static String load(String path) {
-            final StringBuilder builder = new StringBuilder();
-            try {
-                File file = new File(path);
-                BufferedReader reader = new BufferedReader(new FileReader(file));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    builder.append(line).append("\n");
-                }
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return builder.toString();
-        }
-
-        static String getResourceByPath(String path) {
-            String fullPath = EntryPoint.class.getResource(path).getPath();
-            return (String) fullPath.subSequence(1, fullPath.length());
-        }
-
-        static String openDialog(String filterList, String defaultPath) {
-            SceneRuntime.stop();
-            ACTIVE_SCENE.STATE = SceneState.WAITING;
-            String path = null;
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                PointerBuffer buffer = stack.mallocPointer(1);
-                int result = NativeFileDialog.NFD_OpenDialog(filterList, defaultPath, buffer);
-                if (result == NativeFileDialog.NFD_OKAY) {
-                    path = buffer.getStringASCII();
-                }
-            }
-            ACTIVE_SCENE.STATE = SceneState.IDLE;
-            return path;
-        }
-
-        static String saveDialog(String filterList, String defaultPath) {
-            SceneRuntime.stop();
-            ACTIVE_SCENE.STATE = SceneState.WAITING;
-            String path = null;
-            try (MemoryStack stack = MemoryStack.stackPush()) {
-                PointerBuffer buffer = stack.mallocPointer(1);
-                int result = NativeFileDialog.NFD_SaveDialog(filterList, defaultPath, buffer);
-                if (result == NativeFileDialog.NFD_OKAY) {
-                    path = buffer.getStringASCII();
-                }
-            }
-            ACTIVE_SCENE.STATE = SceneState.IDLE;
-            return path;
-        }
-    }
 
     static Vector3f parseStringToVector3f(String sValue) {
         String[] splittedVector = sValue.replace("(", "").replace(")", "").split(" ");

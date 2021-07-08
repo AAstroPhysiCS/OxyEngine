@@ -38,6 +38,10 @@ public class EditorCamera extends PerspectiveCamera {
         viewMatrix.mul(modelMatrix);
         viewMatrix.origin(this.origin);
         calcViewMatrixNoTranslation();
+
+        cameraUniformBuffer.setData(0, getViewMatrix());
+        cameraUniformBuffer.setData(64, getViewMatrixNoTranslation());
+        cameraUniformBuffer.setData(128, origin);
     }
 
     @Override
@@ -48,10 +52,16 @@ public class EditorCamera extends PerspectiveCamera {
     }
 
     private void onMouseMove(OxyMouseEvent.Moved event) {
-        updateRotationSwipe();
+        updateRotationSwipe(event);
+        update();
     }
 
     private void onMouseScroll(OxyMouseEvent.Scroll event){
+
+        cameraUniformBuffer.setData(0, getViewMatrix());
+        cameraUniformBuffer.setData(64, getViewMatrixNoTranslation());
+        cameraUniformBuffer.setData(128, origin);
+
         ImGuiIO io = ImGui.getIO();
         if (ScenePanel.hoveredWindow) {
             if (io.getMouseWheel() > 0) {
@@ -62,6 +72,7 @@ public class EditorCamera extends PerspectiveCamera {
             if (zoom >= 500) zoom = 500;
             if (zoom <= -500) zoom = -500;
         }
+        update();
     }
 
     private void rotate() {
@@ -72,7 +83,7 @@ public class EditorCamera extends PerspectiveCamera {
         rotationRef.y += (-dx * mouseSpeed) / 16;
     }
 
-    private void updateRotationSwipe() {
+    private void updateRotationSwipe(OxyMouseEvent.Moved event) {
         if ((ScenePanel.hoveredWindow || SceneHierarchyPanel.focusedWindowDragging) &&
                 Input.isMouseButtonPressed(MouseCode.GLFW_MOUSE_BUTTON_RIGHT) && !Input.isKeyPressed(KeyCode.GLFW_KEY_LEFT_SHIFT)) {
             rotate();
@@ -81,15 +92,15 @@ public class EditorCamera extends PerspectiveCamera {
         if (Input.isKeyPressed(KeyCode.GLFW_KEY_LEFT_SHIFT) &&
                 Input.isMouseButtonPressed(MouseCode.GLFW_MOUSE_BUTTON_RIGHT) &&
                 ScenePanel.hoveredWindow) {
-            float dx = (float) (Input.getMouseX() - oldMouseX);
-            float dy = (float) (Input.getMouseY() - oldMouseY);
+            float dx = (float) (event.getX() - oldMouseX);
+            float dy = (float) (event.getY() - oldMouseY);
             float angle90 = rotationRef.y;
             positionRef.x += Math.cos(angle90) * (-dx * mouseSpeed);
             positionRef.z -= Math.sin(angle90) * (-dx * mouseSpeed);
             positionRef.y -= (-dy * mouseSpeed);
         }
 
-        oldMouseX = Input.getMouseX();
-        oldMouseY = Input.getMouseY();
+        oldMouseX = event.getX();
+        oldMouseY = event.getY();
     }
 }

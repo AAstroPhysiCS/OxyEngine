@@ -1,9 +1,10 @@
 package OxyEngine.Core.Context;
 
-import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Context.Renderer.Buffer.FrameBuffer;
 import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Buffer.UniformBuffer;
+import OxyEngine.Core.Context.Renderer.Light.SkyLight;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.ShadowRenderer;
@@ -25,40 +26,29 @@ public final class OxyRenderer {
 
     private static OxyRenderCommand renderCommand;
 
+    private static UniformBuffer environmentSettingsUniformBuffer;
+
     private OxyRenderer() {
     }
 
-    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera) {
-        if(RendererAPI.onStackRenderPass == null) throw new IllegalStateException("RenderPass not bound!");
+    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh) {
+        if (RendererAPI.onStackRenderPass == null) throw new IllegalStateException("RenderPass not bound!");
         pipeline.updatePipelineShader();
         pipeline.getShader().begin();
-        pipeline.setCameraUniforms(camera);
         if (mesh.empty())
             mesh.load(pipeline);
         mesh.render();
         pipeline.getShader().end();
     }
 
-    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyCamera camera, OxyShader shader) {
-        if(RendererAPI.onStackRenderPass == null) throw new IllegalStateException("RenderPass not bound!");
+    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyShader shader) {
+        if (RendererAPI.onStackRenderPass == null) throw new IllegalStateException("RenderPass not bound!");
         pipeline.updatePipelineShader();
         shader.begin();
-        pipeline.setCameraUniforms(shader, camera);
         if (mesh.empty())
             mesh.load(pipeline);
         mesh.render();
         shader.end();
-    }
-
-    public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh) {
-        if(RendererAPI.onStackRenderPass == null) throw new IllegalStateException("RenderPass not bound!");
-        pipeline.updatePipelineShader();
-        pipeline.getShader().begin();
-        pipeline.setCameraUniforms(currentBoundedCamera);
-        if (mesh.empty())
-            mesh.load(pipeline);
-        mesh.render();
-        pipeline.getShader().end();
     }
 
     public static void init(TargetPlatform targetPlatform, boolean debug) {
@@ -69,6 +59,8 @@ public final class OxyRenderer {
         INIT = true;
         renderCommand = OxyRenderCommand.getInstance(targetPlatform);
         renderCommand.init(debug);
+
+        environmentSettingsUniformBuffer = UniformBuffer.create(3 * Float.BYTES, 1);
     }
 
     public static void clearBuffer() {
@@ -80,22 +72,37 @@ public final class OxyRenderer {
     }
 
     public static void beginRenderPass(OxyRenderPass renderPass) {
-        if (RendererAPI.onStackRenderPass != null) throw new IllegalStateException("RenderPass already on stack. Did you forget to call endRenderPass?");
+        if (RendererAPI.onStackRenderPass != null)
+            throw new IllegalStateException("RenderPass already on stack. Did you forget to call endRenderPass?");
         FrameBuffer frameBuffer = renderPass.getFrameBuffer();
         if (frameBuffer.needResize()) {
             frameBuffer.resize(frameBuffer.getWidth(), frameBuffer.getHeight());
-            if (SceneRuntime.currentBoundedCamera instanceof PerspectiveCamera p)
+            if (SceneRuntime.currentBoundedCamera instanceof PerspectiveCamera p) {
                 p.setAspect((float) frameBuffer.getWidth() / frameBuffer.getHeight());
+                p.update();
+            }
         }
         renderCommand.getRendererAPI().beginRenderPass(renderPass);
     }
 
     public static void beginScene() {
         assert ACTIVE_SCENE != null : oxyAssert("Active scene is somehow null!");
+        if (currentBoundedCamera == null) return;
         SceneRenderer.getInstance().getMainFrameBuffer().blit();
+
+        environmentSettingsUniformBuffer.setData(0, ACTIVE_SCENE.gammaStrength);
+        environmentSettingsUniformBuffer.setData(4, ACTIVE_SCENE.exposure);
+        environmentSettingsUniformBuffer.setData(8, new float[]{1.0f});
+
+        if (currentBoundedSkyLight != null) {
+            SkyLight skyLightComp = currentBoundedSkyLight.get(SkyLight.class);
+            if (skyLightComp != null) {
+                environmentSettingsUniformBuffer.setData(8, skyLightComp.intensity);
+            }
+        }
     }
 
-    public static void endScene(){
+    public static void endScene() {
         assert ACTIVE_SCENE != null : oxyAssert("Active scene is somehow null!");
 
         SceneRenderer.getInstance().getMainFrameBuffer().resetFlush();
@@ -105,7 +112,8 @@ public final class OxyRenderer {
     }
 
     public static void endRenderPass() {
-        if (RendererAPI.onStackRenderPass == null) throw new IllegalStateException("RenderPass not on stack. Did you forget to call beginRenderPass?");
+        if (RendererAPI.onStackRenderPass == null)
+            throw new IllegalStateException("RenderPass not on stack. Did you forget to call beginRenderPass?");
         renderCommand.getRendererAPI().endRenderPass();
     }
 

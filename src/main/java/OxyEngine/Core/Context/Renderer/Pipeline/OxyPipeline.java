@@ -1,8 +1,7 @@
 package OxyEngine.Core.Context.Renderer.Pipeline;
 
-import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Context.Renderer.Buffer.Buffer;
 import OxyEngine.Core.Context.OxyRenderPass;
+import OxyEngine.Core.Context.Renderer.Buffer.Buffer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -153,21 +152,5 @@ public final class OxyPipeline {
 
     public OxyShader getShader() {
         return shader;
-    }
-
-    public void setCameraUniforms(OxyCamera camera) {
-        shader.setUniformMatrix4fv("pr_Matrix", camera.getProjectionMatrix(), camera.isTranspose());
-        shader.setUniformMatrix4fv("m_Matrix", camera.getModelMatrix(), camera.isTranspose());
-        shader.setUniformMatrix4fv("v_Matrix", camera.getViewMatrix(), camera.isTranspose());
-        shader.setUniformMatrix4fv("v_Matrix_NoTransform", camera.getViewMatrixNoTranslation(), camera.isTranspose());
-        shader.setUniformVec3("cameraPos", camera.origin);
-    }
-
-    public void setCameraUniforms(OxyShader shader, OxyCamera camera) {
-        shader.setUniformMatrix4fv("pr_Matrix", camera.getProjectionMatrix(), camera.isTranspose());
-        shader.setUniformMatrix4fv("m_Matrix", camera.getModelMatrix(), camera.isTranspose());
-        shader.setUniformMatrix4fv("v_Matrix", camera.getViewMatrix(), camera.isTranspose());
-        shader.setUniformMatrix4fv("v_Matrix_NoTransform", camera.getViewMatrixNoTranslation(), camera.isTranspose());
-        shader.setUniformVec3("cameraPos", camera.origin);
     }
 }

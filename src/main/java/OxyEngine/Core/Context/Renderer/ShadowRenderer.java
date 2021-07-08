@@ -18,6 +18,8 @@ import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Window.OxyEvent;
+import OxyEngine.Core.Window.OxyEventDispatcher;
+import OxyEngine.Core.Window.OxyMouseEvent;
 import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.SceneRenderer;
 import OxyEngineEditor.UI.Panels.Panel;
@@ -123,18 +125,6 @@ public class ShadowRenderer {
                 if (currentBoundedCamera.origin.distance(e.get(TransformComponent.class).position) - 20f < cascadeSplit[i]) {
                     cam = cascadedCamArr[i];
                     camIndex = i;
-                    cam.update();
-
-                    /*
-                     * so in order to properly render shadows, we have to render the next split too,
-                     * because then it would be a horrible thing for a scene like sponza (model that is very big in size)
-                     */
-                    if (i != NUMBER_CASCADES - 1) {
-                        cascadedCamArr[i + 1].update();
-                    }
-                    if (i != 0) {
-                        cascadedCamArr[i - 1].update();
-                    }
                     break;
                 }
             }
@@ -233,6 +223,11 @@ public class ShadowRenderer {
         }
     }
 
+    public static void onEvent(OxyEvent event) {
+        if (cascadedCamArr == null) return;
+        for (ShadowMapCamera c : cascadedCamArr) c.onEvent(event);
+    }
+
     private static final class ShadowMapCamera extends OrthographicCamera {
 
         private DirectionalLight directionalLight;
@@ -262,7 +257,6 @@ public class ShadowRenderer {
 
             camera.setDirectionalLight(d);
 
-            //FOVY: 45 (If in the future, some weirdness happens with the shadows, then change the editor camera to 45 FOVY and this to p.getFOVY(); )
             Matrix4f projViewMatrix = new Matrix4f().setPerspective(p.getFovY(), p.getAspect(), nearPlaneOffset, cascadeSplit);
             projViewMatrix.mul(p.getModelMatrix());
 
@@ -346,7 +340,17 @@ public class ShadowRenderer {
 
         @Override
         public void onEvent(OxyEvent event) {
-            //does nothing
+            OxyEventDispatcher dispatcher = OxyEventDispatcher.getInstance();
+            dispatcher.dispatch(OxyMouseEvent.Moved.class, event, this::onMouseMove);
+            dispatcher.dispatch(OxyMouseEvent.Scroll.class, event, this::onMouseScroll);
+        }
+
+        private void onMouseMove(OxyMouseEvent.Moved event) {
+            update();
+        }
+
+        private void onMouseScroll(OxyMouseEvent.Scroll event) {
+            update();
         }
     }
 
@@ -368,7 +372,7 @@ public class ShadowRenderer {
         return cascadedCamArr[0].directionalLight.isCastingShadows();
     }
 
-    public static void resetFlush(){
+    public static void resetFlush() {
         shadowFrameBuffer.resetFlush();
     }
 

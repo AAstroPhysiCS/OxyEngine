@@ -29,7 +29,8 @@ public abstract class ScriptableEntity {
 
     public abstract void onCreate();
 
-    void updateScript(float ts){
+    void updateScript(float ts) {
+        if (entity == null || scene == null) return;
         onUpdate(ts);
         updateData();
     }

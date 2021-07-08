@@ -1,8 +1,7 @@
 package OxyEngine.System;
 
-import OxyEngine.Core.Window.OxyWindow;
 import OxyEngine.Core.Window.Input;
-import OxyEngine.OxyEngine;
+import OxyEngine.Core.Window.OxyWindow;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.ImGuiStyle;
@@ -42,7 +41,7 @@ public class OxyUISystem {
         ImGui.createContext();
 
         io = ImGui.getIO();
-        ImGui.getStyle().setColors(OxyEngine.getLoadedTheme());
+        ImGui.getStyle().setColors(loadStyle(OxyFileSystem.load(OxyFileSystem.getResourceByPath("/theme/oxyTheme.txt")).split("\n")));
         io.setIniFilename(new File(System.getProperty("user.dir") + "\\src\\main\\resources\\ini\\imgui.ini").toPath().toAbsolutePath().toString());
         io.setWantSaveIniSettings(true);
         io.addConfigFlags(ImGuiConfigFlags.NavEnableKeyboard);
@@ -67,7 +66,7 @@ public class OxyUISystem {
             }
         });
 
-        File[] file = new File(OxySystem.FileSystem.getResourceByPath("/fonts/")).listFiles();
+        File[] file = new File(OxyFileSystem.getResourceByPath("/fonts/")).listFiles();
         assert file != null;
         for (File f : file) {
             OxySystem.Font.load(io, f.getPath(), 16, f.getName().split("\\.")[0]);
@@ -82,6 +81,27 @@ public class OxyUISystem {
             style.setWindowRounding(0.0f);
             style.setColor(ImGuiCol.WindowBg, ImGui.getColorU32(ImGuiCol.WindowBg, 1));
         }
+    }
+
+
+    private static float[][] loadStyle(String[] splittedContent) {
+        float[][] allThemeColors = new float[ImGuiCol.COUNT][4];
+        for (int i = 0; i < splittedContent.length; i++) {
+            String s = splittedContent[i];
+            if (s.equals("ImVec4* colors = ImGui::GetStyle().Colors;")) continue;
+            float[] value = loadColorValue(s);
+            allThemeColors[i] = value;
+        }
+        return allThemeColors;
+    }
+
+    private static float[] loadColorValue(String content) {
+        String[] sequence = ((String) content.subSequence(content.indexOf("(") + 1, content.indexOf(")"))).split(",");
+        float[] value = new float[sequence.length];
+        for (int i = 0; i < value.length; i++) {
+            value[i] = Float.parseFloat(sequence[i]);
+        }
+        return value;
     }
 
     public void updateImGuiContext(float deltaTime) {

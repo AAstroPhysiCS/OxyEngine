@@ -21,7 +21,7 @@ public class OpenGLHDRTexture extends HDRTexture {
 
     private Irradiance irradiance;
     private Prefilter prefilter;
-    private BDRF bdrf;
+    private static BDRF bdrf;
 
     private OpenGLRenderBuffer captureRBO;
     private OpenGLFrameBuffer captureFBO;
@@ -88,7 +88,7 @@ public class OpenGLHDRTexture extends HDRTexture {
 
         irradiance = new Irradiance((OpenGLCubeTexture) finalTexture, captureFBO, captureRBO, radianceSlot);
         prefilter = new Prefilter((OpenGLCubeTexture) finalTexture, captureFBO, captureRBO, prefilterSlot);
-        bdrf = new BDRF(captureFBO, captureRBO, bdrfSlot);
+        if (bdrf == null) bdrf = new BDRF(captureFBO, captureRBO, bdrfSlot);
 
         OxyTexture.unbindAllTextures();
     }
@@ -99,7 +99,7 @@ public class OpenGLHDRTexture extends HDRTexture {
         captureRBO.dispose();
         hdrTexture2D.dispose();
         finalTexture.dispose();
-        bdrf.dispose();
+//        bdrf.dispose(); should not get destroyed
         prefilter.dispose();
         irradiance.dispose();
         glDeleteVertexArrays(quadVAO);

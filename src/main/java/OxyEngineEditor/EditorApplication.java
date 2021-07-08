@@ -3,7 +3,6 @@ package OxyEngineEditor;
 import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Layers.EditorLayer;
 import OxyEngine.Core.Layers.Layer;
-import OxyEngine.Core.Layers.UILayer;
 import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.KeyCode;
 import OxyEngine.Core.Window.OxyEvent;
@@ -38,41 +37,37 @@ public class EditorApplication extends OxyApplication {
         oxyEngine.init();
 
         EditorLayer editorLayer = EditorLayer.getInstance();
-        UILayer uiLayer = UILayer.getInstance();
-
-        uiLayer.addPanel(ProjectPanel.getInstance());
-        uiLayer.addPanel(StatsPanel.getInstance());
-        uiLayer.addPanel(ToolbarPanel.getInstance());
-        uiLayer.addPanel(ScenePanel.getInstance());
-        uiLayer.addPanel(SceneRuntime.getPanel());
-        uiLayer.addPanel(SceneHierarchyPanel.getInstance());
-        uiLayer.addPanel(AnimationPanel.getInstance());
-        uiLayer.addPanel(SettingsPanel.getInstance());
-        uiLayer.addPanel(PropertiesPanel.getInstance());
+        editorLayer.addPanel(ProjectPanel.getInstance());
+        editorLayer.addPanel(StatsPanel.getInstance());
+        editorLayer.addPanel(ToolbarPanel.getInstance());
+        editorLayer.addPanel(SceneRuntime.getPanel());
+        editorLayer.addPanel(SceneHierarchyPanel.getInstance());
+        editorLayer.addPanel(AnimationPanel.getInstance());
+        editorLayer.addPanel(SettingsPanel.getInstance());
+        editorLayer.addPanel(PropertiesPanel.getInstance());
+        editorLayer.addPanel(ScenePanel.getInstance());
 //        uiLayer.addPanel(ShadowRenderer.DebugPanel.getInstance());
 
-        layerStack.pushLayer(uiLayer, editorLayer);
+        layerStack.pushLayer(editorLayer);
         for (Layer l : layerStack.getLayerStack())
             l.build();
     }
 
     @Override
-    protected void update(float ts) {
-        for(OxyEvent event : OxyWindow.getEventPool()) {
+    protected void update() {
+        for (OxyEvent event : OxyWindow.getEventPool()) {
             for (Layer l : layerStack.getLayerStack())
                 l.onEvent(event);
         }
-
-        for (Layer l : layerStack.getLayerStack())
-            l.update(ts);
+        oxyWindow.update();
     }
 
     @Override
-    protected void render() {
-        OxyRenderer.clearBuffer(); //clearing the buffer for the default framebuffer
-
-        for (Layer l : layerStack.getLayerStack())
-            l.render();
+    protected void render(float ts) {
+        for (Layer l : layerStack.getLayerStack()) {
+            l.onImGuiRender();
+            l.run(ts);
+        }
 
         OxyRenderer.swapBuffers();
         OxyRenderer.pollEvents();
@@ -93,8 +88,8 @@ public class EditorApplication extends OxyApplication {
                 final float currentTime = (float) glfwGetTime();
                 final float ts = (float) (currentTime - time);
                 time = currentTime;
-                update(ts);
-                render();
+                update();
+                render(ts);
 
                 frames++;
 
@@ -115,7 +110,7 @@ public class EditorApplication extends OxyApplication {
     @Override
     public void dispose() {
         oxyEngine.dispose();
-        UILayer.uiSystem.dispose();
+        EditorLayer.uiSystem.dispose();
         SceneRuntime.dispose();
     }
 }

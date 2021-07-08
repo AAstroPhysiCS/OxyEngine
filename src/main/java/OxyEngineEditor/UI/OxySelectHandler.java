@@ -1,4 +1,4 @@
-package OxyEngineEditor.UI.Gizmo;
+package OxyEngineEditor.UI;
 
 import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Scene.OxyEntity;

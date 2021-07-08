@@ -9,9 +9,9 @@ public abstract class Layer {
 
     public abstract void build();
 
-    public abstract void update(float ts);
+    public abstract void run(float ts);
 
-    public abstract void render();
+    public abstract void onImGuiRender();
 
     public abstract void onEvent(OxyEvent event);
 }

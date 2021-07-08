@@ -13,7 +13,7 @@ import org.lwjgl.stb.STBImage;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneRuntime.entityContext;
-import static OxyEngine.System.OxySystem.FileSystem.openDialog;
+import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxySystem.logger;
 
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;

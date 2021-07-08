@@ -90,6 +90,7 @@ public abstract class OxyCamera implements EntityComponent {
     public float getMouseSpeed() {
         return mouseSpeed;
     }
+
     private static final String[] selection = {"Perspective Camera", "Orthographic Camera"};
 
     private static String currentItem = selection[0];

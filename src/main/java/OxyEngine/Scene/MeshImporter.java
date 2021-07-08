@@ -3,14 +3,12 @@ package OxyEngine.Scene;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.*;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,25 +22,21 @@ import static org.lwjgl.assimp.Assimp.*;
 public non-sealed class MeshImporter implements ModelImporterFactory {
 
     static final class AssimpMesh {
-        public List<OxyVertex> vertexList;
-        public List<int[]> faces;
+        final List<OxyVertex> vertexList = new ArrayList<>();
+        final List<int[]> faces = new ArrayList<>();
+        final OxyEntity rootEntity;
+        final String name;
 
-        //FOR SORTING (NULL AFTER SORTING IS DONE)
-        public List<Vector3f> verticesList;
-
-        public int materialIndex;
-        public Matrix4f transformation = new Matrix4f();
-
-        public final String name;
-        public Vector3f min = new Vector3f(), max = new Vector3f();
-        public final OxyEntity rootEntity;
+        Matrix4f transformation = new Matrix4f();
+        Vector3f minAABB = new Vector3f(), maxAABB = new Vector3f();
+        int materialIndex;
 
         int mNumBones;
         PointerBuffer mBones;
 
-        public AssimpMesh(OxyEntity rootEntity, String name) {
-            this.name = name;
+        AssimpMesh(OxyEntity rootEntity, String name) {
             this.rootEntity = rootEntity;
+            this.name = name;
         }
     }
 
@@ -75,24 +69,22 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
         //Submeshes
         for (int i = 0; i < node.mNumMeshes(); i++) {
             AIMesh mesh = AIMesh.create(scene.mMeshes().get(node.mMeshes().get(i)));
-            System.out.println("NODE: " + node.mName().dataString());
-            System.out.println("SUBMESH: " + mesh.mName().dataString());
-            AssimpMesh oxyMesh = new AssimpMesh(root, mesh.mName().dataString());
-            oxyMesh.transformation = transformation;
-            oxyMesh.mBones = mesh.mBones();
-            oxyMesh.mNumBones = mesh.mNumBones();
-            oxyMesh.materialIndex = mesh.mMaterialIndex();
-            processMesh(mesh, oxyMesh);
+            AssimpMesh subMesh = new AssimpMesh(root, node.mName().dataString());
+            subMesh.transformation = transformation;
+            subMesh.mBones = mesh.mBones();
+            subMesh.mNumBones = mesh.mNumBones();
+            subMesh.materialIndex = mesh.mMaterialIndex();
             AIAABB aiaabb = mesh.mAABB();
-            oxyMesh.min = new Vector3f(aiaabb.mMin().x(), aiaabb.mMin().y(), aiaabb.mMin().z());
-            oxyMesh.max = new Vector3f(aiaabb.mMax().x(), aiaabb.mMax().y(), aiaabb.mMax().z());
-            this.meshes.add(oxyMesh);
+            subMesh.minAABB = new Vector3f(aiaabb.mMin().x(), aiaabb.mMin().y(), aiaabb.mMin().z());
+            subMesh.maxAABB = new Vector3f(aiaabb.mMax().x(), aiaabb.mMax().y(), aiaabb.mMax().z());
+            processMesh(mesh, subMesh);
+            this.meshes.add(subMesh);
         }
 
-        //another node?
+        //Children node
         for (int i = 0; i < node.mNumChildren(); i++) {
-            System.out.println("ANOTHER NODE: " + node.mName().dataString());
-            processNode(AINode.create(node.mChildren().get(i)), scene, root);
+            AINode childrenNode = AINode.create(node.mChildren().get(i));
+            processNode(childrenNode, scene, root);
         }
     }
 
@@ -105,8 +97,6 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
         AIVector3D.Buffer bitangent = mesh.mBitangents();
 
         int size = mesh.mNumVertices();
-        oxyMesh.vertexList = new ArrayList<>(size);
-        oxyMesh.verticesList = new ArrayList<>(size);
 
         for (int i = 0; i < size; i++) {
             AIVector3D vertices = bufferVert.get(i);
@@ -115,49 +105,49 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
             Vector3f v = new Vector3f(vertices.x(), vertices.y(), vertices.z());
 
             vertex.vertices.set(v);
-            oxyMesh.verticesList.add(v);
 
             if (bufferNor != null) {
                 AIVector3D normals3 = bufferNor.get(i);
-                vertex.normals.set(new Vector3f(normals3.x(), normals3.y(), normals3.z()));
+                vertex.normals.set(normals3.x(), normals3.y(), normals3.z());
             } else logger.info("Model: " + rootName + " has no normals");
 
             if (textCoords != null) {
                 AIVector3D textCoord = textCoords.get(i);
-                vertex.textureCoords.set(new Vector2f(textCoord.x(), 1 - textCoord.y()));
+                vertex.textureCoords.set(textCoord.x(), textCoord.y());
             } else logger.info("Model: " + rootName + " has no texture coordinates");
 
             if (tangent != null) {
                 AIVector3D tangentC = tangent.get(i);
-                vertex.tangents.set(new Vector3f(tangentC.x(), tangentC.y(), tangentC.z()));
+                vertex.tangents.set(tangentC.x(), tangentC.y(), tangentC.z());
             } else logger.info("Model: " + rootName + " has no tangent");
 
             if (bitangent != null) {
                 AIVector3D biTangentC = bitangent.get(i);
-                vertex.biTangents.set(new Vector3f(biTangentC.x(), biTangentC.y(), biTangentC.z()));
+                vertex.biTangents.set(biTangentC.x(), biTangentC.y(), biTangentC.z());
             } else logger.info("Model: " + rootName + " has no bitangent");
 
             oxyMesh.vertexList.add(vertex);
         }
 
         int numFaces = mesh.mNumFaces();
-        oxyMesh.faces = new ArrayList<>(numFaces);
         AIFace.Buffer aiFaces = mesh.mFaces();
         for (int i = 0; i < numFaces; i++) {
             AIFace aiFace = aiFaces.get(i);
             IntBuffer buffer = aiFace.mIndices();
             while (buffer.hasRemaining()) {
-                oxyMesh.faces.add(new int[]{buffer.get(), buffer.get(), buffer.get()});
+                int f1 = buffer.get();
+                int f2 = buffer.get();
+                int f3 = buffer.get();
+                oxyMesh.faces.add(new int[]{f1, f2, f3});
             }
         }
-
     }
 
     private void addMaterial(AIMaterial aiMaterial) {
 
         String parentPath = new File(scenePath).getParent();
 
-        AIString nameMaterial = new AIString(ByteBuffer.allocateDirect(1032));
+        AIString nameMaterial = AIString.calloc();
         aiGetMaterialString(aiMaterial, AI_MATKEY_NAME, aiTextureType_NONE, 0, nameMaterial);
         String matName = nameMaterial.dataString();
         nameMaterial.clear();
@@ -216,33 +206,27 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
         if (textPath.isBlank() || textPath.isEmpty()) {
             logger.warning(warningString + "Albedo map is empty!");
             textPath = null;
-        }
-        else textPath = parentPath + "\\" + textPath;
-        if (textPathNormals.isBlank() || textPathNormals.isEmpty()){
+        } else textPath = parentPath + "\\" + textPath;
+        if (textPathNormals.isBlank() || textPathNormals.isEmpty()) {
             logger.warning(warningString + "Normal map is empty!");
             textPathNormals = null;
-        }
-        else textPathNormals = parentPath + "\\" + textPathNormals;
-        if (textPathRoughness.isBlank() || textPathRoughness.isEmpty()){
+        } else textPathNormals = parentPath + "\\" + textPathNormals;
+        if (textPathRoughness.isBlank() || textPathRoughness.isEmpty()) {
             logger.warning(warningString + "Roughness map is empty!");
             textPathRoughness = null;
-        }
-        else textPathRoughness = parentPath + "\\" + textPathRoughness;
-        if (textPathMetallic.isBlank() || textPathMetallic.isEmpty()){
+        } else textPathRoughness = parentPath + "\\" + textPathRoughness;
+        if (textPathMetallic.isBlank() || textPathMetallic.isEmpty()) {
             logger.warning(warningString + "Metallic map is empty!");
             textPathMetallic = null;
-        }
-        else textPathMetallic = parentPath + "\\" + textPathMetallic;
-        if (textPathAO.isBlank() || textPathAO.isEmpty()){
+        } else textPathMetallic = parentPath + "\\" + textPathMetallic;
+        if (textPathAO.isBlank() || textPathAO.isEmpty()) {
             logger.warning(warningString + "AO map is empty!");
             textPathAO = null;
-        }
-        else textPathAO = parentPath + "\\" + textPathAO;
-        if (textPathEmissive.isBlank() || textPathEmissive.isEmpty()){
+        } else textPathAO = parentPath + "\\" + textPathAO;
+        if (textPathEmissive.isBlank() || textPathEmissive.isEmpty()) {
             logger.warning(warningString + "Emissive map is empty!");
             textPathEmissive = null;
-        }
-        else textPathEmissive = parentPath + "\\" + textPathEmissive;
+        } else textPathEmissive = parentPath + "\\" + textPathEmissive;
 
         materials.add(new AssimpMaterial(matName, textPath, textPathMetallic, textPathRoughness, textPathNormals, textPathAO, textPathEmissive, diffuse));
     }

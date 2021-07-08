@@ -1,14 +1,5 @@
-//#type fragment
-#version 460 core
-
-layout(location = 0) out vec4 color;
-
-void main(){
-    color = vec4(0.34, 0.74, 0.42, 1.0);
-}
-
 //#type vertex
-#version 460 core
+#version 450 core
 
 layout(location = 0) in vec3 pos;
 layout(location = 6) in vec4 boneIds;
@@ -39,3 +30,13 @@ void main(){
 
     gl_Position = model * totalPos * v_Matrix;
 }
+
+//#type fragment
+#version 450 core
+
+layout(location = 0) out vec4 color;
+
+void main(){
+    color = vec4(0.34, 0.74, 0.42, 1.0);
+}
+

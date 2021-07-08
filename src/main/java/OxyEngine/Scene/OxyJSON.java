@@ -1,5 +1,6 @@
 package OxyEngine.Scene;
 
+import OxyEngine.System.OxyFileSystem;
 import OxyEngine.System.OxySystem;
 
 import java.io.File;
@@ -265,7 +266,7 @@ public class OxyJSON {
 
         @Override
         public OxyJSONReaderBuilder read(String s) {
-            loadedS = OxySystem.FileSystem.load(s);
+            loadedS = OxyFileSystem.load(s);
             lineSplitted = loadedS.split("\n");
             return this;
         }

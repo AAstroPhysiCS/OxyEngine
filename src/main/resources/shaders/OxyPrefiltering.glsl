@@ -1,5 +1,19 @@
+//#type vertex
+#version 450 core
+
+layout(location = 0) in vec3 pos;
+
+out vec3 localPosOut;
+uniform mat4 u_viewPrefilter;
+uniform mat4 u_projectionPrefilter;
+
+void main(){
+    localPosOut = pos;
+    gl_Position = u_projectionPrefilter * u_viewPrefilter * vec4(pos, 1.0f);
+}
+
 //#type fragment
-#version 460 core
+#version 450 core
 
 layout(location = 0) out vec4 color;
 
@@ -101,18 +115,4 @@ void main(){
 
     prefilteredColor = prefilteredColor / totalWeight;
     color = vec4(prefilteredColor, 1.0);
-}
-
-//#type vertex
-#version 460 core
-
-layout(location = 0) in vec3 pos;
-
-out vec3 localPosOut;
-uniform mat4 u_viewPrefilter;
-uniform mat4 u_projectionPrefilter;
-
-void main(){
-    localPosOut = pos;
-    gl_Position = u_projectionPrefilter * u_viewPrefilter * vec4(pos, 1.0f);
 }

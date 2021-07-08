@@ -19,7 +19,7 @@ import imgui.type.ImString;
 import java.util.List;
 
 import static OxyEngine.Scene.SceneRuntime.entityContext;
-import static OxyEngine.System.OxySystem.FileSystem.openDialog;
+import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;

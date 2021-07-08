@@ -1,5 +1,20 @@
+//#type vertex
+#version 450 core
+
+layout(location = 0) in vec3 pos;
+
+out vec3 localPosOut;
+
+uniform mat4 u_viewIBL;
+uniform mat4 u_projectionIBL;
+
+void main(){
+    localPosOut = pos;
+    gl_Position = u_projectionIBL * u_viewIBL * vec4(pos, 1.0f);
+}
+
 //#type fragment
-#version 460 core
+#version 450 core
 
 layout(location = 0) out vec4 color;
 
@@ -32,19 +47,4 @@ void main(){
     }
     irradiance = PI * irradiance * (1.0 / float(nrSamples));
     color = vec4(irradiance, 1.0);
-}
-
-//#type vertex
-#version 460 core
-
-layout(location = 0) in vec3 pos;
-
-out vec3 localPosOut;
-
-uniform mat4 u_viewIBL;
-uniform mat4 u_projectionIBL;
-
-void main(){
-    localPosOut = pos;
-    gl_Position = u_projectionIBL * u_viewIBL * vec4(pos, 1.0f);
 }

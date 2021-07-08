@@ -1,5 +1,18 @@
+//#type vertex
+#version 450 core
+
+layout(location = 0) in vec3 pos;
+layout(location = 1) in vec2 tcs;
+
+out vec2 tcsOut;
+
+void main(){
+    tcsOut = tcs;
+    gl_Position = vec4(pos, 1.0f);
+}
+
 //#type fragment
-#version 460 core
+#version 450 core
 
 layout(location = 0) out vec2 color;
 
@@ -109,17 +122,4 @@ vec2 IntegrateBRDF(float NdotV, float roughness)
 
 void main(){
     color = IntegrateBRDF(tcsOut.x, tcsOut.y);
-}
-
-//#type vertex
-#version 460 core
-
-layout(location = 0) in vec3 pos;
-layout(location = 1) in vec2 tcs;
-
-out vec2 tcsOut;
-
-void main(){
-    tcsOut = tcs;
-    gl_Position = vec4(pos, 1.0f);
 }

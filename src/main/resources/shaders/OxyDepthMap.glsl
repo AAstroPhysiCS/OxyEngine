@@ -1,11 +1,7 @@
-//#type fragment
-#version 460 core
-
-void main(){
-}
-
 //#type vertex
-#version 460 core
+#version 450 core
+
+#define MAX_BONES 100
 
 layout(location = 0) in vec3 pos;
 layout(location = 6) in vec4 boneIds;
@@ -14,7 +10,6 @@ layout(location = 7) in vec4 weights;
 uniform mat4 model;
 uniform mat4 lightSpaceMatrix;
 
-const int MAX_BONES = 100;
 uniform mat4 finalBonesMatrices[MAX_BONES];
 uniform int animatedModel;
 
@@ -33,4 +28,10 @@ void main(){
     }
 
     gl_Position = lightSpaceMatrix * model * totalPos;
+}
+
+//#type fragment
+#version 450 core
+
+void main(){
 }

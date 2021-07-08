@@ -1,10 +1,9 @@
 package OxyEngine;
 
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.Core.Window.OxyWindow;
+import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.System.OxyDisposable;
-import OxyEngineEditor.UI.UIThemeLoader;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
 import java.util.Objects;
@@ -25,8 +24,6 @@ public class OxyEngine implements OxyDisposable {
     private final Thread thread;
 
     private final TargetPlatform targetPlatform;
-
-    private static final float[][] LOADED_THEME = UIThemeLoader.getInstance().load();
 
     public OxyEngine(Supplier<Runnable> supplier, OxyWindow oxyWindow, Antialiasing antialiasing, boolean vSync, boolean debug, TargetPlatform targetPlatform) {
         thread = new Thread(supplier.get(), "OxyEngine - 1");
@@ -80,17 +77,12 @@ public class OxyEngine implements OxyDisposable {
     @Override
     public void dispose() {
         oxyWindow.dispose();
-
         glfwTerminate();
         Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
 
     public static Antialiasing getAntialiasing() {
         return antialiasing;
-    }
-
-    public static float[][] getLoadedTheme() {
-        return LOADED_THEME;
     }
 
     public static OxyWindow getWindowHandle() {

@@ -213,14 +213,15 @@ public final class SceneSerializer {
             oldScene.disposeAllModels();
 
             Scene scene = new Scene(sceneName, sceneWorkingDir);
-            scene.gammaStrength = Float.parseFloat(sceneJSON.getField("Scene Gamma Strength").value());
-            scene.exposure = Float.parseFloat(sceneJSON.getField("Scene Exposure").value());
+            scene.gammaStrength = new float[]{Float.parseFloat(sceneJSON.getField("Scene Gamma Strength").value())};
+            scene.exposure = new float[]{Float.parseFloat(sceneJSON.getField("Scene Exposure").value())};
 
             for (var n : oldScene.getEntityEntrySet()) {
                 OxyEntity key = n.getKey();
                 scene.put(key);
                 scene.addComponent(key, n.getValue().toArray(EntityComponent[]::new));
             }
+
             SceneRuntime.entityContext = null;
             SceneRuntime.currentBoundedSkyLight = null;
             SceneRenderer.getInstance().clear();

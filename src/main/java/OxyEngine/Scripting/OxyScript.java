@@ -5,13 +5,15 @@ import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Scene.Scene;
 import OxyEngine.Scene.SceneRuntime;
 import OxyEngine.Scene.SceneState;
-import OxyEngine.System.OxySystem;
+import OxyEngine.System.OxyFileSystem;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -19,7 +21,7 @@ import java.util.Objects;
 
 import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneRuntime.entityContext;
-import static OxyEngine.System.OxySystem.FileSystem.openDialog;
+import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
@@ -29,6 +31,8 @@ public class OxyScript {
     private Scene scene;
     private OxyEntity entity;
     private EntityInfoProvider provider;
+
+    private static final JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
     private String path;
 
@@ -44,20 +48,21 @@ public class OxyScript {
         this.entity = entity;
     }
 
-    private Object getObjectFromFile(String classBinName, Scene scene, OxyEntity entity) {
-//        compiler.run(System.in, System.out, System.err, "--enable-preview", "--release", "15",
-//                "-classpath", System.getProperty("java.class.path"), "-d", System.getProperty("user.dir") + "\\target\\classes", path);
+    private Object getObjectFromFile(String packageName, Scene scene, OxyEntity entity) {
+        compiler.run(null, null, null, "--enable-preview", "--release", System.getProperty("java.version"), "-Xlint:none",
+                "-classpath", System.getProperty("java.class.path"), "-d", System.getProperty("user.dir") + "\\target\\classes", path);
+        String pathConvertedToClassExtension = path.replace(".java", ".class");
         try {
-            return SceneRuntime.loadClass(classBinName, scene, entity);
+            return SceneRuntime.loadClass(pathConvertedToClassExtension, packageName, scene, entity);
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    private String getPackage() {
+    private String getPackageName() {
         File file = new File(path);
-        String[] loadedStringInLines = OxySystem.FileSystem.load(path).split("\n");
+        String[] loadedStringInLines = OxyFileSystem.load(path).split("\n");
         for (String s : loadedStringInLines) {
             if (s.startsWith("package")) {
                 return s.split(" ")[1].replace(";", "") + "." + file.getName().replace(".java", "");
@@ -102,7 +107,7 @@ public class OxyScript {
             provider = null;
         }
         if (path == null) return;
-        if (getObjectFromFile(getPackage(), scene, entity) instanceof ScriptableEntity obj) {
+        if (getObjectFromFile(getPackageName(), scene, entity) instanceof ScriptableEntity obj) {
             provider = new EntityInfoProvider(obj);
             ScriptEngine.addProvider(provider);
         } else oxyAssert("The script must extend ScriptableEntity class!");

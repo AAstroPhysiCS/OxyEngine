@@ -2,6 +2,7 @@ package OxyEngine.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Camera.SceneCamera;
 import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
@@ -26,8 +27,8 @@ import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Scene.SceneRuntime.entityContext;
 import static OxyEngine.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Scene.SceneSerializer.fileExtension;
-import static OxyEngine.System.OxySystem.FileSystem.openDialog;
-import static OxyEngine.System.OxySystem.FileSystem.saveDialog;
+import static OxyEngine.System.OxyFileSystem.openDialog;
+import static OxyEngine.System.OxyFileSystem.saveDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 
 public final class Scene implements OxyDisposable {
@@ -37,8 +38,8 @@ public final class Scene implements OxyDisposable {
     private String workingDirectory;
     private String sceneName;
 
-    public float gammaStrength = 2.2f;
-    public float exposure = 1.0f;
+    public float[] gammaStrength = new float[]{2.2f};
+    public float[] exposure = new float[]{1.0f};
 
     public static int OBJECT_ID_COUNTER = 0;
 
@@ -80,7 +81,6 @@ public final class Scene implements OxyDisposable {
             //model.setFamily(new EntityFamily()); this is already the default behaviour once the entity is created
             model.transformLocally();
         }
-//        SceneRenderer.getInstance().rebuild();
         return model;
     }
 
@@ -432,6 +432,7 @@ public final class Scene implements OxyDisposable {
     public void dispose() {
         OxyMaterialPool.clear();
         registry.entityList.keySet().removeIf(Objects::nonNull); //removing all objects that aren't null
+        PerspectiveCamera.disposeUniformBuffer();
     }
 
     public static void openScene() {

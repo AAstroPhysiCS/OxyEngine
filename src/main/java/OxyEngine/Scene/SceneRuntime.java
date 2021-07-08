@@ -5,11 +5,15 @@ import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.PhysX.OxyPhysX;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.Scripting.ScriptEngine;
-import OxyEngineEditor.EntryPoint;
 import OxyEngineEditor.UI.Panels.SceneRuntimeControlPanel;
 
+import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+
+import static OxyEngine.System.OxyFileSystem.deleteDir;
 
 public final class SceneRuntime {
 
@@ -29,9 +33,13 @@ public final class SceneRuntime {
     private SceneRuntime() {
     }
 
-    public static Object loadClass(String classBinName, Scene scene, OxyEntity entity) {
+    public static Object loadClass(String path, String packageName, Scene scene, OxyEntity entity) {
+        File f = new File(path);
         try {
-            return EntryPoint.class.getClassLoader().loadClass(classBinName).getDeclaredConstructor(Scene.class, OxyEntity.class).newInstance(scene, entity);
+            URL url = f.toURI().toURL();
+            try (URLClassLoader loader = new URLClassLoader(new URL[]{url})) {
+                return loader.loadClass(packageName).getDeclaredConstructor(Scene.class, OxyEntity.class).newInstance(scene, entity);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -91,6 +99,9 @@ public final class SceneRuntime {
         ACTIVE_SCENE.STATE = SceneState.TERMINATED;
         ScriptEngine.dispose();
         ACTIVE_SCENE.dispose();
+
+        //Deleting the script class directory
+        deleteDir(new File(System.getProperty("user.dir") + "\\target\\classes\\Scripts"));
     }
 
     public static SceneRuntimeControlPanel getPanel() {
