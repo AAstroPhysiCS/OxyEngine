@@ -13,5 +13,7 @@ public abstract class Layer {
 
     public abstract void onImGuiRender();
 
+    public abstract void endFrame();
+
     public abstract void onEvent(OxyEvent event);
 }

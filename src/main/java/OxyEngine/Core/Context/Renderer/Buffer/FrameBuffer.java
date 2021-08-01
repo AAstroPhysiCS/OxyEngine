@@ -51,6 +51,10 @@ public abstract class FrameBuffer extends Buffer {
         flushed = false;
     }
 
+    public abstract void attachColorAttachment(int textarget, int indexOfColorAttachment, int textureId);
+
+    public abstract void attachColorAttachment(int textarget, int indexOfColorAttachment, int textureId, int mip);
+
     protected abstract void attachRenderBufferToFrameBuffer(int attachmentId, RenderBuffer renderBuffer);
 
     public abstract void checkStatus();

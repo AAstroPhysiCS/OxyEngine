@@ -1,21 +1,17 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.AnimationComponent;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.lwjgl.assimp.AIMatrix4x4;
-import org.lwjgl.assimp.AIQuaternion;
 import org.lwjgl.assimp.AIScene;
-import org.lwjgl.assimp.AIVector3D;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.logger;
 import static org.lwjgl.assimp.Assimp.*;
 
@@ -189,21 +185,6 @@ public class OxyModelImporter {
     public List<OxyVertex> getVertexList(int index) {
         checkMeshImporter();
         return meshImporter.meshes.get(index).vertexList;
-    }
-
-    public static Matrix4f convertAIMatrixToJOMLMatrix(AIMatrix4x4 matrix4x4) {
-        return new Matrix4f(matrix4x4.a1(), matrix4x4.b1(), matrix4x4.c1(), matrix4x4.d1(),
-                matrix4x4.a2(), matrix4x4.b2(), matrix4x4.c2(), matrix4x4.d2(),
-                matrix4x4.a3(), matrix4x4.b3(), matrix4x4.c3(), matrix4x4.d3(),
-                matrix4x4.a4(), matrix4x4.b4(), matrix4x4.c4(), matrix4x4.d4());
-    }
-
-    public static Vector3f convertAIVector3DToJOMLVector3f(AIVector3D vector3D) {
-        return new Vector3f(vector3D.x(), vector3D.y(), vector3D.z());
-    }
-
-    public static Quaternionf convertAIQuaternionToJOMLQuaternion(AIQuaternion quaternion) {
-        return new Quaternionf(quaternion.x(), quaternion.y(), quaternion.z(), quaternion.w());
     }
 
     public List<int[]> getFaces(int index) {

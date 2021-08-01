@@ -252,20 +252,20 @@ public final class OxyShader implements OxyDisposable {
         glUniform3f(location, vec.x, vec.y, vec.z);
     }
 
-    public void setUniformMatrix4fv(String name, Matrix4f m, boolean transpose) {
+    public void setUniformMatrix4fv(String name, Matrix4f m) {
         m.get(buffer);
         if (!parameterLocations.containsKey(name)) {
             parameterLocations.put(name, glGetUniformLocation(program, name));
         }
-        glUniformMatrix4fv((Integer) parameterLocations.get(name), transpose, buffer);
+        glUniformMatrix4fv((Integer) parameterLocations.get(name), false, buffer);
     }
 
-    public void setUniformMatrix3fv(String name, Matrix3f m, boolean transpose) {
+    public void setUniformMatrix3fv(String name, Matrix3f m) {
         m.get(buffer);
         if (!parameterLocations.containsKey(name)) {
             parameterLocations.put(name, glGetUniformLocation(program, name));
         }
-        glUniformMatrix3fv((Integer) parameterLocations.get(name), transpose, buffer);
+        glUniformMatrix3fv((Integer) parameterLocations.get(name), false, buffer);
     }
 
     public void recompile() {

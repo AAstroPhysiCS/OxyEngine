@@ -1,7 +1,5 @@
 package OxyEngine.Core.Window;
 
-import OxyEngine.Func;
-
 public final class OxyEventDispatcher {
 
     private static OxyEventDispatcher INSTANCE = null;
@@ -14,8 +12,8 @@ public final class OxyEventDispatcher {
     private OxyEventDispatcher() {
     }
 
-    public <U extends T, T extends OxyEvent> void dispatch(Class<U> desiredEventClass, T event, Func<U> func) {
+    public <U extends T, T extends OxyEvent> void dispatch(Class<U> desiredEventClass, T event, EventFunc<U> eventFunc) {
         if (desiredEventClass.equals(event.getClass()))
-            func.func((U) event);
+            eventFunc.func((U) event);
     }
 }

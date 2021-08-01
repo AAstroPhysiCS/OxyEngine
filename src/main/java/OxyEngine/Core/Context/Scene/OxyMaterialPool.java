@@ -1,20 +1,18 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
 import OxyEngine.Core.Context.Renderer.Texture.OxyTexture;
 import OxyEngine.Core.Context.Renderer.Texture.TexturePixelType;
-import OxyEngine.Scene.OxyEntity;
 import OxyEngine.Core.Context.Renderer.Texture.TextureSlot;
-import OxyEngine.Scene.OxyMaterial;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static OxyEngineEditor.UI.AssetManager.DEFAULT_TEXTURE_PARAMETER;
+import static OxyEngineEditor.UI.UIAssetManager.DEFAULT_TEXTURE_PARAMETER;
 
 public class OxyMaterialPool {
 

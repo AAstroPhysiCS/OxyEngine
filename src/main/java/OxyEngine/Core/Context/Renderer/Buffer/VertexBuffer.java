@@ -4,7 +4,7 @@ import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLVertexBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
 import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.OxyNativeObject;
+import OxyEngine.Core.Context.Scene.OxyNativeObject;
 import OxyEngine.TargetPlatform;
 
 import static OxyEngine.System.OxySystem.oxyAssert;

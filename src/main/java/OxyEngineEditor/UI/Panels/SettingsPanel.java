@@ -2,7 +2,7 @@ package OxyEngineEditor.UI.Panels;
 
 import imgui.ImGui;
 
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
 
 public final class SettingsPanel extends Panel {
 
@@ -29,8 +29,8 @@ public final class SettingsPanel extends Panel {
         ImGui.text("Exposure: ");
         ImGui.nextColumn();
         ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
-        if(ImGui.sliderFloat("###hidelabel g", ACTIVE_SCENE.gammaStrength, 0, 10))
-        if(ImGui.sliderFloat("###hidelabel exposure", ACTIVE_SCENE.exposure, 0, 10))
+        ImGui.sliderFloat("###hidelabel g", ACTIVE_SCENE.gammaStrength, 0, 10);
+        ImGui.sliderFloat("###hidelabel exposure", ACTIVE_SCENE.exposure, 0, 10);
         ImGui.popItemWidth();
         ImGui.columns(1);
         ImGui.end();

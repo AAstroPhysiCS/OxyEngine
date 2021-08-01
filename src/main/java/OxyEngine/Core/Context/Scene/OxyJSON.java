@@ -1,7 +1,6 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.System.OxyFileSystem;
-import OxyEngine.System.OxySystem;
 
 import java.io.File;
 import java.io.FileWriter;

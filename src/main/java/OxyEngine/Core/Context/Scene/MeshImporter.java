@@ -1,4 +1,4 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
@@ -15,8 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static OxyEngine.Scene.OxyModelImporter.convertAIMatrixToJOMLMatrix;
 import static OxyEngine.System.OxySystem.logger;
+import static OxyEngine.OxyUtils.convertAIMatrixToJOMLMatrix;
 import static org.lwjgl.assimp.Assimp.*;
 
 public non-sealed class MeshImporter implements ModelImporterFactory {

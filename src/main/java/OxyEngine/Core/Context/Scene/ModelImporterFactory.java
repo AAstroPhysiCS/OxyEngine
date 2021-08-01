@@ -1,4 +1,4 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import org.lwjgl.assimp.AIScene;
 

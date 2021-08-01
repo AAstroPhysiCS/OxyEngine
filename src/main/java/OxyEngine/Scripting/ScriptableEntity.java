@@ -1,8 +1,9 @@
 package OxyEngine.Scripting;
 
 import OxyEngine.Components.EntityComponent;
-import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Scene.Scene;
+import OxyEngine.Components.TagComponent;
+import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.Scene;
 
 public abstract class ScriptableEntity {
 
@@ -20,6 +21,15 @@ public abstract class ScriptableEntity {
 
     protected <T extends EntityComponent> boolean hasComponent(Class<T> destClass) {
         return scene.has(entity, destClass);
+    }
+
+    protected <T extends EntityComponent> OxyEntity getEntityByName(String name){
+        for(var s : scene.getEntities()){
+            if(s.has(TagComponent.class)){
+                if(s.get(TagComponent.class).tag().equals(name)) return s;
+            }
+        }
+        return null;
     }
 
     protected void updateData() {

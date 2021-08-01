@@ -5,11 +5,11 @@ import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Context.Renderer.Buffer.*;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.OxyModel;
-import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Scene.SceneRenderer;
-import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.Core.Context.Scene.OxyMaterial;
+import OxyEngine.Core.Context.Scene.OxyModel;
+import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.SceneRenderer;
+import OxyEngine.Core.Context.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
@@ -18,7 +18,7 @@ import imgui.type.ImString;
 
 import java.util.List;
 
-import static OxyEngine.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
 import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 
@@ -29,10 +29,9 @@ public class ModelMeshOpenGL extends OpenGLMesh {
     private final String path;
 
     public ModelMeshOpenGL(OxyPipeline pipeline, String path, MeshRenderMode mode, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
+        super(pipeline);
         this.path = path;
         this.mode = mode;
-
-        assert pipeline != null : oxyAssert("Pipeline null!");
 
         vertexBuffer = VertexBuffer.create(pipeline, MeshUsage.DYNAMIC);
         indexBuffer = IndexBuffer.create(pipeline);

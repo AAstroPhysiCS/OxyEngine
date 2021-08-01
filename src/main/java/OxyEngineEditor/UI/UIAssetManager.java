@@ -8,9 +8,9 @@ import java.util.*;
 import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.removeFileExtension;
 
-public class AssetManager {
+public final class UIAssetManager {
 
-    private final Map<String, Image2DTexture> assets = new HashMap<>();
+    private final Map<String, Image2DTexture> uiAssets = new HashMap<>();
 
     public static final TextureParameterBuilder DEFAULT_TEXTURE_PARAMETER = TextureParameterBuilder.create()
             .setMinFilter(TextureParameter.LINEAR_MIPMAP_LINEAR)
@@ -19,18 +19,17 @@ public class AssetManager {
             .setWrapT(TextureParameter.REPEAT)
             .enableMipMap(true);
 
-    private static AssetManager INSTANCE = null;
+    private static UIAssetManager INSTANCE = null;
 
-    public static AssetManager getInstance() {
-        if (INSTANCE == null) INSTANCE = new AssetManager();
+    public static UIAssetManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new UIAssetManager();
+            INSTANCE.loadUIAssets();
+        }
         return INSTANCE;
     }
 
-    static {
-        AssetManager.getInstance().loadUIAssets();
-    }
-
-    private AssetManager() {
+    private UIAssetManager() {
 
     }
 
@@ -46,15 +45,15 @@ public class AssetManager {
             logger.warning("Asset loader failed because name is empty");
             return;
         }
-        if (assets.containsKey(name)) {
+        if (uiAssets.containsKey(name)) {
             logger.severe("Texture exists in the buffer: " + name);
             return;
         }
 
-        assets.put(name, OxyTexture.loadImage(TextureSlot.UITEXTURE, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER));
+        uiAssets.put(name, OxyTexture.loadImage(TextureSlot.UITEXTURE, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER));
     }
 
-    public Image2DTexture getAsset(String imageName) {
-        return assets.get(imageName);
+    public Image2DTexture getUIAsset(String imageName) {
+        return uiAssets.get(imageName);
     }
 }

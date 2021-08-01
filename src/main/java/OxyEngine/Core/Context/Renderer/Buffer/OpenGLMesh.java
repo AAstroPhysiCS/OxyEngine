@@ -7,9 +7,10 @@ import OxyEngine.Core.Context.Renderer.Mesh.MeshRenderMode;
 import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderType;
-import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 
+import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL45.*;
 
 //TODO: Make a Mesh class that this class will inherit from, as well as the VulkanMesh class.
@@ -20,6 +21,13 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
     protected OpenGLTextureBuffer textureBuffer;
     protected OpenGLNormalsBuffer normalsBuffer;
     protected OpenGLTangentBuffer tangentBuffer;
+
+    protected OxyPipeline pipeline;
+
+    public OpenGLMesh(OxyPipeline pipeline){
+        assert pipeline != null : oxyAssert("Pipeline null!");
+        this.pipeline = pipeline;
+    }
 
     protected String path;
 
@@ -34,7 +42,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         return path;
     }
 
-    public void load(OxyPipeline pipeline) {
+    public void load() {
 
         if (vao == 0) vao = glCreateVertexArrays();
         glBindVertexArray(vao);

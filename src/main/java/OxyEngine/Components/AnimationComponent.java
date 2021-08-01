@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 import static OxyEngine.Core.Context.Renderer.Mesh.OxyVertex.MAX_BONES;
-import static OxyEngine.Scene.OxyModelImporter.*;
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngine.OxyUtils.*;
 import static org.lwjgl.assimp.Assimp.aiReleaseImport;
 
 @SuppressWarnings("ConstantConditions")
@@ -50,24 +50,28 @@ public class AnimationComponent implements EntityComponent {
         this.nodeAnimMap = new HashMap<>(other.nodeAnimMap);
         this.animations = new ArrayList<>(other.animations);
         this.rootNode = other.rootNode;
-        this.currentAIScene = other.currentAIScene;
+        this.currentAIScene = null;
         this.currentTime = other.currentTime;
         init();
     }
 
     //Runs one time
     private void init() {
-        for (int i = 0; i < currentAIScene.mNumAnimations(); i++) {
-            animations.add(new OxyAnimation(AIAnimation.create(currentAIScene.mAnimations().get(i))));
-            for (String nodeName : boneInfoMap.keySet())
-                nodeAnimMap.put(nodeName, findNodeAnim(animations.get(i), nodeName));
+        if(animations.isEmpty()) { //means that we copy it (see copy constructor)
+            for (int i = 0; i < currentAIScene.mNumAnimations(); i++) {
+                animations.add(new OxyAnimation(AIAnimation.create(currentAIScene.mAnimations().get(i))));
+                for (String nodeName : boneInfoMap.keySet())
+                    nodeAnimMap.put(nodeName, findNodeAnim(animations.get(i), nodeName));
+            }
         }
-        AINode aiNode = currentAIScene.mRootNode();
-        if(aiNode != null) {
-            rootNode = new OxyNode(aiNode.mName().dataString(), convertAIMatrixToJOMLMatrix(aiNode.mTransformation()), aiNode.mNumChildren(), new ArrayList<>());
-            addAllNodeChildren(aiNode, rootNode); //reading all the aiNodes and saving them to the oxyNode (begins with rootnode and recursively adds...)
-            //Dont need the AiScene anymore, because we fetched all the necessary animation data and saved them to java objects
-            aiReleaseImport(currentAIScene);
+        if(currentAIScene != null) { //means that we copy it (see copy constructor)
+            AINode aiNode = currentAIScene.mRootNode();
+            if (aiNode != null) {
+                rootNode = new OxyNode(aiNode.mName().dataString(), convertAIMatrixToJOMLMatrix(aiNode.mTransformation()), aiNode.mNumChildren(), new ArrayList<>());
+                addAllNodeChildren(aiNode, rootNode); //reading all the aiNodes and saving them to the oxyNode (begins with rootnode and recursively adds...)
+                //Dont need the AiScene anymore, because we fetched all the necessary animation data and saved them to java objects
+                aiReleaseImport(currentAIScene);
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 package OxyEngine.Core.Context.Renderer.Light;
 
 import OxyEngine.Components.EntityComponent;
-import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.OxyEntity;
 
 public abstract class Light implements EntityComponent {
 

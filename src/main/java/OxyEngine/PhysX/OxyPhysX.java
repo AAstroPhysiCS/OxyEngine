@@ -1,24 +1,27 @@
 package OxyEngine.PhysX;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Scene.SceneRuntime;
-import OxyEngine.Scene.SceneState;
+import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.SceneRuntime;
+import OxyEngine.Core.Context.Scene.SceneState;
 import OxyEngine.System.OxyDisposable;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.lwjgl.system.MemoryStack;
 import physx.PxTopLevelFunctions;
-import physx.common.*;
+import physx.common.JavaErrorCallback;
+import physx.common.PxErrorCodeEnum;
+import physx.common.PxTransform;
 import physx.physics.PxFilterData;
 import physx.physics.PxSceneFlagEnum;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.logger;
+import static OxyEngine.OxyUtils.pxVec3ToJOMLQuaternionf;
+import static OxyEngine.OxyUtils.pxVec3ToJOMLVector3f;
 
 public final class OxyPhysX implements OxyDisposable {
 
@@ -70,20 +73,21 @@ public final class OxyPhysX implements OxyDisposable {
         if (ACTIVE_SCENE.STATE != SceneState.RUNNING) return;
 
         physXEnv.simulatePhysics(SceneRuntime.TS);
+
         for (OxyEntity physXEntities : ACTIVE_SCENE.view(OxyPhysXComponent.class)) {
             OxyPhysXActor actor = physXEntities.get(OxyPhysXComponent.class).getActor();
             OxyPhysXGeometry geometry = physXEntities.get(OxyPhysXComponent.class).getGeometry();
             if (actor == null || geometry == null) continue;
 
-            Vector3f scale = new Vector3f();
-            physXEntities.get(TransformComponent.class).transform.getScale(scale);
-
-            PxTransform globalPose = physXEntities.get(OxyPhysXComponent.class).getActor().getGlobalPose();
+            PxTransform globalPose = actor.getGlobalPose();
             Vector3f pos = pxVec3ToJOMLVector3f(globalPose.getP());
             Quaternionf rot = pxVec3ToJOMLQuaternionf(globalPose.getQ());
 
             //physXMatrix4f is here because we are giving to the nvidia physx the "end" transformation (with root transformation)
             //in order to reset the transformation to the world space, we need to get the root transformation and invert it and finally multiply it
+
+            Vector3f scale = new Vector3f();
+            physXEntities.get(TransformComponent.class).transform.getScale(scale);
 
             Matrix4f physXMatrix4f = new Matrix4f()
                     .translate(pos)
@@ -113,7 +117,9 @@ public final class OxyPhysX implements OxyDisposable {
         }
 
         physXEnv.resetScene();
+    }
 
+    public void onScenePlay() {
         for (OxyEntity e : ACTIVE_SCENE.view(OxyPhysXComponent.class)) {
             e.get(OxyPhysXComponent.class).getGeometry().build();
             e.get(OxyPhysXComponent.class).getActor().build();
@@ -133,25 +139,5 @@ public final class OxyPhysX implements OxyDisposable {
 
     public PxFilterData getDefaultFilterData() {
         return DEFAULT_FILTER_DATA;
-    }
-
-    public static Vector3f pxVec3ToJOMLVector3f(PxVec3 vec3) {
-        return new Vector3f(vec3.getX(), vec3.getY(), vec3.getZ());
-    }
-
-    public static Quaternionf pxVec3ToJOMLQuaternionf(PxQuat quat) {
-        return new Quaternionf(quat.getX(), quat.getY(), quat.getZ(), quat.getW());
-    }
-
-    public static PxTransform matrix4fToPxTransform(Matrix4f transform) {
-        Vector3f pos = new Vector3f();
-        Quaternionf rot = new Quaternionf();
-        transform.getTranslation(pos);
-        transform.getUnnormalizedRotation(rot);
-        try (MemoryStack stack = MemoryStack.stackPush()) {
-            PxVec3 vec3 = PxVec3.createAt(stack, MemoryStack::nmalloc, pos.x, pos.y, pos.z);
-            PxQuat quat = PxQuat.createAt(stack, MemoryStack::nmalloc, rot.x, rot.y, rot.z, rot.w);
-            return PxTransform.createAt(stack, MemoryStack::nmalloc, vec3, quat);
-        }
     }
 }

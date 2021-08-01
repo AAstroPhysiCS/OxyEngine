@@ -1,4 +1,4 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.RenderableComponent;
 import OxyEngine.Components.RenderingMode;
@@ -9,7 +9,7 @@ import org.joml.Vector4f;
 
 import java.util.List;
 
-import static OxyEngine.Utils.copy;
+import static OxyEngine.OxyUtils.copy;
 
 public class OxyNativeObject extends OxyEntity {
 

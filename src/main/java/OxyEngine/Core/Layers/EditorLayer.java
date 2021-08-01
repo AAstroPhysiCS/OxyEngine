@@ -3,16 +3,15 @@ package OxyEngine.Core.Layers;
 import OxyEngine.Components.TagComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.EditorCamera;
-import OxyEngine.Core.Context.Renderer.ShadowRenderer;
+import OxyEngine.Core.Context.Scene.*;
+import OxyEngine.Core.Context.SceneRenderer;
 import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.KeyCode;
 import OxyEngine.Core.Window.OxyEvent;
 import OxyEngine.Core.Window.OxyKeyEvent;
 import OxyEngine.OxyEngine;
 import OxyEngine.PhysX.OxyPhysX;
-import OxyEngine.Scene.*;
 import OxyEngine.Scripting.ScriptEngine;
-import OxyEngine.System.OxyFileSystem;
 import OxyEngine.System.OxySystem;
 import OxyEngine.System.OxyUISystem;
 import OxyEngineEditor.UI.Panels.Panel;
@@ -27,11 +26,10 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.Scene.Scene.*;
-import static OxyEngine.Scene.SceneRuntime.*;
+import static OxyEngine.Core.Context.Scene.Scene.*;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.*;
 import static OxyEngineEditor.UI.OxySelectHandler.currentGizmoOperation;
 import static OxyEngineEditor.UI.OxySelectHandler.useSnap;
-import static OxyEngineEditor.UI.Panels.ScenePanel.editorCameraEntity;
 
 public class EditorLayer extends Layer {
 
@@ -41,6 +39,8 @@ public class EditorLayer extends Layer {
 
     private final SceneRenderer sceneRenderer = SceneRenderer.getInstance();
     public static OxyUISystem uiSystem;
+
+    public static OxyNativeObject editorCameraEntity;
 
     private final List<Panel> panelList = new ArrayList<>();
 
@@ -58,32 +58,14 @@ public class EditorLayer extends Layer {
         panelList.add(panel);
     }
 
-    private static float[] getIniViewportSize() {
-        String content = OxyFileSystem.load(OxyFileSystem.getResourceByPath("/ini/imgui.ini"));
-
-        if (content.contains("Viewport")) {
-            int index = content.indexOf("Size", content.indexOf("Viewport"));
-            int newLine = content.indexOf("\n", index);
-            content = ((String) content.subSequence(index, newLine)).replace("Size=", "");
-        }
-
-        String[] size = content.split(",");
-        float width = Float.parseFloat(size[0]);
-        float height = Float.parseFloat(size[1]);
-        return new float[]{width, height};
-    }
-
     @Override
     public void build() {
-        float[] size = getIniViewportSize();
-        ScenePanel.windowSize.set(size[0], size[1]);
 
         oxyPhysics.init();
-        sceneRenderer.initPipelines();
         sceneRenderer.initScene();
 
         editorCameraEntity = ACTIVE_SCENE.createNativeObjectEntity(null, null);
-        EditorCamera editorCamera = new EditorCamera(true, 45f, size[0] / size[1], 1f, 10000f, true);
+        EditorCamera editorCamera = new EditorCamera(true, 45f, ScenePanel.windowPos.x / ScenePanel.windowSize.y, 1f, 10000f, true);
         editorCameraEntity.addComponent(new TransformComponent(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f)), editorCamera, new TagComponent("Editor Camera"));
         //just first frame update
         editorCamera.calcViewMatrixNoTranslation();
@@ -102,7 +84,6 @@ public class EditorLayer extends Layer {
 
         if (currentBoundedCamera != null)
             currentBoundedCamera.onEvent(event);
-        ShadowRenderer.onEvent(event);
     }
 
     public void onKeyPressed(OxyKeyEvent event) {
@@ -131,7 +112,7 @@ public class EditorLayer extends Layer {
 
             case GLFW_KEY_DELETE -> {
                 if (entityContext != null) {
-                    SceneRuntime.stop();
+                    SceneRuntime.onStop();
                     SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
                     var instance = SceneRenderer.getInstance();
                     instance.updateModelEntities();
@@ -181,6 +162,11 @@ public class EditorLayer extends Layer {
         ScriptEngine.run();
         oxyPhysics.simulate();
         sceneRenderer.renderScene();
+    }
+
+    @Override
+    public void endFrame() {
+        sceneRenderer.endFrame();
     }
 
     @Override

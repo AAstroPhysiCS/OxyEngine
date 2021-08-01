@@ -1,6 +1,6 @@
 package OxyEngine.PhysX;
 
-import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 import org.lwjgl.system.MemoryStack;
 import physx.PxTopLevelFunctions;
@@ -13,7 +13,7 @@ import physx.physics.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.System.OxySystem.logger;
 
 public final class OxyPhysXEnvironment implements OxyDisposable {

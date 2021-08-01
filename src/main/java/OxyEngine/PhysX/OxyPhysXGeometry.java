@@ -2,12 +2,12 @@ package OxyEngine.PhysX;
 
 import OxyEngine.Components.MeshPosition;
 import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.OxyMaterial;
+import OxyEngine.Core.Context.Scene.OxyMaterialPool;
 import OxyEngine.PhysX.OxyPhysXGeometry.Box;
 import OxyEngine.PhysX.OxyPhysXGeometry.Sphere;
 import OxyEngine.PhysX.OxyPhysXGeometry.TriangleMesh;
-import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.OxyMaterialPool;
-import OxyEngine.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -29,7 +29,7 @@ import physx.physics.PxShapeFlags;
 import physx.support.Vector_PxU32;
 import physx.support.Vector_PxVec3;
 
-import static OxyEngine.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
 
 
 public sealed abstract class OxyPhysXGeometry implements OxyDisposable
@@ -47,6 +47,21 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
     public abstract void build();
 
     abstract void update();
+
+    public String getColliderType() {
+        return this.getClass().getSimpleName();
+    }
+
+    @SuppressWarnings("preview")
+    static Class<?> getClassBasedOnType(String colliderType) {
+        for (Class<?> classesThatInherit : OxyPhysXGeometry.class.getPermittedSubclasses()) {
+            String simpleName = classesThatInherit.getSimpleName();
+            if (simpleName.equals(colliderType)) {
+                return classesThatInherit;
+            }
+        }
+        return null;
+    }
 
     @Override
     public void dispose() {
@@ -77,8 +92,7 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
                 PxVec3 vec3VerticesTemp = PxVec3.createAt(stack, MemoryStack::nmalloc, 0f, 0f, 0f);
                 TransformComponent eReferenceTransform = eReference.get(TransformComponent.class);
                 for (int i = 0; i < eReference.getVertices().length; ) {
-                    Vector4f vec4fTemp = new Vector4f(eReference.getVertices()[i++], eReference.getVertices()[i++], eReference.getVertices()[i++], 1.0f)
-                            .mul(eReferenceTransform.transform);
+                    Vector4f vec4fTemp = new Vector4f(eReference.getVertices()[i++], eReference.getVertices()[i++], eReference.getVertices()[i++], 1.0f);
                     vec3VerticesTemp.setX(vec4fTemp.x);
                     vec3VerticesTemp.setY(vec4fTemp.y);
                     vec3VerticesTemp.setZ(vec4fTemp.z);
@@ -152,15 +166,21 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
 
     public static final class Box extends OxyPhysXGeometry {
 
-        private final Vector3f pxHalfScalar;
+        private Vector3f pxHalfScalar = new Vector3f();
 
         public Box(Vector3f scale, OxyEntity e) {
             super(e);
             this.pxHalfScalar = scale;
         }
 
+        public Box(OxyEntity e) {
+            super(e);
+            e.get(TransformComponent.class).transform.getScale(this.pxHalfScalar);
+        }
+
         public Box() {
-            this(new Vector3f(entityContext.get(TransformComponent.class).scale), entityContext);
+            super(entityContext);
+            entityContext.get(TransformComponent.class).transform.getScale(this.pxHalfScalar);
         }
 
         @Override
@@ -170,7 +190,6 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
             if (!eReference.has(MeshPosition.class)) return;
 
             OxyMaterial oxyMaterial = OxyMaterialPool.getMaterial(eReference).orElseThrow(() -> new IllegalStateException("Geometry has no OxyMaterial"));
-            if (oxyMaterial == null) throw new IllegalStateException("Geometry has no OxyMaterial");
 
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 PxBoxGeometry geometry = PxBoxGeometry.createAt(stack, MemoryStack::nmalloc, pxHalfScalar.x, pxHalfScalar.y, pxHalfScalar.z);
@@ -190,6 +209,7 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
 
         @Override
         void update() {
+            if (shape == null) return;
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 PxBoxGeometry geometry = PxBoxGeometry.createAt(stack, MemoryStack::nmalloc, pxHalfScalar.x, pxHalfScalar.y, pxHalfScalar.z);
                 shape.setGeometry(geometry);
@@ -206,7 +226,7 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
             OxyPhysXGeometry geometry = entityContext.get(OxyPhysXComponent.class).getGeometry();
 
             if (ImGui.treeNodeEx("Box Collider", ImGuiTreeNodeFlags.DefaultOpen)) {
-                if(geometry instanceof Box b){
+                if (geometry instanceof Box b) {
                     Vector3f halfScalar = b.getPxHalfScalar();
                     halfScalarArr[0] = halfScalar.x;
                     halfScalarArr[1] = halfScalar.y;
@@ -232,10 +252,20 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
         public Sphere(float r, OxyEntity eReference) {
             super(eReference);
             this.r = r;
-            TransformComponent t = entityContext.get(TransformComponent.class);
-            if (t.scale.x != t.scale.y || t.scale.y != t.scale.z)
+            Vector3f scaleDest = new Vector3f();
+            entityContext.get(TransformComponent.class).transform.getScale(scaleDest);
+            if (Math.round(scaleDest.x) != Math.round(scaleDest.y) || Math.round(scaleDest.y) != Math.round(scaleDest.z))
                 throw new IllegalStateException("Sphere must have the same scale");
-            this.r = entityContext.get(TransformComponent.class).scale.x;
+            this.r = Math.round(scaleDest.x);
+        }
+
+        public Sphere(OxyEntity eReference) {
+            super(eReference);
+            Vector3f scaleDest = new Vector3f();
+            eReference.get(TransformComponent.class).transform.getScale(scaleDest);
+            if (Math.round(scaleDest.x) != Math.round(scaleDest.y) || Math.round(scaleDest.y) != Math.round(scaleDest.z))
+                throw new IllegalStateException("Sphere must have the same scale");
+            this.r = Math.round(scaleDest.x);
         }
 
         public Sphere() {
@@ -269,6 +299,7 @@ public sealed abstract class OxyPhysXGeometry implements OxyDisposable
 
         @Override
         void update() {
+            if (shape == null) return;
 //            r = eReference.get(TransformComponent.class).scale.x;
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 PxSphereGeometry geometry = PxSphereGeometry.createAt(stack, MemoryStack::nmalloc, r);

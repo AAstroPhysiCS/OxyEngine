@@ -1,9 +1,6 @@
 package OxyEngine.Scripting;
 
-import java.io.File;
-
-import static OxyEngine.Scene.SceneRuntime.TS;
-import static OxyEngine.System.OxyFileSystem.deleteDir;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.TS;
 
 public final class ScriptEngine {
 

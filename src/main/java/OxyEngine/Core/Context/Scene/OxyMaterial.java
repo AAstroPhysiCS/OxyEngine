@@ -1,4 +1,4 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
@@ -12,10 +12,10 @@ import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.type.ImString;
 import org.joml.Vector4f;
 
-import static OxyEngine.Scene.SceneRuntime.entityContext;
-import static OxyEngine.Scene.SceneRuntime.materialContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.materialContext;
 import static OxyEngine.System.OxySystem.parseStringToVector4f;
-import static OxyEngineEditor.UI.AssetManager.DEFAULT_TEXTURE_PARAMETER;
+import static OxyEngineEditor.UI.UIAssetManager.DEFAULT_TEXTURE_PARAMETER;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public class OxyMaterial implements OxyDisposable {
@@ -32,7 +32,7 @@ public class OxyMaterial implements OxyDisposable {
     public float[] metalness, roughness, aoStrength, emissiveStrength;
     public final float[] normalStrength;
 
-    public final float[] dynamicFriction = new float[]{0.5f}, staticFriction = new float[]{0.5f}, restitution = new float[]{0.5f};
+    public float[] dynamicFriction = new float[]{0.5f}, staticFriction = new float[]{0.5f}, restitution = new float[]{0.5f};
 
     public OxyMaterial(String name, OxyShader shader, Image2DTexture albedoTexture, Image2DTexture normalTexture, Image2DTexture roughnessTexture, Image2DTexture metallicTexture, Image2DTexture aoTexture, Image2DTexture emissiveTexture,
                        OxyColor albedoColor) {
@@ -107,6 +107,21 @@ public class OxyMaterial implements OxyDisposable {
         this.emissiveStrength = other.emissiveStrength.clone();
         this.index = other.index;
         this.assimpIndex = other.assimpIndex;
+        this.dynamicFriction = other.dynamicFriction.clone();
+        this.staticFriction = other.staticFriction.clone();
+        this.restitution = other.restitution.clone();
+    }
+
+    public void setDynamicFriction(float dynamicFriction) {
+        this.dynamicFriction = new float[]{dynamicFriction};
+    }
+
+    public void setStaticFriction(float staticFriction) {
+        this.staticFriction = new float[]{staticFriction};
+    }
+
+    public void setRestitution(float restitution) {
+        this.restitution = new float[]{restitution};
     }
 
     void bindTextures() {

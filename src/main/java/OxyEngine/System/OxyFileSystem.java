@@ -1,7 +1,7 @@
 package OxyEngine.System;
 
-import OxyEngine.Scene.SceneRuntime;
-import OxyEngine.Scene.SceneState;
+import OxyEngine.Core.Context.Scene.SceneRuntime;
+import OxyEngine.Core.Context.Scene.SceneState;
 import OxyEngineEditor.EntryPoint;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.BufferUtils.createByteBuffer;
 
 public interface OxyFileSystem {
@@ -82,7 +82,7 @@ public interface OxyFileSystem {
     }
 
     static String openDialog(String filterList, String defaultPath) {
-        SceneRuntime.stop();
+        SceneRuntime.onStop();
         ACTIVE_SCENE.STATE = SceneState.WAITING;
         String path = null;
         try (MemoryStack stack = MemoryStack.stackPush()) {
@@ -97,7 +97,7 @@ public interface OxyFileSystem {
     }
 
     static String saveDialog(String filterList, String defaultPath) {
-        SceneRuntime.stop();
+        SceneRuntime.onStop();
         ACTIVE_SCENE.STATE = SceneState.WAITING;
         String path = null;
         try (MemoryStack stack = MemoryStack.stackPush()) {

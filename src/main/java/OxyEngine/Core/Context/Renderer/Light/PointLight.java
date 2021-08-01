@@ -3,14 +3,14 @@ package OxyEngine.Core.Context.Renderer.Light;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
-import OxyEngine.Scene.OxyMaterialPool;
-import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.OxyMaterialPool;
+import OxyEngine.Core.Context.Scene.OxyEntity;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Vector3f;
 
-import static OxyEngine.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
 
 
 public class PointLight extends Light {

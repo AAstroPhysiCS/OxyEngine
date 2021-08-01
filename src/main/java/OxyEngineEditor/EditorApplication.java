@@ -9,7 +9,7 @@ import OxyEngine.Core.Window.OxyEvent;
 import OxyEngine.Core.Window.OxyWindow;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.Core.Context.Scene.SceneRuntime;
 import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
 
@@ -46,7 +46,6 @@ public class EditorApplication extends OxyApplication {
         editorLayer.addPanel(SettingsPanel.getInstance());
         editorLayer.addPanel(PropertiesPanel.getInstance());
         editorLayer.addPanel(ScenePanel.getInstance());
-//        uiLayer.addPanel(ShadowRenderer.DebugPanel.getInstance());
 
         layerStack.pushLayer(editorLayer);
         for (Layer l : layerStack.getLayerStack())
@@ -55,6 +54,7 @@ public class EditorApplication extends OxyApplication {
 
     @Override
     protected void update() {
+        OxyRenderer.pollEvents();
         for (OxyEvent event : OxyWindow.getEventPool()) {
             for (Layer l : layerStack.getLayerStack())
                 l.onEvent(event);
@@ -67,10 +67,10 @@ public class EditorApplication extends OxyApplication {
         for (Layer l : layerStack.getLayerStack()) {
             l.onImGuiRender();
             l.run(ts);
+            l.endFrame();
         }
 
         OxyRenderer.swapBuffers();
-        OxyRenderer.pollEvents();
     }
 
     protected Runnable run() {

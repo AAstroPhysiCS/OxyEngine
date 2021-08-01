@@ -1,4 +1,4 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
@@ -9,6 +9,7 @@ import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
 import OxyEngine.Core.Context.OxyRenderPass;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.PhysX.OxyPhysXComponent;
+import OxyEngine.Core.Context.SceneRenderer;
 import OxyEngine.Scripting.OxyScript;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static OxyEngine.Utils.toPrimitiveInteger;
+import static OxyEngine.OxyUtils.toPrimitiveInteger;
 
 public class OxyModel extends OxyEntity {
 
@@ -27,8 +28,8 @@ public class OxyModel extends OxyEntity {
     OxyModel(Scene scene, int id, List<OxyVertex> vertexList, List<int[]> faces) {
         super(scene);
         this.objectID = id;
-        this.vertexList = vertexList;
-        this.faces = faces;
+        this.vertexList = new ArrayList<>(vertexList);
+        this.faces = new ArrayList<>(faces);
     }
 
     OxyModel(Scene scene, int id) {
@@ -86,7 +87,7 @@ public class OxyModel extends OxyEntity {
         //adding all the parent gui nodes (except OxyScript, bcs that gui node is instance dependent)
         e.getGUINodes().addAll(this.getGUINodes().stream().filter(c -> !(c instanceof OxyScript)).collect(Collectors.toList()));
 
-        SceneRuntime.stop();
+        SceneRuntime.onStop();
 
         if (has(OpenGLMesh.class)) e.constructCopy(get(OpenGLMesh.class).getPath(), this);
 

@@ -1,13 +1,9 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Context.Renderer.Light.SkyLight;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
-import OxyEngine.Core.Context.Renderer.ShadowRenderer;
-import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
-import OxyEngine.Core.Context.Renderer.Texture.TextureSlot;
 import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngineEditor.UI.Panels.GUINode;
@@ -16,11 +12,9 @@ import org.joml.Matrix4f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.Core.Context.Renderer.ShadowRenderer.NUMBER_CASCADES;
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngine.Scene.SceneRuntime.currentBoundedSkyLight;
-import static OxyEngine.Utils.toPrimitiveFloat;
-import static OxyEngine.Utils.toPrimitiveInteger;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.OxyUtils.toPrimitiveFloat;
+import static OxyEngine.OxyUtils.toPrimitiveInteger;
 import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
 public abstract class OxyEntity {
@@ -86,6 +80,26 @@ public abstract class OxyEntity {
         var root = getRoot();
         if (root != null)
             c.transform.mulLocal(root.get(TransformComponent.class).transform);
+
+        c.transform.getTranslation(c.worldSpacePosition);
+    }
+
+    public void transformLocallyWithoutRotation() {
+        TransformComponent c = get(TransformComponent.class);
+        c.transform = new Matrix4f()
+                .translate(c.position)
+                .rotateX(0f)
+                .rotateY(0f)
+                .rotateZ(0f)
+                .scale(c.scale);
+
+        var root = getRoot();
+        if (root != null) {
+            Matrix4f rootTransform = new Matrix4f(root.get(TransformComponent.class).transform);
+            rootTransform.setRotationXYZ(0f, 0f, 0f);
+
+            c.transform.mulLocal(rootTransform);
+        }
 
         c.transform.getTranslation(c.worldSpacePosition);
     }
@@ -251,47 +265,14 @@ public abstract class OxyEntity {
                 animComp.updateAnimation(SceneRuntime.TS);
                 List<Matrix4f> matrix4fList = animComp.getFinalBoneMatrices();
                 for (int j = 0; j < matrix4fList.size(); j++) {
-                    shader.setUniformMatrix4fv("Animation.finalBonesMatrices[" + j + "]", matrix4fList.get(j), false);
+                    shader.setUniformMatrix4fv("Animation.finalBonesMatrices[" + j + "]", matrix4fList.get(j));
                 }
             } else animComp.setTime(0);
         }
 
         TransformComponent c = get(TransformComponent.class);
-        shader.setUniformMatrix4fv("Transforms.model", c.transform, false);
-        int iblSlot = TextureSlot.UNUSED.getValue(), prefilterSlot = TextureSlot.UNUSED.getValue(), brdfLUTSlot = TextureSlot.UNUSED.getValue();
+        shader.setUniformMatrix4fv("Transforms.model", c.transform);
 
-        if (currentBoundedSkyLight != null) {
-            SkyLight skyLightComp = currentBoundedSkyLight.get(SkyLight.class);
-            HDRTexture hdrTexture = null;
-            if (skyLightComp != null)
-                hdrTexture = skyLightComp.getHDRTexture();
-            if (hdrTexture != null) {
-                iblSlot = hdrTexture.getIBLSlot();
-                prefilterSlot = hdrTexture.getPrefilterSlot();
-                brdfLUTSlot = hdrTexture.getBDRFSlot();
-            }
-        }
-
-        shader.setUniform1i("EnvironmentTex.iblMap", iblSlot);
-        shader.setUniform1i("EnvironmentTex.prefilterMap", prefilterSlot);
-        shader.setUniform1i("EnvironmentTex.brdfLUT", brdfLUTSlot);
-
-        boolean castShadows = ShadowRenderer.castShadows();
-        shader.setUniform1i("Shadows.castShadows", castShadows ? 1 : 0);
-        if (castShadows) {
-            if (ShadowRenderer.cascadeIndicatorToggle)
-                shader.setUniform1i("Shadows.cascadeIndicatorToggle", 1);
-            else shader.setUniform1i("Shadows.cascadeIndicatorToggle", 0);
-
-            for (int i = 0; i < NUMBER_CASCADES; i++) {
-                if (ShadowRenderer.ready(i)) {
-                    glBindTextureUnit(TextureSlot.CSM.getValue() + i, ShadowRenderer.getShadowMap(i));
-                    shader.setUniform1i("Shadows.shadowMap[" + i + "]", TextureSlot.CSM.getValue() + i);
-                    shader.setUniformMatrix4fv("lightSpaceMatrix[" + i + "]", ShadowRenderer.getShadowViewMatrix(i), false);
-                    shader.setUniform1f("Shadows.cascadeSplits[" + i + "]", ShadowRenderer.getCascadeSplits(i));
-                }
-            }
-        }
         material.push(shader);
         shader.end();
     }

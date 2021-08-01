@@ -7,6 +7,7 @@ import static org.lwjgl.glfw.GLFW.glfwPollEvents;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL13.*;
+import static org.lwjgl.opengl.GL32.GL_TEXTURE_CUBE_MAP_SEAMLESS;
 
 public class OpenGLContext extends RendererContext {
 
@@ -16,6 +17,7 @@ public class OpenGLContext extends RendererContext {
     public void init() {
         createCapabilities();
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
         glDepthFunc(GL_LEQUAL); //for skybox
 
         logger.info("Renderer: " + glGetString(GL_RENDERER));

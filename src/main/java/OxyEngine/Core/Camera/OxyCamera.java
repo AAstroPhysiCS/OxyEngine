@@ -2,14 +2,14 @@ package OxyEngine.Core.Camera;
 
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Core.Window.OxyEvent;
-import OxyEngine.Scene.OxyModel;
+import OxyEngine.Core.Context.Scene.OxyModel;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import static OxyEngine.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
 
 public abstract class OxyCamera implements EntityComponent {
 

@@ -1,28 +1,19 @@
 package OxyEngine.System;
 
 import OxyEngine.OxyApplication;
-import OxyEngine.Scene.SceneRuntime;
-import OxyEngine.Scene.SceneState;
 import OxyEngineEditor.EditorApplication;
-import OxyEngineEditor.EntryPoint;
 import imgui.ImFont;
 import imgui.ImFontAtlas;
 import imgui.ImFontConfig;
 import imgui.ImGuiIO;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.PointerBuffer;
 import org.lwjgl.assimp.AIString;
 import org.lwjgl.assimp.Assimp;
-import org.lwjgl.system.MemoryStack;
-import org.lwjgl.util.nfd.NativeFileDialog;
 import org.reflections.Reflections;
 
 import java.io.*;
-import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,9 +21,6 @@ import java.util.Set;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
-
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static org.lwjgl.BufferUtils.createByteBuffer;
 
 public interface OxySystem {
 

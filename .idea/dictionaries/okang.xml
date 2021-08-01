@@ -9,11 +9,13 @@
       <w>blendfileasset</w>
       <w>blitted</w>
       <w>childiren</w>
+      <w>chromacity</w>
       <w>coords</w>
       <w>cubemap</w>
       <w>dest</w>
       <w>dirasset</w>
       <w>emissive</w>
+      <w>equirectangular</w>
       <w>fbxfileasset</w>
       <w>fileasset</w>
       <w>fovy</w>
@@ -22,6 +24,7 @@
       <w>glsl</w>
       <w>gltffileasset</w>
       <w>imgui</w>
+      <w>inclimation</w>
       <w>irradiance</w>
       <w>jcenter</w>
       <w>jpgfileasset</w>
@@ -34,8 +37,10 @@
       <w>materialpinksphere</w>
       <w>maximov</w>
       <w>objfileasset</w>
+      <w>physxcomponent</w>
       <w>pngfileasset</w>
       <w>polyfbx</w>
+      <w>preetham</w>
       <w>prefilter</w>
       <w>reloader</w>
       <w>renderable</w>
@@ -46,6 +51,7 @@
       <w>stringified</w>
       <w>texturecoords</w>
       <w>uitexture</w>
+      <w>xcomponent</w>
       <w>xoffset</w>
       <w>xpos</w>
       <w>yoffset</w>

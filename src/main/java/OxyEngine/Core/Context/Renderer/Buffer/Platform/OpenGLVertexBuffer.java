@@ -3,9 +3,9 @@ package OxyEngine.Core.Context.Renderer.Buffer.Platform;
 import OxyEngine.Core.Context.Renderer.Buffer.VertexBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Scene.OxyNativeObject;
+import OxyEngine.Core.Context.Scene.OxyNativeObject;
 
-import static OxyEngine.Utils.copy;
+import static OxyEngine.OxyUtils.copy;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 

@@ -2,12 +2,12 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.OxyModel;
-import OxyEngine.Scene.OxyNativeObject;
-import OxyEngine.Scene.SceneRenderer;
+import OxyEngine.Core.Context.SceneRenderer;
+import OxyEngine.Core.Context.Scene.OxyMaterial;
+import OxyEngine.Core.Context.Scene.OxyModel;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
@@ -20,8 +20,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
-import static OxyEngine.Scene.SceneRuntime.*;
+import static OxyEngine.Core.Context.Scene.OxyEntity.addParentTransformToChildren;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.*;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedModelFileExtension;
 import static OxyEngineEditor.UI.OxySelectHandler.*;
@@ -36,7 +36,7 @@ public class ScenePanel extends Panel {
     public static final ImVec2 offsetScreenPos = new ImVec2();
     public static final ImVec2 offset = new ImVec2(); //Window position relative to the window... means that it subtracts the tab
 
-    private static final ImVec2 availContentRegionSize = new ImVec2();
+    public static final ImVec2 availContentRegionSize = new ImVec2();
 
     private static ScenePanel INSTANCE = null;
 
@@ -51,8 +51,6 @@ public class ScenePanel extends Panel {
     @Override
     public void preload() {
     }
-
-    public static OxyNativeObject editorCameraEntity;
 
     @Override
     public void renderPanel() {
@@ -73,7 +71,7 @@ public class ScenePanel extends Panel {
         focusedWindow = ImGui.isWindowFocused();
         hoveredWindow = ImGui.isWindowHovered();
 
-        OpenGLFrameBuffer blittedFrameBuffer = SceneRenderer.getInstance().getMainFrameBuffer().getBlittedFrameBuffer();
+        OpenGLFrameBuffer blittedFrameBuffer = OxyRenderer.getMainFrameBuffer().getBlittedFrameBuffer();
 
         if (blittedFrameBuffer != null) {
 
@@ -97,13 +95,6 @@ public class ScenePanel extends Panel {
                         ProjectPanel.lastDragDropFile = null;
                     }
                     ImGui.endDragDropTarget();
-                }
-
-                var instance = SceneRenderer.getInstance();
-                OpenGLFrameBuffer mainFrameBuffer = instance.getMainFrameBuffer();
-                if (availContentRegionSize.x != mainFrameBuffer.getWidth() || availContentRegionSize.y != mainFrameBuffer.getHeight()) {
-                    mainFrameBuffer.setNeedResize(true, (int) availContentRegionSize.x, (int) availContentRegionSize.y);
-                    instance.getPickingFrameBuffer().setNeedResize(true, (int) availContentRegionSize.x, (int) availContentRegionSize.y);
                 }
             }
 
@@ -144,8 +135,6 @@ public class ScenePanel extends Panel {
 
                     addParentTransformToChildren(entityContext);
                 }
-
-
             }
         }
 

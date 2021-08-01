@@ -1,4 +1,4 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.AnimationComponent;
 import org.lwjgl.assimp.AIBone;
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import static OxyEngine.Core.Context.Renderer.Mesh.OxyVertex.MAX_BONE_INFLUENCE;
-import static OxyEngine.Scene.OxyModelImporter.convertAIMatrixToJOMLMatrix;
+import static OxyEngine.OxyUtils.convertAIMatrixToJOMLMatrix;
 
 public non-sealed class AnimationImporter implements ModelImporterFactory {
 

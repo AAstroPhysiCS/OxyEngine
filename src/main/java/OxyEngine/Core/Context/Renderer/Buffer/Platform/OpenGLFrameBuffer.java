@@ -106,6 +106,10 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         } else windowMinized = false;
 
         if (bufferId == 0) bufferId = glCreateFramebuffers();
+        create();
+    }
+
+    private void create(){
         glBindFramebuffer(GL_FRAMEBUFFER, bufferId);
 
         if (specs != null) {
@@ -171,6 +175,9 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         checkStatus();
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
+    /*
+     * This method should be called when you reuse a framebuffer
+     */
 
     @Override
     public void bind() {
@@ -217,7 +224,8 @@ public class OpenGLFrameBuffer extends FrameBuffer {
 
     @Override
     public void checkStatus() {
-        assert glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete!");
+        int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        assert status == GL_FRAMEBUFFER_COMPLETE : oxyAssert("Framebuffer is incomplete! Error Code: 0x" + Integer.toHexString(status));
     }
 
     public void blit() {

@@ -4,6 +4,7 @@ Registry [
 		Mesh Position: 0
 		Name: RootNode
 		Emitting: false
+		Camera: false
 		Emitting Type: null
 		Position: ( 0.000E+0 -1.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -31,6 +32,7 @@ Registry [
 			Mesh Position: 0
 			Name: Plane.001
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
@@ -60,6 +62,7 @@ Registry [
 		Mesh Position: 0
 		Name: RootNode
 		Emitting: false
+		Camera: false
 		Emitting Type: null
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -87,6 +90,7 @@ Registry [
 			Mesh Position: 0
 			Name: Cube.002
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  5.000E+0  0.000E+0)
 			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
@@ -148,7 +152,7 @@ Registry [
 		Mesh Position: -1
 		Name: Sky Light
 		Emitting: true
-		Emitting Type: SkyLight
+		Emitting Type: OpenGLHDREnvironmentMap
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)

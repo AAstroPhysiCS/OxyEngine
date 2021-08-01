@@ -1,5 +1,5 @@
 package OxyEngine.PhysX;
 
-public enum PhysXRigidBodyMode {
+public enum PhysXRigidBodyType {
     Static(), Dynamic()
 }

@@ -1,10 +1,10 @@
 package OxyEngine.Scripting;
 
 import OxyEngine.Components.UUIDComponent;
-import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Scene.Scene;
-import OxyEngine.Scene.SceneRuntime;
-import OxyEngine.Scene.SceneState;
+import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.Scene;
+import OxyEngine.Core.Context.Scene.SceneRuntime;
+import OxyEngine.Core.Context.Scene.SceneState;
 import OxyEngine.System.OxyFileSystem;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -19,8 +19,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngine.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
 import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 
@@ -132,7 +132,7 @@ public class OxyScript {
                 if (pathDialog != null) {
                     this.path = pathDialog;
                     loadAssembly();
-                    SceneRuntime.stop();
+                    SceneRuntime.onStop();
                     ACTIVE_SCENE.STATE = SceneState.IDLE;
                     bufferPath.set(pathDialog);
                 }

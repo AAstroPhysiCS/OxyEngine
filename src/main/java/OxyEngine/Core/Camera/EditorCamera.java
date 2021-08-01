@@ -1,7 +1,7 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Window.*;
-import OxyEngine.Scene.SceneRuntime;
+import OxyEngine.Core.Context.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import imgui.ImGui;

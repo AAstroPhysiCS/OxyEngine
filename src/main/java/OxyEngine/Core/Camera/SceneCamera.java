@@ -1,7 +1,6 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Window.*;
-import OxyEngine.Scene.SceneRuntime;
 import org.joml.Matrix4f;
 
 public class SceneCamera extends PerspectiveCamera {
@@ -39,6 +38,8 @@ public class SceneCamera extends PerspectiveCamera {
         viewMatrix.set(projectionMatrix);
         viewMatrix.mul(modelMatrix);
         viewMatrix.origin(this.origin);
+
+        updateUniformBuffer();
     }
 
     private void updateUniformBuffer() {
@@ -49,50 +50,5 @@ public class SceneCamera extends PerspectiveCamera {
 
     @Override
     public void onEvent(OxyEvent event) {
-        OxyEventDispatcher dispatcher = OxyEventDispatcher.getInstance();
-        dispatcher.dispatch(OxyMouseEvent.Moved.class, event, this::onMouseMove);
-        dispatcher.dispatch(OxyKeyEvent.Press.class, event, this::onKeyPress);
-    }
-
-    private void onKeyPress(OxyKeyEvent.Press event) {
-        updatePosition(event, SceneRuntime.TS);
-    }
-
-    private void onMouseMove(OxyMouseEvent.Moved event) {
-        update();
-        updateUniformBuffer();
-
-        oldMouseX = event.getX();
-        oldMouseY = event.getY();
-    }
-
-    private void updatePosition(OxyKeyEvent.Press event, float ts) {
-        float angle90 = (float) (-rotationRef.y + (Math.PI / 2));
-        float angle = -rotationRef.y;
-        zoom = 0;
-        if (event.getKeyCode().equals(KeyCode.GLFW_KEY_W)) {
-            positionRef.x += Math.cos(angle90) * horizontalSpeed * ts;
-            positionRef.z += Math.sin(angle90) * horizontalSpeed * ts;
-        }
-        if (event.getKeyCode().equals(KeyCode.GLFW_KEY_S)) {
-            positionRef.x -= Math.cos(angle90) * horizontalSpeed * ts;
-            positionRef.z -= Math.sin(angle90) * horizontalSpeed * ts;
-        }
-        if (event.getKeyCode().equals(KeyCode.GLFW_KEY_D)) {
-            positionRef.x -= Math.cos(angle) * horizontalSpeed * ts;
-            positionRef.z -= Math.sin(angle) * horizontalSpeed * ts;
-        }
-        if (event.getKeyCode().equals(KeyCode.GLFW_KEY_A)) {
-            positionRef.x += Math.cos(angle) * horizontalSpeed * ts;
-            positionRef.z += Math.sin(angle) * horizontalSpeed * ts;
-        }
-        if (event.getKeyCode().equals(KeyCode.GLFW_KEY_SPACE)) {
-            positionRef.y -= verticalSpeed * ts;
-        }
-        if (event.getKeyCode().equals(KeyCode.GLFW_KEY_LEFT_SHIFT)) {
-            positionRef.y += verticalSpeed * ts;
-        }
-        update();
-        updateUniformBuffer();
     }
 }

@@ -1,18 +1,17 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Camera.SceneCamera;
 import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Context.Renderer.Light.PointLight;
-import OxyEngine.Core.Context.Renderer.Light.SkyLight;
+import OxyEngine.Core.Context.Renderer.Light.*;
 import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
 import OxyEngine.PhysX.OxyPhysXComponent;
+import OxyEngine.Core.Context.SceneRenderer;
 import OxyEngine.Scripting.ScriptEngine;
 import OxyEngine.System.OxyDisposable;
 import org.joml.Vector3f;
@@ -23,10 +22,10 @@ import java.util.*;
 
 import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
 import static OxyEngine.Core.Context.Renderer.Light.Light.LIGHT_SIZE;
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
-import static OxyEngine.Scene.SceneRuntime.entityContext;
-import static OxyEngine.Scene.SceneSerializer.extensionName;
-import static OxyEngine.Scene.SceneSerializer.fileExtension;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneSerializer.extensionName;
+import static OxyEngine.Core.Context.Scene.SceneSerializer.fileExtension;
 import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxyFileSystem.saveDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
@@ -91,10 +90,9 @@ public final class Scene implements OxyDisposable {
     }
 
     public OxyNativeObject createSkyLight() {
-        OxyNativeObject skyLightEnt = createNativeObjectEntity(SkyLight.skyboxVertices, SkyLight.indices);
+        OxyNativeObject skyLightEnt = createNativeObjectEntity(null, null);
         if (entityContext != null) skyLightEnt.setFamily(new EntityFamily(entityContext.getFamily()));
-        skyLightEnt.addComponent(new TagComponent("Sky Light"), new SkyLight());
-        skyLightEnt.addComponent(SkyLight.mesh);
+        skyLightEnt.addComponent(new TagComponent("Sky Light"), new OpenGLHDREnvironmentMap());
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
             skyLightEnt.getGUINodes().add(SkyLight.guiNode);
         SceneRenderer.getInstance().updateLightEntities();
@@ -284,19 +282,22 @@ public final class Scene implements OxyDisposable {
             }
         }
 
+        for (var scripts : e.getScripts()) {
+            if (scripts.getProvider() != null) ScriptEngine.removeProvider(scripts.getProvider());
+        }
+
         int index = e.get(OxyMaterialIndex.class) != null ? e.get(OxyMaterialIndex.class).index() : -1;
 
         if (e.has(OxyPhysXComponent.class)) e.get(OxyPhysXComponent.class).dispose();
 
         if (e.has(ModelMeshOpenGL.class)) e.get(ModelMeshOpenGL.class).dispose();
-        if (e.has(SkyLight.class)) {
-            HDRTexture texture = e.get(SkyLight.class).getHDRTexture();
+
+        if (e.has(OpenGLHDREnvironmentMap.class)) {
+            OpenGLHDREnvironmentMap skyLight = e.get(OpenGLHDREnvironmentMap.class);
+            HDRTexture texture = skyLight.getHDRTexture();
             if (texture != null) texture.dispose();
         }
 
-        for (var scripts : e.getScripts()) {
-            if (scripts.getProvider() != null) ScriptEngine.removeProvider(scripts.getProvider());
-        }
         var value = registry.entityList.remove(e);
         assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");
 
@@ -372,6 +373,10 @@ public final class Scene implements OxyDisposable {
         return registry.distinct(destClasses);
     }
 
+    Set<EntityComponent> getAllComponents(OxyEntity e){
+        return registry.entityList.get(e);
+    }
+
     public int getShapeCount() {
         return registry.entityList.keySet().size();
     }
@@ -388,7 +393,7 @@ public final class Scene implements OxyDisposable {
         return sceneName;
     }
 
-    public void disposeAllModels() {
+    public void disposeAllEntities() {
         Iterator<OxyEntity> it = registry.entityList.keySet().iterator();
         while (it.hasNext()) {
             OxyEntity e = it.next();
@@ -406,10 +411,16 @@ public final class Scene implements OxyDisposable {
             }
 
             //REMOVING ENV MAP BCS WE ARE GONNA REPLACE IT WITH THE NEW ENV MAP FROM THE NEW SCENE
-            if (e instanceof OxyNativeObject && e.has(SkyLight.class)) {
-                HDRTexture texture = e.get(SkyLight.class).getHDRTexture();
-                if (texture != null) texture.dispose();
-                it.remove();
+            if (e instanceof OxyNativeObject) {
+                if(e.has(OpenGLHDREnvironmentMap.class)) {
+                    HDRTexture texture = e.get(OpenGLHDREnvironmentMap.class).getHDRTexture();
+                    if (texture != null) texture.dispose();
+                    it.remove();
+                } else if(e.has(DynamicSky.class)) {
+                    DynamicSky dynamicSky = e.get(DynamicSky.class);
+                    dynamicSky.dispose();
+                    it.remove();
+                }
             }
         }
         OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
@@ -431,7 +442,8 @@ public final class Scene implements OxyDisposable {
     @Override
     public void dispose() {
         OxyMaterialPool.clear();
-        registry.entityList.keySet().removeIf(Objects::nonNull); //removing all objects that aren't null
+        disposeAllEntities();
+        registry.entityList.clear();
         PerspectiveCamera.disposeUniformBuffer();
     }
 
@@ -439,14 +451,14 @@ public final class Scene implements OxyDisposable {
         String openScene = openDialog(extensionName, ACTIVE_SCENE.getWorkingDirectory());
         if (openScene != null) {
             ScriptEngine.clearProviders();
-            SceneRuntime.stop();
+            SceneRuntime.onStop();
             ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene);
             SceneRenderer.getInstance().initScene();
         }
     }
 
     public static void saveScene() {
-        SceneRuntime.stop();
+        SceneRuntime.onStop();
         if (ACTIVE_SCENE.workingDirectory == null || ACTIVE_SCENE.workingDirectory.equals("null")) {
             String s = saveDialog(extensionName, null);
             if (s == null) return;
@@ -458,17 +470,17 @@ public final class Scene implements OxyDisposable {
     }
 
     public static void saveAs() {
-        SceneRuntime.stop();
+        SceneRuntime.onStop();
         String saveAs = saveDialog(extensionName, null);
         if (saveAs != null) SceneSerializer.serializeScene(saveAs + fileExtension);
     }
 
     public static void newScene() {
         ScriptEngine.clearProviders();
-        SceneRuntime.stop();
+        SceneRuntime.onStop();
         SceneRuntime.entityContext = null;
         Scene oldScene = ACTIVE_SCENE;
-        oldScene.disposeAllModels();
+        oldScene.disposeAllEntities();
 
         Scene scene = new Scene("Test Scene 1", null);
         for (var n : oldScene.getEntityEntrySet()) {

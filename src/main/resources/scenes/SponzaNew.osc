@@ -4,6 +4,7 @@ Registry [
 		Mesh Position: 0
 		Name: RootNode
 		Emitting: false
+		Camera: false
 		Emitting Type: null
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -31,6 +32,7 @@ Registry [
 			Mesh Position: 0
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -59,6 +61,7 @@ Registry [
 			Mesh Position: 1
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -87,6 +90,7 @@ Registry [
 			Mesh Position: 2
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -115,6 +119,7 @@ Registry [
 			Mesh Position: 3
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -143,6 +148,7 @@ Registry [
 			Mesh Position: 4
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -171,6 +177,7 @@ Registry [
 			Mesh Position: 5
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -199,6 +206,7 @@ Registry [
 			Mesh Position: 6
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -227,6 +235,7 @@ Registry [
 			Mesh Position: 7
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -255,6 +264,7 @@ Registry [
 			Mesh Position: 8
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -283,6 +293,7 @@ Registry [
 			Mesh Position: 9
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -311,6 +322,7 @@ Registry [
 			Mesh Position: 10
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -339,6 +351,7 @@ Registry [
 			Mesh Position: 11
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -367,6 +380,7 @@ Registry [
 			Mesh Position: 12
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -395,6 +409,7 @@ Registry [
 			Mesh Position: 13
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -423,6 +438,7 @@ Registry [
 			Mesh Position: 14
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -451,6 +467,7 @@ Registry [
 			Mesh Position: 15
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -479,6 +496,7 @@ Registry [
 			Mesh Position: 16
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -507,6 +525,7 @@ Registry [
 			Mesh Position: 17
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -535,6 +554,7 @@ Registry [
 			Mesh Position: 18
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -563,6 +583,7 @@ Registry [
 			Mesh Position: 19
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -591,6 +612,7 @@ Registry [
 			Mesh Position: 20
 			Name: sponza_382
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -620,7 +642,8 @@ Registry [
 		Mesh Position: -1
 		Name: Sky Light
 		Emitting: true
-		Emitting Type: SkyLight
+		Camera: false
+		Emitting Type: OpenGLHDREnvironmentMap
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
@@ -655,6 +678,7 @@ Registry [
 		Mesh Position: 0
 		Name: Directional Light
 		Emitting: true
+		Camera: false
 		Emitting Type: DirectionalLight
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 2.344E+0  7.206E-2  5.565E-1)

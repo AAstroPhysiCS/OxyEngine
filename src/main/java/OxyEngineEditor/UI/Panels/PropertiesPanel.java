@@ -20,13 +20,13 @@ import OxyEngine.Core.Context.Renderer.Texture.TextureSlot;
 import OxyEngine.PhysX.OxyPhysXActor;
 import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.PhysX.OxyPhysXGeometry;
-import OxyEngine.PhysX.PhysXRigidBodyMode;
-import OxyEngine.Scene.OxyMaterialPool;
-import OxyEngine.Scene.OxyNativeObject;
-import OxyEngine.Scene.OxyMaterial;
-import OxyEngine.Scene.SceneRenderer;
-import OxyEngine.Scene.SceneRuntime;
-import OxyEngine.Scene.SceneState;
+import OxyEngine.PhysX.PhysXRigidBodyType;
+import OxyEngine.Core.Context.Scene.OxyMaterialPool;
+import OxyEngine.Core.Context.Scene.OxyNativeObject;
+import OxyEngine.Core.Context.Scene.OxyMaterial;
+import OxyEngine.Core.Context.SceneRenderer;
+import OxyEngine.Core.Context.Scene.SceneRuntime;
+import OxyEngine.Core.Context.Scene.SceneState;
 import OxyEngine.Scripting.OxyScript;
 import OxyEngine.System.OxySystem;
 import imgui.ImFont;
@@ -38,12 +38,12 @@ import org.joml.Vector4f;
 import java.io.File;
 import java.util.List;
 
-import static OxyEngine.Scene.OxyEntity.addParentTransformToChildren;
-import static OxyEngine.Scene.SceneRuntime.*;
+import static OxyEngine.Core.Context.Scene.OxyEntity.addParentTransformToChildren;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.*;
 import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedTextureFile;
-import static OxyEngineEditor.UI.AssetManager.DEFAULT_TEXTURE_PARAMETER;
+import static OxyEngineEditor.UI.UIAssetManager.DEFAULT_TEXTURE_PARAMETER;
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 import static OxyEngineEditor.UI.Panels.SceneHierarchyPanel.materialPinkSphere;
 
@@ -215,7 +215,7 @@ public class PropertiesPanel extends Panel {
 
                 if (!t.position.equals(translationX[0], translationY[0], translationZ[0]) ||
                         !t.rotation.equals(rotationX[0], rotationY[0], rotationZ[0]) ||
-                        !t.scale.equals(scaleX[0], scaleY[0], scaleZ[0])) {
+                        !t.scale.equals(scaleX[0], scaleY[0], scaleZ[0]) && SceneState.IDLE == ACTIVE_SCENE.STATE) {
 
                     t.position.set(translationX[0], translationY[0], translationZ[0]);
                     t.rotation.set(rotationX[0], rotationY[0], rotationZ[0]);
@@ -254,7 +254,7 @@ public class PropertiesPanel extends Panel {
                 }
                 if (ImGui.beginMenu("Scripts")) {
                     if (ImGui.menuItem("Basic Script")) {
-                        SceneRuntime.stop();
+                        SceneRuntime.onStop();
                         entityContext.addScript(new OxyScript(null));
                         ACTIVE_SCENE.STATE = SceneState.IDLE;
                     }
@@ -297,7 +297,7 @@ public class PropertiesPanel extends Panel {
                     if (ImGui.menuItem("Rigid Body")) {
                         if (!entityContext.has(OxyPhysXComponent.class))
                             entityContext.addComponent(new OxyPhysXComponent());
-                        OxyPhysXActor actor = new OxyPhysXActor(PhysXRigidBodyMode.Static);
+                        OxyPhysXActor actor = new OxyPhysXActor(PhysXRigidBodyType.Static);
                         actor.build();
                         entityContext.get(OxyPhysXComponent.class).setRigidBodyAs(actor);
                         nodeList.add(OxyPhysXActor.guiNode);
@@ -355,7 +355,7 @@ public class PropertiesPanel extends Panel {
                         //error or hint that lights are single instanced. TODO
                     }
 
-                    if (ImGui.menuItem("Sky Light")) {
+                    if (ImGui.menuItem("HDR Sky Light")) {
                         if (!entityContext.has(Light.class)) {
                             SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
                             OxyNativeObject skyLightEnt = ACTIVE_SCENE.createSkyLight();

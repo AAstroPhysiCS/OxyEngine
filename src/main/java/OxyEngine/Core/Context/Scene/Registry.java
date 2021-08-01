@@ -1,8 +1,9 @@
-package OxyEngine.Scene;
+package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Components.EntityFamily;
 import OxyEngine.Components.UUIDComponent;
+import OxyEngine.System.OxyDisposable;
 
 import java.util.*;
 
@@ -97,6 +98,7 @@ public class Registry {
 
     public void removeComponent(OxyEntity entity, EntityComponent c) {
         entityList.get(entity).remove(c);
+        if(c instanceof OxyDisposable d) d.dispose();
     }
 
     public OxyEntity getRoot(OxyEntity entity) {

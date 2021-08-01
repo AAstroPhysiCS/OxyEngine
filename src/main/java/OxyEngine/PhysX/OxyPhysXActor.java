@@ -1,7 +1,7 @@
 package OxyEngine.PhysX;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.OxyEntity;
 import OxyEngine.System.OxyDisposable;
 import OxyEngineEditor.UI.Panels.GUINode;
 import imgui.ImGui;
@@ -15,26 +15,27 @@ import physx.common.PxQuat;
 import physx.common.PxTransform;
 import physx.common.PxVec3;
 import physx.physics.PxRigidActor;
+import physx.physics.PxRigidBody;
+import physx.physics.PxRigidDynamic;
 
-import static OxyEngine.PhysX.OxyPhysX.matrix4fToPxTransform;
-import static OxyEngine.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.OxyUtils.*;
 
 
 public final class OxyPhysXActor implements OxyDisposable {
 
-    private float mass;
-    private PhysXRigidBodyMode bodyMode;
+    private PhysXRigidBodyType bodyType;
 
     PxRigidActor pxActor;
 
     private final OxyEntity eReference;
 
-    public OxyPhysXActor(PhysXRigidBodyMode bodyMode) {
-        this(bodyMode, entityContext);
+    public OxyPhysXActor(PhysXRigidBodyType bodyType) {
+        this(bodyType, entityContext);
     }
 
-    public OxyPhysXActor(PhysXRigidBodyMode bodyMode, OxyEntity eReference){
-        this.bodyMode = bodyMode;
+    public OxyPhysXActor(PhysXRigidBodyType bodyType, OxyEntity eReference){
+        this.bodyType = bodyType;
         this.eReference = eReference;
     }
 
@@ -52,14 +53,16 @@ public final class OxyPhysXActor implements OxyDisposable {
         transform.getTranslation(pos);
         transform.getUnnormalizedRotation(rot);
 
+        OxyPhysXEnvironment physXEnv = OxyPhysX.getInstance().getPhysXEnv();
+
         try (MemoryStack stack = MemoryStack.stackPush()) {
             PxTransform pose = PxTransform.createAt(stack, MemoryStack::nmalloc, PxIDENTITYEnum.PxIdentity);
             pose.setP(PxVec3.createAt(stack, MemoryStack::nmalloc, pos.x, pos.y, pos.z));
             pose.setQ(PxQuat.createAt(stack, MemoryStack::nmalloc, rot.x, rot.y, rot.z, rot.w));
-            if (bodyMode == PhysXRigidBodyMode.Static)
-                pxActor = OxyPhysX.getInstance().getPhysXEnv().pxPhysics.createRigidStatic(pose);
-            else pxActor = OxyPhysX.getInstance().getPhysXEnv().pxPhysics.createRigidDynamic(pose);
-            OxyPhysX.getInstance().getPhysXEnv().addActor(pxActor);
+            if (bodyType == PhysXRigidBodyType.Static)
+                pxActor = physXEnv.pxPhysics.createRigidStatic(pose);
+            else pxActor = physXEnv.pxPhysics.createRigidDynamic(pose);
+            physXEnv.addActor(pxActor);
         }
         OxyPhysXGeometry oxyPhysXGeometry = eReference.get(OxyPhysXComponent.class).getGeometry();
         if(oxyPhysXGeometry != null){
@@ -67,31 +70,8 @@ public final class OxyPhysXActor implements OxyDisposable {
         }
     }
 
-    public static final GUINode guiNode = () -> {
-        if (entityContext == null) return;
-        if (!entityContext.has(OxyPhysXComponent.class)) return;
-
-        PhysXRigidBodyMode currentMode = entityContext.get(OxyPhysXComponent.class).getActor().getPhysXRigidBodyMode();
-
-        if(ImGui.treeNodeEx("Rigid Body", ImGuiTreeNodeFlags.DefaultOpen)) {
-            if (ImGui.beginCombo("##hideLabelRigidBodyMode", currentMode.name())) {
-                for (var modes : PhysXRigidBodyMode.values()) {
-                    String s = modes.name();
-                    boolean isSelected = (currentMode.name().equals(s));
-                    if (ImGui.selectable(s, isSelected)) {
-                        entityContext.get(OxyPhysXComponent.class).getActor().setPhysXRigidBodyMode(modes);
-                        entityContext.get(OxyPhysXComponent.class).getActor().build();
-                    }
-                }
-                ImGui.endCombo();
-            }
-            ImGui.treePop();
-        }
-
-    };
-
     public void setMass(float mass) {
-        this.mass = mass;
+        ((PxRigidBody)pxActor).setMass(mass);
     }
 
     PxTransform getGlobalPose() {
@@ -110,20 +90,61 @@ public final class OxyPhysXActor implements OxyDisposable {
     }
 
     public void setGlobalPose(Matrix4f transform){
-        pxActor.setGlobalPose(matrix4fToPxTransform(transform));
+        if(pxActor != null) pxActor.setGlobalPose(matrix4fToPxTransform(transform));
     }
 
-    PhysXRigidBodyMode getPhysXRigidBodyMode() {
-        return bodyMode;
+    public PhysXRigidBodyType getBodyType() {
+        return bodyType;
     }
 
-    void setPhysXRigidBodyMode(PhysXRigidBodyMode bodyMode){
-        this.bodyMode = bodyMode;
+    void setPhysXRigidBodytype(PhysXRigidBodyType bodytype){
+        this.bodyType = bodytype;
+    }
+
+    public void addForce(Vector3f force){
+        if(pxActor instanceof PxRigidDynamic d) {
+            PxVec3 forcePxVec3 = vector3fToPxVec3(force);
+            d.addForce(forcePxVec3);
+            forcePxVec3.destroy();
+        }
+    }
+
+    public void addTorque(Vector3f torque){
+        if(pxActor instanceof PxRigidDynamic d) {
+            PxVec3 torquePxVec3 = vector3fToPxVec3(torque);
+            d.addTorque(torquePxVec3);
+            torquePxVec3.destroy();
+        }
     }
 
     @Override
     public void dispose() {
-        pxActor.release();
-        pxActor = null;
+        if(pxActor != null){
+            pxActor.release();
+            pxActor = null;
+        }
     }
+
+    public static final GUINode guiNode = () -> {
+        if (entityContext == null) return;
+        if (!entityContext.has(OxyPhysXComponent.class)) return;
+
+        PhysXRigidBodyType currentMode = entityContext.get(OxyPhysXComponent.class).getActor().getBodyType();
+
+        if(ImGui.treeNodeEx("Rigid Body", ImGuiTreeNodeFlags.DefaultOpen)) {
+            if (ImGui.beginCombo("##hideLabelRigidBodyMode", currentMode.name())) {
+                for (var modes : PhysXRigidBodyType.values()) {
+                    String s = modes.name();
+                    boolean isSelected = (currentMode.name().equals(s));
+                    if (ImGui.selectable(s, isSelected)) {
+                        entityContext.get(OxyPhysXComponent.class).getActor().setPhysXRigidBodytype(modes);
+                        entityContext.get(OxyPhysXComponent.class).getActor().build();
+                    }
+                }
+                ImGui.endCombo();
+            }
+            ImGui.treePop();
+        }
+
+    };
 }

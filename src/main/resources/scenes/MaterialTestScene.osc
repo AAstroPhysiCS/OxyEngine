@@ -4,6 +4,7 @@ Registry [
 		Mesh Position: 0
 		Name: Scene
 		Emitting: false
+		Camera: false
 		Emitting Type: null
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -31,6 +32,7 @@ Registry [
 			Mesh Position: 0
 			Name: Plane
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  0.000E+0  0.000E+0)
 			Rotation: (-1.571E+0 -1.132E-7 -1.275E-3)
@@ -59,6 +61,7 @@ Registry [
 			Mesh Position: 1
 			Name: Cube.001
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: (-9.708E+0  3.000E+0  0.000E+0)
 			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
@@ -87,6 +90,7 @@ Registry [
 			Mesh Position: 2
 			Name: Cube.002
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 9.191E+0  8.248E+0  2.753E+0)
 			Rotation: ( 2.280E+0 -2.873E-1 -1.131E+0)
@@ -115,6 +119,7 @@ Registry [
 			Mesh Position: 3
 			Name: Sphere
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  2.500E+0 -6.000E+0)
 			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
@@ -143,6 +148,7 @@ Registry [
 			Mesh Position: 4
 			Name: Cone
 			Emitting: false
+			Camera: false
 			Emitting Type: null
 			Position: ( 0.000E+0  2.500E+0  6.000E+0)
 			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
@@ -172,7 +178,8 @@ Registry [
 		Mesh Position: -1
 		Name: Sky Light
 		Emitting: true
-		Emitting Type: SkyLight
+		Camera: false
+		Emitting Type: OpenGLHDREnvironmentMap
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
@@ -207,6 +214,7 @@ Registry [
 		Mesh Position: 0
 		Name: Sun
 		Emitting: true
+		Camera: false
 		Emitting Type: DirectionalLight
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 5.385E-1 -2.491E-1 -1.375E+0)

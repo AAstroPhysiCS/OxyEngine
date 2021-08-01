@@ -1,7 +1,7 @@
 package OxyEngine.Core.Camera;
 
 import OxyEngine.Core.Context.Renderer.Buffer.UniformBuffer;
-import OxyEngine.Scene.SceneRenderer;
+import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Matrix4f;
 
 public abstract class PerspectiveCamera extends OxyCamera {
@@ -16,7 +16,7 @@ public abstract class PerspectiveCamera extends OxyCamera {
     protected static final float zoomSpeed = 250f;
 
     public PerspectiveCamera() {
-        this(0.05f, 30f, 30f, false, 45, (float) SceneRenderer.getInstance().getMainFrameBuffer().getWidth() / SceneRenderer.getInstance().getMainFrameBuffer().getHeight(), 1f, 10000f, true);
+        this(0.05f, 30f, 30f, false, 45, ScenePanel.windowSize.x / ScenePanel.windowSize.y, 1f, 10000f, true);
     }
 
     public PerspectiveCamera(float mouseSpeed, float horizontalSpeed, float verticalSpeed, boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
@@ -36,7 +36,7 @@ public abstract class PerspectiveCamera extends OxyCamera {
         viewMatrixNoTranslation.rotateY(-this.getRotation().y);
     }
 
-    public static void disposeUniformBuffer(){
+    public static void disposeUniformBuffer() {
         cameraUniformBuffer.dispose();
     }
 

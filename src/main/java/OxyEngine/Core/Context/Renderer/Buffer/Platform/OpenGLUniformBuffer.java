@@ -8,10 +8,6 @@ import org.joml.Vector4fc;
 import java.nio.FloatBuffer;
 
 import static org.lwjgl.BufferUtils.createFloatBuffer;
-import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
-import static org.lwjgl.opengl.GL15.glDeleteBuffers;
-import static org.lwjgl.opengl.GL30.glBindBufferBase;
-import static org.lwjgl.opengl.GL31.GL_UNIFORM_BUFFER;
 import static org.lwjgl.opengl.GL45.*;
 
 public final class OpenGLUniformBuffer extends UniformBuffer {

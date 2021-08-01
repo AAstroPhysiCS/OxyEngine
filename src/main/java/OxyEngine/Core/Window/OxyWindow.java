@@ -1,12 +1,12 @@
 package OxyEngine.Core.Window;
 
-import OxyEngine.Scene.SceneState;
+import OxyEngine.Core.Context.Scene.SceneState;
 import OxyEngine.System.OxyDisposable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static OxyEngine.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 

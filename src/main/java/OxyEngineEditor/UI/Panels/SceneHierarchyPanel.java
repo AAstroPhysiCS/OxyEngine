@@ -6,30 +6,30 @@ import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Light.Light;
 import OxyEngine.Core.Context.Renderer.Light.SkyLight;
 import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
-import OxyEngine.Scene.OxyMaterialPool;
-import OxyEngine.Scene.OxyModel;
-import OxyEngine.Scene.OxyEntity;
-import OxyEngine.Scene.OxyMaterial;
-import OxyEngineEditor.UI.AssetManager;
+import OxyEngine.Core.Context.Scene.OxyMaterialPool;
+import OxyEngine.Core.Context.Scene.OxyModel;
+import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.OxyMaterial;
+import OxyEngineEditor.UI.UIAssetManager;
 import imgui.ImGui;
 import imgui.flag.*;
 
 import java.util.List;
 import java.util.Set;
 
-import static OxyEngine.Scene.SceneRuntime.*;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.*;
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public class SceneHierarchyPanel extends Panel {
 
     private static SceneHierarchyPanel INSTANCE = null;
 
-    private static final Image2DTexture eyeViewTexture = AssetManager.getInstance().getAsset("UI VIEW");
-    private static final Image2DTexture materialGreyMesh = AssetManager.getInstance().getAsset("UI MATERIALGREYMESH");
-    private static final Image2DTexture materialGroupGizmo = AssetManager.getInstance().getAsset("UI MATERIALGROUPGIZMO");
-    private static final Image2DTexture materialLightBulb = AssetManager.getInstance().getAsset("UI MATERIALLIGHTBULB");
-    private static final Image2DTexture materialCamera = AssetManager.getInstance().getAsset("UI MATERIALCAMERA");
-    static final Image2DTexture materialPinkSphere = AssetManager.getInstance().getAsset("UI MATERIALPINKSPHERE");
+    private static final Image2DTexture eyeViewTexture = UIAssetManager.getInstance().getUIAsset("UI VIEW");
+    private static final Image2DTexture materialGreyMesh = UIAssetManager.getInstance().getUIAsset("UI MATERIALGREYMESH");
+    private static final Image2DTexture materialGroupGizmo = UIAssetManager.getInstance().getUIAsset("UI MATERIALGROUPGIZMO");
+    private static final Image2DTexture materialLightBulb = UIAssetManager.getInstance().getUIAsset("UI MATERIALLIGHTBULB");
+    private static final Image2DTexture materialCamera = UIAssetManager.getInstance().getUIAsset("UI MATERIALCAMERA");
+    static final Image2DTexture materialPinkSphere = UIAssetManager.getInstance().getUIAsset("UI MATERIALPINKSPHERE");
 
     public static boolean focusedWindow, focusedWindowDragging;
 
