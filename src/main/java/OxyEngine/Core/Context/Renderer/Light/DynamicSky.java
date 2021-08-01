@@ -1,10 +1,10 @@
 package OxyEngine.Core.Context.Renderer.Light;
 
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Buffer.FrameBuffer;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.FrameBufferSpecification;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.TextureFormat;
-import OxyEngine.Core.Context.Renderer.Buffer.RenderBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.FrameBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.FrameBufferSpecification;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
+import OxyEngine.Core.Context.Renderer.Mesh.RenderBuffer;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.*;

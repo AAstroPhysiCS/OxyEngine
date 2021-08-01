@@ -2,13 +2,11 @@ package OxyEngine.Core.Context;
 
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.PerspectiveCamera;
-import OxyEngine.Core.Context.Renderer.Buffer.*;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.FrameBufferSpecification;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.TextureFormat;
+import OxyEngine.Core.Context.Renderer.Mesh.*;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.FrameBufferSpecification;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLFrameBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
 import OxyEngine.Core.Context.Renderer.Light.SkyLight;
-import OxyEngine.Core.Context.Renderer.Mesh.MeshRenderMode;
-import OxyEngine.Core.Context.Renderer.Mesh.NativeMeshOpenGL;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
@@ -43,7 +41,7 @@ public final class OxyRenderer {
 
     private static UniformBuffer environmentSettingsUniformBuffer;
 
-    private static NativeMeshOpenGL environmentMesh;
+    private static OpenGLMesh environmentMesh;
 
     static OxyPipeline geometryPipeline;
     static OxyRenderPass pickingRenderPass;
@@ -64,7 +62,7 @@ public final class OxyRenderer {
     }
 
     private static boolean enableGrid = true;
-    private static NativeMeshOpenGL gridMesh;
+    private static OpenGLMesh gridMesh;
 
     private OxyRenderer() {
     }
@@ -274,7 +272,7 @@ public final class OxyRenderer {
                 )
                 .setShader(equirectangularShader));
 
-        environmentMesh = new NativeMeshOpenGL(hdrPipeline);
+        environmentMesh = new OpenGLMesh(hdrPipeline, MeshUsage.STATIC);
 
         float[] skyboxVertices = {
                 -1.0f, -1.0f, -1.0f,
@@ -349,10 +347,10 @@ public final class OxyRenderer {
         mesh.render();
         pipeline.getShader().end();
     }
+
     /*
      * Overriding the pipeline shader with a given shader
      */
-
     public static void renderMesh(OxyPipeline pipeline, OpenGLMesh mesh, OxyShader shader) {
         if (RendererAPI.onStackRenderPass == null) throw new IllegalStateException("RenderPass not bound!");
         pipeline.updatePipelineShader();
@@ -418,7 +416,7 @@ public final class OxyRenderer {
         }
     }
 
-    private static NativeMeshOpenGL buildGrid(int gridSize) {
+    private static OpenGLMesh buildGrid(int gridSize) {
 
         final float[] vertexPos = new float[]{
                 -0.5f, 0.5f, 0.5f,
@@ -473,7 +471,7 @@ public final class OxyRenderer {
             indicesZ += 4;
         }
 
-        NativeMeshOpenGL mesh = new NativeMeshOpenGL(gridPipeline);
+        OpenGLMesh mesh = new OpenGLMesh(gridPipeline, MeshUsage.STATIC);
         mesh.pushVertices(vertices);
         mesh.pushIndices(indices);
         return mesh;

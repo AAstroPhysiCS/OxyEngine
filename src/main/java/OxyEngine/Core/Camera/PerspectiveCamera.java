@@ -1,6 +1,6 @@
 package OxyEngine.Core.Camera;
 
-import OxyEngine.Core.Context.Renderer.Buffer.UniformBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.UniformBuffer;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Matrix4f;
 

@@ -4,9 +4,8 @@ import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Light.*;
-import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
@@ -85,8 +84,8 @@ public final class Scene implements OxyDisposable {
 
     public void createMeshEntity() {
         OxyEntity model = createEmptyEntity();
-        if (!model.getGUINodes().contains(ModelMeshOpenGL.guiNode))
-            model.getGUINodes().add(ModelMeshOpenGL.guiNode);
+        if (!model.getGUINodes().contains(OpenGLMesh.guiNode))
+            model.getGUINodes().add(OpenGLMesh.guiNode);
     }
 
     public OxyNativeObject createSkyLight() {
@@ -96,7 +95,7 @@ public final class Scene implements OxyDisposable {
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
             skyLightEnt.getGUINodes().add(SkyLight.guiNode);
         SceneRenderer.getInstance().updateLightEntities();
-        SceneRenderer.getInstance().updateNativeEntities();
+        SceneRenderer.getInstance().updateModelEntities();
         return skyLightEnt;
     }
 
@@ -290,7 +289,7 @@ public final class Scene implements OxyDisposable {
 
         if (e.has(OxyPhysXComponent.class)) e.get(OxyPhysXComponent.class).dispose();
 
-        if (e.has(ModelMeshOpenGL.class)) e.get(ModelMeshOpenGL.class).dispose();
+        if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
 
         if (e.has(OpenGLHDREnvironmentMap.class)) {
             OpenGLHDREnvironmentMap skyLight = e.get(OpenGLHDREnvironmentMap.class);

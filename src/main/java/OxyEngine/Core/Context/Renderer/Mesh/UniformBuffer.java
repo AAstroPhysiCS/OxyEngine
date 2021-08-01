@@ -1,7 +1,7 @@
-package OxyEngine.Core.Context.Renderer.Buffer;
+package OxyEngine.Core.Context.Renderer.Mesh;
 
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLUniformBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLUniformBuffer;
 import OxyEngine.TargetPlatform;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;

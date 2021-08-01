@@ -1,6 +1,6 @@
-package OxyEngine.Core.Context.Renderer.Buffer.Platform;
+package OxyEngine.Core.Context.Renderer.Mesh.Platform;
 
-import OxyEngine.Core.Context.Renderer.Buffer.RenderBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.RenderBuffer;
 
 import java.util.HashMap;
 import java.util.Map;

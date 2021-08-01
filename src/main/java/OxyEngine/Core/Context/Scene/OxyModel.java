@@ -1,10 +1,10 @@
 package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Context.Renderer.Light.PointLight;
-import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
 import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
 import OxyEngine.Core.Context.OxyRenderPass;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
@@ -108,7 +108,7 @@ public class OxyModel extends OxyEntity {
         construct();
         OxyPipeline geometryPipeline = SceneRenderer.getInstance().getGeometryPipeline();
         OxyRenderPass geometryRenderPass = geometryPipeline.getRenderPass();
-        addComponent(new ModelMeshOpenGL(geometryPipeline, meshPath, geometryRenderPass.getMeshRenderingMode(),
+        addComponent(new OpenGLMesh(geometryPipeline, meshPath, geometryRenderPass.getMeshRenderingMode(), MeshUsage.DYNAMIC,
                 vertices, indices, tcs, normals, tangents, biTangents));
         vertexList.clear();
         faces.clear();
@@ -134,7 +134,7 @@ public class OxyModel extends OxyEntity {
             e.tangents = model.tangents.clone();
             e.biTangents = model.biTangents.clone();
             e.indices = model.indices.clone();
-            e.addComponent(new ModelMeshOpenGL(geometryPipeline, meshPath, geometryRenderPass.getMeshRenderingMode(),
+            e.addComponent(new OpenGLMesh(geometryPipeline, meshPath, geometryRenderPass.getMeshRenderingMode(), MeshUsage.DYNAMIC,
                     vertices, indices, tcs, normals, tangents, biTangents));
         }
     }

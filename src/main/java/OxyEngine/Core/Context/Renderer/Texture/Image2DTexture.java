@@ -1,7 +1,7 @@
 package OxyEngine.Core.Context.Renderer.Texture;
 
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.TextureFormat;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
 import OxyEngine.TargetPlatform;
 
 import static OxyEngine.System.OxySystem.oxyAssert;

@@ -117,7 +117,6 @@ public class EditorLayer extends Layer {
                     var instance = SceneRenderer.getInstance();
                     instance.updateModelEntities();
                     instance.updateCameraEntities();
-                    instance.updateNativeEntities();
                     entityContext = null;
                     System.gc();
                     ACTIVE_SCENE.STATE = SceneState.IDLE;

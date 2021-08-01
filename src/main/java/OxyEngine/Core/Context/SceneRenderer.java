@@ -4,10 +4,8 @@ import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Light.*;
-import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
-import OxyEngine.Core.Context.Renderer.Mesh.NativeMeshOpenGL;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
@@ -53,7 +51,7 @@ public final class SceneRenderer {
 
     public void initScene() {
 
-        cachedNativeMeshes = ACTIVE_SCENE.view(NativeMeshOpenGL.class);
+        cachedNativeMeshes = ACTIVE_SCENE.view(OpenGLMesh.class);
         cachedCameraComponents = ACTIVE_SCENE.view(OxyCamera.class);
         updateModelEntities();
 
@@ -95,16 +93,12 @@ public final class SceneRenderer {
     }
 
     public void updateModelEntities() {
-        allModelEntities = ACTIVE_SCENE.view(ModelMeshOpenGL.class);
+        allModelEntities = ACTIVE_SCENE.view(OpenGLMesh.class);
         updateLightEntities();
     }
 
     public void updateCameraEntities() {
         cachedCameraComponents = ACTIVE_SCENE.view(OxyCamera.class);
-    }
-
-    public void updateNativeEntities() {
-        cachedNativeMeshes = ACTIVE_SCENE.view(NativeMeshOpenGL.class);
     }
 
     public void updateCurrentBoundedCamera() {
@@ -146,22 +140,27 @@ public final class SceneRenderer {
         }
 
         OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
+
         //Environment
+        int irradianceSlot = TextureSlot.UNUSED.getValue();
+        int prefilterSlot = TextureSlot.UNUSED.getValue();
+        int bdrfSlot = TextureSlot.UNUSED.getValue();
+        int hdrSlot = TextureSlot.UNUSED.getValue();
+
         pbrShader.begin();
         if (currentBoundedSkyLightEntity != null) {
-            pbrShader.setUniform1i("EnvironmentTex.iblMap", TextureSlot.IRRADIANCE.getValue());
-            pbrShader.setUniform1i("EnvironmentTex.prefilterMap", TextureSlot.PREFILTER.getValue());
-            pbrShader.setUniform1i("EnvironmentTex.brdfLUT", TextureSlot.BDRF.getValue());
-            pbrShader.setUniform1i("EnvironmentTex.skyBoxTexture", TextureSlot.HDR.getValue());
-        } else {
-            pbrShader.setUniform1i("EnvironmentTex.iblMap", TextureSlot.UNUSED.getValue());
-            pbrShader.setUniform1i("EnvironmentTex.prefilterMap", TextureSlot.UNUSED.getValue());
-            pbrShader.setUniform1i("EnvironmentTex.brdfLUT", TextureSlot.UNUSED.getValue());
-            pbrShader.setUniform1i("EnvironmentTex.skyBoxTexture", TextureSlot.UNUSED.getValue());
+            irradianceSlot = TextureSlot.IRRADIANCE.getValue();
+            prefilterSlot = TextureSlot.PREFILTER.getValue();
+            bdrfSlot = TextureSlot.BDRF.getValue();
+            hdrSlot = TextureSlot.HDR.getValue();
         }
+        pbrShader.setUniform1i("EnvironmentTex.iblMap", irradianceSlot);
+        pbrShader.setUniform1i("EnvironmentTex.prefilterMap", prefilterSlot);
+        pbrShader.setUniform1i("EnvironmentTex.brdfLUT", bdrfSlot);
+        pbrShader.setUniform1i("EnvironmentTex.skyBoxTexture", hdrSlot);
         pbrShader.end();
 
-        if(currentBoundedCamera instanceof SceneCamera s) s.update();
+        if (currentBoundedCamera instanceof SceneCamera s) s.update();
     }
 
     private void geometryPass() {

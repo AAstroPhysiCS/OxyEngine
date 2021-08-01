@@ -1,8 +1,8 @@
-package OxyEngine.Core.Context.Renderer.Buffer.Platform;
+package OxyEngine.Core.Context.Renderer.Mesh.Platform;
 
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Buffer.FrameBuffer;
-import OxyEngine.Core.Context.Renderer.Buffer.RenderBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.FrameBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.RenderBuffer;
 import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
 import OxyEngine.OxyEngine;
 

@@ -14,7 +14,7 @@ public enum DefaultModelType {
         this.path = path;
     }
 
-    public String getPath() {
+    String getPath() {
         return path;
     }
 }

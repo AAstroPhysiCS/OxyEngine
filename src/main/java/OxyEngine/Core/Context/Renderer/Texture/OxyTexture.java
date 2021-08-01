@@ -1,6 +1,6 @@
 package OxyEngine.Core.Context.Renderer.Texture;
 
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.TextureFormat;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
 
 import static OxyEngine.System.OxySystem.isValidPath;
 import static OxyEngine.System.OxySystem.logger;

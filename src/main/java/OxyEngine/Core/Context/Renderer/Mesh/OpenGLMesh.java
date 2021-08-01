@@ -1,20 +1,35 @@
-package OxyEngine.Core.Context.Renderer.Buffer;
+package OxyEngine.Core.Context.Renderer.Mesh;
 
 import OxyEngine.Components.EntityComponent;
+import OxyEngine.Components.EntityFamily;
+import OxyEngine.Components.SelectedComponent;
+import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.*;
-import OxyEngine.Core.Context.Renderer.Mesh.MeshRenderMode;
-import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.*;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderType;
 import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.OxyMaterial;
+import OxyEngine.Core.Context.Scene.OxyModel;
+import OxyEngine.Core.Context.Scene.SceneRuntime;
+import OxyEngine.Core.Context.SceneRenderer;
 import OxyEngine.System.OxyDisposable;
+import OxyEngineEditor.UI.Panels.GUINode;
+import imgui.ImGui;
+import imgui.flag.ImGuiInputTextFlags;
+import imgui.flag.ImGuiTreeNodeFlags;
+import imgui.type.ImString;
 
+import java.util.List;
+
+import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.System.OxyFileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
+import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 import static org.lwjgl.opengl.GL45.*;
 
 //TODO: Make a Mesh class that this class will inherit from, as well as the VulkanMesh class.
-public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
+public final class OpenGLMesh implements OxyDisposable, EntityComponent {
 
     protected OpenGLIndexBuffer indexBuffer;
     protected OpenGLVertexBuffer vertexBuffer;
@@ -24,15 +39,37 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
 
     protected OxyPipeline pipeline;
 
-    public OpenGLMesh(OxyPipeline pipeline){
-        assert pipeline != null : oxyAssert("Pipeline null!");
-        this.pipeline = pipeline;
-    }
-
     protected String path;
 
     protected int vao;
     protected MeshRenderMode mode;
+
+    public OpenGLMesh(OxyPipeline pipeline, String path, MeshRenderMode mode, MeshUsage usage, float[] vertices, int[] indices, float[] textureCoords, float[] normals, float[] tangents, float[] biTangents) {
+        this.pipeline = pipeline;
+        this.path = path;
+        this.mode = mode;
+
+        vertexBuffer = VertexBuffer.create(pipeline, usage);
+        indexBuffer = IndexBuffer.create(pipeline);
+        textureBuffer = TextureBuffer.create(pipeline);
+        normalsBuffer = NormalsBuffer.create(pipeline);
+        tangentBuffer = TangentBuffer.create(pipeline);
+
+        vertexBuffer.setVertices(vertices);
+        indexBuffer.setIndices(indices);
+        textureBuffer.setTextureCoords(textureCoords);
+        normalsBuffer.setNormals(normals);
+        tangentBuffer.setBiAndTangent(tangents, biTangents);
+
+        assert textureCoords != null && indices != null && vertices != null : oxyAssert("Data that is given is null.");
+    }
+
+    public OpenGLMesh(OxyPipeline pipeline, MeshUsage usage){
+        this.pipeline = pipeline;
+        this.mode = this.pipeline.getRenderPass().getMeshRenderingMode();
+        vertexBuffer = VertexBuffer.create(pipeline, usage);
+        indexBuffer = IndexBuffer.create(pipeline);
+    }
 
     public boolean empty() {
         return indexBuffer.glBufferNull() && vertexBuffer.glBufferNull();
@@ -85,6 +122,14 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
         OxyRenderer.Stats.totalIndicesCount += indexBuffer.getIndices().length;
     }
 
+    public void pushVertices(float[] vertices){
+        vertexBuffer.addToBuffer(vertices);
+    }
+
+    public void pushIndices(int[] indices){
+        indexBuffer.addToBuffer(indices);
+    }
+
     public void addToList(OxyEntity e) {
         vertexBuffer.addToBuffer(e.getVertices());
         indexBuffer.addToBuffer(e.getIndices());
@@ -115,7 +160,7 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
     public void setRenderingMode(MeshRenderMode mode) {
         this.mode = mode;
     }
-
+    
     private void processPipeline(OxyPipeline pipeline) {
         if (pipeline.getLayouts() == null) return;
         for (OxyPipeline.Layout layout : pipeline.getLayouts()) {
@@ -161,4 +206,71 @@ public abstract class OpenGLMesh implements OxyDisposable, EntityComponent {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         }
     }
+
+    private static ImString meshPath = new ImString(0);
+
+    public static final GUINode guiNode = () -> {
+        if (entityContext == null) return;
+
+        {
+            if (ImGui.treeNodeEx("Mesh Renderer", ImGuiTreeNodeFlags.DefaultOpen)) {
+                if (entityContext.has(OpenGLMesh.class))
+                    meshPath = new ImString(entityContext.get(OpenGLMesh.class).getPath());
+                else meshPath = new ImString("");
+
+                ImGui.setNextItemOpen(true);
+                ImGui.columns(2, "myColumns");
+                ImGui.setColumnOffset(0, -120f);
+                ImGui.alignTextToFramePadding();
+                ImGui.text("Mesh:");
+                ImGui.nextColumn();
+                ImGui.pushItemWidth(ImGui.getContentRegionAvailX() - 30f);
+                ImGui.inputText("##hidelabel", meshPath, ImGuiInputTextFlags.ReadOnly);
+                ImGui.popItemWidth();
+                ImGui.sameLine();
+                if (ImGui.imageButton(dirAssetGrey.getTextureId(), 20, 20, 0, 1, 1, 0, 0)) {
+                    String path = openDialog("", null);
+                    if (path != null) {
+                        if (entityContext != null) {
+                            //removing the added entity with the new model entities and carrying the transform of the old entity to the new models.
+                            TransformComponent c = entityContext.get(TransformComponent.class);
+                            List<OxyModel> eList = SceneRuntime.ACTIVE_SCENE.createModelEntities(path);
+                            OxyEntity root = eList.get(0).getRoot();
+                            EntityFamily family = entityContext.getFamily();
+                            SceneRuntime.ACTIVE_SCENE.removeEntity(entityContext);
+                            root.setFamily(family);
+
+                            TransformComponent cRoot = root.get(TransformComponent.class);
+                            cRoot.position.set(c.position);
+                            cRoot.rotation.set(c.rotation);
+                            cRoot.scale.set(c.scale);
+
+                            for (OxyModel e : eList) {
+                                e.addComponent(new SelectedComponent(false));
+                                e.setFamily(new EntityFamily(root.getFamily()));
+                                e.getGUINodes().add(OpenGLMesh.guiNode);
+                                if (!e.getGUINodes().contains(OxyMaterial.guiNode))
+                                    e.getGUINodes().add(OxyMaterial.guiNode);
+                                e.updateData();
+                            }
+
+                            cRoot.transform.mulLocal(c.transform);
+
+                            for (OxyModel e : eList) {
+                                e.transformLocally();
+                            }
+
+                            SceneRenderer.getInstance().updateModelEntities();
+                            meshPath = new ImString(path);
+                            entityContext = root;
+                        }
+                    }
+                }
+                ImGui.columns(1);
+                ImGui.separator();
+                ImGui.treePop();
+                ImGui.spacing();
+            }
+        }
+    };
 }

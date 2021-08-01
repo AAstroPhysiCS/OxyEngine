@@ -1,7 +1,7 @@
 package OxyEngine.Core.Context.Renderer.Pipeline;
 
 import OxyEngine.Core.Context.OxyRenderPass;
-import OxyEngine.Core.Context.Renderer.Buffer.Buffer;
+import OxyEngine.Core.Context.Renderer.Mesh.Buffer;
 
 import java.util.ArrayList;
 import java.util.HashMap;

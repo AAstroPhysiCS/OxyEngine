@@ -1,6 +1,6 @@
-package OxyEngine.Core.Context.Renderer.Buffer;
+package OxyEngine.Core.Context.Renderer.Mesh;
 
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLTextureBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLTextureBuffer;
 import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.TargetPlatform;

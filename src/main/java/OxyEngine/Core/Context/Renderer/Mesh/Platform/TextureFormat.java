@@ -1,4 +1,4 @@
-package OxyEngine.Core.Context.Renderer.Buffer.Platform;
+package OxyEngine.Core.Context.Renderer.Mesh.Platform;
 
 import static org.lwjgl.opengl.GL30.*;
 

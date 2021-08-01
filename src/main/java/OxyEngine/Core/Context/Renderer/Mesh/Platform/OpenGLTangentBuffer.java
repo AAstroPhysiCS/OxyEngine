@@ -1,6 +1,6 @@
-package OxyEngine.Core.Context.Renderer.Buffer.Platform;
+package OxyEngine.Core.Context.Renderer.Mesh.Platform;
 
-import OxyEngine.Core.Context.Renderer.Buffer.TangentBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.TangentBuffer;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 
 import static org.lwjgl.opengl.GL15.*;

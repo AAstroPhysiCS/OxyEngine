@@ -3,11 +3,8 @@ package OxyEngine.Core.Context.Scene;
 import OxyEngine.Components.RenderableComponent;
 import OxyEngine.Components.RenderingMode;
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
-import OxyEngine.Core.Context.Renderer.Mesh.OxyVertex;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
 import org.joml.Vector4f;
-
-import java.util.List;
 
 import static OxyEngine.OxyUtils.copy;
 
@@ -25,21 +22,6 @@ public class OxyNativeObject extends OxyEntity {
         for(int i = 0; i < this.vertices.length; i++){
             this.vertices = copy(this.vertices, vertices);
         }
-    }
-
-    public void pushVertexData(DefaultModelType type){
-        OxyModelImporter loader = new OxyModelImporter(type.getPath(), ImporterType.MeshImporter); //JUST IMPORTING MESH FOR NOW
-        List<OxyVertex> modelVertices = loader.getVertexList(0);
-        float[] vertices = new float[modelVertices.size() * 3];
-        int vertPtr = 0;
-        TransformComponent c = get(TransformComponent.class);
-        for (OxyVertex o : modelVertices) {
-            Vector4f transformed = new Vector4f(o.vertices, 1.0f).mul(c.transform);
-            vertices[vertPtr++] = transformed.x;
-            vertices[vertPtr++] = transformed.y;
-            vertices[vertPtr++] = transformed.z;
-        }
-        this.vertices = copy(this.vertices, vertices);
     }
 
     @Override

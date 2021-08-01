@@ -6,11 +6,11 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Camera.OxyCamera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.TextureFormat;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
 import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
 import OxyEngine.Core.Context.Renderer.Light.Light;
 import OxyEngine.Core.Context.Renderer.Light.PointLight;
-import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
 import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
@@ -242,8 +242,8 @@ public class PropertiesPanel extends Panel {
                 ImGui.inputText("##hidelabel comp_popup_search", searchAddComponent);
                 if (ImGui.beginMenu("Mesh")) {
                     if (ImGui.menuItem("Mesh Renderer"))
-                        if (!nodeList.contains(ModelMeshOpenGL.guiNode))
-                            nodeList.add(ModelMeshOpenGL.guiNode);
+                        if (!nodeList.contains(OpenGLMesh.guiNode))
+                            nodeList.add(OpenGLMesh.guiNode);
                     if (ImGui.menuItem("Material"))
                         if (!nodeList.contains(OxyMaterial.guiNode)) {
                             int index = OxyMaterialPool.addMaterial(new OxyMaterial(ShaderLibrary.get("OxyPBR"), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 1.0f, 1.0f, 1.0f));

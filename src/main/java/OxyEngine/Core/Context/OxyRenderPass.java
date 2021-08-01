@@ -1,6 +1,6 @@
 package OxyEngine.Core.Context;
 
-import OxyEngine.Core.Context.Renderer.Buffer.FrameBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.FrameBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.MeshRenderMode;
 
 public class OxyRenderPass {

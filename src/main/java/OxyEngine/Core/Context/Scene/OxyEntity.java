@@ -2,7 +2,7 @@ package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Context.Renderer.Buffer.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
 import OxyEngine.PhysX.OxyPhysXComponent;
 import OxyEngine.Scripting.OxyScript;

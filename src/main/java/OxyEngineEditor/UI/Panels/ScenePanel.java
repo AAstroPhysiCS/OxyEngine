@@ -3,8 +3,8 @@ package OxyEngineEditor.UI.Panels;
 import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Context.Renderer.Mesh.ModelMeshOpenGL;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLFrameBuffer;
 import OxyEngine.Core.Context.SceneRenderer;
 import OxyEngine.Core.Context.Scene.OxyMaterial;
 import OxyEngine.Core.Context.Scene.OxyModel;
@@ -86,7 +86,7 @@ public class ScenePanel extends Panel {
                             List<OxyModel> eList = ACTIVE_SCENE.createModelEntities(fPath);
                             for (OxyModel e : eList) {
                                 e.addComponent(new SelectedComponent(false));
-                                e.getGUINodes().add(ModelMeshOpenGL.guiNode);
+                                e.getGUINodes().add(OpenGLMesh.guiNode);
                                 if (!e.getGUINodes().contains(OxyMaterial.guiNode))
                                     e.getGUINodes().add(OxyMaterial.guiNode);
                             }

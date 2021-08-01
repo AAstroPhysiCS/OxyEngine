@@ -1,8 +1,8 @@
-package OxyEngine.Core.Context.Renderer.Buffer;
+package OxyEngine.Core.Context.Renderer.Mesh;
 
 import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.TextureFormat;
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLRenderBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLRenderBuffer;
 import OxyEngine.TargetPlatform;
 
 public abstract class RenderBuffer extends Buffer {

@@ -55,7 +55,7 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
     public void process(AIScene aiScene, String scenePath, OxyEntity root) {
         this.scenePath = scenePath;
         rootName = root.get(TagComponent.class).tag();
-        processNode(Objects.requireNonNull(aiScene.mRootNode()), aiScene, root);
+        processNode(Objects.requireNonNull(aiScene.mRootNode()), new Matrix4f(), aiScene, root);
 
         for (int i = 0; i < aiScene.mNumMaterials(); i++) {
             AIMaterial material = AIMaterial.create(Objects.requireNonNull(aiScene.mMaterials()).get(i));
@@ -63,14 +63,14 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
         }
     }
 
-    private void processNode(AINode node, AIScene scene, OxyEntity root) {
-        Matrix4f transformation = convertAIMatrixToJOMLMatrix(node.mTransformation());
+    private void processNode(AINode node, Matrix4f parentTransform, AIScene scene, OxyEntity root) {
+        Matrix4f localTransform = convertAIMatrixToJOMLMatrix(node.mTransformation());
 
         //Submeshes
         for (int i = 0; i < node.mNumMeshes(); i++) {
             AIMesh mesh = AIMesh.create(scene.mMeshes().get(node.mMeshes().get(i)));
             AssimpMesh subMesh = new AssimpMesh(root, node.mName().dataString());
-            subMesh.transformation = transformation;
+            subMesh.transformation = new Matrix4f(parentTransform).mul(localTransform);
             subMesh.mBones = mesh.mBones();
             subMesh.mNumBones = mesh.mNumBones();
             subMesh.materialIndex = mesh.mMaterialIndex();
@@ -84,7 +84,7 @@ public non-sealed class MeshImporter implements ModelImporterFactory {
         //Children node
         for (int i = 0; i < node.mNumChildren(); i++) {
             AINode childrenNode = AINode.create(node.mChildren().get(i));
-            processNode(childrenNode, scene, root);
+            processNode(childrenNode, localTransform, scene, root);
         }
     }
 

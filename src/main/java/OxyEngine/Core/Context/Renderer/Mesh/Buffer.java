@@ -1,4 +1,4 @@
-package OxyEngine.Core.Context.Renderer.Buffer;
+package OxyEngine.Core.Context.Renderer.Mesh;
 
 import OxyEngine.System.OxyDisposable;
 

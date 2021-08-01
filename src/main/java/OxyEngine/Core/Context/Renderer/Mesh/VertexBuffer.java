@@ -1,7 +1,6 @@
-package OxyEngine.Core.Context.Renderer.Buffer;
+package OxyEngine.Core.Context.Renderer.Mesh;
 
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLVertexBuffer;
-import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLVertexBuffer;
 import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Scene.OxyNativeObject;

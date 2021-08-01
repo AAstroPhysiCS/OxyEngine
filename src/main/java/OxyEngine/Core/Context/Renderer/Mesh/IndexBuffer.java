@@ -1,6 +1,6 @@
-package OxyEngine.Core.Context.Renderer.Buffer;
+package OxyEngine.Core.Context.Renderer.Mesh;
 
-import OxyEngine.Core.Context.Renderer.Buffer.Platform.OpenGLIndexBuffer;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLIndexBuffer;
 import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
 import OxyEngine.Core.Context.Scene.OxyNativeObject;
