@@ -4,16 +4,16 @@ import OxyEngine.Core.Context.Renderer.Mesh.UniformBuffer;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import org.joml.Matrix4f;
 
-public abstract class PerspectiveCamera extends OxyCamera {
+public abstract class PerspectiveCamera extends Camera {
 
     protected float fovY, zNear, zFar;
     protected float aspect;
 
     protected static UniformBuffer cameraUniformBuffer;
 
-    public static float zoom = 56;
+    protected static float zoom = 56;
 
-    protected static final float zoomSpeed = 250f;
+    protected static final float zoomSpeed = 1000f;
 
     public PerspectiveCamera() {
         this(0.05f, 30f, 30f, false, 45, ScenePanel.windowSize.x / ScenePanel.windowSize.y, 1f, 10000f, true);
@@ -30,12 +30,6 @@ public abstract class PerspectiveCamera extends OxyCamera {
         cameraUniformBuffer = UniformBuffer.create((4 * 4 * Float.BYTES) * 2 + (3 * Float.BYTES), 0);
     }
 
-    public void calcViewMatrixNoTranslation() {
-        viewMatrixNoTranslation.set(getProjectionMatrix());
-        viewMatrixNoTranslation.rotateX(-this.getRotation().x);
-        viewMatrixNoTranslation.rotateY(-this.getRotation().y);
-    }
-
     public static void disposeUniformBuffer() {
         cameraUniformBuffer.dispose();
     }
@@ -46,6 +40,10 @@ public abstract class PerspectiveCamera extends OxyCamera {
 
     public float getAspect() {
         return aspect;
+    }
+
+    public static float getZoom() {
+        return zoom;
     }
 
     public float getFovY() {

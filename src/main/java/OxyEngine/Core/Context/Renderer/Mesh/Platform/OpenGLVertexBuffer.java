@@ -1,66 +1,72 @@
 package OxyEngine.Core.Context.Renderer.Mesh.Platform;
 
-import OxyEngine.Core.Context.Renderer.Mesh.VertexBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
-import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Core.Context.Scene.OxyNativeObject;
+import OxyEngine.Core.Context.Renderer.Mesh.VertexBuffer;
 
-import static OxyEngine.OxyUtils.copy;
+import static OxyEngine.Utils.copy;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public final class OpenGLVertexBuffer extends VertexBuffer {
 
-    protected OpenGLVertexBuffer(OxyPipeline.Layout layout, MeshUsage usage) {
-        super(layout, usage);
+    private OpenGLVertexBuffer(float[] data, MeshUsage usage) {
+        super(data, usage);
+        bufferId = glCreateBuffers();
+    }
+
+    private OpenGLVertexBuffer(int allocationSize, MeshUsage usage) {
+        super(allocationSize, usage);
+        bufferId = glCreateBuffers();
+    }
+
+    private OpenGLVertexBuffer(OpenGLVertexBuffer other) {
+        super(other.data.clone(), other.usage);
+        bufferId = glCreateBuffers();
     }
 
     @Override
     public void load() {
-        if (bufferId == 0) bufferId = glCreateBuffers();
         if (usage == MeshUsage.STATIC) loadStatically();
-        else loadDynamically();
+        else if (usage == MeshUsage.DYNAMIC) loadDynamically();
+        else throw new IllegalStateException("How did that happen?");
     }
 
     private void loadStatically() {
         glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-        glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, data, GL_STATIC_DRAW);
     }
 
     private void loadDynamically() {
         glBindBuffer(GL_ARRAY_BUFFER, bufferId);
-        glBufferData(GL_ARRAY_BUFFER, (long) vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (long) data.length * Float.BYTES, GL_DYNAMIC_DRAW);
     }
 
     @Override
-    public void addToBuffer(OxyNativeObject oxyEntity) {
-        addToBuffer(oxyEntity.getVertices());
-    }
-
-    @Override
-    public void addToBuffer(float[] m_Vertices) {
-        if (vertices.length == 0) {
-            vertices = m_Vertices;
+    public void addToBuffer(float[] data) {
+        if (data == null) return;
+        if (this.data == null || this.data.length == 0) {
+            this.data = data;
             return;
         }
-        vertices = copy(vertices, m_Vertices);
+        this.data = copy(this.data, data);
     }
 
-
     @Override
-    public void updateSingleEntityData(int pos, float[] newVertices) {
-        this.offsetToUpdate = pos * Float.BYTES;
-        this.dataToUpdate = newVertices;
-        for (float newVertex : newVertices) {
-            if (this.vertices == null) return; //for not breaking when object is deleted
-            vertices[pos++] = newVertex;
+    public void updateData(int pos, float[] newData) {
+        int i = pos;
+        for (float newVertex : newData) {
+            data[i++] = newVertex;
+        }
+        if (usage == MeshUsage.DYNAMIC) {
+            int offsetToUpdate = pos * Float.BYTES;
+            glBindBuffer(GL_ARRAY_BUFFER, bufferId);
+            glBufferSubData(GL_ARRAY_BUFFER, offsetToUpdate, newData);
         }
     }
 
     @Override
     public void dispose() {
-        vertices = null;
-        dataToUpdate = null;
+        data = null;
         glDeleteBuffers(bufferId);
         bufferId = 0;
     }

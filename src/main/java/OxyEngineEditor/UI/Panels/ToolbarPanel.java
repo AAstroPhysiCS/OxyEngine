@@ -6,7 +6,7 @@ import imgui.flag.ImGuiStyleVar;
 
 import static OxyEngine.Core.Context.Scene.Scene.*;
 
-public class ToolbarPanel extends Panel {
+public final class ToolbarPanel extends Panel {
 
     private static ToolbarPanel INSTANCE = null;
 

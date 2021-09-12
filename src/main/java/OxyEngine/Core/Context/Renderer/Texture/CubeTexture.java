@@ -1,13 +1,13 @@
 package OxyEngine.Core.Context.Renderer.Texture;
 
-import OxyEngine.Core.Context.OxyRenderer;
+import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
 import OxyEngine.TargetPlatform;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 
-public abstract class CubeTexture extends Texture {
+public abstract class CubeTexture extends TextureBase {
 
     protected final TextureSlot textureSlot;
     protected int textureId;
@@ -18,7 +18,7 @@ public abstract class CubeTexture extends Texture {
     }
 
     static CubeTexture create(TextureSlot slot, String path, TexturePixelType pixelType, TextureParameterBuilder parameterBuilder) {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             if (parameterBuilder instanceof TextureParameterBuilder.POpenGL pOpenGL)
                 return new OpenGLCubeTexture(slot, path, pixelType, pOpenGL);
             else oxyAssert("Wrong parameter is being used!");
@@ -27,7 +27,7 @@ public abstract class CubeTexture extends Texture {
     }
 
     static CubeTexture create(TextureSlot slot, int width, int height, TexturePixelType pixelType, TextureFormat format, TextureParameterBuilder parameterBuilder) {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             if (parameterBuilder instanceof TextureParameterBuilder.POpenGL pOpenGL)
                 return new OpenGLCubeTexture(slot, width, height, pixelType, format, pOpenGL);
             else oxyAssert("Wrong parameter is being used!");

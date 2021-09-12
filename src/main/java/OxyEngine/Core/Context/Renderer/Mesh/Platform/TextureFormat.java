@@ -24,6 +24,8 @@ public enum TextureFormat {
 
     RGB32F(GL_RGB32F, GL_RGB),
 
+    RGBA32F(GL_RGBA32F, GL_RGBA),
+
     RGB(GL_RGB, GL_RGB),
 
     RGBA(GL_RGBA, GL_RGBA);

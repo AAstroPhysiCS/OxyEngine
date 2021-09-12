@@ -91,7 +91,7 @@ void main(){
 layout(location = 0) out vec4 color;
 layout(location = 1) out int o_IDBuffer;
 
-#define NUMBER_CASCADES 4 //TODO: convert this and many things into uniform buffer objects
+#define NUMBER_CASCADES 4
 #define MAX_REFLECTION_LOD 4.0
 
 struct RendererVertexOutput {
@@ -105,10 +105,7 @@ struct RendererVertexOutput {
 };
 
 struct RendererMaterial {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-    float reflectance;
+    vec4 diffuse;
 
     //PBR
     int albedoMapSlot;
@@ -126,9 +123,7 @@ struct RendererMaterial {
 
 struct PointLight {
     vec3 position;
-    vec3 ambient;
     vec3 diffuse;
-    vec3 specular;
 
     float constant;
     float linear;
@@ -139,9 +134,7 @@ struct PointLight {
 
 struct DirectionalLight {
     vec3 direction;
-    vec3 ambient;
     vec3 diffuse;
-    vec3 specular;
 
     int activeState;
 };
@@ -289,7 +282,7 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoords, vec3 viewDir, vec3 norm){
     vec3 ambient = (kD * diffuseMap + specular) * aoMap * hdrIntensity;
 
     vec3 result = ambient + Lo + emissive;
-    //result = result / (result + vec3(1.0));
+    result = result / (result + vec3(1.0));
     result = vec3(1.0) - exp(-result * exposure);
     result = pow(result, vec3(1f / gamma));
 
@@ -396,7 +389,7 @@ float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
     float currentDepth = projCoords.z;
 
     vec3 normal = norm;
-    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.003);
+    float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.002);
 
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(Shadows.shadowMap[index], 0);

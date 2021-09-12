@@ -1,14 +1,14 @@
 package OxyEngine;
 
 import OxyEngine.Core.Layers.LayerStack;
-import OxyEngine.Core.Window.OxyWindow;
-import OxyEngine.System.OxyDisposable;
+import OxyEngine.Core.Window.Window;
+import OxyEngine.System.Disposable;
 
-public abstract class OxyApplication implements OxyDisposable {
+public abstract class OxyApplication implements Disposable {
 
     protected final LayerStack layerStack; // every app should have a layer stack
     protected OxyEngine oxyEngine;
-    protected OxyWindow oxyWindow;
+    protected Window window;
 
     public OxyApplication() {
         layerStack = new LayerStack();
@@ -18,9 +18,7 @@ public abstract class OxyApplication implements OxyDisposable {
 
     protected abstract void init();
 
-    protected abstract void update();
-
-    protected abstract void render(float ts);
+    protected abstract void update(float ts);
 
     protected abstract Runnable run();
 }

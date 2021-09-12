@@ -10,7 +10,7 @@ import imgui.flag.ImGuiWindowFlags;
 import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
 
 
-public class AnimationPanel extends Panel {
+public final class AnimationPanel extends Panel {
 
     private static final Image2DTexture playTexture = UIAssetManager.getInstance().getUIAsset("UI PLAY");
     private static final Image2DTexture stopTexture = UIAssetManager.getInstance().getUIAsset("UI STOP");

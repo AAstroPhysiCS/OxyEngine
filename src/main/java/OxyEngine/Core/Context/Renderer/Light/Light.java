@@ -1,7 +1,7 @@
 package OxyEngine.Core.Context.Renderer.Light;
 
 import OxyEngine.Components.EntityComponent;
-import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.Entity;
 
 public abstract class Light implements EntityComponent {
 
@@ -17,7 +17,7 @@ public abstract class Light implements EntityComponent {
         this(1);
     }
 
-    public abstract void update(OxyEntity e, int i);
+    public abstract void update(Entity e, int i);
 
     public float getColorIntensity() {
         return colorIntensity;

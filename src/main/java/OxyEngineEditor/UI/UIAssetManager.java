@@ -50,7 +50,7 @@ public final class UIAssetManager {
             return;
         }
 
-        uiAssets.put(name, OxyTexture.loadImage(TextureSlot.UITEXTURE, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER));
+        uiAssets.put(name, Texture.loadImage(TextureSlot.UITEXTURE, path, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER));
     }
 
     public Image2DTexture getUIAsset(String imageName) {

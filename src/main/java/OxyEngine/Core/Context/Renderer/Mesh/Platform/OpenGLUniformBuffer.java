@@ -23,12 +23,12 @@ public final class OpenGLUniformBuffer extends UniformBuffer {
     public OpenGLUniformBuffer(int size, int binding) {
         this.size = size;
         this.binding = binding;
+        bufferId = glCreateBuffers();
         load();
     }
 
     @Override
-    protected void load() {
-        bufferId = glCreateBuffers();
+    public void load() {
         glNamedBufferData(bufferId, size, GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_UNIFORM_BUFFER, binding, bufferId);
     }

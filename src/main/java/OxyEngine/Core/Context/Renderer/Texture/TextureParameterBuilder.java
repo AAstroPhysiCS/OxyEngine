@@ -1,6 +1,6 @@
 package OxyEngine.Core.Context.Renderer.Texture;
 
-import OxyEngine.Core.Context.OxyRenderer;
+import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.TargetPlatform;
 
 public interface TextureParameterBuilder {
@@ -20,7 +20,7 @@ public interface TextureParameterBuilder {
     TextureParameterBuilder enableMipMap(boolean mipMap);
 
     static <T extends TextureParameterBuilder> T create() {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             return (T) new POpenGL();
         }
         throw new IllegalStateException("API not supported yet!");

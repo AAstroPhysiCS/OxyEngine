@@ -1,9 +1,9 @@
 package OxyEngine;
 
-import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Window.OxyWindow;
+import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Window.Window;
 import OxyEngine.Core.Window.WindowBuilder;
-import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.Disposable;
 import org.lwjgl.glfw.GLFWErrorCallback;
 
 import java.util.Objects;
@@ -13,9 +13,9 @@ import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.glfw.GLFW.*;
 
-public class OxyEngine implements OxyDisposable {
+public final class OxyEngine implements Disposable {
 
-    private static OxyWindow oxyWindow;
+    private static Window window;
     private static Antialiasing antialiasing;
 
     private final boolean vSync;
@@ -25,9 +25,9 @@ public class OxyEngine implements OxyDisposable {
 
     private final TargetPlatform targetPlatform;
 
-    public OxyEngine(Supplier<Runnable> supplier, OxyWindow oxyWindow, Antialiasing antialiasing, boolean vSync, boolean debug, TargetPlatform targetPlatform) {
+    public OxyEngine(Supplier<Runnable> supplier, Window window, Antialiasing antialiasing, boolean vSync, boolean debug, TargetPlatform targetPlatform) {
         thread = new Thread(supplier.get(), "OxyEngine - 1");
-        OxyEngine.oxyWindow = oxyWindow;
+        OxyEngine.window = window;
         this.vSync = vSync;
         this.debug = debug;
         this.targetPlatform = targetPlatform;
@@ -57,26 +57,27 @@ public class OxyEngine implements OxyDisposable {
         logger.info("GLFW init successful");
         GLFWErrorCallback.createPrint(System.err).set();
 
-        OxyWindow.WindowSpecs specs = oxyWindow.getSpecs();
+        Window.WindowSpecs specs = window.getSpecs();
         WindowBuilder builder = new WindowBuilder.WindowFactory();
         builder.createHints()
                 .resizable(specs.resizable())
                 .doubleBuffered(specs.doubleBuffered())
                 .colorBitsSetDefault()
                 .create();
-        oxyWindow.setPointer(switch (oxyWindow.getMode()) {
-            case WINDOWED -> builder.createOpenGLWindow(oxyWindow.getWidth(), oxyWindow.getHeight(), oxyWindow.getTitle());
-            case FULLSCREEN -> builder.createFullscreenOpenGLWindow(oxyWindow.getTitle());
-            case WINDOWEDFULLSCREEN -> builder.createWindowedFullscreenOpenGLWindow(oxyWindow.getTitle());
+        window.setPointer(switch (window.getMode()) {
+            case WINDOWED -> builder.createOpenGLWindow(window.getWidth(), window.getHeight(), window.getTitle());
+            case FULLSCREEN -> builder.createFullscreenOpenGLWindow(window.getTitle());
+            case WINDOWEDFULLSCREEN -> builder.createWindowedFullscreenOpenGLWindow(window.getTitle());
         });
-        oxyWindow.init();
+        window.init();
         glfwSwapInterval(vSync ? 1 : 0);
-        OxyRenderer.init(targetPlatform, debug);
+        Renderer.init(targetPlatform, debug);
+        Renderer.enableGrid(true);
     }
 
     @Override
     public void dispose() {
-        oxyWindow.dispose();
+        window.dispose();
         glfwTerminate();
         Objects.requireNonNull(glfwSetErrorCallback(null)).free();
     }
@@ -85,7 +86,7 @@ public class OxyEngine implements OxyDisposable {
         return antialiasing;
     }
 
-    public static OxyWindow getWindowHandle() {
-        return oxyWindow;
+    public static Window getWindowHandle() {
+        return window;
     }
 }

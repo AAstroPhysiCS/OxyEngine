@@ -1,51 +1,53 @@
 package OxyEngine.Core.Context.Renderer.Mesh;
 
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLIndexBuffer;
-import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Core.Context.Scene.OxyNativeObject;
+import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.TargetPlatform;
 
-public abstract class IndexBuffer extends Buffer {
+public abstract class IndexBuffer extends Buffer<int[]> {
 
-    protected int length;
-    protected int[] indices;
-
-    protected final OxyPipeline.Layout layout;
-
-    public IndexBuffer(OxyPipeline.Layout layout) {
-        this.layout = layout;
+    protected IndexBuffer(int[] data) {
+        super(data);
     }
 
-    protected abstract void copy(int[] m_indices);
-
-    public int length() {
-        return length;
+    protected IndexBuffer(int allocationSize) {
+        super(new int[allocationSize]);
     }
 
-    public int[] getIndices() {
-        return indices;
-    }
+    public abstract void addToBuffer(int[] data);
 
-    public void setIndices(int[] indices) {
-        this.indices = indices;
-    }
-
-    public abstract void addToBuffer(OxyNativeObject oxyEntity);
-
-    public abstract void addToBuffer(int[] m_indices);
-
-    public boolean emptyData() {
-        return indices == null;
-    }
-
-    public static <T extends IndexBuffer> T create(OxyPipeline pipeline) {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
-            var layout = pipeline.getLayout(IndexBuffer.class);
+    public static <T extends IndexBuffer> T create(int[] data) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             try {
-                var constructor = OpenGLIndexBuffer.class.getDeclaredConstructor(OxyPipeline.Layout.class);
+                var constructor = OpenGLIndexBuffer.class.getDeclaredConstructor(int[].class);
                 constructor.setAccessible(true);
-                return (T) constructor.newInstance(layout);
+                return (T) constructor.newInstance(data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        throw new IllegalStateException("API not supported yet!");
+    }
+
+    public static <T extends IndexBuffer> T create(int allocationSize) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+            try {
+                var constructor = OpenGLIndexBuffer.class.getDeclaredConstructor(int.class);
+                constructor.setAccessible(true);
+                return (T) constructor.newInstance(allocationSize);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        throw new IllegalStateException("API not supported yet!");
+    }
+
+    public static <T extends IndexBuffer> T create(T other) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+            try {
+                var constructor = OpenGLIndexBuffer.class.getDeclaredConstructor(OpenGLIndexBuffer.class);
+                constructor.setAccessible(true);
+                return (T) constructor.newInstance(other);
             } catch (Exception e) {
                 e.printStackTrace();
             }

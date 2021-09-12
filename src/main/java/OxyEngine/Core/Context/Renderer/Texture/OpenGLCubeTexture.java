@@ -16,10 +16,11 @@ import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 import static org.lwjgl.opengl.GL45.glCreateTextures;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 
-public class OpenGLCubeTexture extends CubeTexture {
+public final class OpenGLCubeTexture extends CubeTexture {
 
     OpenGLCubeTexture(TextureSlot slot, int width, int height, TexturePixelType pixelType, TextureFormat format, TextureParameterBuilder.POpenGL parameter) {
         super(slot, null, pixelType, parameter);
@@ -103,5 +104,10 @@ public class OpenGLCubeTexture extends CubeTexture {
                 }
             }
         }
+    }
+
+    @Override
+    public void bind() {
+        glBindTextureUnit(textureSlot.getValue(), textureId);
     }
 }

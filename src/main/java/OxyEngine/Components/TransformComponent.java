@@ -4,45 +4,32 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-public class TransformComponent implements EntityComponent {
+public final class TransformComponent implements EntityComponent {
 
-    public Vector3f position;
-    public Vector3f rotation;
-    public Vector3f scale;
+    public final Vector3f position = new Vector3f();
+    public final Vector3f rotation = new Vector3f();
+    public final Vector3f scale = new Vector3f();
 
-    public Vector3f worldSpacePosition = new Vector3f();
+    public final Matrix4f transform = new Matrix4f();
 
-    public Matrix4f transform;
-
-    public TransformComponent(TransformComponent t) {
-        this.scale = new Vector3f(t.scale);
-        this.position = new Vector3f(t.position);
-        this.rotation = new Vector3f(t.rotation);
-        this.transform = new Matrix4f(t.transform);
-        this.worldSpacePosition = new Vector3f(t.position);
-    }
-
-    public void set(TransformComponent t) {
-        this.scale = new Vector3f(t.scale);
-        this.position = new Vector3f(t.position);
-        this.rotation = new Vector3f(t.rotation);
-        this.transform = new Matrix4f(t.transform);
+    public TransformComponent(TransformComponent other) {
+        this.scale.set(other.scale);
+        this.position.set(other.position);
+        this.rotation.set(other.rotation);
+        this.transform.set(other.transform);
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation, Vector3f scale) {
-        this.scale = scale;
-        this.position = position;
-        this.rotation = rotation;
-        this.transform = new Matrix4f();
-        this.worldSpacePosition = new Vector3f(position);
+        this.scale.set(scale);
+        this.position.set(position);
+        this.rotation.set(rotation);
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation, Vector3f scale, Matrix4f transform) {
-        this.scale = scale;
-        this.position = position;
-        this.rotation = rotation;
-        this.transform = transform;
-        this.worldSpacePosition = new Vector3f(position);
+        this.scale.set(scale);
+        this.position.set(position);
+        this.rotation.set(rotation);
+        this.transform.set(transform);
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation, float scale) {
@@ -50,37 +37,52 @@ public class TransformComponent implements EntityComponent {
     }
 
     public TransformComponent(Vector3f position, Quaternionf rotation, Vector3f scale) {
-        this.position = new Vector3f(position);
-        this.rotation = new Vector3f();
-        this.scale = new Vector3f(scale);
-        rotation.getEulerAnglesXYZ(this.rotation);
-        this.transform = new Matrix4f();
-    }
-
-    public void set(Vector3f position, Quaternionf rotation, Vector3f scale){
         this.position.set(position);
         this.scale.set(scale);
         rotation.getEulerAnglesXYZ(this.rotation);
-        this.transform = new Matrix4f();
     }
 
-    public TransformComponent(Matrix4f t){
-        this.transform = t;
-        this.position = new Vector3f();
-        this.rotation = new Vector3f();
-        this.scale = new Vector3f();
+    public void set(TransformComponent t) {
+        this.scale.set(t.scale);
+        this.position.set(t.position);
+        this.rotation.set(t.rotation);
+        this.transform.set(t.transform);
+    }
+
+    public void set(Vector3f position, Quaternionf rotation, Vector3f scale) {
+        this.position.set(position);
+        this.scale.set(scale);
+        rotation.getEulerAnglesXYZ(this.rotation);
+    }
+
+    public void set(Vector3f position, Vector3f rotation, Vector3f scale) {
+        this.position.set(position);
+        this.scale.set(scale);
+        this.rotation.set(rotation);
+    }
+
+    public void set(float xPos, float yPos, float zPos, float xRot, float yRot, float zRot, float scaleX, float scaleY, float scaleZ) {
+        this.position.set(xPos, yPos, zPos);
+        this.scale.set(scaleX, scaleY, scaleZ);
+        this.rotation.set(xRot, yRot, zRot);
+    }
+
+    public void set(Vector3f position, Quaternionf rotation) {
+        this.position.set(position);
+        rotation.getEulerAnglesXYZ(this.rotation);
+    }
+
+    public void set(Matrix4f t) {
+        this.transform.set(t);
         Quaternionf rot = new Quaternionf();
-        transform.getTranslation(position);
+        transform.getTranslation(this.position);
         transform.getUnnormalizedRotation(rot);
-        transform.getScale(scale);
-        //Could function or could not function idk.
-        if(scale.x < 0.01f && scale.y < 0.01f && scale.z < 0.01f) scale.set(1);
-        else {
-            scale.mul(0.01f);
-            position.mul(0.01f);
-        }
+        transform.getScale(this.scale);
         rot.getEulerAnglesXYZ(this.rotation);
-//        this.rotation.mul((float) (180 / Math.PI));
+    }
+
+    public TransformComponent(Matrix4f t) {
+        set(t);
     }
 
     public TransformComponent(Vector3f position, Vector3f rotation) {

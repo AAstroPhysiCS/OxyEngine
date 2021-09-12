@@ -1,6 +1,6 @@
 package OxyEngine.Components;
 
-public class TagComponent implements EntityComponent {
+public final class TagComponent implements EntityComponent {
 
     private String tag;
 

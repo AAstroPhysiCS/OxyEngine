@@ -1,9 +1,159 @@
 Registry [
+	Wall: {
+		ID: cac8aa1f-c4dd-4c68-a897-2a6b06b47c0b
+		Name: Wall
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: ( 0.000E+0  1.534E+2  4.573E+1)
+		Rotation: (-1.571E+0  0.000E+0  0.000E+0)
+		Scale: ( 9.135E+0  1.000E+0  2.899E+2)
+		Bounds Min: (-1.000E+0 -1.000E+0 -1.000E+0)
+		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Static
+			Collider Type: Box
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+		}
+		Material 0: {
+			Material Index: 0
+			Material Name: DefaultMaterial
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 0.86
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.42
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+		}
+	}
+	Floor: {
+		ID: cd9a4e44-0f6e-4528-a824-6c85695093fc
+		Name: Floor
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 9.135E+0  1.000E+0  2.899E+2)
+		Bounds Min: (-1.000E+0 -1.000E+0 -1.000E+0)
+		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Static
+			Collider Type: Box
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+		}
+		Material 0: {
+			Material Index: 0
+			Material Name: DefaultMaterial
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 0.86
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.42
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+		}
+	}
+	Platforms: {
+		ID: 4773ea4f-1d98-44ca-8001-551749935568
+		Name: Platforms
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: ( 0.000E+0  0.000E+0 -8.414E-1)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Mesh Path: null
+		Submesh Indices: 
+		Family: {
+			Root: null
+		}
+		Script: {
+		}
+	}
+	Player: {
+		ID: 16c65fbc-7705-45f4-8e76-549ae45e45ce
+		Name: Player
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: ( 0.000E+0  9.830E+0  2.024E+1)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 5.780E-2  5.780E-2  5.780E-2)
+		Bounds Min: (-1.000E+2 -1.000E+2 -1.000E+2)
+		Bounds Max: ( 1.000E+2  1.000E+2  1.000E+2)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\sphere.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Dynamic
+			Collider Type: Sphere
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\resources\Scripts\MovementScript.java
+		}
+		Material 0: {
+			Material Index: 0
+			Material Name: DefaultMaterial
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 0.3
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.92
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+		}
+	}
 	Sky Light: {
-		ID: fabb0db1-1af9-463b-a7f3-7445ff4fdecb
-		Mesh Position: -1
+		ID: 18c9f4fc-b056-449e-9fc3-c767af6fb7bf
 		Name: Sky Light
 		Emitting: true
+		Hidden: false
 		Camera: false
 		Emitting Type: DynamicSky
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
@@ -11,454 +161,151 @@ Registry [
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
 		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
 		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: null
-		Color: null
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 0
-		Roughness Map Texture: null
-		Roughness Map Strength: 0
-		AO Map Texture: null
-		AO Map Strength: 0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0
-		Emissive Map Texture: null
-		Emissive Map Strength: 0
-		Mesh: null
+		Mesh Path: null
+		Submesh Indices: 
 		Light Attributes: {
 			Intensity: 1.0
-			Dynamic Sky Turbidity: 2.015
+			Dynamic Sky Turbidity: 2.0
 			Dynamic Sky Azimuth: 0.0
 			Dynamic Sky Inclination: 0.0
 			Dynamic Sky Sun Direction: ( 0.000E+0  1.000E+0  0.000E+0)
 			Environment Intensity: 1.0
 			Environment Primary: true
 		}
+		Family: {
+			Root: null
+		}
 		Script: {
-		}
-	}
-	RootNode: {
-		ID: f24ceac2-e163-4478-9610-b5c275427cfd
-		Mesh Position: 0
-		Name: RootNode
-		Emitting: false
-		Camera: false
-		Emitting Type: null
-		Position: ( 0.000E+0  0.000E+0  0.000E+0)
-		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: null
-		Color: null
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 0
-		Roughness Map Texture: null
-		Roughness Map Strength: 0
-		AO Map Texture: null
-		AO Map Strength: 0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0
-		Emissive Map Texture: null
-		Emissive Map Strength: 0
-		Mesh: null
-		Script: {
-		}
-		Cube: {
-			ID: 4f084fbe-ddf8-462e-bbd8-e26a2913f408
-			Mesh Position: 0
-			Name: Cube
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 0.000E+0  0.000E+0  0.000E+0)
-			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
-			Scale: ( 6.077E+0  5.824E+2  1.011E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-			Material Name: DefaultMaterial
-			Color: [0.8, 0.8, 0.8, 1.0]
-			Albedo Texture: null
-			Normal Map Texture: null
-			Normal Map Strength: 1.0
-			Roughness Map Texture: null
-			Roughness Map Strength: 1.0
-			AO Map Texture: null
-			AO Map Strength: 1.0
-			Metallic Map Texture: null
-			Metallic Map Strength: 0.0
-			Emissive Map Texture: null
-			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
-			PhysX: {
-				Rigid Body Type: Static
-				Collider Type: Box
-				Dynamic Friction: 0.0
-				Static Friction: 0.0
-				Restitution: 0.0
-			}
-			Script: {
-			}
-		}
-	}
-	RootNode: {
-		ID: b916b83f-5b71-4dac-803a-95a2e12b5de1
-		Mesh Position: 0
-		Name: RootNode
-		Emitting: false
-		Camera: false
-		Emitting Type: null
-		Position: ( 0.000E+0  1.850E+1  0.000E+0)
-		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: null
-		Color: null
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 0
-		Roughness Map Texture: null
-		Roughness Map Strength: 0
-		AO Map Texture: null
-		AO Map Strength: 0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0
-		Emissive Map Texture: null
-		Emissive Map Strength: 0
-		Mesh: null
-		Script: {
-		}
-		Cube: {
-			ID: 61f2dfe2-4fd4-4223-a3b1-0a7c72421979
-			Mesh Position: 0
-			Name: Cube
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 0.000E+0  2.884E+0  1.448E+1)
-			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
-			Scale: ( 3.003E+0  9.005E+0  1.001E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-			Material Name: DefaultMaterial
-			Color: [0.8, 0.8, 0.8, 1.0]
-			Albedo Texture: null
-			Normal Map Texture: null
-			Normal Map Strength: 1.0
-			Roughness Map Texture: null
-			Roughness Map Strength: 1.0
-			AO Map Texture: null
-			AO Map Strength: 1.0
-			Metallic Map Texture: null
-			Metallic Map Strength: 0.0
-			Emissive Map Texture: null
-			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
-			PhysX: {
-				Rigid Body Type: Static
-				Collider Type: Box
-				Dynamic Friction: 0.0
-				Static Friction: 0.0
-				Restitution: 0.0
-			}
-			Script: {
-			}
-		}
-		Cube: {
-			ID: 8d2f36c8-77fc-43ae-8d4c-5bc56e7ef1fa
-			Mesh Position: 0
-			Name: Cube
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 0.000E+0 -4.970E+0 -9.500E+0)
-			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
-			Scale: ( 3.003E+0  9.005E+0  1.001E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-			Material Name: DefaultMaterial
-			Color: [0.8, 0.8, 0.8, 1.0]
-			Albedo Texture: null
-			Normal Map Texture: null
-			Normal Map Strength: 1.0
-			Roughness Map Texture: null
-			Roughness Map Strength: 1.0
-			AO Map Texture: null
-			AO Map Strength: 1.0
-			Metallic Map Texture: null
-			Metallic Map Strength: 0.0
-			Emissive Map Texture: null
-			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
-			PhysX: {
-				Rigid Body Type: Static
-				Collider Type: Box
-				Dynamic Friction: 0.0
-				Static Friction: 0.0
-				Restitution: 0.0
-			}
-			Script: {
-			}
-		}
-	}
-	RootNode: {
-		ID: 059568c3-b1f0-4f1f-a164-4c1b40b9f683
-		Mesh Position: 0
-		Name: RootNode
-		Emitting: false
-		Camera: false
-		Emitting Type: null
-		Position: ( 0.000E+0  4.627E+1 -5.369E+1)
-		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-		Scale: ( 6.707E+0  4.601E+1  1.000E+0)
-		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: null
-		Color: null
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 0
-		Roughness Map Texture: null
-		Roughness Map Strength: 0
-		AO Map Texture: null
-		AO Map Strength: 0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0
-		Emissive Map Texture: null
-		Emissive Map Strength: 0
-		Mesh: null
-		Script: {
-		}
-		Cube: {
-			ID: 7b2eaa4b-ef0d-4601-9a0f-9d6ef276c3a7
-			Mesh Position: 0
-			Name: Cube
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 0.000E+0  0.000E+0  4.959E-5)
-			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
-			Scale: ( 1.012E+0  1.011E+0  1.011E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-			Material Name: DefaultMaterial
-			Color: [0.8, 0.8, 0.8, 1.0]
-			Albedo Texture: null
-			Normal Map Texture: null
-			Normal Map Strength: 1.0
-			Roughness Map Texture: null
-			Roughness Map Strength: 0.204
-			AO Map Texture: null
-			AO Map Strength: 1.0
-			Metallic Map Texture: null
-			Metallic Map Strength: 0.263
-			Emissive Map Texture: null
-			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
-			PhysX: {
-				Rigid Body Type: Static
-				Collider Type: Box
-				Dynamic Friction: 0.0
-				Static Friction: 0.0
-				Restitution: 0.0
-			}
-			Script: {
-			}
 		}
 	}
 	Directional Light: {
-		ID: 06e0c7ee-52f4-47b0-8d15-f79d822dd8f7
-		Mesh Position: 0
+		ID: 36f6f821-20a9-47ce-8a1d-425a0504c297
 		Name: Directional Light
 		Emitting: true
+		Hidden: false
 		Camera: false
 		Emitting Type: DirectionalLight
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
-		Rotation: ( 2.403E+0 -7.072E-1  8.472E-2)
+		Rotation: ( 1.977E+0 -1.175E+0 -3.159E-1)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
 		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
 		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: Material (0)
-		Color: [1.0, 1.0, 1.0, 1.0]
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 1.0
-		Roughness Map Texture: null
-		Roughness Map Strength: 1.0
-		AO Map Texture: null
-		AO Map Strength: 1.0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0.0
-		Emissive Map Texture: null
-		Emissive Map Strength: 1.0
-		Mesh: null
+		Mesh Path: null
+		Submesh Indices: 
 		Light Attributes: {
 			Intensity: 1.0
-			Direction: ( 2.403E+0 -7.072E-1  8.472E-2)
+			Direction: ( 1.977E+0 -1.175E+0 -3.159E-1)
+		}
+		Family: {
+			Root: null
 		}
 		Script: {
 		}
 	}
-	RootNode: {
-		ID: 36334426-b26b-44c7-bdba-99ff88e10247
-		Mesh Position: 0
-		Name: RootNode
+	Platform 1: {
+		ID: 2c5ebf05-5164-4b87-b298-6a6f2bda63ad
+		Name: Platform 1
 		Emitting: false
+		Hidden: false
 		Camera: false
 		Emitting Type: null
-		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Position: ( 0.000E+0  2.000E+1 -2.845E+1)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: null
-		Color: null
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 0
-		Roughness Map Texture: null
-		Roughness Map Strength: 0
-		AO Map Texture: null
-		AO Map Strength: 0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0
-		Emissive Map Texture: null
-		Emissive Map Strength: 0
-		Mesh: null
+		Scale: ( 3.522E+0  1.000E+0  8.858E+0)
+		Bounds Min: (-1.000E+0 -1.000E+0 -1.000E+0)
+		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Static
+			Collider Type: Box
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: 4773ea4f-1d98-44ca-8001-551749935568
+		}
 		Script: {
 		}
-		Sphere: {
-			ID: e4fc85c9-25ba-4909-8600-72802ae0796f
-			Mesh Position: 0
-			Name: Sphere
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 1.789E-6  9.510E+0 -3.595E+1)
-			Rotation: ( 0.000E+0 -3.717E-8  4.320E-8)
-			Scale: ( 4.025E+0  4.009E+0  4.010E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-			Material Name: DefaultMaterial
-			Color: [1.0, 0.41375923, 0.14691943, 1.0]
-			Albedo Texture: null
-			Normal Map Texture: null
-			Normal Map Strength: 1.0
-			Roughness Map Texture: null
-			Roughness Map Strength: 0.298
-			AO Map Texture: null
-			AO Map Strength: 1.0
-			Metallic Map Texture: null
-			Metallic Map Strength: 0.635
-			Emissive Map Texture: null
-			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\sphere.fbx
-			PhysX: {
-				Rigid Body Type: Dynamic
-				Collider Type: Sphere
-				Dynamic Friction: 0.0
-				Static Friction: 0.0
-				Restitution: 0.05
-			}
-			Script: {
-				Path: D:\programming\Java\OxyEngine\src\main\resources\Scripts\MovementScript.java
-			}
-			Camera: {
-				ID: dacd61cb-b021-4571-861b-65984a400c30
-				Mesh Position: 0
-				Name: Camera
-				Emitting: false
-				Camera: true
-				Emitting Type: null
-				Position: (-5.520E+1  7.900E+0  0.000E+0)
-				Rotation: ( 0.000E+0 -1.545E+0  0.000E+0)
-				Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-				Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-				Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-				Material Name: null
-				Color: null
-				Albedo Texture: null
-				Normal Map Texture: null
-				Normal Map Strength: 0
-				Roughness Map Texture: null
-				Roughness Map Strength: 0
-				AO Map Texture: null
-				AO Map Strength: 0
-				Metallic Map Texture: null
-				Metallic Map Strength: 0
-				Emissive Map Texture: null
-				Emissive Map Strength: 0
-				Mesh: null
-				Script: {
-				}
-			}
-		}
-	}
-	RootNode: {
-		ID: 5b652ee9-261c-445d-80d5-6949ad0d230e
-		Mesh Position: 0
-		Name: RootNode
-		Emitting: false
-		Camera: false
-		Emitting Type: null
-		Position: ( 0.000E+0  0.000E+0  0.000E+0)
-		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
-		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: null
-		Color: null
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 0
-		Roughness Map Texture: null
-		Roughness Map Strength: 0
-		AO Map Texture: null
-		AO Map Strength: 0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0
-		Emissive Map Texture: null
-		Emissive Map Strength: 0
-		Mesh: null
-		Script: {
-		}
-		m1911: {
-			ID: 9d7bb9e7-ff31-49e8-97d1-222e03924437
-			Mesh Position: 0
-			Name: m1911
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 8.994E-1  9.341E+0  1.971E+1)
-			Rotation: ( 3.839E-1  1.570E+0 -3.839E-1)
-			Scale: ( 1.500E+0  1.500E+0  1.500E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material 0: {
+			Material Index: 0
 			Material Name: DefaultMaterial
 			Color: [0.8, 0.8, 0.8, 1.0]
 			Albedo Texture: null
 			Normal Map Texture: null
 			Normal Map Strength: 1.0
 			Roughness Map Texture: null
-			Roughness Map Strength: 1.0
+			Roughness Map Strength: 0.5
 			AO Map Texture: null
 			AO Map Strength: 1.0
 			Metallic Map Texture: null
-			Metallic Map Strength: 0.0
+			Metallic Map Strength: 0.36
 			Emissive Map Texture: null
 			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\colt-m1911\source\colt low polyfbx.fbx
-			PhysX: {
-				Rigid Body Type: Dynamic
-				Collider Type: TriangleMesh
-				Dynamic Friction: 0.0
-				Static Friction: 0.0
-				Restitution: 0.0
-			}
-			Script: {
-			}
+		}
+	}
+	Platform 2: {
+		ID: f28da7fa-8d4c-45f4-aa58-463a82a52ccc
+		Name: Platform 2
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: ( 0.000E+0  1.150E+1 -6.952E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 3.522E+0  1.000E+0  8.858E+0)
+		Bounds Min: (-1.000E+0 -1.000E+0 -1.000E+0)
+		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Static
+			Collider Type: Box
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: 4773ea4f-1d98-44ca-8001-551749935568
+		}
+		Script: {
+		}
+		Material 0: {
+			Material Index: 0
+			Material Name: DefaultMaterial
+			Color: [0.8, 0.8, 0.8, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 0.5
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.36
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+		}
+	}
+	Camera: {
+		ID: e6a8df69-2b18-42e5-ad33-4052a1fedea8
+		Name: Camera
+		Emitting: false
+		Hidden: false
+		Camera: true
+		Emitting Type: null
+		Position: ( 6.000E+2  1.500E+2  0.000E+0)
+		Rotation: (-2.616E-1  1.570E+0  8.724E-1)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Mesh Path: null
+		Submesh Indices: 
+		Family: {
+			Root: 16c65fbc-7705-45f4-8e76-549ae45e45ce
+		}
+		Script: {
 		}
 	}
 ]

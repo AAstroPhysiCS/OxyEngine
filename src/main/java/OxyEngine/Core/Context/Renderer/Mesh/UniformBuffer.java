@@ -1,16 +1,19 @@
 package OxyEngine.Core.Context.Renderer.Mesh;
 
-import OxyEngine.Core.Context.OxyRenderer;
+import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLUniformBuffer;
+import OxyEngine.System.Disposable;
 import OxyEngine.TargetPlatform;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 import org.joml.Vector4fc;
 
-public abstract class UniformBuffer extends Buffer {
+public abstract class UniformBuffer implements Disposable {
+
+    protected int bufferId;
 
     public static <T extends UniformBuffer> T create(int size, int binding) {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             try {
                 var constructor = OpenGLUniformBuffer.class.getDeclaredConstructor(int.class, int.class);
                 constructor.setAccessible(true);
@@ -21,6 +24,8 @@ public abstract class UniformBuffer extends Buffer {
         }
         throw new IllegalStateException("API not supported yet!");
     }
+
+    public abstract void load();
 
     public abstract void setData(int offset, int[] data);
 

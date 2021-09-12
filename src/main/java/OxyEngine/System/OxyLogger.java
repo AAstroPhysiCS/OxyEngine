@@ -1,6 +1,6 @@
 package OxyEngine.System;
 
-import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Context.Renderer.Texture.Color;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -8,19 +8,19 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-public class OxyLogger extends Formatter {
+public final class OxyLogger extends Formatter {
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_BLUE = "\u001B[34m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_YELLOW = "\u001B[33m";
 
-    public static final OxyColor ANSI_BLUE_OXY = new OxyColor(0.3f, 0.3f, 1.0f, 1.0f);
-    public static final OxyColor ANSI_RED_OXY = new OxyColor(1f, 0.3f, 0.3f, 1.0f);
-    public static final OxyColor ANSI_YELLOW_OXY = new OxyColor(1.0f, 1.0f, 0.3f, 1.0f);
+    public static final Color ANSI_BLUE_OXY = new Color(0.3f, 0.3f, 1.0f, 1.0f);
+    public static final Color ANSI_RED_OXY = new Color(1f, 0.3f, 0.3f, 1.0f);
+    public static final Color ANSI_YELLOW_OXY = new Color(1.0f, 1.0f, 0.3f, 1.0f);
 
     //apparently, we cant take console output with System.in... System.in is null
-    //for the history, we need to define our own buffer and limit its size
+    //for the history, we need to define our own buffer and limit its indexCount
     private static final int bufferCapacity = 10000;
     private static final StringBuilder bufferHistory = new StringBuilder(bufferCapacity);
 

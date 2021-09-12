@@ -2,11 +2,14 @@ package OxyEngine.Core.Context.Renderer.Mesh;
 
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Context.OxyRenderer;
-import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Context.Renderer.Texture.Color;
+import OxyEngine.System.Disposable;
 import OxyEngine.TargetPlatform;
 
-public abstract class FrameBuffer extends Buffer {
+public abstract class FrameBuffer implements Disposable {
+
+    protected int bufferId;
 
     protected int width;
     protected int height;
@@ -17,9 +20,9 @@ public abstract class FrameBuffer extends Buffer {
 
     protected static boolean windowMinized;
 
-    protected final OxyColor clearColor;
+    protected final Color clearColor;
 
-    public FrameBuffer(final int width, final int height, OxyColor clearColor) {
+    public FrameBuffer(final int width, final int height, Color clearColor) {
         this.width = width;
         this.height = height;
         this.clearColor = clearColor;
@@ -67,7 +70,7 @@ public abstract class FrameBuffer extends Buffer {
         return height;
     }
 
-    public OxyColor getClearColor() {
+    public Color getClearColor() {
         return clearColor;
     }
 
@@ -75,11 +78,11 @@ public abstract class FrameBuffer extends Buffer {
         return flushed;
     }
 
-    public static <T extends FrameBuffer> T create(int width, int height, OxyColor clearColor, FrameBufferSpecification... specBuilders) {
+    public static <T extends FrameBuffer> T create(int width, int height, Color clearColor, FrameBufferSpecification... specBuilders) {
         if (specBuilders.length == 0) throw new IllegalStateException("Specification not given!");
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             try {
-                var constructor = OpenGLFrameBuffer.class.getDeclaredConstructor(int.class, int.class, OxyColor.class, specBuilders.getClass());
+                var constructor = OpenGLFrameBuffer.class.getDeclaredConstructor(int.class, int.class, Color.class, specBuilders.getClass());
                 constructor.setAccessible(true);
                 return (T) constructor.newInstance(width, height, clearColor, specBuilders);
             } catch (Exception e) {
@@ -91,7 +94,7 @@ public abstract class FrameBuffer extends Buffer {
 
     public static <T extends FrameBuffer> T create(int width, int height, FrameBufferSpecification... specBuilders) {
         if (specBuilders.length == 0) throw new IllegalStateException("Specification not given!");
-        return create(width, height, OxyColor.DEFAULT, specBuilders);
+        return create(width, height, Color.DEFAULT, specBuilders);
     }
 
     public static <T> T createNewSpec(Class<T> tClass) {

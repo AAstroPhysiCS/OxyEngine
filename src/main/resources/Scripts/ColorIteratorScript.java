@@ -1,19 +1,17 @@
 package Scripts;
 
-import OxyEngine.Components.OxyMaterialIndex;
 import OxyEngine.Scripting.ScriptableEntity;
-import OxyEngine.Core.Context.Scene.OxyMaterial;
-import OxyEngine.Core.Context.Scene.OxyMaterialPool;
-import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.Material;
+import OxyEngine.Core.Context.Scene.Entity;
 import OxyEngine.Core.Context.Scene.Scene;
 
-public class ColorIteratorScript extends ScriptableEntity {
+public final class ColorIteratorScript extends ScriptableEntity {
 
-    public ColorIteratorScript(Scene scene, OxyEntity entity) {
+    public ColorIteratorScript(Scene scene, Entity entity) {
         super(scene, entity);
     }
 
-    OxyMaterial material;
+    Material material;
 
     @Override
     public void onCreate() {

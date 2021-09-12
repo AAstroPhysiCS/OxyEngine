@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 import static OxyEngine.System.OxySystem.*;
 
-public class ProjectPanel extends Panel {
+public final class ProjectPanel extends Panel {
 
     private static ProjectPanel INSTANCE = null;
 

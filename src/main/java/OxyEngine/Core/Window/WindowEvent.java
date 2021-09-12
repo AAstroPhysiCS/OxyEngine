@@ -3,7 +3,7 @@ package OxyEngine.Core.Window;
 import OxyEngine.Core.Window.WindowEvent.WindowResizeEvent;
 import OxyEngine.Core.Window.WindowEvent.WindowCloseEvent;
 
-public abstract sealed class WindowEvent implements OxyEvent permits WindowResizeEvent, WindowCloseEvent {
+public abstract sealed class WindowEvent implements Event permits WindowResizeEvent, WindowCloseEvent {
 
     public static final class WindowResizeEvent extends WindowEvent {
 

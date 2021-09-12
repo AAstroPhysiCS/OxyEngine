@@ -2,15 +2,15 @@ package OxyEngine.Scripting;
 
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Components.TagComponent;
-import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.Entity;
 import OxyEngine.Core.Context.Scene.Scene;
 
 public abstract class ScriptableEntity {
 
     private final Scene scene;
-    final OxyEntity entity;
+    final Entity entity;
 
-    public ScriptableEntity(Scene scene, OxyEntity entity) {
+    public ScriptableEntity(Scene scene, Entity entity) {
         this.scene = scene;
         this.entity = entity;
     }
@@ -23,7 +23,7 @@ public abstract class ScriptableEntity {
         return scene.has(entity, destClass);
     }
 
-    protected <T extends EntityComponent> OxyEntity getEntityByName(String name){
+    protected <T extends EntityComponent> Entity getEntityByName(String name){
         for(var s : scene.getEntities()){
             if(s.has(TagComponent.class)){
                 if(s.get(TagComponent.class).tag().equals(name)) return s;
@@ -32,18 +32,12 @@ public abstract class ScriptableEntity {
         return null;
     }
 
-    protected void updateData() {
-        if (entity == null) return;
-        entity.transformLocally();
-    }
-
-    public abstract void onCreate();
-
     void updateScript(float ts) {
         if (entity == null || scene == null) return;
         onUpdate(ts);
-        updateData();
     }
+
+    public abstract void onCreate();
 
     public abstract void onUpdate(float ts);
 }

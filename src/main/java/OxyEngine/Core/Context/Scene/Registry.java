@@ -3,7 +3,7 @@ package OxyEngine.Core.Context.Scene;
 import OxyEngine.Components.EntityComponent;
 import OxyEngine.Components.EntityFamily;
 import OxyEngine.Components.UUIDComponent;
-import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.Disposable;
 
 import java.util.*;
 
@@ -11,15 +11,15 @@ import java.util.*;
  * Entity Component System (ECS)
  * More info: https://github.com/skypjack/entt
  */
-public class Registry {
+public final class Registry {
 
-    final Map<OxyEntity, Set<EntityComponent>> entityList = new LinkedHashMap<>();
+    final Map<Entity, List<EntityComponent>> entityList = new LinkedHashMap<>();
 
     /*
      * add component to the registry
      */
-    public final void addComponent(OxyEntity entity, EntityComponent... component) {
-        Set<EntityComponent> entityComponentSet = entityList.get(entity);
+    public final void addComponent(Entity entity, EntityComponent... component) {
+        List<EntityComponent> entityComponentSet = entityList.get(entity);
         for (EntityComponent c : component) {
             if (c != null) {
                 entityComponentSet.removeIf(entityComponent -> entityComponent.getClass().equals(c.getClass()) || entityComponent.getClass().isInstance(c));
@@ -31,8 +31,9 @@ public class Registry {
     /*
      * returns true if the component is already in the set
      */
-    public boolean has(OxyEntity entity, Class<? extends EntityComponent> destClass) {
-        Set<EntityComponent> set = entityList.get(entity);
+
+    public boolean has(Entity entity, Class<? extends EntityComponent> destClass) {
+        List<EntityComponent> set = entityList.get(entity);
         for (EntityComponent c : set) {
             if (destClass.equals(c.getClass()))
                 return true;
@@ -45,8 +46,8 @@ public class Registry {
     /*
      * gets the component from the set
      */
-    public <T extends EntityComponent> T get(OxyEntity entity, Class<T> destClass) {
-        Set<EntityComponent> set = entityList.get(entity);
+    public <T extends EntityComponent> T get(Entity entity, Class<T> destClass) {
+        List<EntityComponent> set = entityList.get(entity);
         for (EntityComponent c : set) {
             if (c.getClass() == destClass) {
                 return (T) c;
@@ -61,11 +62,12 @@ public class Registry {
     /*
      * gets all the entities associated with this class
      */
-    public Set<OxyEntity> view(Class<? extends EntityComponent> destClass) {
-        Set<OxyEntity> list = new LinkedHashSet<>();
+
+    public Set<Entity> view(Class<? extends EntityComponent> destClass) {
+        Set<Entity> list = new LinkedHashSet<>();
         for (var entrySet : entityList.entrySet()) {
-            Set<EntityComponent> value = entrySet.getValue();
-            OxyEntity entity = entrySet.getKey();
+            List<EntityComponent> value = entrySet.getValue();
+            Entity entity = entrySet.getKey();
             for (EntityComponent c : value) {
                 if (c.getClass() == destClass) {
                     list.add(entity);
@@ -96,23 +98,30 @@ public class Registry {
         return allDistinctComponents;
     }
 
-    public void removeComponent(OxyEntity entity, EntityComponent c) {
+    public void removeComponent(Entity entity, EntityComponent c) {
         entityList.get(entity).remove(c);
-        if(c instanceof OxyDisposable d) d.dispose();
+        if(c instanceof Disposable d) d.dispose();
     }
 
-    public OxyEntity getRoot(OxyEntity entity) {
+    public Entity getRoot(Entity entity) {
         EntityFamily familyComponent = entity.getFamily();
         EntityFamily rootFamilyComponent = familyComponent.root();
-        for (OxyEntity eList : entityList.keySet()) {
+        for (Entity eList : entityList.keySet()) {
             if (eList.getFamily() == rootFamilyComponent) return eList;
         }
         return null;
     }
 
-    public OxyEntity getEntityByUUID(UUIDComponent uuidComponent) {
-        for(OxyEntity e : entityList.keySet()){
-            if(e.get(UUIDComponent.class).id().equals(uuidComponent.id())) return e;
+    public Entity getEntityByUUID(UUIDComponent uuidComponent) {
+        for(Entity e : entityList.keySet()){
+            if(e.get(UUIDComponent.class).getUUID().equals(uuidComponent.getUUID())) return e;
+        }
+        return null;
+    }
+
+    public Entity getEntityByUUID(String uuid) {
+        for(Entity e : entityList.keySet()){
+            if(e.get(UUIDComponent.class).getUUID().equals(uuid)) return e;
         }
         return null;
     }

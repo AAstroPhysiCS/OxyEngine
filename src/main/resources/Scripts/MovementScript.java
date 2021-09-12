@@ -1,28 +1,25 @@
 package Scripts;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Camera.OxyCamera;
-import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.Entity;
 import OxyEngine.Core.Context.Scene.Scene;
 import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.KeyCode;
-import OxyEngine.PhysX.OxyPhysXActor;
-import OxyEngine.PhysX.OxyPhysXComponent;
+import OxyEngine.PhysX.PhysXActor;
+import OxyEngine.PhysX.PhysXComponent;
 import OxyEngine.Scripting.ScriptableEntity;
 import org.joml.Vector3f;
 
-import javax.xml.crypto.dsig.Transform;
-
 public final class MovementScript extends ScriptableEntity {
 
-    public MovementScript(Scene scene, OxyEntity entity) {
+    public MovementScript(Scene scene, Entity entity) {
         super(scene, entity);
     }
 
     TransformComponent transformComponent;
-    OxyPhysXComponent physXComponent;
-    OxyEntity cameraEntity;
-    OxyEntity playerEntity;
+    PhysXComponent physXComponent;
+    Entity cameraEntity;
+    Entity playerEntity;
 
     public float SpeedHorizontal = 10000f;
     public float SpeedVertical = 5000f;
@@ -30,7 +27,7 @@ public final class MovementScript extends ScriptableEntity {
     @Override
     public void onCreate() {
         transformComponent = getComponent(TransformComponent.class);
-        physXComponent = getComponent(OxyPhysXComponent.class);
+        physXComponent = getComponent(PhysXComponent.class);
         cameraEntity = getEntityByName("Camera");
         playerEntity = getEntityByName("Sphere");
     }
@@ -67,7 +64,7 @@ public final class MovementScript extends ScriptableEntity {
                 positionRef.y += SpeedVertical * ts;
             }
         } else {
-            OxyPhysXActor actor = physXComponent.getActor();
+            PhysXActor actor = physXComponent.getActor();
             if (Input.isKeyPressed(KeyCode.GLFW_KEY_W)) {
                 actor.addForce(new Vector3f((float) -Math.cos(angle90) * SpeedHorizontal * ts, 0f, (float) Math.sin(angle90) * SpeedHorizontal * ts));
             }
@@ -86,7 +83,6 @@ public final class MovementScript extends ScriptableEntity {
             /*if (Input.isKeyPressed(KeyCode.GLFW_KEY_LEFT_SHIFT)) {
                 actor.addForce(new Vector3f(0f, (float) -SpeedVertical * ts, 0f));
             }*/
-            if(cameraEntity != null) cameraEntity.transformLocallyWithoutRotation();
         }
     }
 }

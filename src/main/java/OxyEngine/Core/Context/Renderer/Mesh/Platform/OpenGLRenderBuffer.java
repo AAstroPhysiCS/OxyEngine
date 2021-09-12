@@ -5,18 +5,15 @@ import OxyEngine.Core.Context.Renderer.Mesh.RenderBuffer;
 import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.opengl.GL45.glCreateRenderbuffers;
 
-public class OpenGLRenderBuffer extends RenderBuffer {
+public final class OpenGLRenderBuffer extends RenderBuffer {
 
     public OpenGLRenderBuffer(TextureFormat textureFormat, int width, int height) {
         super(textureFormat, -1, width, height);
+        if (bufferId == 0) bufferId = glCreateRenderbuffers();
     }
 
     public OpenGLRenderBuffer(TextureFormat textureFormat, int samples, int width, int height) {
         super(textureFormat, samples, width, height);
-    }
-
-    @Override
-    protected void load() {
         if (bufferId == 0) bufferId = glCreateRenderbuffers();
     }
 

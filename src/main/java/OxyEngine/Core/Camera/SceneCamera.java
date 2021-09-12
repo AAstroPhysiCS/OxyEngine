@@ -1,18 +1,25 @@
 package OxyEngine.Core.Camera;
 
-import OxyEngine.Core.Window.*;
+import OxyEngine.Core.Window.Event;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
-public class SceneCamera extends PerspectiveCamera {
+public final class SceneCamera extends PerspectiveCamera {
 
-    public SceneCamera(float mouseSpeed, float horizontalSpeed, float verticalSpeed, boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
+    private final Matrix4f transform;
+    private final Vector3f origin = new Vector3f();
+
+    public SceneCamera(Matrix4f transform, float mouseSpeed, float horizontalSpeed, float verticalSpeed, boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
         super(mouseSpeed, horizontalSpeed, verticalSpeed, primary, fovY, aspect, zNear, zFar, transpose);
+        this.transform = transform;
         projectionMatrix = new Matrix4f();
         modelMatrix = new Matrix4f();
         viewMatrix = new Matrix4f();
     }
 
-    public SceneCamera() {
+    public SceneCamera(Matrix4f transform) {
+        this.transform = transform;
         projectionMatrix = new Matrix4f();
         modelMatrix = new Matrix4f();
         viewMatrix = new Matrix4f();
@@ -25,9 +32,30 @@ public class SceneCamera extends PerspectiveCamera {
 
     private void calcModelMatrix() {
         modelMatrix.identity();
-        modelMatrix.rotateX(-this.getRotation().x);
-        modelMatrix.rotateY(-this.getRotation().y);
-        modelMatrix.translate(-this.getPosition().x, -this.getPosition().y, -this.getPosition().z);
+
+        Vector3f rotation = new Vector3f();
+        Quaternionf quat = new Quaternionf();
+        transform.getUnnormalizedRotation(quat);
+        quat.getEulerAnglesXYZ(rotation);
+
+        Vector3f position = new Vector3f();
+        transform.getTranslation(position);
+
+        modelMatrix.rotateX(-rotation.x);
+        modelMatrix.rotateY(-rotation.y);
+        modelMatrix.translate(-position.x, -position.y, -position.z);
+    }
+
+    private void calcViewMatrixNoTranslation() {
+        viewMatrixNoTranslation.set(getProjectionMatrix());
+
+        Vector3f rotation = new Vector3f();
+        Quaternionf quat = new Quaternionf();
+        transform.getUnnormalizedRotation(quat);
+        quat.getEulerAnglesXYZ(rotation);
+
+        viewMatrixNoTranslation.rotateX(-rotation.x);
+        viewMatrixNoTranslation.rotateY(-rotation.y);
     }
 
     @Override
@@ -49,6 +77,6 @@ public class SceneCamera extends PerspectiveCamera {
     }
 
     @Override
-    public void onEvent(OxyEvent event) {
+    public void onEvent(Event event) {
     }
 }

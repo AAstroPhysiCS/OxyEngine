@@ -1,53 +1,47 @@
 package OxyEngine.Core.Context.Renderer.Mesh.Platform;
 
 import OxyEngine.Core.Context.Renderer.Mesh.IndexBuffer;
-import OxyEngine.Core.Context.Renderer.Pipeline.OxyPipeline;
-import OxyEngine.Core.Context.Scene.OxyNativeObject;
 
+import static OxyEngine.Utils.copy;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL45.glCreateBuffers;
 
 public final class OpenGLIndexBuffer extends IndexBuffer {
 
-    OpenGLIndexBuffer(OxyPipeline.Layout layout) {
-        super(layout);
+    private OpenGLIndexBuffer(int[] data) {
+        super(data);
+        bufferId = glCreateBuffers();
+    }
+
+    private OpenGLIndexBuffer(int allocationSize){
+        super(new int[allocationSize]);
+        bufferId = glCreateBuffers();
+    }
+
+    private OpenGLIndexBuffer(OpenGLIndexBuffer other) {
+        super(other.data.clone());
+        bufferId = glCreateBuffers();
     }
 
     @Override
     public void load() {
-        if (indices == null) return;
-        if (bufferId == 0) bufferId = glCreateBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices, GL_STATIC_DRAW);
-        this.length = indices.length;
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data, GL_STATIC_DRAW);
     }
 
     @Override
-    public void addToBuffer(OxyNativeObject oxyEntity) {
-        addToBuffer(oxyEntity.getIndices());
-    }
-
-    @Override
-    public void addToBuffer(int[] m_indices) {
-        if (m_indices == null) return;
-        if (indices == null) {
-            this.indices = m_indices;
+    public void addToBuffer(int[] data) {
+        if (data == null) return;
+        if (this.data == null || this.data.length == 0) {
+            this.data = data;
             return;
         }
-        copy(m_indices);
-    }
-
-    @Override
-    protected void copy(int[] m_indices) {
-        int[] newObjInd = new int[indices.length + m_indices.length];
-        System.arraycopy(indices, 0, newObjInd, 0, indices.length);
-        System.arraycopy(m_indices, 0, newObjInd, indices.length, m_indices.length);
-        this.indices = newObjInd;
+        this.data = copy(this.data, data);
     }
 
     @Override
     public void dispose() {
-        indices = null;
+        data = null;
         glDeleteBuffers(bufferId);
         bufferId = 0;
     }

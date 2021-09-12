@@ -1,11 +1,8 @@
 package OxyEngine.PhysX;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Context.Scene.OxyEntity;
-import OxyEngine.Core.Context.Scene.SceneRuntime;
-import OxyEngine.Core.Context.Scene.SceneState;
-import OxyEngine.System.OxyDisposable;
-import org.joml.Matrix4f;
+import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Context.Scene.Entity;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import physx.PxTopLevelFunctions;
@@ -18,21 +15,20 @@ import physx.physics.PxSceneFlagEnum;
 import java.util.HashMap;
 import java.util.Map;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Utils.toJOMLQuaternionf;
+import static OxyEngine.Utils.toJOMLVector3f;
 import static OxyEngine.System.OxySystem.logger;
-import static OxyEngine.OxyUtils.pxVec3ToJOMLQuaternionf;
-import static OxyEngine.OxyUtils.pxVec3ToJOMLVector3f;
 
-public final class OxyPhysX implements OxyDisposable {
+public final class OxyPhysX {
 
-    private OxyPhysXEnvironment physXEnv = null;
+    private static PhysXEnvironment physXEnv = null;
     private static PxFilterData DEFAULT_FILTER_DATA;
 
-    private static OxyPhysX INSTANCE = null;
+    static final int PHYSX_VERSION = PxTopLevelFunctions.getPHYSICS_VERSION();
 
-    public static OxyPhysX getInstance() {
-        if (INSTANCE == null) INSTANCE = new OxyPhysX();
-        return INSTANCE;
+    static {
+        logger.info("PhysX init version: " + PHYSX_VERSION);
     }
 
     private OxyPhysX() {
@@ -59,8 +55,8 @@ public final class OxyPhysX implements OxyDisposable {
         }
     }
 
-    public void init() {
-        physXEnv = OxyPhysXEnvironment.create(OxyPhysXEnvironment.createSpecification()
+    public static void init() {
+        physXEnv = PhysXEnvironment.create(PhysXEnvironment.createSpecification()
                 .setFilterShader(PxTopLevelFunctions.DefaultFilterShader())
                 .setFlags(PxSceneFlagEnum.eENABLE_CCD)
                 .setGravity(0f, -9.81f, 0f)
@@ -68,76 +64,50 @@ public final class OxyPhysX implements OxyDisposable {
         DEFAULT_FILTER_DATA = physXEnv.createFilterData(1, 1, 0, 0);
     }
 
-    public void simulate() {
+    public static void simulate() {
 
-        if (ACTIVE_SCENE.STATE != SceneState.RUNNING) return;
+        physXEnv.simulatePhysics(Renderer.TS);
 
-        physXEnv.simulatePhysics(SceneRuntime.TS);
-
-        for (OxyEntity physXEntities : ACTIVE_SCENE.view(OxyPhysXComponent.class)) {
-            OxyPhysXActor actor = physXEntities.get(OxyPhysXComponent.class).getActor();
-            OxyPhysXGeometry geometry = physXEntities.get(OxyPhysXComponent.class).getGeometry();
+        for (Entity physXEntities : sceneContext.view(PhysXComponent.class)) {
+            PhysXActor actor = physXEntities.get(PhysXComponent.class).getActor();
+            PhysXGeometry geometry = physXEntities.get(PhysXComponent.class).getGeometry();
             if (actor == null || geometry == null) continue;
 
             PxTransform globalPose = actor.getGlobalPose();
-            Vector3f pos = pxVec3ToJOMLVector3f(globalPose.getP());
-            Quaternionf rot = pxVec3ToJOMLQuaternionf(globalPose.getQ());
+            Vector3f pos = toJOMLVector3f(globalPose.getP());
+            Quaternionf rot = toJOMLQuaternionf(globalPose.getQ());
 
-            //physXMatrix4f is here because we are giving to the nvidia physx the "end" transformation (with root transformation)
-            //in order to reset the transformation to the world space, we need to get the root transformation and invert it and finally multiply it
-
-            Vector3f scale = new Vector3f();
-            physXEntities.get(TransformComponent.class).transform.getScale(scale);
-
-            Matrix4f physXMatrix4f = new Matrix4f()
-                    .translate(pos)
-                    .rotate(rot)
-                    .scale(scale);
-
-            Matrix4f actualEntityMatrix = physXMatrix4f.mulLocal(new Matrix4f(physXEntities.getRoot().get(TransformComponent.class).transform).invert());
-
-            Vector3f posDest = new Vector3f();
-            Quaternionf rotDest = new Quaternionf();
-            Vector3f scaleDest = new Vector3f();
-
-            actualEntityMatrix.getTranslation(posDest);
-            actualEntityMatrix.getUnnormalizedRotation(rotDest);
-            actualEntityMatrix.getScale(scaleDest);
-
-            physXEntities.get(TransformComponent.class).set(posDest, rotDest, scaleDest);
-            physXEntities.transformLocally();
+            physXEntities.get(TransformComponent.class).set(pos, rot);
+            physXEntities.updateTransform();
         }
     }
 
-    public void resetSimulation() {
+    public static void resetSimulation() {
+        for (Entity e : sceneContext.view(PhysXComponent.class))
+            e.get(PhysXComponent.class).reset();
 
-        for (OxyEntity e : ACTIVE_SCENE.view(OxyPhysXComponent.class)) {
-            physXEnv.removeActor(e.get(OxyPhysXComponent.class));
-            e.get(OxyPhysXComponent.class).dispose();
-        }
-
-        physXEnv.resetScene();
+//        physXEnv.resetScene();
     }
 
-    public void onScenePlay() {
-        for (OxyEntity e : ACTIVE_SCENE.view(OxyPhysXComponent.class)) {
-            e.get(OxyPhysXComponent.class).getGeometry().build();
-            e.get(OxyPhysXComponent.class).getActor().build();
+    public static void buildComponents() {
+        for (Entity e : sceneContext.view(PhysXComponent.class)) {
+            PhysXComponent physXComponent = e.get(PhysXComponent.class);
+            physXComponent.getActor().build();
+            physXComponent.getGeometry().build();
         }
     }
 
-    @Override
-    public void dispose() {
+    public static void dispose() {
         DEFAULT_FILTER_DATA.destroy();
         physXEnv.dispose();
         physXEnv = null;
     }
 
-    public OxyPhysXEnvironment getPhysXEnv() {
+    static PhysXEnvironment getPhysXEnv() {
         return physXEnv;
     }
 
-    public PxFilterData getDefaultFilterData() {
+    static PxFilterData getDefaultFilterData() {
         return DEFAULT_FILTER_DATA;
     }
 }

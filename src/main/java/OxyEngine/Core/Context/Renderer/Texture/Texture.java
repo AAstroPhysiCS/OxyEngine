@@ -1,98 +1,72 @@
 package OxyEngine.Core.Context.Renderer.Texture;
 
-import OxyEngine.System.OxyDisposable;
+import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
 
-import java.nio.Buffer;
-
+import static OxyEngine.System.OxySystem.isValidPath;
 import static OxyEngine.System.OxySystem.logger;
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.stb.STBImage.*;
+import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
-public abstract class Texture implements OxyDisposable {
+public final class Texture {
 
-    protected final String path;
-
-    protected int alFormat = -1;
-
-    private static final int[] widthBuffer = new int[1];
-    private static final int[] heightBuffer = new int[1];
-    private static final int[] channelBuffer = new int[1];
-
-    protected int width, height, channel;
-
-    protected final TexturePixelType pixelType;
-    protected Buffer textureBuffer;
-    protected final TextureParameterBuilder parameterBuilder;
-
-    protected Texture(String path, TexturePixelType pixelType, TextureParameterBuilder parameterBuilder) {
-        this.path = path;
-        this.pixelType = pixelType;
-        this.parameterBuilder = parameterBuilder;
+    private Texture() {
     }
 
-    protected void loadAsByteBuffer() {
-        loadAsByteBuffer(this.path, true);
-    }
-
-    protected void loadAsByteBuffer(String path) {
-        loadAsByteBuffer(path, true);
-    }
-
-    protected void loadAsByteBuffer(String path, boolean flip) {
-        stbi_set_flip_vertically_on_load(flip);
-        textureBuffer = stbi_load(path, widthBuffer, heightBuffer, channelBuffer, 0);
-        if (textureBuffer == null) {
-            logger.warning("Texture: " + path + " could not be loaded!");
+    private static boolean check(String path) {
+        if (path == null) return false;
+        if (path.equals("null")) return false;
+        if (path.isEmpty() || path.isBlank()) return false;
+        if (!isValidPath(path)) {
+            logger.warning("Path: %s not valid!".formatted(path));
+            return false;
         }
-        width = widthBuffer[0];
-        height = heightBuffer[0];
-        channel = channelBuffer[0];
-        if (channel == 1)
-            alFormat = GL_RED;
-        else if (channel == 3)
-            alFormat = GL_RGB;
-        else if (channel == 4)
-            alFormat = GL_RGBA;
+        return true;
     }
 
-    protected void loadAsFloatBuffer() {
-        loadAsFloatBuffer(this.path, true);
+    public static void unbindAllTextures() {
+        for (int i = 0; i < 32; i++) glBindTextureUnit(i, 0);
     }
 
-    protected void loadAsFloatBuffer(String path) {
-        loadAsFloatBuffer(path, true);
+    public static Image2DTexture loadImage(TextureSlot slot, String path, TexturePixelType pixelType, TextureParameterBuilder parameterBuilder) {
+        if (!check(path)) return null;
+        return Image2DTexture.create(slot, path, null, pixelType, parameterBuilder);
     }
 
-    protected void loadAsFloatBuffer(String path, boolean flip) {
-        stbi_set_flip_vertically_on_load(flip);
-        textureBuffer = stbi_loadf(path, widthBuffer, heightBuffer, channelBuffer, 0);
-        if (textureBuffer == null) {
-            logger.warning("Texture: " + path + " could not be loaded!");
-        }
-        width = widthBuffer[0];
-        height = heightBuffer[0];
-        channel = channelBuffer[0];
-        if (channel == 1)
-            alFormat = GL_RED;
-        else if (channel == 3)
-            alFormat = GL_RGB;
-        else if (channel == 4)
-            alFormat = GL_RGBA;
+    public static Image2DTexture loadImage(TextureSlot slot, String path, TexturePixelType pixelType, TextureFormat format, TextureParameterBuilder parameterBuilder) {
+        if (!check(path)) return null;
+        return Image2DTexture.create(slot, path, null, pixelType, format, parameterBuilder);
     }
 
-    public String getPath() {
-        return path;
+    public static Image2DTexture loadImage(TextureSlot slot, int width, int height, TexturePixelType pixelType, TextureFormat format, TextureParameterBuilder parameterBuilder) {
+        return Image2DTexture.create(slot, width, height, pixelType, format, parameterBuilder);
     }
 
-    public int getWidth() {
-        return width;
+    public static Image2DTexture loadImage(TextureSlot slot, String path, float[] tcs, TexturePixelType pixelType, TextureParameterBuilder parameterBuilder) {
+        if (!check(path)) return null;
+        return Image2DTexture.create(slot, path, tcs, pixelType, parameterBuilder);
     }
 
-    public int getHeight() {
-        return height;
+    public static Image2DTexture loadImage(Image2DTexture other) {
+        TextureSlot slot = TextureSlot.find(other.getTextureSlot());
+        String path = other.getPath();
+        if (!check(path)) return null;
+        return Image2DTexture.create(slot, path, other.getTextureCoords(), other.pixelType, other.parameterBuilder);
     }
 
-    public int getChannel() {
-        return channel;
+    public static CubeTexture loadCubemap(TextureSlot slot, int width, int height, TexturePixelType pixelType, TextureParameterBuilder parameterBuilder) {
+        return CubeTexture.create(slot, width, height, pixelType, TextureFormat.RGB32F, parameterBuilder);
+    }
+
+    public static CubeTexture loadCubemap(TextureSlot slot, int width, int height, TexturePixelType pixelType, TextureFormat format, TextureParameterBuilder parameterBuilder) {
+        return CubeTexture.create(slot, width, height, pixelType, format, parameterBuilder);
+    }
+
+    public static CubeTexture loadCubemap(TextureSlot slot, String path, TexturePixelType pixelType, TextureParameterBuilder parameterBuilder) {
+        if (!check(path)) return null;
+        return CubeTexture.create(slot, path, pixelType, parameterBuilder);
+    }
+
+    public static EnvironmentTexture loadHDRTexture(String path) {
+        if (!check(path)) return null;
+        return EnvironmentTexture.create(TextureSlot.HDR, TextureSlot.PREFILTER, TextureSlot.IRRADIANCE, TextureSlot.BDRF, path);
     }
 }

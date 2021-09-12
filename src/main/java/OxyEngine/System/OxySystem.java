@@ -1,5 +1,7 @@
 package OxyEngine.System;
 
+import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngine.Core.Context.Scene.Scene;
 import OxyEngine.OxyApplication;
 import OxyEngineEditor.EditorApplication;
 import imgui.ImFont;
@@ -13,6 +15,8 @@ import org.lwjgl.assimp.Assimp;
 import org.reflections.Reflections;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,7 +101,6 @@ public interface OxySystem {
         }
     }
 
-
     static Vector3f parseStringToVector3f(String sValue) {
         String[] splittedVector = sValue.replace("(", "").replace(")", "").split(" ");
         String[] valuesPos = new String[3];
@@ -155,5 +158,18 @@ public interface OxySystem {
                 extensionToSupport.equalsIgnoreCase("png") ||
                 extensionToSupport.equalsIgnoreCase("jpeg") ||
                 extensionToSupport.equalsIgnoreCase("tga");
+    }
+
+    static Object loadClassJVM(String path, String packageName, Scene scene, Entity entity) {
+        File f = new File(path);
+        try {
+            URL url = f.toURI().toURL();
+            try (URLClassLoader loader = new URLClassLoader(new URL[]{url})) {
+                return loader.loadClass(packageName).getDeclaredConstructor(Scene.class, Entity.class).newInstance(scene, entity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

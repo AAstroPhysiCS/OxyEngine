@@ -1,23 +1,21 @@
 package OxyEngine.Core.Context.Renderer.Light;
 
-import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Context.Renderer.Mesh.FrameBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.FrameBufferSpecification;
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
 import OxyEngine.Core.Context.Renderer.Mesh.RenderBuffer;
-import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
-import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
+import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Context.Renderer.Shader;
 import OxyEngine.Core.Context.Renderer.Texture.*;
-import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.Disposable;
 import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X;
-import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 
-public final class DynamicSky extends SkyLight implements OxyDisposable {
+public final class DynamicSky extends SkyLight implements Disposable {
 
     CubeTexture dynamicSkyTexture;
     final float[] azimuth = new float[]{0f};
@@ -25,9 +23,9 @@ public final class DynamicSky extends SkyLight implements OxyDisposable {
     final float[] turbidity = new float[]{2.0f};
     Vector3f dynamicSkySunDir = new Vector3f(Math.sin(inclination[0]) * Math.cos(azimuth[0]), Math.cos(inclination[0]), Math.sin(inclination[0]) * Math.sin(azimuth[0]));
 
-    private OxyIrradiance irradiance;
-    private OxyPrefilter prefilter;
-    private static OxyBDRF bdrf;
+    private Irradiance irradiance;
+    private Prefilter prefilter;
+    private static BDRF bdrf;
 
     public DynamicSky() {
     }
@@ -35,12 +33,13 @@ public final class DynamicSky extends SkyLight implements OxyDisposable {
     @Override
     public void bind() {
         if (prefilter != null)
-            glBindTextureUnit(prefilter.getTexture().getTextureSlot(), prefilter.getTexture().getTextureId());
+            prefilter.getTexture().bind();
         if (irradiance != null)
-            glBindTextureUnit(irradiance.getTexture().getTextureSlot(), irradiance.getTexture().getTextureId());
-        if (bdrf != null) glBindTextureUnit(bdrf.getTexture().getTextureSlot(), bdrf.getTexture().getTextureId());
+            irradiance.getTexture().bind();
+        if (bdrf != null)
+            bdrf.getTexture().bind();
         if (dynamicSkyTexture != null)
-            glBindTextureUnit(dynamicSkyTexture.getTextureSlot(), dynamicSkyTexture.getTextureId());
+            dynamicSkyTexture.bind();
     }
 
     public void load() {
@@ -52,7 +51,7 @@ public final class DynamicSky extends SkyLight implements OxyDisposable {
                 FrameBuffer.createNewSpec(FrameBufferSpecification.class)
                         .useRenderBuffer(captureRBO));
 
-        dynamicSkyTexture = OxyTexture.loadCubemap(TextureSlot.HDR, 1024, 1024, TexturePixelType.UByte, TextureFormat.RGB,
+        dynamicSkyTexture = Texture.loadCubemap(TextureSlot.HDR, 1024, 1024, TexturePixelType.UByte, TextureFormat.RGB,
                 TextureParameterBuilder.create()
                         .setMinFilter(TextureParameter.LINEAR)
                         .setMagFilter(TextureParameter.LINEAR)
@@ -76,7 +75,7 @@ public final class DynamicSky extends SkyLight implements OxyDisposable {
         };
         Matrix4f captureProjection = new Matrix4f().setPerspective(Math.toRadians(90), 1.0f, 0.4768f, 10.0f);
 
-        OxyShader preethamBuilder = ShaderLibrary.get("OxyPreetham");
+        Shader preethamBuilder = Renderer.getShader("OxyPreetham");
         preethamBuilder.begin();
         preethamBuilder.setUniformVec3("u_Direction", dynamicSkySunDir);
         preethamBuilder.setUniform1f("u_Turbidity", turbidity[0]);
@@ -89,7 +88,7 @@ public final class DynamicSky extends SkyLight implements OxyDisposable {
             preethamBuilder.begin();
             preethamBuilder.setUniformMatrix4fv("u_View", captureViews[i]);
             captureFBO.attachColorAttachment(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, dynamicSkyTexture.getTextureId());
-            OxyRenderer.clearBuffer();
+            Renderer.clearBuffer();
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
             preethamBuilder.end();
         }
@@ -98,9 +97,9 @@ public final class DynamicSky extends SkyLight implements OxyDisposable {
         if (prefilter != null) prefilter.dispose();
         if (irradiance != null) irradiance.dispose();
 
-        irradiance = new OxyIrradiance(dynamicSkyTexture, captureFBO, captureRBO, TextureSlot.IRRADIANCE);
-        prefilter = new OxyPrefilter(dynamicSkyTexture, captureFBO, captureRBO, TextureSlot.PREFILTER);
-        if (bdrf == null) bdrf = new OxyBDRF(captureFBO, captureRBO, TextureSlot.BDRF);
+        irradiance = new Irradiance(dynamicSkyTexture, captureFBO, captureRBO, TextureSlot.IRRADIANCE);
+        prefilter = new Prefilter(dynamicSkyTexture, captureFBO, captureRBO, TextureSlot.PREFILTER);
+        if (bdrf == null) bdrf = new BDRF(captureFBO, captureRBO, TextureSlot.BDRF);
 
         captureRBO.dispose();
         captureFBO.dispose();

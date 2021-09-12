@@ -1,35 +1,38 @@
 package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Camera.EditorCamera;
+import OxyEngine.Core.Camera.Camera;
 import OxyEngine.Core.Camera.PerspectiveCamera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Light.*;
-import OxyEngine.Core.Context.Renderer.Pipeline.OxyShader;
-import OxyEngine.Core.Context.Renderer.Pipeline.ShaderLibrary;
-import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
-import OxyEngine.PhysX.OxyPhysXComponent;
-import OxyEngine.Core.Context.SceneRenderer;
+import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Pipeline;
+import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Context.Renderer.Shader;
+import OxyEngine.Core.Context.Renderer.Texture.EnvironmentTexture;
+import OxyEngine.PhysX.PhysXComponent;
 import OxyEngine.Scripting.ScriptEngine;
-import OxyEngine.System.OxyDisposable;
+import OxyEngine.System.Disposable;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static OxyEngine.Components.EntityComponent.allEntityComponentChildClasses;
 import static OxyEngine.Core.Context.Renderer.Light.Light.LIGHT_SIZE;
-import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
 import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
 import static OxyEngine.Core.Context.Scene.SceneSerializer.extensionName;
 import static OxyEngine.Core.Context.Scene.SceneSerializer.fileExtension;
-import static OxyEngine.System.OxyFileSystem.openDialog;
-import static OxyEngine.System.OxyFileSystem.saveDialog;
+import static OxyEngine.System.FileSystem.openDialog;
+import static OxyEngine.System.FileSystem.saveDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-public final class Scene implements OxyDisposable {
+public final class Scene implements Disposable {
 
     private final Registry registry = new Registry();
 
@@ -41,242 +44,109 @@ public final class Scene implements OxyDisposable {
 
     public static int OBJECT_ID_COUNTER = 0;
 
-    public SceneState STATE = SceneState.IDLE;
-
-    private OxyModelImporter modelImporter;
+    private SceneState STATE = SceneState.STOP;
 
     public Scene(String sceneName, String workingDirectory) {
         this.sceneName = sceneName;
         this.workingDirectory = workingDirectory;
     }
 
-    public final void put(OxyEntity e) {
-        registry.entityList.put(e, new LinkedHashSet<>(allEntityComponentChildClasses.size()));
-        e.addComponent(new UUIDComponent(UUID.randomUUID()));
+    public final void put(Entity e) {
+        registry.entityList.put(e, new ArrayList<>());
+        e.addComponent(new UUIDComponent());
     }
 
-    public final OxyNativeObject createNativeObjectEntity(float[] vertices, int[] indices) {
-        OxyNativeObject e = new OxyNativeObject(this);
-        e.vertices = vertices;
-        e.indices = indices;
-        e.importedFromFile = false;
-        put(e);
-        e.addComponent(
-                new TransformComponent(),
-                new SelectedComponent(false),
-                new RenderableComponent(RenderingMode.Normal));
-        return e;
+    public final void put(Entity e, List<EntityComponent> components) {
+        registry.entityList.put(e, new ArrayList<>(components));
     }
 
-    public OxyEntity createEmptyEntity() {
-        OxyEntity model = ACTIVE_SCENE.createEmptyModel();
-        if (entityContext != null) {
-            model.addComponent(new TagComponent("Empty Group"), new SelectedComponent(false));
-            model.setFamily(new EntityFamily(entityContext.getFamily()));
-            model.transformLocally();
-        } else {
-            model.addComponent(new TagComponent("Empty Group"), new SelectedComponent(false));
-            //model.setFamily(new EntityFamily()); this is already the default behaviour once the entity is created
-            model.transformLocally();
-        }
-        return model;
+    public Entity createMeshEntity() {
+        Entity entity = createEmptyEntity();
+        if (!entity.getGUINodes().contains(OpenGLMesh.guiNode))
+            entity.getGUINodes().add(OpenGLMesh.guiNode);
+        return entity;
     }
 
-    public void createMeshEntity() {
-        OxyEntity model = createEmptyEntity();
-        if (!model.getGUINodes().contains(OpenGLMesh.guiNode))
-            model.getGUINodes().add(OpenGLMesh.guiNode);
-    }
-
-    public OxyNativeObject createSkyLight() {
-        OxyNativeObject skyLightEnt = createNativeObjectEntity(null, null);
+    public Entity createSkyLight() {
+        Entity skyLightEnt = sceneContext.createEmptyEntity();
         if (entityContext != null) skyLightEnt.setFamily(new EntityFamily(entityContext.getFamily()));
-        skyLightEnt.addComponent(new TagComponent("Sky Light"), new OpenGLHDREnvironmentMap());
+        skyLightEnt.addComponent(new TagComponent("Sky Light"), new HDREnvironmentMap());
         if (!skyLightEnt.getGUINodes().contains(SkyLight.guiNode))
             skyLightEnt.getGUINodes().add(SkyLight.guiNode);
-        SceneRenderer.getInstance().updateLightEntities();
-        SceneRenderer.getInstance().updateModelEntities();
+        Renderer.submitSkyLight(skyLightEnt.get(SkyLight.class));
         return skyLightEnt;
     }
 
-    public void createPointLight() {
+    public Entity createPointLight() {
 
-        OxyModel model = ACTIVE_SCENE.createEmptyModel();
-        if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
+        Entity entity = sceneContext.createEmptyEntity();
+        if (entityContext != null) entity.setFamily(new EntityFamily(entityContext.getFamily()));
 
         PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
-        int index = OxyMaterialPool.addMaterial(new OxyMaterial(ShaderLibrary.get("OxyPBR"), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
-        model.addComponent(pointLight, new OxyMaterialIndex(index), new TagComponent("Point Light"));
+        entity.addComponent(pointLight, new TagComponent("Point Light"));
 
-        if (!model.getGUINodes().contains(OxyMaterial.guiNode))
-            model.getGUINodes().add(OxyMaterial.guiNode);
-        model.getGUINodes().add(PointLight.guiNode);
-        model.transformLocally();
-        SceneRenderer.getInstance().updateModelEntities();
+        entity.getGUINodes().add(PointLight.guiNode);
+        Renderer.submitPointLight(pointLight);
+
+        return entity;
     }
 
-    public void createDirectionalLight() {
-        OxyModel model = ACTIVE_SCENE.createEmptyModel();
-        if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
-        int index = OxyMaterialPool.addMaterial(new OxyMaterial(ShaderLibrary.get("OxyPBR"), new Vector4f(1.0f, 1.0f, 1.0f, 1.0f)));
-        model.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f));
-        model.addComponent(new OxyMaterialIndex(index));
-        model.getGUINodes().add(DirectionalLight.guiNode);
-        model.transformLocally();
-        SceneRenderer.getInstance().updateModelEntities();
+    public Entity createDirectionalLight() {
+        Entity entity = sceneContext.createEmptyEntity();
+        if (entityContext != null) entity.setFamily(new EntityFamily(entityContext.getFamily()));
+        entity.addComponent(new TagComponent("Directional Light"), new DirectionalLight(1.0f));
+        entity.getGUINodes().add(DirectionalLight.guiNode);
+        Renderer.submitDirectionalLight(entity.get(DirectionalLight.class));
+
+        return entity;
     }
 
-    public void createPerspectiveCamera() {
-        OxyModel model = ACTIVE_SCENE.createEmptyModel();
-        if (entityContext != null) model.setFamily(new EntityFamily(entityContext.getFamily()));
-        model.addComponent(new SceneCamera());
-        if (!model.getGUINodes().contains(OxyCamera.guiNode))
-            model.getGUINodes().add(OxyCamera.guiNode);
-        model.transformLocally();
-        SceneRenderer.getInstance().updateCameraEntities();
+    public Entity createPerspectiveCamera() {
+        Entity entity = sceneContext.createEmptyEntity();
+        if (entityContext != null) entity.setFamily(new EntityFamily(entityContext.getFamily()));
+        entity.addComponent(new SceneCamera(entity.getTransform()));
+        if (!entity.getGUINodes().contains(Camera.guiNode))
+            entity.getGUINodes().add(Camera.guiNode);
+
+        return entity;
     }
 
-    public final List<OxyModel> createModelEntities(DefaultModelType type, boolean importedFromFile) {
-        return createModelEntities(type.getPath(), importedFromFile);
+    public final Entity createEntity(DefaultModelType type) {
+        return createEntity(type.getPath());
     }
 
-    public final List<OxyModel> createModelEntities(DefaultModelType type) {
-        return createModelEntities(type.getPath(), false);
-    }
-
-    public final OxyModel createModelEntity(DefaultModelType type) {
-        return createModelEntity(type.getPath(), 0, 0);
-    }
-
-    public final OxyModel createEmptyModel() {
-        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
-        e.importedFromFile = false;
+    public final Entity createEmptyEntity() {
+        Entity e = new Entity(this);
         put(e);
         e.addComponent(
                 new TransformComponent(new Vector3f(0, 0, 0)),
-                new TagComponent("Empty Group"),
-                new MeshPosition(0),
-                new RenderableComponent(RenderingMode.Normal),
+                new TagComponent("Empty Entity"),
                 new SelectedComponent(false)
         );
         return e;
     }
 
-    public final OxyModel createEmptyModel(int i) {
-        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER);
-        put(e);
-        e.addComponent(
-                new TransformComponent(new Vector3f(0, 0, 0)),
-                new TagComponent("Empty Group"),
-                new MeshPosition(i),
-                new RenderableComponent(RenderingMode.Normal),
-                new SelectedComponent(false)
-        );
+    public final Entity createEntity(String path) {
+        Entity e = createEmptyEntity();
+
+        Pipeline geometryPipeline = Renderer.getGeometryPipeline();
+
+        OpenGLMesh mesh = new OpenGLMesh(geometryPipeline, path, MeshUsage.STATIC);
+        e.addComponent(mesh);
+
+        if (mesh.getAIScene().mNumAnimations() > 0)
+            e.addComponent(new AnimationComponent(mesh.getAIScene(), mesh.getBoneInfoMap())); //deletes aiScene
+
+        Renderer.submitMesh(mesh, e.get(TransformComponent.class), e.get(AnimationComponent.class));
+
         return e;
     }
 
-    public final List<OxyModel> createModelEntities(String path, boolean importedFromFile) {
-        List<OxyModel> models = new ArrayList<>();
-        modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
+    public final void removeEntity(Entity e) {
 
-        int pos = 0;
-        OxyMaterialPool.newBatch();
-        for (int i = 0; i < modelImporter.getMeshSize(); i++) {
-            int materialIndex = modelImporter.getMaterialIndex(i);
-            int index = OxyMaterialPool.addMaterial(modelImporter.getMaterialName(materialIndex), materialIndex, modelImporter.getMaterialPaths(materialIndex));
-            OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER, modelImporter.getVertexList(i), modelImporter.getFaces(i));
-            e.importedFromFile = importedFromFile;
-            put(e);
-            e.setFamily(new EntityFamily(modelImporter.getRootEntity(i).getFamily()));
-            e.addComponent(
-                    new UUIDComponent(UUID.randomUUID()),
-                    new BoundingBoxComponent(
-                            modelImporter.getBoundingBoxMin(i),
-                            modelImporter.getBoundingBoxMax(i)
-                    ),
-                    new TransformComponent(modelImporter.getTransformation(i)),
-                    new TagComponent(modelImporter.getMeshName(i)),
-                    new MeshPosition(pos),
-                    new RenderableComponent(RenderingMode.Normal),
-                    new OxyMaterialIndex(index)
-            );
-            if (modelImporter.getScene().mNumAnimations() > 0) {
-                e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
-                System.gc();
-            }
-            e.initMesh(path);
-            models.add(e);
-            pos++;
-        }
-        return models;
-    }
-
-    public final List<OxyModel> createModelEntities(String path) {
-        return createModelEntities(path, false);
-    }
-
-    public final OxyModel createModelEntity(String path, int i) {
-        modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
-        OxyMaterialPool.newBatch();
-        int materialIndex = modelImporter.getMaterialIndex(i);
-        int index = OxyMaterialPool.addMaterial(modelImporter.getMaterialName(materialIndex), materialIndex, modelImporter.getMaterialPaths(materialIndex));
-        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER, modelImporter.getVertexList(i), modelImporter.getFaces(i));
-        put(e);
-        e.setFamily(new EntityFamily(modelImporter.getRootEntity(i).getFamily()));
-        e.addComponent(
-                new UUIDComponent(UUID.randomUUID()),
-                new BoundingBoxComponent(
-                        modelImporter.getBoundingBoxMin(i),
-                        modelImporter.getBoundingBoxMax(i)
-                ),
-                new TransformComponent(modelImporter.getTransformation(i)),
-                new TagComponent(modelImporter.getMeshName(i)),
-                new MeshPosition(i),
-                new RenderableComponent(RenderingMode.Normal),
-                new OxyMaterialIndex(index)
-        );
-        if (modelImporter.getScene().mNumAnimations() > 0) {
-            e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
-            System.gc();
-        }
-        e.initMesh(path);
-        return e;
-    }
-
-    static String optimization_Path = ""; //optimization for the scene serialization import
-
-    public final OxyModel createModelEntity(String path, int i, int materialIndex) {
-        if (!Scene.optimization_Path.equals(path)) {
-            modelImporter = new OxyModelImporter(path, ImporterType.MeshImporter, ImporterType.AnimationImporter);
-            Scene.optimization_Path = path;
-        }
-        OxyMaterialPool.newBatch();
-        OxyModel e = new OxyModel(this, ++OBJECT_ID_COUNTER, modelImporter.getVertexList(i), modelImporter.getFaces(i));
-        put(e);
-        e.addComponent(
-                new BoundingBoxComponent(
-                        modelImporter.getBoundingBoxMin(i),
-                        modelImporter.getBoundingBoxMax(i)
-                ),
-                new TransformComponent(modelImporter.getTransformation(i)),
-                new TagComponent(modelImporter.getMeshName(i)),
-                new MeshPosition(i),
-                new RenderableComponent(RenderingMode.Normal),
-                new OxyMaterialIndex(materialIndex)
-        );
-        if (modelImporter.getScene().mNumAnimations() > 0) {
-            e.addComponent(new AnimationComponent(modelImporter.getScene(), modelImporter.getBoneInfoMap()));
-            System.gc();
-        }
-        e.initMesh(path);
-        return e;
-    }
-
-    public final void removeEntity(OxyEntity e) {
-
-        List<OxyEntity> entitiesRelatedTo = e.getEntitiesRelatedTo();
+        List<Entity> entitiesRelatedTo = e.getEntitiesRelatedTo();
         if (entitiesRelatedTo.size() != 0) {
-            for (OxyEntity eRT : entitiesRelatedTo) {
+            for (Entity eRT : entitiesRelatedTo) {
                 removeEntity(eRT);
             }
         }
@@ -285,38 +155,27 @@ public final class Scene implements OxyDisposable {
             if (scripts.getProvider() != null) ScriptEngine.removeProvider(scripts.getProvider());
         }
 
-        int index = e.get(OxyMaterialIndex.class) != null ? e.get(OxyMaterialIndex.class).index() : -1;
-
-        if (e.has(OxyPhysXComponent.class)) e.get(OxyPhysXComponent.class).dispose();
-
-        if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
-
-        if (e.has(OpenGLHDREnvironmentMap.class)) {
-            OpenGLHDREnvironmentMap skyLight = e.get(OpenGLHDREnvironmentMap.class);
-            HDRTexture texture = skyLight.getHDRTexture();
-            if (texture != null) texture.dispose();
+        if (e.has(PhysXComponent.class)) e.get(PhysXComponent.class).dispose();
+        //not removing animation component because mesh already deletes the command
+        if (e.has(OpenGLMesh.class)) {
+            OpenGLMesh mesh = e.get(OpenGLMesh.class);
+            Renderer.removeFromCommand(mesh);
+            mesh.dispose();
         }
+        if (e.has(HDREnvironmentMap.class)) e.get(HDREnvironmentMap.class).dispose();
+        if (e.has(Light.class)) Renderer.removeFromCommand(e.get(Light.class));
 
         var value = registry.entityList.remove(e);
         assert !registry.entityList.containsKey(e) && !registry.entityList.containsValue(value) : oxyAssert("Remove entity failed!");
-
-        if (ACTIVE_SCENE.getEntities()
-                .stream()
-                .filter(oxyEntity -> oxyEntity instanceof OxyModel)
-                .filter(oxyEntity -> oxyEntity.has(OxyMaterialIndex.class))
-                .map(entity -> entity.get(OxyMaterialIndex.class).index())
-                .noneMatch(integer -> index == integer) && index != -1) {
-            //if there's no entity that is using this material => dispose it
-            OxyMaterialPool.getMaterial(index).ifPresent((m) -> {
-                OxyMaterialPool.removeMaterial(m);
-                m.dispose();
-            });
-        }
     }
 
-    public final OxyEntity getEntityByIndex(int index) {
+    public Entity copyEntity(Entity other) {
+        return new Entity(other);
+    }
+
+    public final Entity getEntityByIndex(int index) {
         int i = 0;
-        for (OxyEntity e : registry.entityList.keySet()) {
+        for (Entity e : registry.entityList.keySet()) {
             if (i == index) {
                 return e;
             }
@@ -325,37 +184,50 @@ public final class Scene implements OxyDisposable {
         return null;
     }
 
-    public final OxyEntity getEntityByUUID(UUIDComponent uuidComponent) {
+    public final Entity getEntityByUUID(UUIDComponent uuidComponent) {
         return registry.getEntityByUUID(uuidComponent);
     }
 
-    public final boolean isValid(OxyEntity entity) {
+    public final Entity getEntityByUUID(String uuid) {
+        return registry.getEntityByUUID(uuid);
+    }
+
+    public final Entity findEntityByComponent(EntityComponent entityComponent) {
+        Class<? extends EntityComponent> targetClass = entityComponent.getClass();
+        Set<Entity> entities = view(targetClass);
+        for (Entity e : entities) {
+            if (e.get(targetClass).equals(entityComponent)) return e;
+        }
+        return null;
+    }
+
+    public final boolean isValid(Entity entity) {
         return registry.entityList.containsKey(entity);
     }
 
     /*
      * add component to the registry
      */
-    public final void addComponent(OxyEntity entity, EntityComponent... component) {
+    public final void addComponent(Entity entity, EntityComponent... component) {
         registry.addComponent(entity, component);
     }
 
-    public final void removeComponent(OxyEntity entity, EntityComponent components) {
+    public final void removeComponent(Entity entity, EntityComponent components) {
         registry.removeComponent(entity, components);
     }
 
     /*
      * returns true if the component is already in the set
      */
-
-    public boolean has(OxyEntity entity, Class<? extends EntityComponent> destClass) {
+    public boolean has(Entity entity, Class<? extends EntityComponent> destClass) {
         return registry.has(entity, destClass);
     }
+
     /*
      * gets the component from the set
      */
 
-    public <T extends EntityComponent> T get(OxyEntity entity, Class<T> destClass) {
+    public <T extends EntityComponent> T get(Entity entity, Class<T> destClass) {
         return registry.get(entity, destClass);
     }
 
@@ -363,7 +235,7 @@ public final class Scene implements OxyDisposable {
      * gets all the entities associated with these classes
      */
 
-    public Set<OxyEntity> view(Class<? extends EntityComponent> destClass) {
+    public Set<Entity> view(Class<? extends EntityComponent> destClass) {
         return registry.view(destClass);
     }
 
@@ -372,7 +244,7 @@ public final class Scene implements OxyDisposable {
         return registry.distinct(destClasses);
     }
 
-    Set<EntityComponent> getAllComponents(OxyEntity e){
+    List<EntityComponent> getAllComponents(Entity e) {
         return registry.entityList.get(e);
     }
 
@@ -380,11 +252,19 @@ public final class Scene implements OxyDisposable {
         return registry.entityList.keySet().size();
     }
 
-    public Set<OxyEntity> getEntities() {
+    public Set<Entity> getEntities() {
         return registry.entityList.keySet();
     }
 
-    Set<Map.Entry<OxyEntity, Set<EntityComponent>>> getEntityEntrySet() {
+    public void setState(SceneState STATE) {
+        this.STATE = STATE;
+    }
+
+    public SceneState getState() {
+        return STATE;
+    }
+
+    Set<Map.Entry<Entity, List<EntityComponent>>> getEntityEntrySet() {
         return registry.entityList.entrySet();
     }
 
@@ -393,36 +273,25 @@ public final class Scene implements OxyDisposable {
     }
 
     public void disposeAllEntities() {
-        Iterator<OxyEntity> it = registry.entityList.keySet().iterator();
+        var it = registry.entityList.entrySet().iterator();
         while (it.hasNext()) {
-            OxyEntity e = it.next();
-            if (e instanceof OxyModel) {
-                if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
-                if (e.has(OxyMaterialIndex.class)) {
-                    OxyMaterialPool.getMaterial(e).ifPresent((m) -> {
-                        if (m.index != -1) {
-                            OxyMaterialPool.removeMaterial(m);
-                            m.dispose();
-                        }
-                    });
-                }
-                it.remove();
-            }
+            var map = it.next();
+            Entity e = map.getKey();
+            if (e.has(EditorCamera.class)) continue;
+            if (e.has(OpenGLMesh.class)) e.get(OpenGLMesh.class).dispose();
 
             //REMOVING ENV MAP BCS WE ARE GONNA REPLACE IT WITH THE NEW ENV MAP FROM THE NEW SCENE
-            if (e instanceof OxyNativeObject) {
-                if(e.has(OpenGLHDREnvironmentMap.class)) {
-                    HDRTexture texture = e.get(OpenGLHDREnvironmentMap.class).getHDRTexture();
-                    if (texture != null) texture.dispose();
-                    it.remove();
-                } else if(e.has(DynamicSky.class)) {
-                    DynamicSky dynamicSky = e.get(DynamicSky.class);
-                    dynamicSky.dispose();
-                    it.remove();
-                }
+            if (e.has(HDREnvironmentMap.class)) {
+                EnvironmentTexture texture = e.get(HDREnvironmentMap.class).getEnvironmentTexture();
+                if (texture != null) texture.dispose();
+            } else if (e.has(DynamicSky.class)) {
+                DynamicSky dynamicSky = e.get(DynamicSky.class);
+                dynamicSky.dispose();
             }
+
+            it.remove();
         }
-        OxyShader pbrShader = ShaderLibrary.get("OxyPBR");
+        Shader pbrShader = Renderer.getShader("OxyPBR");
         for (int i = 0; i < LIGHT_SIZE; i++) {
             pbrShader.begin();
             pbrShader.setUniformVec3("p_Light[" + i + "].position", 0, 0, 0);
@@ -436,49 +305,51 @@ public final class Scene implements OxyDisposable {
 
             pbrShader.end();
         }
+        Renderer.flushList();
     }
 
     @Override
     public void dispose() {
-        OxyMaterialPool.clear();
         disposeAllEntities();
         registry.entityList.clear();
         PerspectiveCamera.disposeUniformBuffer();
     }
 
     public static void openScene() {
-        String openScene = openDialog(extensionName, ACTIVE_SCENE.getWorkingDirectory());
+        Renderer.flushList();
+        String openScene = openDialog(extensionName, sceneContext.getWorkingDirectory());
         if (openScene != null) {
             ScriptEngine.clearProviders();
-            SceneRuntime.onStop();
-            ACTIVE_SCENE = SceneSerializer.deserializeScene(openScene);
-            SceneRenderer.getInstance().initScene();
+            SceneRuntime.runtimeStop();
+            sceneContext = SceneSerializer.deserializeScene(openScene);
+//            SceneRenderer.getInstance().initScene();
         }
     }
 
     public static void saveScene() {
-        SceneRuntime.onStop();
-        if (ACTIVE_SCENE.workingDirectory == null || ACTIVE_SCENE.workingDirectory.equals("null")) {
+        SceneRuntime.runtimeStop();
+        if (sceneContext.workingDirectory == null || sceneContext.workingDirectory.equals("null")) {
             String s = saveDialog(extensionName, null);
             if (s == null) return;
             File f = new File(s);
-            ACTIVE_SCENE.workingDirectory = f.getParent();
-            ACTIVE_SCENE.sceneName = f.getName();
+            sceneContext.workingDirectory = f.getParent();
+            sceneContext.sceneName = f.getName();
         }
-        SceneSerializer.serializeScene(ACTIVE_SCENE.workingDirectory + "//" + ACTIVE_SCENE.getSceneName() + fileExtension);
+        SceneSerializer.serializeScene(sceneContext.workingDirectory + "//" + sceneContext.getSceneName() + fileExtension);
     }
 
     public static void saveAs() {
-        SceneRuntime.onStop();
+        SceneRuntime.runtimeStop();
         String saveAs = saveDialog(extensionName, null);
         if (saveAs != null) SceneSerializer.serializeScene(saveAs + fileExtension);
     }
 
     public static void newScene() {
+        Renderer.flushList();
         ScriptEngine.clearProviders();
-        SceneRuntime.onStop();
+        SceneRuntime.runtimeStop();
         SceneRuntime.entityContext = null;
-        Scene oldScene = ACTIVE_SCENE;
+        Scene oldScene = sceneContext;
         oldScene.disposeAllEntities();
 
         Scene scene = new Scene("Test Scene 1", null);
@@ -486,15 +357,15 @@ public final class Scene implements OxyDisposable {
             scene.put(n.getKey());
             scene.addComponent(n.getKey(), n.getValue().toArray(EntityComponent[]::new));
         }
-        ACTIVE_SCENE = scene;
-        SceneRenderer.getInstance().initScene();
+        sceneContext = scene;
+//        SceneRenderer.getInstance().initScene();
     }
 
     public String getWorkingDirectory() {
         return workingDirectory;
     }
 
-    public OxyEntity getRoot(OxyEntity entity) {
+    public Entity getRoot(Entity entity) {
         return registry.getRoot(entity);
     }
 }

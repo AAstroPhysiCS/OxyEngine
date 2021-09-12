@@ -10,10 +10,11 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_WRAP_R;
 import static org.lwjgl.opengl.GL14.GL_TEXTURE_LOD_BIAS;
 import static org.lwjgl.opengl.GL30.glGenerateMipmap;
+import static org.lwjgl.opengl.GL45.glBindTextureUnit;
 import static org.lwjgl.opengl.GL45.glCreateTextures;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 
-public class OpenGLImage2DTexture extends Image2DTexture {
+public final class OpenGLImage2DTexture extends Image2DTexture {
 
     OpenGLImage2DTexture(TextureSlot slot, String path, float[] tcs, TexturePixelType pixelType, TextureFormat format, TextureParameterBuilder.POpenGL parameter) {
         this(slot, path, tcs, -1, -1, pixelType, format, parameter);
@@ -82,5 +83,10 @@ public class OpenGLImage2DTexture extends Image2DTexture {
         }
         glBindTexture(GL_TEXTURE_2D, 0);
         textureBuffer = null;
+    }
+
+    @Override
+    public void bind() {
+        glBindTextureUnit(textureSlot.getValue(), textureId);
     }
 }

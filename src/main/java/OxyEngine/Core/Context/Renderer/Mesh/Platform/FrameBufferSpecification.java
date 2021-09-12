@@ -5,7 +5,7 @@ import OxyEngine.Core.Context.Renderer.Mesh.RenderBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FrameBufferSpecification {
+public final class FrameBufferSpecification {
 
     int attachmentIndex = -1;
     boolean multiSampled;

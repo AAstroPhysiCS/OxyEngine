@@ -37,6 +37,7 @@
       <w>materialpinksphere</w>
       <w>maximov</w>
       <w>objfileasset</w>
+      <w>oxycomp</w>
       <w>physxcomponent</w>
       <w>pngfileasset</w>
       <w>polyfbx</w>
@@ -49,6 +50,8 @@
       <w>skybox</w>
       <w>skyboxtexture</w>
       <w>stringified</w>
+      <w>submesh</w>
+      <w>submeshes</w>
       <w>texturecoords</w>
       <w>uitexture</w>
       <w>xcomponent</w>

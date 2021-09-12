@@ -1,11 +1,11 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Context.OxyRenderer;
+import OxyEngine.Core.Context.Renderer.Renderer;
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImBoolean;
 
-public class StatsPanel extends Panel {
+public final class StatsPanel extends Panel {
 
     private static StatsPanel INSTANCE = null;
 
@@ -24,7 +24,7 @@ public class StatsPanel extends Panel {
     public void renderPanel() {
         ImGui.begin("Stats", ImGuiWindowFlags.NoBackground);
 
-        ImGui.textColored(200/255f, 200/255f, 200/255f, 1.0f, OxyRenderer.Stats.getStats());
+        ImGui.textColored(200/255f, 200/255f, 200/255f, 1.0f, Renderer.Stats.getStats());
         ImGui.spacing();
 
         ImGui.checkbox("Demo", open);

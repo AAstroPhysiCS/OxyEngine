@@ -1,204 +1,118 @@
 Registry [
-	Scene: {
-		ID: f72a7bd7-69d7-43e1-9ade-cd648c1a12cf
-		Mesh Position: 0
-		Name: Scene
+	Empty Entity: {
+		ID: 1ede9f51-2f05-41be-bff7-1fbc37eb8d47
+		Name: Empty Entity
 		Emitting: false
+		Hidden: false
 		Camera: false
 		Emitting Type: null
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
-		Scale: ( 2.670E+0  2.670E+0  2.670E+0)
-		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: null
-		Color: null
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 0
-		Roughness Map Texture: null
-		Roughness Map Strength: 0
-		AO Map Texture: null
-		AO Map Strength: 0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0
-		Emissive Map Texture: null
-		Emissive Map Strength: 0
-		Mesh: null
+		Scale: ( 2.720E-2  2.720E-2  2.720E-2)
+		Bounds Min: (-1.000E+3 -1.629E-4 -1.000E+3)
+		Bounds Max: ( 1.000E+3  6.000E+2  1.000E+3)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\scene.fbx
+		Submesh Indices: [0, 1, 2, 3, 4]
+		Family: {
+			Root: null
+		}
 		Script: {
 		}
-		Plane: {
-			ID: 42aa574d-af91-4834-af08-4bf7914b0f0d
-			Mesh Position: 0
-			Name: Plane
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 0.000E+0  0.000E+0  0.000E+0)
-			Rotation: (-1.571E+0 -1.132E-7 -1.275E-3)
-			Scale: ( 1.000E+1  1.000E+1  1.000E+1)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material 0: {
+			Material Index: 0
 			Material Name: Material.001
-			Color: [1.0, 1.0, 1.0, 1.0]
+			Color: [0.99998546, 0.99998546, 0.99998546, 1.0]
 			Albedo Texture: null
 			Normal Map Texture: null
 			Normal Map Strength: 1.0
 			Roughness Map Texture: null
-			Roughness Map Strength: 0.733
+			Roughness Map Strength: 0.5
 			AO Map Texture: null
 			AO Map Strength: 1.0
 			Metallic Map Texture: null
-			Metallic Map Strength: 0.946
+			Metallic Map Strength: 0.0
 			Emissive Map Texture: null
 			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\scene.fbx
-			Script: {
-			}
 		}
-		Cube.001: {
-			ID: c35b963b-0828-4336-92bf-6caf02a7ebe0
-			Mesh Position: 1
-			Name: Cube.001
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: (-9.708E+0  3.000E+0  0.000E+0)
-			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
-			Scale: ( 2.500E-1  1.000E+1  3.000E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material 1: {
+			Material Index: 1
 			Material Name: Material.002
 			Color: [0.0, 0.0, 0.0, 1.0]
 			Albedo Texture: null
 			Normal Map Texture: null
 			Normal Map Strength: 1.0
 			Roughness Map Texture: null
-			Roughness Map Strength: 1.0
+			Roughness Map Strength: 0.5
 			AO Map Texture: null
 			AO Map Strength: 1.0
 			Metallic Map Texture: null
 			Metallic Map Strength: 0.0
 			Emissive Map Texture: null
 			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\scene.fbx
-			Script: {
-			}
 		}
-		Cube.002: {
-			ID: 1ccc84af-298f-44cf-8775-7e76ad15245f
-			Mesh Position: 2
-			Name: Cube.002
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 9.191E+0  8.248E+0  2.753E+0)
-			Rotation: ( 2.280E+0 -2.873E-1 -1.131E+0)
-			Scale: ( 1.500E+0  1.500E+0  1.500E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material 2: {
+			Material Index: 2
 			Material Name: Material.003
-			Color: [0.007227, 0.8, 0.0, 1.0]
+			Color: [0.0072268043, 0.8000001, 0.0, 1.0]
 			Albedo Texture: null
 			Normal Map Texture: null
 			Normal Map Strength: 1.0
 			Roughness Map Texture: null
-			Roughness Map Strength: 1.0
+			Roughness Map Strength: 0.5
 			AO Map Texture: null
 			AO Map Strength: 1.0
 			Metallic Map Texture: null
 			Metallic Map Strength: 0.0
 			Emissive Map Texture: null
 			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\scene.fbx
-			Script: {
-			}
 		}
-		Sphere: {
-			ID: 02349bed-a30e-4c4c-9938-9f730049caae
-			Mesh Position: 3
-			Name: Sphere
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 0.000E+0  2.500E+0 -6.000E+0)
-			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
-			Scale: ( 1.500E+0  1.500E+0  1.500E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material 3: {
+			Material Index: 3
 			Material Name: Material.004
-			Color: [0.8, 0.0, 0.0, 1.0]
+			Color: [0.8000001, 0.0, 0.0, 1.0]
 			Albedo Texture: null
 			Normal Map Texture: null
 			Normal Map Strength: 1.0
 			Roughness Map Texture: null
-			Roughness Map Strength: 0.146
+			Roughness Map Strength: 0.5
 			AO Map Texture: null
 			AO Map Strength: 1.0
 			Metallic Map Texture: null
-			Metallic Map Strength: 1.0
+			Metallic Map Strength: 0.0
 			Emissive Map Texture: null
 			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\scene.fbx
-			Script: {
-			}
 		}
-		Cone: {
-			ID: 467ca3ca-2fd3-449f-8e25-876c2afbeae3
-			Mesh Position: 4
-			Name: Cone
-			Emitting: false
-			Camera: false
-			Emitting Type: null
-			Position: ( 0.000E+0  2.500E+0  6.000E+0)
-			Rotation: (-1.571E+0  0.000E+0  0.000E+0)
-			Scale: ( 1.500E+0  1.500E+0  1.500E+0)
-			Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
-			Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Material 4: {
+			Material Index: 4
 			Material Name: Material.005
-			Color: [0.0, 0.2033, 0.8, 1.0]
+			Color: [0.0, 0.20334649, 0.8000001, 1.0]
 			Albedo Texture: null
 			Normal Map Texture: null
 			Normal Map Strength: 1.0
 			Roughness Map Texture: null
-			Roughness Map Strength: 0.287
+			Roughness Map Strength: 0.5
 			AO Map Texture: null
 			AO Map Strength: 1.0
 			Metallic Map Texture: null
-			Metallic Map Strength: 0.625
+			Metallic Map Strength: 0.0
 			Emissive Map Texture: null
 			Emissive Map Strength: 1.0
-			Mesh: D:\programming\Java\OxyEngine\src\main\resources\models\scene.fbx
-			Script: {
-			}
 		}
 	}
 	Sky Light: {
-		ID: 0f415335-b32f-4e8d-8858-b7d658e24179
-		Mesh Position: -1
+		ID: dd329fc5-ad83-47f4-aed3-2ba80dd7dc6a
 		Name: Sky Light
 		Emitting: true
+		Hidden: false
 		Camera: false
-		Emitting Type: OpenGLHDREnvironmentMap
+		Emitting Type: HDREnvironmentMap
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
 		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
 		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
 		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: null
-		Color: null
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 0
-		Roughness Map Texture: null
-		Roughness Map Strength: 0
-		AO Map Texture: null
-		AO Map Strength: 0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0
-		Emissive Map Texture: null
-		Emissive Map Strength: 0
-		Mesh: null
+		Mesh Path: null
+		Submesh Indices: 
 		Light Attributes: {
 			Intensity: 1.0
 			Environment Map: D:\programming\Java\OxyEngine\src\main\resources\hdr\pink_sunrise_4k.hdr
@@ -206,38 +120,32 @@ Registry [
 			Environment Intensity: 1.0
 			Environment Primary: true
 		}
+		Family: {
+			Root: null
+		}
 		Script: {
 		}
 	}
-	Sun: {
-		ID: 51c076c6-c134-4edc-a820-9736ab289472
-		Mesh Position: 0
-		Name: Sun
+	Directional Light: {
+		ID: ece674a8-155a-4be0-8b89-fe1cf9ce598d
+		Name: Directional Light
 		Emitting: true
+		Hidden: false
 		Camera: false
 		Emitting Type: DirectionalLight
 		Position: ( 0.000E+0  0.000E+0  0.000E+0)
-		Rotation: ( 5.385E-1 -2.491E-1 -1.375E+0)
+		Rotation: ( 1.572E+0 -3.548E-1 -2.014E-1)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
 		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
 		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
-		Material Name: Material (0)
-		Color: [1.0, 1.0, 1.0, 1.0]
-		Albedo Texture: null
-		Normal Map Texture: null
-		Normal Map Strength: 1.0
-		Roughness Map Texture: null
-		Roughness Map Strength: 1.0
-		AO Map Texture: null
-		AO Map Strength: 1.0
-		Metallic Map Texture: null
-		Metallic Map Strength: 0.0
-		Emissive Map Texture: null
-		Emissive Map Strength: 1.0
-		Mesh: null
+		Mesh Path: null
+		Submesh Indices: 
 		Light Attributes: {
 			Intensity: 1.0
-			Direction: ( 5.385E-1 -2.491E-1 -1.375E+0)
+			Direction: ( 1.572E+0 -3.548E-1 -2.014E-1)
+		}
+		Family: {
+			Root: null
 		}
 		Script: {
 		}

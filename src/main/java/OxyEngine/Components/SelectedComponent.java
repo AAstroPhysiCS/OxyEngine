@@ -1,6 +1,6 @@
 package OxyEngine.Components;
 
-public class SelectedComponent implements EntityComponent {
+public final class SelectedComponent implements EntityComponent {
     public boolean selected;
 
     public SelectedComponent(boolean selected){

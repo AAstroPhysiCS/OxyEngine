@@ -1,30 +1,32 @@
 package OxyEngine.Core.Context.Scene;
 
 import OxyEngine.Components.*;
-import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Core.Camera.Camera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Light.*;
-import OxyEngine.Core.Context.Renderer.Texture.HDRTexture;
-import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Context.Renderer.Mesh.MeshUsage;
+import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
+import OxyEngine.Core.Context.Renderer.Pipeline;
+import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Context.Renderer.Texture.*;
 import OxyEngine.Core.Context.Scene.OxyJSON.OxyJSONArray;
 import OxyEngine.Core.Context.Scene.OxyJSON.OxyJSONObject;
 import OxyEngine.Core.Context.Scene.OxyJSON.OxyJSONWriterBuilder;
-import OxyEngine.Core.Context.SceneRenderer;
-import OxyEngine.PhysX.OxyPhysXActor;
-import OxyEngine.PhysX.OxyPhysXComponent;
-import OxyEngine.PhysX.OxyPhysXGeometry;
-import OxyEngine.Scripting.OxyScript;
+import OxyEngine.PhysX.PhysXActor;
+import OxyEngine.PhysX.PhysXComponent;
+import OxyEngine.PhysX.PhysXGeometry;
+import OxyEngine.PhysX.PhysXMaterial;
+import OxyEngine.Scripting.Script;
 import org.joml.Vector3f;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static OxyEngine.System.OxySystem.parseStringToFloatArray;
 import static OxyEngine.System.OxySystem.parseStringToVector3f;
+import static OxyEngineEditor.UI.UIAssetManager.DEFAULT_TEXTURE_PARAMETER;
 
 public final class SceneSerializer {
 
@@ -36,7 +38,7 @@ public final class SceneSerializer {
 
     public static void serializeScene(String path) {
         if (WRITER == null) WRITER = new SceneWriter();
-        WRITER.writeScene(new File(path), SceneRuntime.ACTIVE_SCENE);
+        WRITER.writeScene(new File(path), SceneRuntime.sceneContext);
     }
 
     public static Scene deserializeScene(String path) {
@@ -58,188 +60,164 @@ public final class SceneSerializer {
 
             OxyJSONWriterBuilder builder = INSTANCE.openWritingStream();
 
-            var array = builder.createOxyJSONArray("Registry");
-            List<OxyEntity> rootPooled = new ArrayList<>();
-            for (OxyEntity e : scene.getEntities()) {
-                if (!e.familyHasRoot()) {
-                    if (!rootPooled.contains(e)) rootPooled.add(e);
-                }
-            }
-            for (OxyEntity root : rootPooled) {
-                if (!(root instanceof OxyModel) & !root.has(SkyLight.class)) continue;
-                var obj = array.createOxyJSONObject(root.get(TagComponent.class).tag());
-                int meshPosRoot = -1;
-                String idRoot = root.get(UUIDComponent.class).getUUIDString();
-                String tagRoot = "null";
-                if (root.has(MeshPosition.class)) meshPosRoot = root.get(MeshPosition.class).meshPos();
-                if (root.has(TagComponent.class)) tagRoot = root.get(TagComponent.class).tag();
-                boolean emittingRoot = root.has(Light.class);
+            var registryArray = builder.createOxyJSONArray("Registry");
 
-                obj.putField("ID", idRoot)
-                        .putField("Mesh Position", String.valueOf(meshPosRoot))
-                        .putField("Name", tagRoot)
-                        .putField("Emitting", String.valueOf(emittingRoot));
-                addCommonFields(obj, emittingRoot, root);
-                dump(obj, root.getEntitiesRelatedTo());
+            /*
+             * sorting because otherwise, there may be a exception regarding the root.
+             * if a entity has a root, that entity should be less prioritised than a entity without one
+             * simple reason: root's cant have roots and so you ensure that all the root entities are being added first.
+             */
+            List<Entity> sortedEntityList = new ArrayList<>(scene.getEntities());
+            sortedEntityList.sort((o1, o2) -> {
+                if (!o1.familyHasRoot() && o2.familyHasRoot()) return -1;
+                if (o1.familyHasRoot() && !o2.familyHasRoot()) return 1;
+                if (!o1.familyHasRoot() && !o2.familyHasRoot()) return 0;
+                if (o1.familyHasRoot() && o2.familyHasRoot()) return 0;
+                return 0;
+            });
+
+            for (Entity e : sortedEntityList) {
+                String tag = e.get(TagComponent.class).tag();
+                var entityOxyJSON = registryArray.createOxyJSONObject(tag);
+                String id = e.get(UUIDComponent.class).getUUID();
+                boolean emitting = e.has(Light.class);
+                entityOxyJSON.putField("ID", id)
+                        .putField("Name", tag)
+                        .putField("Emitting", String.valueOf(emitting));
+                addCommonFields(entityOxyJSON, emitting, e);
             }
             builder.build().writeAndCloseStream();
         }
 
+        private static void addCommonFields(OxyJSONObject entityOxyJSON, boolean emitting, Entity e) {
 
-        private static void dump(OxyJSONObject arr, List<OxyEntity> relatedToList) {
-            if (relatedToList.size() == 0) return;
-
-            for (OxyEntity e : relatedToList) {
-                if (!(e instanceof OxyModel)) continue;
-                int meshPos = -1;
-                String id = e.get(UUIDComponent.class).getUUIDString();
-                String tag = "null";
-                if (e.has(MeshPosition.class)) meshPos = e.get(MeshPosition.class).meshPos();
-                if (e.has(TagComponent.class)) tag = e.get(TagComponent.class).tag();
-                boolean emitting = e.has(Light.class);
-
-                var obj = arr.createInnerObject(e.get(TagComponent.class).tag())
-                        .putField("ID", id)
-                        .putField("Mesh Position", String.valueOf(meshPos))
-                        .putField("Name", tag)
-                        .putField("Emitting", String.valueOf(emitting));
-
-                addCommonFields(obj, emitting, e);
-
-                List<OxyEntity> related = e.getEntitiesRelatedTo();
-                if (related.size() != 0) {
-                    dump(obj, related);
-                }
-            }
-        }
-
-        private static void addCommonFields(OxyJSONObject obj, boolean emitting, OxyEntity e) {
-
-            TransformComponent transform = e.get(TransformComponent.class);
-            var ref = new Object() {
-                String albedoColor = "null";
-                String albedoTexture = "null";
-                String normalTexture = "null", normalTextureStrength = "0";
-                String roughnessTexture = "null", roughnessTextureStrength = "0";
-                String metallicTexture = "null", metalnessTextureStrength = "0";
-                String aoTexture = "null", aoTextureStrength = "0";
-                String emissiveTexture = "null", emissiveTextureStrength = "0";
-                String mesh = "null";
-                String materialName = "null";
-            };
+            TransformComponent transformComponent = e.get(TransformComponent.class);
+            OpenGLMesh mesh = null;
 
             Vector3f minBound = new Vector3f(0, 0, 0), maxBound = new Vector3f(0, 0, 0);
-            if (e.has(BoundingBoxComponent.class)) {
-                minBound = e.get(BoundingBoxComponent.class).min();
-                maxBound = e.get(BoundingBoxComponent.class).max();
+            if (e.has(OpenGLMesh.class)) {
+                mesh = e.get(OpenGLMesh.class);
+                BoundingBox boundingBox = mesh.getAABB();
+                minBound = boundingBox.min();
+                maxBound = boundingBox.max();
             }
-            if (e.has(OxyMaterialIndex.class)) {
-                OxyMaterialPool.getMaterial(e).ifPresent((m) -> {
-                    ref.materialName = m.name;
-                    if (m.albedoColor != null) ref.albedoColor = Arrays.toString(m.albedoColor.getNumbers());
-                    if (m.albedoTexture != null) ref.albedoTexture = m.albedoTexture.getPath();
-                    if (m.normalTexture != null) ref.normalTexture = m.normalTexture.getPath();
-                    ref.normalTextureStrength = String.valueOf(m.normalStrength[0]);
-                    if (m.roughnessTexture != null) ref.roughnessTexture = m.roughnessTexture.getPath();
-                    ref.roughnessTextureStrength = String.valueOf(m.roughness[0]);
-                    if (m.metallicTexture != null) ref.metallicTexture = m.metallicTexture.getPath();
-                    ref.metalnessTextureStrength = String.valueOf(m.metalness[0]);
-                    if (m.aoTexture != null) ref.aoTexture = m.aoTexture.getPath();
-                    ref.aoTextureStrength = String.valueOf(m.aoStrength[0]);
-                    if (m.emissiveTexture != null) ref.emissiveTexture = m.emissiveTexture.getPath();
-                    ref.emissiveTextureStrength = String.valueOf(m.emissiveStrength[0]);
-                });
-            }
-            if (e.has(OpenGLMesh.class)) ref.mesh = e.get(OpenGLMesh.class).getPath();
             if (e.has(Light.class)) emitting = true;
 
             if (emitting) {
                 Light l = e.get(Light.class);
-                obj = obj.createInnerObject("Light Attributes")
+                entityOxyJSON = entityOxyJSON.createInnerObject("Light Attributes")
                         .putField("Intensity", String.valueOf(l.getColorIntensity()));
                 if (l instanceof PointLight p) {
-                    obj.putField("Constant", String.valueOf(p.getConstantValue()));
-                    obj.putField("Linear", String.valueOf(p.getLinearValue()));
-                    obj.putField("Quadratic", String.valueOf(p.getQuadraticValue()));
+                    entityOxyJSON.putField("Constant", String.valueOf(p.getConstantValue()));
+                    entityOxyJSON.putField("Linear", String.valueOf(p.getLinearValue()));
+                    entityOxyJSON.putField("Quadratic", String.valueOf(p.getQuadraticValue()));
                 } else if (l instanceof DirectionalLight) {
-                    obj.putField("Direction", e.get(TransformComponent.class).rotation.toString());
-                } else if (l instanceof OpenGLHDREnvironmentMap s) {
-                    HDRTexture hdrTexture = s.getHDRTexture();
-                    if (hdrTexture != null) obj.putField("Environment Map", hdrTexture.getPath());
-                    else obj.putField("Environment Map", "null");
+                    entityOxyJSON.putField("Direction", e.getRotation().toString());
+                } else if (l instanceof HDREnvironmentMap s) {
+                    EnvironmentTexture environmentTexture = s.getEnvironmentTexture();
+                    if (environmentTexture != null) entityOxyJSON.putField("Environment Map", environmentTexture.getPath());
+                    else entityOxyJSON.putField("Environment Map", "null");
 
-                    obj.putField("Environment LOD", String.valueOf(s.mipLevelStrength[0]));
-                    obj.putField("Environment Intensity", String.valueOf(s.intensity[0]));
-                    obj.putField("Environment Primary", String.valueOf(s.isPrimary()));
+                    entityOxyJSON.putField("Environment LOD", String.valueOf(s.mipLevelStrength[0]));
+                    entityOxyJSON.putField("Environment Intensity", String.valueOf(s.intensity[0]));
+                    entityOxyJSON.putField("Environment Primary", String.valueOf(s.isPrimary()));
                 } else if (l instanceof DynamicSky s) {
-                    obj.putField("Dynamic Sky Turbidity", String.valueOf(s.getTurbidity()[0]));
-                    obj.putField("Dynamic Sky Azimuth", String.valueOf(s.getAzimuth()[0]));
-                    obj.putField("Dynamic Sky Inclination", String.valueOf(s.getInclination()[0]));
-                    obj.putField("Dynamic Sky Sun Direction", s.getDynamicSkySunDir().toString());
-                    obj.putField("Environment Intensity", String.valueOf(s.intensity[0]));
-                    obj.putField("Environment Primary", String.valueOf(s.isPrimary()));
+                    entityOxyJSON.putField("Dynamic Sky Turbidity", String.valueOf(s.getTurbidity()[0]));
+                    entityOxyJSON.putField("Dynamic Sky Azimuth", String.valueOf(s.getAzimuth()[0]));
+                    entityOxyJSON.putField("Dynamic Sky Inclination", String.valueOf(s.getInclination()[0]));
+                    entityOxyJSON.putField("Dynamic Sky Sun Direction", s.getDynamicSkySunDir().toString());
+                    entityOxyJSON.putField("Environment Intensity", String.valueOf(s.intensity[0]));
+                    entityOxyJSON.putField("Environment Primary", String.valueOf(s.isPrimary()));
                 }
-                obj = obj.backToObject();
+                entityOxyJSON = entityOxyJSON.backToObject();
             }
 
-            if (e.has(OxyPhysXComponent.class)) {
-                OxyPhysXComponent physXComponent = e.get(OxyPhysXComponent.class);
+            entityOxyJSON = entityOxyJSON.putField("Hidden", String.valueOf(e.has(HiddenComponent.class)));
 
-                OxyPhysXActor actor = physXComponent.getActor();
-                OxyPhysXGeometry geometry = physXComponent.getGeometry();
-                var refPhysX = new Object() {
-                    float dynamicFr = 0.5f;
-                    float staticFr = 0.5f;
-                    float restitution = 0.5f;
-                };
+            if (e.has(PhysXComponent.class)) {
+                PhysXComponent physXComponent = e.get(PhysXComponent.class);
 
-                OxyMaterialPool.getMaterial(e).ifPresent((m) -> {
-                    refPhysX.dynamicFr = m.dynamicFriction[0];
-                    refPhysX.staticFr = m.staticFriction[0];
-                    refPhysX.restitution = m.restitution[0];
-                });
+                PhysXActor actor = physXComponent.getActor();
+                PhysXGeometry geometry = physXComponent.getGeometry();
+                PhysXMaterial material = physXComponent.getMaterial();
 
-                obj = obj.createInnerObject("PhysX")
+                entityOxyJSON = entityOxyJSON.createInnerObject("PhysX")
                         .putField("Rigid Body Type", actor.getBodyType().toString())
                         .putField("Collider Type", geometry.getColliderType())
-                        .putField("Dynamic Friction", String.valueOf(refPhysX.dynamicFr))
-                        .putField("Static Friction", String.valueOf(refPhysX.staticFr))
-                        .putField("Restitution", String.valueOf(refPhysX.restitution));
+                        .putField("Dynamic Friction", String.valueOf(material.dynamicFriction[0]))
+                        .putField("Static Friction", String.valueOf(material.staticFriction[0]))
+                        .putField("Restitution", String.valueOf(material.restitution[0]));
 
-                obj = obj.backToObject();
+                entityOxyJSON = entityOxyJSON.backToObject();
             }
 
-            obj.putField("Camera", String.valueOf(e.has(OxyCamera.class)));
 
-            obj = obj.putField("Emitting Type", emitting ? e.get(Light.class).getClass().getSimpleName() : "null")
-                    .putField("Position", transform.position.toString())
-                    .putField("Rotation", transform.rotation.toString())
-                    .putField("Scale", transform.scale.toString())
+            entityOxyJSON.putField("Camera", String.valueOf(e.has(Camera.class)));
+
+            Entity root = e.getRoot();
+            entityOxyJSON = entityOxyJSON.createInnerObject("Family")
+                    .putField("Root", root != null ? root.get(UUIDComponent.class).getUUID() : "null")
+                    .backToObject();
+
+            entityOxyJSON = entityOxyJSON.putField("Emitting Type", emitting ? e.get(Light.class).getClass().getSimpleName() : "null")
+                    .putField("Position", transformComponent.position.toString())
+                    .putField("Rotation", transformComponent.rotation.toString())
+                    .putField("Scale", transformComponent.scale.toString())
                     .putField("Bounds Min", minBound.toString())
                     .putField("Bounds Max", maxBound.toString())
-                    .putField("Material Name", ref.materialName)
-                    .putField("Color", ref.albedoColor)
-                    .putField("Albedo Texture", ref.albedoTexture)
-                    .putField("Normal Map Texture", ref.normalTexture)
-                    .putField("Normal Map Strength", ref.normalTextureStrength)
-                    .putField("Roughness Map Texture", ref.roughnessTexture)
-                    .putField("Roughness Map Strength", ref.roughnessTextureStrength)
-                    .putField("AO Map Texture", ref.aoTexture)
-                    .putField("AO Map Strength", ref.aoTextureStrength)
-                    .putField("Metallic Map Texture", ref.metallicTexture)
-                    .putField("Metallic Map Strength", ref.metalnessTextureStrength)
-                    .putField("Emissive Map Texture", ref.emissiveTexture)
-                    .putField("Emissive Map Strength", ref.emissiveTextureStrength)
-                    .putField("Mesh", ref.mesh)
+                    .putField("Mesh Path", mesh != null ? mesh.getPath() : "null")
                     .createInnerObject("Script");
-            for (var scripts : e.getScripts()) obj.putField("Path", scripts.getPath());
+            for (var scripts : e.getScripts()) entityOxyJSON.putField("Path", scripts.getPath());
+            entityOxyJSON = entityOxyJSON.backToObject();
+
+            entityOxyJSON.putField("Submesh Indices", mesh != null ? mesh.getSubmeshes().stream().map(OpenGLMesh.Submesh::assimpMaterialIndex).sorted().toList().toString() : "");
+
+            List<Material> materials = mesh != null ? mesh.getMaterials() : null;
+            if (materials != null) {
+                for (int i = 0; i < materials.size(); i++) {
+
+                    Material material = materials.get(i);
+
+                    Color albedoColor = material.albedoColor;
+
+                    Image2DTexture albedoTexture = material.albedoTexture;
+                    Image2DTexture normalTexture = material.normalTexture;
+                    Image2DTexture roughnessTexture = material.roughnessTexture;
+                    Image2DTexture aoTexture = material.aoTexture;
+                    Image2DTexture emissiveTexture = material.emissiveTexture;
+                    Image2DTexture metallicTexture = material.metallicTexture;
+
+                    float[] metalnessStrength = material.metalness;
+                    float[] roughnessStrength = material.roughness;
+                    float[] aoStrength = material.aoStrength;
+                    float[] emissiveStrength = material.emissiveStrength;
+                    float[] normalStrength = material.normalStrength;
+
+                    entityOxyJSON = entityOxyJSON.createInnerObject("Material " + i)
+                            .putField("Material Index", String.valueOf(material.getAssimpMaterialIndex()))
+                            .putField("Material Name", material.name)
+                            .putField("Color", albedoColor != null ? Arrays.toString(albedoColor.getNumbers()) : "null")
+                            .putField("Albedo Texture", albedoTexture != null ? albedoTexture.getPath() : "null")
+                            .putField("Normal Map Texture", normalTexture != null ? normalTexture.getPath() : "null")
+                            .putField("Normal Map Strength", String.valueOf(normalStrength[0]))
+                            .putField("Roughness Map Texture", roughnessTexture != null ? roughnessTexture.getPath() : "null")
+                            .putField("Roughness Map Strength", String.valueOf(roughnessStrength[0]))
+                            .putField("AO Map Texture", aoTexture != null ? aoTexture.getPath() : "null")
+                            .putField("AO Map Strength", String.valueOf(aoStrength[0]))
+                            .putField("Metallic Map Texture", metallicTexture != null ? metallicTexture.getPath() : "null")
+                            .putField("Metallic Map Strength", String.valueOf(metalnessStrength[0]))
+                            .putField("Emissive Map Texture", emissiveTexture != null ? emissiveTexture.getPath() : "null")
+                            .putField("Emissive Map Strength", String.valueOf(emissiveStrength[0]))
+                            .backToObject();
+                }
+            }
         }
     }
 
     private static final class SceneReader {
 
         public Scene readScene(String path) {
-            SceneRuntime.onStop();
+            SceneRuntime.runtimeStop();
 
             var modelsJSON = new OxyJSONArray();
             var sceneJSON = new OxyJSONObject();
@@ -252,100 +230,82 @@ public final class SceneSerializer {
             String sceneName = sceneJSON.getField("Scene Name").value();
             String sceneWorkingDir = sceneJSON.getField("Scene Working Directory").value();
 
-            Scene oldScene = SceneRuntime.ACTIVE_SCENE;
-            oldScene.disposeAllEntities();
+            Scene oldScene = SceneRuntime.sceneContext;
 
-            Scene scene = new Scene(sceneName, sceneWorkingDir);
-            scene.gammaStrength = new float[]{Float.parseFloat(sceneJSON.getField("Scene Gamma Strength").value())};
-            scene.exposure = new float[]{Float.parseFloat(sceneJSON.getField("Scene Exposure").value())};
+            Scene newScene = new Scene(sceneName, sceneWorkingDir);
+            newScene.gammaStrength = new float[]{Float.parseFloat(sceneJSON.getField("Scene Gamma Strength").value())};
+            newScene.exposure = new float[]{Float.parseFloat(sceneJSON.getField("Scene Exposure").value())};
 
-            SceneRenderer.getInstance().clear();
-
-            //Putting all the native entities back
-            for (var n : oldScene.getEntityEntrySet()) {
-                OxyEntity key = n.getKey();
-                scene.put(key);
-                scene.addComponent(key, n.getValue().toArray(EntityComponent[]::new));
-            }
+            oldScene.disposeAllEntities(); //disposing all entities (exception editor camera)
 
             SceneRuntime.entityContext = null;
-            SceneRuntime.currentBoundedSkyLightEntity = null;
+            SceneRuntime.skyLightEntityContext = null;
 
-            Scene.optimization_Path = "";
-
-            for (var root : modelsJSON.getObjectList()) {
-                var familyComponentRoot = new EntityFamily();
-                OxyEntity rootEntity = readFields(root, scene);
-                rootEntity.setFamily(familyComponentRoot);
-                rootEntity.transformLocally();
-                readAllInnerObjects(root, scene, rootEntity);
-                readPhysXFields(root, rootEntity);
+            for (var jsonObject : modelsJSON.getObjectList()) {
+                Entity entity = readFields(jsonObject, newScene);
+                readPhysXFields(jsonObject, entity);
+                entity.updateTransform();
             }
 
             //I don't have to do this... but just to be sure
             System.gc();
-            return scene;
+            return newScene;
         }
 
-        private static void readAllInnerObjects(OxyJSONObject root, Scene scene, OxyEntity rootEntity) {
-            for (var ent : root.getInnerObjects()) {
-                if (ent.getName().startsWith("Script")) continue;
-                if (ent.getName().startsWith("Light Attributes")) continue;
-                if (ent.getName().startsWith("PhysX")) continue;
-
-                var childFamilyComponent = new EntityFamily(rootEntity.getFamily());
-                OxyEntity childEntity = readFields(ent, scene);
-                childEntity.setFamily(childFamilyComponent);
-                childEntity.transformLocally();
-                readAllInnerObjects(ent, scene, childEntity);
-                readPhysXFields(ent, childEntity);
-            }
-        }
-
-        private static void readPhysXFields(OxyJSONObject ent, OxyEntity entity) {
-            //PhysX
+        private static void readPhysXFields(OxyJSONObject ent, Entity entity) {
             OxyJSONObject physXObject = ent.getInnerObjectByName("PhysX");
             if (physXObject != null) {
 
                 float dynamicFr = Float.parseFloat(physXObject.getField("Dynamic Friction").value());
                 float staticFr = Float.parseFloat(physXObject.getField("Static Friction").value());
                 float restitution = Float.parseFloat(physXObject.getField("Restitution").value());
-                OxyMaterialPool.getMaterial(entity).ifPresent((m) -> {
-                    m.setDynamicFriction(dynamicFr);
-                    m.setStaticFriction(staticFr);
-                    m.setRestitution(restitution);
-                });
 
                 String rigidBodyType = physXObject.getField("Rigid Body Type").value();
                 String colliderType = physXObject.getField("Collider Type").value();
 
-                OxyPhysXComponent physXComponent = new OxyPhysXComponent(entity, rigidBodyType, colliderType);
+                PhysXComponent physXComponent = new PhysXComponent(entity, new PhysXMaterial(staticFr, dynamicFr, restitution),
+                        rigidBodyType, colliderType);
                 entity.addComponent(physXComponent);
-
-                physXComponent.getGeometry().build();
-                physXComponent.getActor().build();
             }
         }
 
-        private static OxyEntity readFields(OxyJSONObject ent, Scene scene) {
+        private static Entity readFields(OxyJSONObject ent, Scene scene) {
+
+            Entity entity = scene.createEmptyEntity();
+
+            String meshPath = ent.getField("Mesh Path").value();
             String name = ent.getField("Name").value();
             String id = ent.getField("ID").value();
-            int meshPos = Integer.parseInt(ent.getField("Mesh Position").value());
+            Vector3f position = parseStringToVector3f(ent.getField("Position").value());
+            Vector3f rot = parseStringToVector3f(ent.getField("Rotation").value());
+            Vector3f scale = parseStringToVector3f(ent.getField("Scale").value());
+            Vector3f minB = parseStringToVector3f(ent.getField("Bounds Min").value());
+            Vector3f maxB = parseStringToVector3f(ent.getField("Bounds Max").value());
+
+            entity.addComponent(new TagComponent(name), new TransformComponent(position, rot, scale), new SelectedComponent(false),
+                    new UUIDComponent(id));
+
+            boolean isCamera = Boolean.parseBoolean(ent.getField("Camera").value());
+            if (isCamera) {
+                entity.addComponent(new SceneCamera(entity.getTransform()));
+                entity.getGUINodes().add(SceneCamera.guiNode);
+            }
+
+            if (ent.getField("Hidden").value().equals("true")) entity.addComponent(new HiddenComponent());
+
+            var scripts = ent.getInnerObjectByName("Script");
+            for (var f : scripts.getFieldList()) entity.addScript(new Script(f.value()));
 
             boolean emitting = Boolean.parseBoolean(ent.getField("Emitting").value());
             String emittingType = ent.getField("Emitting Type").value();
 
-            //SKYLIGHT
             if (emitting) {
                 var lightAttributes = ent.getInnerObjectByName("Light Attributes");
-                if (emittingType.equals(OpenGLHDREnvironmentMap.class.getSimpleName())) {
+                if (emittingType.equals(HDREnvironmentMap.class.getSimpleName())) {
                     String path = lightAttributes.getField("Environment Map").value();
 
-                    OxyNativeObject skyLightEnt = scene.createSkyLight();
-                    skyLightEnt.removeComponent(SkyLight.class);
-
-                    OpenGLHDREnvironmentMap envMap = new OpenGLHDREnvironmentMap();
-                    skyLightEnt.addComponent(envMap);
+                    HDREnvironmentMap envMap = new HDREnvironmentMap();
+                    entity.addComponent(envMap);
                     if (!path.equals("null")) {
                         envMap.loadEnvironmentMap(path);
                         envMap.mipLevelStrength = new float[]{Float.parseFloat(lightAttributes.getField("Environment LOD").value())};
@@ -353,15 +313,14 @@ public final class SceneSerializer {
 
                     envMap.intensity = new float[]{Float.parseFloat(lightAttributes.getField("Environment Intensity").value())};
                     envMap.setPrimary(Boolean.parseBoolean(lightAttributes.getField("Environment Primary").value()));
+                    entity.getGUINodes().add(SkyLight.guiNode);
 
-                    return skyLightEnt;
+                    Renderer.submitSkyLight(envMap);
+
                 } else if (emittingType.equals(DynamicSky.class.getSimpleName())) {
 
-                    OxyNativeObject skyLightEnt = scene.createSkyLight();
-                    skyLightEnt.removeComponent(SkyLight.class);
-
                     DynamicSky envMap = new DynamicSky();
-                    skyLightEnt.addComponent(envMap);
+                    entity.addComponent(envMap);
 
                     envMap.setTurbidity(Float.parseFloat(lightAttributes.getField("Dynamic Sky Turbidity").value()));
                     envMap.setAzimuth(Float.parseFloat(lightAttributes.getField("Dynamic Sky Azimuth").value()));
@@ -371,81 +330,90 @@ public final class SceneSerializer {
 
                     envMap.intensity = new float[]{Float.parseFloat(lightAttributes.getField("Environment Intensity").value())};
                     envMap.setPrimary(Boolean.parseBoolean(lightAttributes.getField("Environment Primary").value()));
+                    entity.getGUINodes().add(SkyLight.guiNode);
 
-                    return skyLightEnt;
-                }
-            }
+                    Renderer.submitSkyLight(envMap);
 
-            Vector3f position = parseStringToVector3f(ent.getField("Position").value());
-            Vector3f rot = parseStringToVector3f(ent.getField("Rotation").value());
-            Vector3f scale = parseStringToVector3f(ent.getField("Scale").value());
-            Vector3f minB = parseStringToVector3f(ent.getField("Bounds Min").value());
-            Vector3f maxB = parseStringToVector3f(ent.getField("Bounds Max").value());
-            float[] color = parseStringToFloatArray(ent.getField("Color").value(), 4);
-            String nameMaterial = ent.getField("Material Name").value();
-            String albedoTPath = ent.getField("Albedo Texture").value();
-            String normalMapTPath = ent.getField("Normal Map Texture").value();
-            float normalMapStrength = Float.parseFloat(ent.getField("Normal Map Strength").value());
-            String roughnessMapTPath = ent.getField("Roughness Map Texture").value();
-            float roughnessMapStrength = Float.parseFloat(ent.getField("Roughness Map Strength").value());
-            String aoMapTPath = ent.getField("AO Map Texture").value();
-            float aoMapStrength = Float.parseFloat(ent.getField("AO Map Strength").value());
-            String metallicMapTPath = ent.getField("Metallic Map Texture").value();
-            float metallicMapStrength = Float.parseFloat(ent.getField("Metallic Map Strength").value());
-            String emissiveMapTPath = ent.getField("Emissive Map Texture").value();
-            float emissiveMapStrength = Float.parseFloat(ent.getField("Emissive Map Strength").value());
-            String meshPath = ent.getField("Mesh").value();
-            boolean isCamera = Boolean.parseBoolean(ent.getField("Camera").value());
-
-            OxyModel modelInstance;
-
-            int index = OxyMaterialPool.addMaterial(nameMaterial, albedoTPath,
-                    normalMapTPath, roughnessMapTPath, metallicMapTPath, aoMapTPath, emissiveMapTPath,
-                    new OxyColor(color), normalMapStrength, aoMapStrength, roughnessMapStrength, metallicMapStrength, emissiveMapStrength);
-
-            if (!meshPath.equals("null")) {
-                modelInstance = scene.createModelEntity(meshPath, meshPos, index);
-                modelInstance.getGUINodes().add(OxyMaterial.guiNode);
-            } else {
-                modelInstance = scene.createEmptyModel(meshPos);
-            }
-
-            if (emitting) {
-                var lightAttributes = ent.getInnerObjectByName("Light Attributes");
-                float colorIntensity = Float.parseFloat(lightAttributes.getField("Intensity").value());
-
-                if (emittingType.equals(PointLight.class.getSimpleName())) {
+                } else if (emittingType.equals(PointLight.class.getSimpleName())) {
+                    float colorIntensity = Float.parseFloat(lightAttributes.getField("Intensity").value());
                     float constant = Float.parseFloat(lightAttributes.getField("Constant").value());
                     float linear = Float.parseFloat(lightAttributes.getField("Linear").value());
                     float quadratic = Float.parseFloat(lightAttributes.getField("Quadratic").value());
 
-                    modelInstance.addComponent(new PointLight(colorIntensity, constant, linear, quadratic));
-                    modelInstance.getGUINodes().add(PointLight.guiNode);
+                    PointLight pointLight = new PointLight(colorIntensity, constant, linear, quadratic);
+
+                    entity.addComponent(pointLight);
+                    entity.getGUINodes().add(PointLight.guiNode);
+
+                    Renderer.submitPointLight(pointLight);
+
                 } else if (emittingType.equals(DirectionalLight.class.getSimpleName())) {
-                    modelInstance.addComponent(new DirectionalLight(colorIntensity));
-                    modelInstance.getGUINodes().add(DirectionalLight.guiNode);
+                    float colorIntensity = Float.parseFloat(lightAttributes.getField("Intensity").value());
+                    DirectionalLight directionalLight = new DirectionalLight(colorIntensity);
+                    entity.addComponent(directionalLight);
+                    entity.getGUINodes().add(DirectionalLight.guiNode);
+
+                    Renderer.submitDirectionalLight(directionalLight);
                 }
-
-                modelInstance.addComponent(new OxyMaterialIndex(index));
-
-                if (!modelInstance.getGUINodes().contains(OxyMaterial.guiNode))
-                    modelInstance.getGUINodes().add(OxyMaterial.guiNode);
             }
 
-            TransformComponent t = new TransformComponent(position, rot, scale);
-            modelInstance.importedFromFile = true;
-            modelInstance.addComponent(new MeshPosition(meshPos), new TagComponent(name), t,
-                    new SelectedComponent(false), new BoundingBoxComponent(minB, maxB), new UUIDComponent(UUID.fromString(id)));
+            if (!meshPath.isEmpty() && !meshPath.equals("null")) {
+                Pipeline geometryPipeline = Renderer.getGeometryPipeline();
+                OpenGLMesh mesh = new OpenGLMesh(geometryPipeline, MeshUsage.STATIC);
+                mesh.setAABB(minB, maxB);
+                //adding materials
+                for (int i = 0; ; i++) {
+                    var materials = ent.getInnerObjectByName("Material " + i);
+                    if (materials == null) break; //loop, unless there's no more material available
+                    int materialIndex = Integer.parseInt(materials.getField("Material Index").value());
+                    float[] color = parseStringToFloatArray(materials.getField("Color").value(), 4);
+                    String nameMaterial = materials.getField("Material Name").value();
+                    String albedoTPath = materials.getField("Albedo Texture").value();
+                    String normalMapTPath = materials.getField("Normal Map Texture").value();
+                    float normalMapStrength = Float.parseFloat(materials.getField("Normal Map Strength").value());
+                    String roughnessMapTPath = materials.getField("Roughness Map Texture").value();
+                    float roughnessMapStrength = Float.parseFloat(materials.getField("Roughness Map Strength").value());
+                    String aoMapTPath = materials.getField("AO Map Texture").value();
+                    float aoMapStrength = Float.parseFloat(materials.getField("AO Map Strength").value());
+                    String metallicMapTPath = materials.getField("Metallic Map Texture").value();
+                    float metallicMapStrength = Float.parseFloat(materials.getField("Metallic Map Strength").value());
+                    String emissiveMapTPath = materials.getField("Emissive Map Texture").value();
+                    float emissiveMapStrength = Float.parseFloat(materials.getField("Emissive Map Strength").value());
 
-            if (isCamera) {
-                modelInstance.addComponent(new SceneCamera());
-                modelInstance.getGUINodes().add(SceneCamera.guiNode);
+                    Material material = Material.create(materialIndex);
+                    material.name = nameMaterial;
+                    material.albedoColor = new Color(color);
+                    material.albedoTexture = Texture.loadImage(TextureSlot.ALBEDO, albedoTPath, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
+                    material.normalTexture = Texture.loadImage(TextureSlot.NORMAL, normalMapTPath, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
+                    material.roughnessTexture = Texture.loadImage(TextureSlot.ROUGHNESS, roughnessMapTPath, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
+                    material.metallicTexture = Texture.loadImage(TextureSlot.METALLIC, metallicMapTPath, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
+                    material.aoTexture = Texture.loadImage(TextureSlot.AO, aoMapTPath, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
+                    material.emissiveTexture = Texture.loadImage(TextureSlot.EMISSIVE, emissiveMapTPath, TexturePixelType.UByte, DEFAULT_TEXTURE_PARAMETER);
+                    material.roughness[0] = roughnessMapStrength;
+                    material.metalness[0] = metallicMapStrength;
+                    material.normalStrength[0] = normalMapStrength;
+                    material.aoStrength[0] = aoMapStrength;
+                    material.emissiveStrength[0] = emissiveMapStrength;
+                    mesh.addMaterial(material);
+                }
+                mesh.importScene(meshPath); //import the assimp scene
+                if (mesh.getAIScene().mNumAnimations() > 0)
+                    entity.addComponent(new AnimationComponent(mesh.getAIScene(), mesh.getBoneInfoMap())); //deletes aiScene
+                entity.addComponent(mesh);
+                entity.getGUINodes().add(OpenGLMesh.guiNode);
+                Renderer.submitMesh(mesh, entity.get(TransformComponent.class), entity.get(AnimationComponent.class));
             }
 
-            var scripts = ent.getInnerObjectByName("Script");
-            for (var f : scripts.getFieldList()) modelInstance.addScript(new OxyScript(f.value()));
+            var family = ent.getInnerObjectByName("Family");
+            if (family != null) {
+                String val = family.getField("Root").value();
+                if (!val.equals("null") && !val.isEmpty() && !val.isBlank()) {
+                    Entity rootEntity = scene.getEntityByUUID(val);
+                    entity.setFamily(new EntityFamily(rootEntity.getFamily()));
+                }
+            }
 
-            return modelInstance;
+            return entity;
         }
     }
 }

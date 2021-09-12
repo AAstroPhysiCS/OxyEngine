@@ -3,7 +3,7 @@ package OxyEngine.Core.Window;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.glfw.GLFW.*;
 
-public class WindowHint {
+public final class WindowHint {
 
     private int resizable, doubleBuffered = 1;
     private int redBits, greenBits, blueBits;

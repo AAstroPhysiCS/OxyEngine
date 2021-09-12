@@ -1,12 +1,13 @@
 package OxyEngineEditor;
 
-import OxyEngine.Core.Context.OxyRenderer;
+import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.Core.Layers.EditorLayer;
+import OxyEngine.Core.Layers.ImGuiLayer;
 import OxyEngine.Core.Layers.Layer;
 import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.KeyCode;
-import OxyEngine.Core.Window.OxyEvent;
-import OxyEngine.Core.Window.OxyWindow;
+import OxyEngine.Core.Window.Event;
+import OxyEngine.Core.Window.Window;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
 import OxyEngine.Core.Context.Scene.SceneRuntime;
@@ -19,15 +20,18 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
 import static org.lwjgl.opengl.GL11.glGetError;
 
-public class EditorApplication extends OxyApplication {
+public final class EditorApplication extends OxyApplication {
+
+    private EditorLayer editorLayer;
+    private ImGuiLayer imGuiLayer;
 
     public EditorApplication() {
     }
 
     @Override
     public void start() {
-        oxyWindow = new OxyWindow("OxyEngine - Editor", 1366, 768, OxyWindow.WindowMode.WINDOWEDFULLSCREEN);
-        oxyEngine = new OxyEngine(this::run, oxyWindow, OxyEngine.Antialiasing.ON, false, true, TargetPlatform.OpenGL);
+        window = new Window("OxyEngine - Editor", 1366, 768, Window.WindowMode.WINDOWEDFULLSCREEN);
+        oxyEngine = new OxyEngine(this::run, window, OxyEngine.Antialiasing.ON, false, true, TargetPlatform.OpenGL);
         oxyEngine.start();
     }
 
@@ -36,41 +40,37 @@ public class EditorApplication extends OxyApplication {
 
         oxyEngine.init();
 
-        EditorLayer editorLayer = EditorLayer.getInstance();
-        editorLayer.addPanel(ProjectPanel.getInstance());
-        editorLayer.addPanel(StatsPanel.getInstance());
-        editorLayer.addPanel(ToolbarPanel.getInstance());
-        editorLayer.addPanel(SceneRuntime.getPanel());
-        editorLayer.addPanel(SceneHierarchyPanel.getInstance());
-        editorLayer.addPanel(AnimationPanel.getInstance());
-        editorLayer.addPanel(SettingsPanel.getInstance());
-        editorLayer.addPanel(PropertiesPanel.getInstance());
-        editorLayer.addPanel(ScenePanel.getInstance());
+        editorLayer = EditorLayer.getInstance();
+        imGuiLayer = ImGuiLayer.getInstance(window);
 
-        layerStack.pushLayer(editorLayer);
-        for (Layer l : layerStack.getLayerStack())
-            l.build();
+        imGuiLayer.addPanel(ProjectPanel.getInstance());
+        imGuiLayer.addPanel(StatsPanel.getInstance());
+        imGuiLayer.addPanel(ToolbarPanel.getInstance());
+        imGuiLayer.addPanel(SceneRuntime.getPanel());
+        imGuiLayer.addPanel(SceneHierarchyPanel.getInstance());
+        imGuiLayer.addPanel(AnimationPanel.getInstance());
+        imGuiLayer.addPanel(SettingsPanel.getInstance());
+        imGuiLayer.addPanel(PropertiesPanel.getInstance());
+        imGuiLayer.addPanel(ScenePanel.getInstance());
+        imGuiLayer.addPanel(MaterialEditorPanel.getInstance());
+
+        layerStack.pushLayer(imGuiLayer, editorLayer);
     }
 
     @Override
-    protected void update() {
-        OxyRenderer.pollEvents();
-        for (OxyEvent event : OxyWindow.getEventPool()) {
+    protected void update(float ts) {
+        Renderer.pollEvents();
+        for (Event event : Window.getEventPool()) {
             for (Layer l : layerStack.getLayerStack())
                 l.onEvent(event);
         }
-        oxyWindow.update();
-    }
+        window.update();
 
-    @Override
-    protected void render(float ts) {
         for (Layer l : layerStack.getLayerStack()) {
-            l.onImGuiRender();
-            l.run(ts);
-            l.endFrame();
+            l.update(ts);
         }
 
-        OxyRenderer.swapBuffers();
+        Renderer.swapBuffers();
     }
 
     protected Runnable run() {
@@ -82,21 +82,20 @@ public class EditorApplication extends OxyApplication {
             long timeMillis = System.currentTimeMillis();
             double frames = 0;
 
-            while (Thread.currentThread().isAlive() && !glfwWindowShouldClose(oxyWindow.getPointer())) {
+            while (Thread.currentThread().isAlive() && !glfwWindowShouldClose(window.getPointer())) {
                 if (Input.isKeyPressed(KeyCode.GLFW_KEY_ESCAPE)) break;
 
                 final float currentTime = (float) glfwGetTime();
                 final float ts = (float) (currentTime - time);
                 time = currentTime;
-                update();
-                render(ts);
+                update(ts);
 
                 frames++;
 
                 if (System.currentTimeMillis() - timeMillis > 1000) {
                     timeMillis += 1000;
-                    SceneRuntime.FRAME_TIME = (float) (1000 / frames);
-                    SceneRuntime.FPS = (int) frames;
+                    Renderer.FRAME_TIME = (float) (1000 / frames);
+                    Renderer.FPS = (int) frames;
                     frames = 0;
                 }
 
@@ -110,7 +109,7 @@ public class EditorApplication extends OxyApplication {
     @Override
     public void dispose() {
         oxyEngine.dispose();
-        EditorLayer.uiSystem.dispose();
-        SceneRuntime.dispose();
+        editorLayer.dispose();
+        imGuiLayer.dispose();
     }
 }

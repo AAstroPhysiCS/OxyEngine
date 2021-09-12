@@ -13,13 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static OxyEngine.Core.Context.Renderer.Mesh.OxyVertex.MAX_BONES;
+import static OxyEngine.Core.Context.Renderer.Mesh.Vertex.MAX_BONES;
 import static OxyEngine.System.OxySystem.oxyAssert;
-import static OxyEngine.OxyUtils.*;
+import static OxyEngine.Utils.*;
 import static org.lwjgl.assimp.Assimp.aiReleaseImport;
 
 @SuppressWarnings("ConstantConditions")
-public class AnimationComponent implements EntityComponent {
+public final class AnimationComponent implements EntityComponent {
 
     private List<Matrix4f> finalBoneMatrices = new ArrayList<>(MAX_BONES);
     private final Map<String, BoneInfo> boneInfoMap;

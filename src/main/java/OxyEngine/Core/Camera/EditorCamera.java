@@ -1,17 +1,24 @@
 package OxyEngine.Core.Camera;
 
+import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.Core.Window.*;
-import OxyEngine.Core.Context.Scene.SceneRuntime;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
-public class EditorCamera extends PerspectiveCamera {
+public final class EditorCamera extends PerspectiveCamera {
 
-    public EditorCamera(boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
+    protected final Vector3f positionRef;
+    protected final Vector3f rotationRef;
+    public final Vector3f origin = new Vector3f();
+
+    public EditorCamera(Vector3f position, Vector3f rotation, boolean primary, float fovY, float aspect, float zNear, float zFar, boolean transpose) {
         super(0.05f, 20f, 20f, primary, fovY, aspect, zNear, zFar, transpose);
+        this.positionRef = position;
+        this.rotationRef = rotation;
         projectionMatrix = new Matrix4f();
         modelMatrix = new Matrix4f();
         viewMatrix = new Matrix4f();
@@ -25,9 +32,15 @@ public class EditorCamera extends PerspectiveCamera {
     private void calcModelMatrix() {
         modelMatrix.identity();
         modelMatrix.translate(0, 0, -zoom);
-        modelMatrix.rotateX(-this.getRotation().x);
-        modelMatrix.rotateY(-this.getRotation().y);
-        modelMatrix.translate(-this.getPosition().x, -this.getPosition().y, -this.getPosition().z);
+        modelMatrix.rotateX(-rotationRef.x);
+        modelMatrix.rotateY(-rotationRef.y);
+        modelMatrix.translate(-positionRef.x, -positionRef.y, -positionRef.z);
+    }
+
+    private void calcViewMatrixNoTranslation() {
+        viewMatrixNoTranslation.set(getProjectionMatrix());
+        viewMatrixNoTranslation.rotateX(-rotationRef.x);
+        viewMatrixNoTranslation.rotateY(-rotationRef.y);
     }
 
     @Override
@@ -45,18 +58,18 @@ public class EditorCamera extends PerspectiveCamera {
     }
 
     @Override
-    public void onEvent(OxyEvent event) {
-        OxyEventDispatcher dispatcher = OxyEventDispatcher.getInstance();
-        dispatcher.dispatch(OxyMouseEvent.Moved.class, event, this::onMouseMove);
-        dispatcher.dispatch(OxyMouseEvent.Scroll.class, event, this::onMouseScroll);
+    public void onEvent(Event event) {
+        EventDispatcher dispatcher = EventDispatcher.getInstance();
+        dispatcher.dispatch(MouseEvent.Moved.class, event, this::onMouseMove);
+        dispatcher.dispatch(MouseEvent.Scroll.class, event, this::onMouseScroll);
     }
 
-    private void onMouseMove(OxyMouseEvent.Moved event) {
+    private void onMouseMove(MouseEvent.Moved event) {
         updateRotationSwipe(event);
         update();
     }
 
-    private void onMouseScroll(OxyMouseEvent.Scroll event){
+    private void onMouseScroll(MouseEvent.Scroll event){
 
         cameraUniformBuffer.setData(0, getViewMatrix());
         cameraUniformBuffer.setData(64, getViewMatrixNoTranslation());
@@ -65,9 +78,9 @@ public class EditorCamera extends PerspectiveCamera {
         ImGuiIO io = ImGui.getIO();
         if (ScenePanel.hoveredWindow) {
             if (io.getMouseWheel() > 0) {
-                zoom += zoomSpeed * SceneRuntime.TS;
+                zoom += zoomSpeed * Renderer.TS;
             } else if (io.getMouseWheel() < 0) {
-                zoom += -zoomSpeed * SceneRuntime.TS;
+                zoom += -zoomSpeed * Renderer.TS;
             }
             if (zoom >= 500) zoom = 500;
             if (zoom <= -500) zoom = -500;
@@ -83,7 +96,7 @@ public class EditorCamera extends PerspectiveCamera {
         rotationRef.y += (-dx * mouseSpeed) / 16;
     }
 
-    private void updateRotationSwipe(OxyMouseEvent.Moved event) {
+    private void updateRotationSwipe(MouseEvent.Moved event) {
         if ((ScenePanel.hoveredWindow || SceneHierarchyPanel.focusedWindowDragging) &&
                 Input.isMouseButtonPressed(MouseCode.GLFW_MOUSE_BUTTON_RIGHT) && !Input.isKeyPressed(KeyCode.GLFW_KEY_LEFT_SHIFT)) {
             rotate();

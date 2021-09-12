@@ -1,7 +1,9 @@
 package OxyEngine.Core.Context.Renderer.Light;
 
-import OxyEngine.Core.Context.Scene.OxyEntity;
-import OxyEngineEditor.UI.Panels.GUINode;
+import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Context.Renderer.Texture.EnvironmentTexture;
+import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngineEditor.UI.GUINode;
 import imgui.ImGui;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.type.ImString;
@@ -9,10 +11,10 @@ import org.joml.Math;
 
 import java.util.Set;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
 import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
-import static OxyEngine.System.OxyFileSystem.openDialog;
-import static OxyEngine.System.OxySystem.getSubClasses;
+import static OxyEngine.System.FileSystem.openDialog;
+import static OxyEngine.System.OxySystem.*;
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;
 
 public abstract class SkyLight extends Light {
@@ -26,7 +28,7 @@ public abstract class SkyLight extends Light {
     }
 
     @Override
-    public void update(OxyEntity e, int i) {
+    public void update(Entity e, int i) {
     }
 
     private static final ImString guiNodePath = new ImString(100);
@@ -34,10 +36,8 @@ public abstract class SkyLight extends Light {
     private static void guiEnvMapLoad() {
         String path = openDialog("hdr", null);
         SkyLight skyLightComp = entityContext.get(SkyLight.class);
-        if (skyLightComp instanceof OpenGLHDREnvironmentMap envMap) {
-            if (path != null) {
-                if (envMap.loadEnvironmentMap(path)) guiNodePath.set(path);
-            }
+        if (skyLightComp instanceof HDREnvironmentMap envMap && path != null) {
+            if (envMap.loadEnvironmentMap(path)) guiNodePath.set(path);
         }
     }
 
@@ -60,7 +60,6 @@ public abstract class SkyLight extends Light {
         SkyLight comp = entityContext.get(SkyLight.class);
 
         String currentSkyLightType = comp.getClass().getSimpleName();
-
         ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
         if (ImGui.beginCombo("##hideLabelSkyLight", currentSkyLightType)) {
             for (Class<? extends SkyLight> classesToPick : subClasses) {
@@ -73,13 +72,18 @@ public abstract class SkyLight extends Light {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
+                    Renderer.submitSkyLight(entityContext.get(SkyLight.class));
                 }
             }
             ImGui.endCombo();
         }
         ImGui.popItemWidth();
 
-        if (comp instanceof OpenGLHDREnvironmentMap envMap) {
+        if (comp instanceof HDREnvironmentMap envMap) {
+
+            EnvironmentTexture environmentTexture = envMap.getEnvironmentTexture();
+            if(environmentTexture != null) guiNodePath.set(environmentTexture.getPath());
+
             ImGui.spacing();
             ImGui.alignTextToFramePadding();
             ImGui.indent(5);
@@ -111,7 +115,7 @@ public abstract class SkyLight extends Light {
             if (ImGui.radioButton("Use", envMap.primary)) {
                 envMap.primary = !envMap.primary;
                 //RESETTING ALL THE OTHER SKYLIGHTS
-                ACTIVE_SCENE.view(SkyLight.class).stream().map(e -> e.get(SkyLight.class)).filter(e -> !e.equals(comp)).forEach(e -> e.primary = false);
+                sceneContext.view(SkyLight.class).stream().map(e -> e.get(SkyLight.class)).filter(e -> !e.equals(comp)).forEach(e -> e.primary = false);
             }
 
             ImGui.separator();
@@ -149,10 +153,10 @@ public abstract class SkyLight extends Light {
             if (ImGui.radioButton("Use", envMap.primary)) {
                 envMap.primary = !envMap.primary;
                 if (!envMap.primary) envMap.dispose();
-                if (envMap.primary) envMap.load();
+                else envMap.load();
 
                 //RESETTING ALL THE OTHER SKYLIGHTS
-                ACTIVE_SCENE.view(SkyLight.class).stream().map(e -> e.get(SkyLight.class)).filter(e -> !e.equals(comp)).forEach(e -> e.primary = false);
+                sceneContext.view(SkyLight.class).stream().map(e -> e.get(SkyLight.class)).filter(e -> !e.equals(comp)).forEach(e -> e.primary = false);
             }
 
             ImGui.separator();

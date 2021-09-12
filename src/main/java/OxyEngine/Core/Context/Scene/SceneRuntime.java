@@ -1,88 +1,77 @@
 package OxyEngine.Core.Context.Scene;
 
-import OxyEngine.Core.Camera.OxyCamera;
+import OxyEngine.Components.TransformComponent;
+import OxyEngine.Core.Camera.Camera;
 import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
 import OxyEngine.PhysX.OxyPhysX;
-import OxyEngine.Scripting.OxyScript;
+import OxyEngine.Scripting.Script;
 import OxyEngine.Scripting.ScriptEngine;
 import OxyEngineEditor.UI.Panels.Panel;
 import OxyEngineEditor.UI.UIAssetManager;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
+import org.joml.Matrix4f;
 
-import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-
-import static OxyEngine.System.OxyFileSystem.deleteDir;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class SceneRuntime {
 
     private static final RuntimeControlPanel panel = new RuntimeControlPanel();
 
-    public static OxyCamera currentBoundedCamera;
-    public static OxyNativeObject currentBoundedSkyLightEntity;
+    public static Camera cameraContext;
+    public static Entity skyLightEntityContext;
 
-    public static OxyEntity entityContext;
-    public static OxyMaterial materialContext;
-    public static Scene ACTIVE_SCENE;
+    public static Entity entityContext;
+    public static Scene sceneContext;
 
-    public static float FPS = 0;
-    public static float FRAME_TIME = 0;
-    public static float TS = 0;
+    private static final List<Matrix4f> transforms = new ArrayList<>();
 
     private SceneRuntime() {
     }
 
-    public static Object loadClass(String path, String packageName, Scene scene, OxyEntity entity) {
-        File f = new File(path);
-        try {
-            URL url = f.toURI().toURL();
-            try (URLClassLoader loader = new URLClassLoader(new URL[]{url})) {
-                return loader.loadClass(packageName).getDeclaredConstructor(Scene.class, OxyEntity.class).newInstance(scene, entity);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void onPlay() {
-        for (OxyEntity e : ACTIVE_SCENE.getEntities()) {
-            if (!(e instanceof OxyModel)) continue;
-            for (OxyScript c : e.getScripts()) {
+    public static void runtimePlay() {
+        sceneContext.setState(SceneState.PLAY);
+        for (Entity e : sceneContext.getEntities()) {
+            for (Script c : e.getScripts()) {
                 c.invokeCreate();
                 ScriptEngine.addProvider(c.getProvider());
             }
         }
-        ACTIVE_SCENE.STATE = SceneState.RUNNING;
+        saveOriginalTransforms();
         ScriptEngine.restart();
-        OxyPhysX.getInstance().onScenePlay();
+        OxyPhysX.buildComponents();
         System.gc();
     }
 
-    public static void onUpdate(float ts) {
-        TS = ts;
-        ScriptEngine.onUpdate();
-    }
-
-    public static void onStop() {
-        ACTIVE_SCENE.STATE = SceneState.IDLE;
+    public static void runtimeStop() {
+        if (sceneContext.getState() != SceneState.PLAY) return;
+        sceneContext.setState(SceneState.STOP);
         ScriptEngine.stop();
+        OxyPhysX.resetSimulation();
         System.gc();
-        //TODO: MAKE SOME SCENE STATE RESETTING OR STORAGE
-        OxyPhysX.getInstance().resetSimulation();
+
+        loadOriginalTransforms();
     }
 
-    public static void dispose() {
-        ScriptEngine.dispose();
-        OxyPhysX.getInstance().dispose();
-        ACTIVE_SCENE.STATE = SceneState.TERMINATED;
-        ACTIVE_SCENE.dispose();
+    private static void saveOriginalTransforms() {
+        for (Entity e : sceneContext.getEntities()) {
+            if(e.familyHasRoot()){
+                transforms.add(new Matrix4f(e.getTransform()).mulLocal(new Matrix4f(e.getRoot().getTransform()).invert()));
+            } else {
+                transforms.add(new Matrix4f(e.getTransform()));
+            }
+        }
+    }
 
-        //Deleting the script class directory
-        deleteDir(new File(System.getProperty("user.dir") + "\\target\\classes\\Scripts"));
+    private static void loadOriginalTransforms() {
+        int i = 0;
+        for (Entity e : sceneContext.getEntities()) {
+            e.get(TransformComponent.class).set(transforms.get(i++));
+            e.updateTransform();
+        }
+        transforms.clear();
     }
 
     public static final class RuntimeControlPanel extends Panel {
@@ -90,7 +79,8 @@ public final class SceneRuntime {
         private static Image2DTexture playTexture;
         private static Image2DTexture stopTexture;
 
-        private RuntimeControlPanel(){}
+        private RuntimeControlPanel() {
+        }
 
         @Override
         public void preload() {
@@ -114,11 +104,11 @@ public final class SceneRuntime {
             ImGui.dummy(5, 0);
             ImGui.sameLine();
             if (ImGui.imageButton(playTexture.getTextureId(), size, size, 0, 1, 1, 0, 1)) {
-                SceneRuntime.onPlay();
+                SceneRuntime.runtimePlay();
             }
             ImGui.sameLine(0, 15);
             if (ImGui.imageButton(stopTexture.getTextureId(), size, size, 0, 1, 1, 0, 1)) {
-                SceneRuntime.onStop();
+                SceneRuntime.runtimeStop();
             }
             ImGui.popStyleColor(4);
             ImGui.end();

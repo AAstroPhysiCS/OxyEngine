@@ -1,8 +1,9 @@
 package OxyEngineEditor.UI.Panels;
 
+import OxyEngine.Core.Context.Renderer.Renderer;
 import imgui.ImGui;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.ACTIVE_SCENE;
+import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
 
 public final class SettingsPanel extends Panel {
 
@@ -27,10 +28,14 @@ public final class SettingsPanel extends Panel {
         ImGui.text("Gamma strength:");
         ImGui.alignTextToFramePadding();
         ImGui.text("Exposure: ");
+        ImGui.alignTextToFramePadding();
+        ImGui.text("Show Bounding Boxes: ");
         ImGui.nextColumn();
         ImGui.pushItemWidth(ImGui.getContentRegionAvailX());
-        ImGui.sliderFloat("###hidelabel g", ACTIVE_SCENE.gammaStrength, 0, 10);
-        ImGui.sliderFloat("###hidelabel exposure", ACTIVE_SCENE.exposure, 0, 10);
+        ImGui.sliderFloat("###hidelabel g", sceneContext.gammaStrength, 0, 10);
+        ImGui.sliderFloat("###hidelabel exposure", sceneContext.exposure, 0, 10);
+        if(ImGui.radioButton("###hidelabel aabb", Renderer.showBoundingBoxes))
+            Renderer.showBoundingBoxes = !Renderer.showBoundingBoxes;
         ImGui.popItemWidth();
         ImGui.columns(1);
         ImGui.end();

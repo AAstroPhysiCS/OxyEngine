@@ -1,9 +1,9 @@
 package OxyEngine.Core.Context.Renderer.Mesh.Platform;
 
-import OxyEngine.Core.Context.OxyRenderer;
+import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.Core.Context.Renderer.Mesh.FrameBuffer;
 import OxyEngine.Core.Context.Renderer.Mesh.RenderBuffer;
-import OxyEngine.Core.Context.Renderer.Texture.OxyColor;
+import OxyEngine.Core.Context.Renderer.Texture.Color;
 import OxyEngine.OxyEngine;
 
 import java.nio.FloatBuffer;
@@ -14,7 +14,7 @@ import static OxyEngine.System.OxySystem.logger;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL45.*;
 
-public class OpenGLFrameBuffer extends FrameBuffer {
+public final class OpenGLFrameBuffer extends FrameBuffer {
 
     private final FrameBufferSpecification[] specs;
 
@@ -24,7 +24,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
 
     private int[] drawIndices = null;
 
-    OpenGLFrameBuffer(int width, int height, OxyColor clearColor, FrameBufferSpecification... specs) {
+    OpenGLFrameBuffer(int width, int height, Color clearColor, FrameBufferSpecification... specs) {
         super(width, height, clearColor);
         this.specs = specs;
         load();
@@ -98,7 +98,6 @@ public class OpenGLFrameBuffer extends FrameBuffer {
         attachRenderBufferToFrameBuffer(renderBuffer.getFormat().getStorageFormat(), renderBuffer);
     }
 
-    @Override
     public void load() {
         if (width <= 10 || height <= 10) {
             windowMinized = true;
@@ -117,7 +116,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
                 FrameBufferSpecification fbS = specs[i];
                 RenderBuffer renderBuffer = fbS.renderBuffer;
 
-                if ((renderBuffer != null) && !renderBuffer.glBufferNull()) {
+                if ((renderBuffer != null) && !renderBuffer.isNull()) {
                     if (fbS.multiSampled) attachRenderBuffer(renderBuffer, OxyEngine.getAntialiasing().getLevel());
                     else attachRenderBuffer(renderBuffer);
                 }
@@ -134,7 +133,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
                     for (int j = 0; j < fbS.colorAttachmentTextures.length; j++) {
                         int colorAttachmentTexture = fbS.colorAttachmentTextures[j];
 
-                        int width = this.width; //assume that the size is not set on the texture attachments
+                        int width = this.width; //assume that the indexCount is not set on the texture attachments
                         int height = this.height;
 
                         if (fbS.sizeForTextures.size() != 0) {
@@ -189,7 +188,7 @@ public class OpenGLFrameBuffer extends FrameBuffer {
 
     public void flushDepthAttachment(int specIndex, int index) {
         bindDepthAttachment(specIndex, index);
-        OxyRenderer.clearBuffer();
+        Renderer.clearBuffer();
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
     }
 
@@ -231,8 +230,8 @@ public class OpenGLFrameBuffer extends FrameBuffer {
     public void blit() {
         if (blitted == null)
             throw new IllegalStateException("Framebuffer blitting failed because there's no blitting framebuffer");
-        glBindFramebuffer(GL_READ_FRAMEBUFFER, getBufferId());
-        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, blitted.getBufferId());
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, bufferId);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, blitted.bufferId);
         glBlitFramebuffer(0, 0, getWidth(), getHeight(), 0, 0, getWidth(), getHeight(), GL_COLOR_BUFFER_BIT, GL_NEAREST);
     }
 
@@ -286,8 +285,8 @@ public class OpenGLFrameBuffer extends FrameBuffer {
     @Override
     public void flush() {
         bind();
-        OxyRenderer.clearColor(clearColor);
-        OxyRenderer.clearBuffer();
+        Renderer.clearColor(clearColor);
+        Renderer.clearBuffer();
         flushed = true;
     }
 

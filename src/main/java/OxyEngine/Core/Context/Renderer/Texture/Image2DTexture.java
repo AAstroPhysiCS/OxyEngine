@@ -1,13 +1,13 @@
 package OxyEngine.Core.Context.Renderer.Texture;
 
-import OxyEngine.Core.Context.OxyRenderer;
+import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.TextureFormat;
 import OxyEngine.TargetPlatform;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static org.lwjgl.opengl.GL11.glDeleteTextures;
 
-public abstract class Image2DTexture extends Texture {
+public abstract class Image2DTexture extends TextureBase {
 
     protected final TextureSlot textureSlot;
     protected int textureId;
@@ -26,7 +26,7 @@ public abstract class Image2DTexture extends Texture {
     }
 
     static Image2DTexture create(TextureSlot slot, String path, float[] tcs, TexturePixelType pixelType, TextureFormat textureFormat, TextureParameterBuilder parameterBuilder) {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             if (parameterBuilder instanceof TextureParameterBuilder.POpenGL pOpenGL)
                 return new OpenGLImage2DTexture(slot, path, tcs, pixelType, textureFormat, pOpenGL);
             else oxyAssert("Wrong parameter is being used!");
@@ -35,7 +35,7 @@ public abstract class Image2DTexture extends Texture {
     }
 
     static Image2DTexture create(TextureSlot slot, String path, int width, int height, TextureParameterBuilder parameterBuilder) {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             if (parameterBuilder instanceof TextureParameterBuilder.POpenGL pOpenGL)
                 return new OpenGLImage2DTexture(slot, path, null, width, height, pOpenGL);
             else oxyAssert("Wrong parameter is being used!");
@@ -44,7 +44,7 @@ public abstract class Image2DTexture extends Texture {
     }
 
     static Image2DTexture create(TextureSlot slot,int width, int height, TexturePixelType pixelType, TextureFormat format, TextureParameterBuilder parameterBuilder) {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             if (parameterBuilder instanceof TextureParameterBuilder.POpenGL pOpenGL)
                 return new OpenGLImage2DTexture(slot, null, null, width, height, pixelType, format, pOpenGL);
             else oxyAssert("Wrong parameter is being used!");
@@ -53,7 +53,7 @@ public abstract class Image2DTexture extends Texture {
     }
 
     static Image2DTexture create(TextureSlot slot, String path, float[] tcs, TexturePixelType pixelType, TextureParameterBuilder parameterBuilder) {
-        if (OxyRenderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
+        if (Renderer.getCurrentTargetPlatform() == TargetPlatform.OpenGL) {
             if (parameterBuilder instanceof TextureParameterBuilder.POpenGL pOpenGL)
                 return new OpenGLImage2DTexture(slot, path, tcs, pixelType, pOpenGL);
             else oxyAssert("Wrong parameter is being used!");

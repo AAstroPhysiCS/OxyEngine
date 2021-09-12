@@ -2,12 +2,12 @@ package Scripts;
 
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Scripting.ScriptableEntity;
-import OxyEngine.Core.Context.Scene.OxyEntity;
+import OxyEngine.Core.Context.Scene.Entity;
 import OxyEngine.Core.Context.Scene.Scene;
 
-public class LightScript extends ScriptableEntity {
+public final class LightScript extends ScriptableEntity {
 
-    public LightScript(Scene scene, OxyEntity entity) {
+    public LightScript(Scene scene, Entity entity) {
         super(scene, entity);
     }
 

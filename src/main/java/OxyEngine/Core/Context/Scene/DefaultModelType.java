@@ -1,12 +1,12 @@
 package OxyEngine.Core.Context.Scene;
 
-import OxyEngine.System.OxyFileSystem;
+import OxyEngine.System.FileSystem;
 
 public enum DefaultModelType {
-    Plane(OxyFileSystem.getResourceByPath("/models/plane.fbx")),
-    Sphere(OxyFileSystem.getResourceByPath("/models/sphere.fbx")),
-    Cone(OxyFileSystem.getResourceByPath("/models/cone.fbx")),
-    Cube(OxyFileSystem.getResourceByPath("/models/cube.fbx"));
+    Plane(FileSystem.getResourceByPath("/models/plane.fbx")),
+    Sphere(FileSystem.getResourceByPath("/models/sphere.fbx")),
+    Cone(FileSystem.getResourceByPath("/models/cone.fbx")),
+    Cube(FileSystem.getResourceByPath("/models/cube.fbx"));
 
     private final String path;
 

@@ -1,6 +1,6 @@
 package OxyEngine.Core.Context.Scene;
 
-import OxyEngine.System.OxyFileSystem;
+import OxyEngine.System.FileSystem;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,7 +10,7 @@ import java.util.List;
 
 import static OxyEngine.System.OxySystem.oxyAssert;
 
-public class OxyJSON {
+public final class OxyJSON {
 
     private static OxyJSON INSTANCE = null;
 
@@ -260,12 +260,11 @@ public class OxyJSON {
 
     static class OxyJSONReader implements OxyJSONReaderBuilder {
 
-        private String loadedS;
         private String[] lineSplitted;
 
         @Override
         public OxyJSONReaderBuilder read(String s) {
-            loadedS = OxyFileSystem.load(s);
+            String loadedS = FileSystem.load(s);
             lineSplitted = loadedS.split("\n");
             return this;
         }

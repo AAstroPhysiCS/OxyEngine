@@ -1,32 +1,26 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Components.SelectedComponent;
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Context.OxyRenderer;
 import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
 import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Context.SceneRenderer;
-import OxyEngine.Core.Context.Scene.OxyMaterial;
-import OxyEngine.Core.Context.Scene.OxyModel;
+import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Context.Scene.Entity;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
 import imgui.extension.imguizmo.flag.Operation;
 import imgui.flag.ImGuiStyleVar;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.List;
 
-import static OxyEngine.Core.Context.Scene.OxyEntity.addParentTransformToChildren;
 import static OxyEngine.Core.Context.Scene.SceneRuntime.*;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedModelFileExtension;
-import static OxyEngineEditor.UI.OxySelectHandler.*;
+import static OxyEngineEditor.UI.SelectHandler.*;
 
-public class ScenePanel extends Panel {
+public final class ScenePanel extends Panel {
 
     public static boolean focusedWindowDragging, focusedWindow, hoveredWindow;
 
@@ -71,7 +65,7 @@ public class ScenePanel extends Panel {
         focusedWindow = ImGui.isWindowFocused();
         hoveredWindow = ImGui.isWindowHovered();
 
-        OpenGLFrameBuffer blittedFrameBuffer = OxyRenderer.getMainFrameBuffer().getBlittedFrameBuffer();
+        OpenGLFrameBuffer blittedFrameBuffer = Renderer.getMainFrameBuffer().getBlittedFrameBuffer();
 
         if (blittedFrameBuffer != null) {
 
@@ -83,14 +77,8 @@ public class ScenePanel extends Panel {
                         String fPath = f.getPath();
                         String extension = getExtension(fPath);
                         if (isSupportedModelFileExtension(extension)) {
-                            List<OxyModel> eList = ACTIVE_SCENE.createModelEntities(fPath);
-                            for (OxyModel e : eList) {
-                                e.addComponent(new SelectedComponent(false));
-                                e.getGUINodes().add(OpenGLMesh.guiNode);
-                                if (!e.getGUINodes().contains(OxyMaterial.guiNode))
-                                    e.getGUINodes().add(OxyMaterial.guiNode);
-                            }
-                            SceneRenderer.getInstance().updateModelEntities();
+                            Entity model = sceneContext.createEntity(fPath);
+                            model.getGUINodes().add(OpenGLMesh.guiNode);
                         }
                         ProjectPanel.lastDragDropFile = null;
                     }
@@ -98,13 +86,13 @@ public class ScenePanel extends Panel {
                 }
             }
 
-            if (entityContext != null && currentBoundedCamera != null && currentGizmoOperation != -1) {
+            if (entityContext != null && cameraContext != null && currentGizmoOperation != -1) {
                 ImGuizmo.setOrthographic(false);
                 ImGuizmo.setDrawList();
                 ImGuizmo.setRect(windowPos.x, windowPos.y, windowSize.x, windowSize.y);
 
-                float[] modelMatrix = currentBoundedCamera.getModelMatrixAsFloatArray();
-                float[] projectionMatrix = currentBoundedCamera.getProjectionMatrixAsFloatArray();
+                float[] modelMatrix = cameraContext.getModelMatrixAsFloatArray();
+                float[] projectionMatrix = cameraContext.getProjectionMatrixAsFloatArray();
 
                 float[] entityModelMatrix = new float[4 * 4];
                 TransformComponent c = entityContext.get(TransformComponent.class);
@@ -124,16 +112,10 @@ public class ScenePanel extends Panel {
                     Matrix4f entityModelMatrix4f = new Matrix4f().set(entityModelMatrix);
                     //Inverting the root transform.
                     if (entityContext.familyHasRoot())
-                        entityModelMatrix4f.mulLocal(new Matrix4f(entityContext.getRoot().get(TransformComponent.class).transform).invert());
+                        entityModelMatrix4f.mulLocal(new Matrix4f(entityContext.getRoot().getTransform()).invert());
 
-                    Quaternionf quat = new Quaternionf();
-                    entityModelMatrix4f.getTranslation(c.position);
-                    entityModelMatrix4f.getUnnormalizedRotation(quat);
-                    entityModelMatrix4f.getScale(c.scale);
-                    quat.getEulerAnglesXYZ(c.rotation);
-                    entityContext.transformLocally();
-
-                    addParentTransformToChildren(entityContext);
+                    c.set(entityModelMatrix4f);
+                    entityContext.updateTransform();
                 }
             }
         }
