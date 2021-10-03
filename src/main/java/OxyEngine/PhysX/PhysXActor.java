@@ -1,6 +1,6 @@
 package OxyEngine.PhysX;
 
-import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngine.Core.Scene.Entity;
 import OxyEngine.System.Disposable;
 import OxyEngineEditor.UI.GUINode;
 import imgui.ImGui;
@@ -15,7 +15,7 @@ import physx.common.PxTransform;
 import physx.common.PxVec3;
 import physx.physics.*;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Scene.SceneRuntime.entityContext;
 import static OxyEngine.Utils.toPxTransform;
 import static OxyEngine.Utils.toPxVec3;
 
@@ -35,7 +35,7 @@ public final class PhysXActor implements Disposable {
         this.eReference = eReference;
     }
 
-    void build() {
+    public void build() {
 
         Matrix4f transform = eReference.getTransform();
 
@@ -102,6 +102,10 @@ public final class PhysXActor implements Disposable {
 
     public void setGlobalPose(Matrix4f transform) {
         if (pxActor != null) pxActor.setGlobalPose(toPxTransform(transform));
+    }
+
+    public void setBodyType(PhysXRigidBodyType bodyType){
+        this.bodyType = bodyType;
     }
 
     public PhysXRigidBodyType getBodyType() {
@@ -172,6 +176,7 @@ public final class PhysXActor implements Disposable {
 
             if (currentMode == PhysXRigidBodyType.Dynamic && ImGui.treeNodeEx("Constraints")) {
                 renderAxisLocking(actor);
+                if (actor.pxActor != null) actor.setPhysXAxisLocking(actor.axisLocker);
                 ImGui.treePop();
             }
 

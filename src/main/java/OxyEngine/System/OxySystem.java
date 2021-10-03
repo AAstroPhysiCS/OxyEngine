@@ -1,7 +1,7 @@
 package OxyEngine.System;
 
-import OxyEngine.Core.Context.Scene.Entity;
-import OxyEngine.Core.Context.Scene.Scene;
+import OxyEngine.Core.Scene.Entity;
+import OxyEngine.Core.Scene.Scene;
 import OxyEngine.OxyApplication;
 import OxyEngineEditor.EditorApplication;
 import imgui.ImFont;
@@ -36,7 +36,7 @@ public interface OxySystem {
     Logger logger = Logger.getLogger(OxySystem.class.getName());
 
     String BASE_PATH = System.getProperty("user.dir");
-    String gl_Version = "#version 460";
+    String glVersion = "#version 460";
 
     Reflections reflections = new Reflections("OxyEngine");
 

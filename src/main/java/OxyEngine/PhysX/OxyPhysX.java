@@ -1,8 +1,8 @@
 package OxyEngine.PhysX;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Context.Renderer.Renderer;
-import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngine.Core.Renderer.Renderer;
+import OxyEngine.Core.Scene.Entity;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import physx.PxTopLevelFunctions;
@@ -15,7 +15,7 @@ import physx.physics.PxSceneFlagEnum;
 import java.util.HashMap;
 import java.util.Map;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
 import static OxyEngine.Utils.toJOMLQuaternionf;
 import static OxyEngine.Utils.toJOMLVector3f;
 import static OxyEngine.System.OxySystem.logger;

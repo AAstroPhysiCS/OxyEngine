@@ -123,13 +123,16 @@ struct RendererMaterial {
 
 struct PointLight {
     vec3 position;
+    float _padding1;
     vec3 diffuse;
+    float _padding2;
+    float radius;
+    float cutoff;
+    vec2 _padding3;
+};
 
-    float constant;
-    float linear;
-    float quadratic;
-
-    int activeState;
+struct VisibleIndex {
+	int index;
 };
 
 struct DirectionalLight {
@@ -166,17 +169,29 @@ layout (std140, binding = 1) uniform EnvironmentSettings {
     float hdrIntensity;
 };
 
+layout(std430, binding = 0) readonly buffer LightBuffer {
+	PointLight data[];
+} lightBuffer;
+
+layout(std430, binding = 1) readonly buffer VisibleLightIndicesBuffer {
+	VisibleIndex data[];
+} visibleLightIndicesBuffer;
+
 flat in int v_ObjectID;
 in float clipSpacePosZ;
 in RendererVertexOutput Output;
 
 uniform RendererMaterial Material;
-uniform PointLight p_Light[4];
-uniform DirectionalLight d_Light[4];
+uniform DirectionalLight d_Light;
 uniform RendererShadows Shadows;
 uniform RendererEnvironmentTextures EnvironmentTex;
 
 uniform sampler2D tex[32];
+
+//Forward+ Rendering
+uniform int numberOfTilesX;
+uniform int totalLightCount;
+uniform bool showPixelComplexity;
 
 #define PI 3.14159265358979323
 
@@ -186,7 +201,8 @@ float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness);
 vec3 fresnelSchlick(float cosTheta, vec3 F0);
 vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness);
 vec3 calcPBR(vec3 L, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec3 F0, vec3 albedo, float roughness, float metallic, float attenuation);
-float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index);
+float shadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index);
+vec3 pixelComplexityDebug();
 
 vec4 startPBR(vec3 vertexPos, vec2 texCoords, vec3 viewDir, vec3 norm){
     vec3 albedo, emissive;
@@ -229,41 +245,53 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoords, vec3 viewDir, vec3 norm){
 
     F0 = mix(F0, albedo, metallicMap);
 
-    for(int i = 0; i < d_Light.length; i++){
-        if(d_Light[i].activeState == 0) continue;
-        vec3 lightDir = d_Light[i].direction;
+    if(d_Light.activeState != 0) {
+       vec3 lightDir = d_Light.direction;
 
-        float shadowCalc = 0.0f;
+       float shadowCalc = 0.0f;
 
-        if(bool(Shadows.castShadows)){
-            for(int j = 0; j < NUMBER_CASCADES; j++) {
-                if(clipSpacePosZ <= Shadows.cascadeSplits[j]) {
-                   shadowCalc = ShadowCalculation(norm, Output.lightSpacePos[j], lightDir, j);
-                   if (j == 0)
-                       cascadeIndicator = vec4(0.1, 0.0, 0.0, 0.0);
-                   else if (j == 1)
-                       cascadeIndicator = vec4(0.0, 0.1, 0.0, 0.0);
-                   else if (j == 2)
-                       cascadeIndicator = vec4(0.0, 0.0, 0.1, 0.0);
-                   else if(j == 3)
-                       cascadeIndicator = vec4(0.0, 0.5, 0.5, 0.0);
-                   break;
-                }
-            }
-        }
+       if (bool(Shadows.castShadows)){
+          for(int j = 0; j < NUMBER_CASCADES; j++) {
+             if(clipSpacePosZ <= Shadows.cascadeSplits[j]) {
+                shadowCalc = shadowCalculation(norm, Output.lightSpacePos[j], lightDir, j);
+                if (j == 0)
+                    cascadeIndicator = vec4(0.1, 0.0, 0.0, 0.0);
+                else if (j == 1)
+                    cascadeIndicator = vec4(0.0, 0.1, 0.0, 0.0);
+                else if (j == 2)
+                    cascadeIndicator = vec4(0.0, 0.0, 0.1, 0.0);
+                else if(j == 3)
+                    cascadeIndicator = vec4(0.0, 0.5, 0.5, 0.0);
+                break;
+             }
+          }
+       }
 
-        Lo += calcPBR(lightDir, d_Light[i].diffuse, norm, viewDir, Output.vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0) * (1.0 - shadowCalc);
+       Lo += calcPBR(lightDir, d_Light.diffuse, norm, viewDir, Output.vertexPos, F0, albedo, roughnessMap, metallicMap, 1.0) * (1.0 - shadowCalc);
     }
 
-    for(int i = 0; i < p_Light.length; i++) {
-        if(p_Light[i].activeState == 0) continue;
-        vec3 lightPos = p_Light[i].position;
+    ivec2 location = ivec2(gl_FragCoord.xy);
+    ivec2 tileID = location / ivec2(16, 16);
+    uint index = tileID.y * numberOfTilesX + tileID.x;
+    uint offset = index * 1024;
+    for(uint i = 0; i < totalLightCount && visibleLightIndicesBuffer.data[offset + i].index != -1; i++) {
+        uint lightIndex = visibleLightIndicesBuffer.data[offset + i].index;
+        PointLight p_Light = lightBuffer.data[lightIndex];
 
+        vec3 lightPos = p_Light.position;
         vec3 lightDir = normalize(lightPos - vertexPos);
         float distance = length(lightPos - vertexPos);
-        float attenuation = 1.0 / (p_Light[i].constant + p_Light[i].linear * distance + p_Light[i].quadratic * (distance * distance));
 
-        Lo += calcPBR(lightDir, p_Light[i].diffuse, norm, viewDir, Output.vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);
+        /*
+        float attenuation = dot(lightDir, lightDir) / (100.0 * p_Light.radius);
+        attenuation = 1.0 / (attenuation * distance + 1.0);
+        attenuation = (attenuation - p_Light.cutoff) / (1.0f - p_Light.cutoff);
+        attenuation = clamp(attenuation, 0.0, 1.0);
+        */
+
+        float attenuation = pow(clamp(1 - pow((distance / p_Light.radius), 4.0), 0.0, 1.0), 2.0) / (1.0 + (distance * distance));
+
+        Lo += calcPBR(lightDir, p_Light.diffuse, norm, viewDir, Output.vertexPos, F0, albedo, roughnessMap, metallicMap, attenuation);
     }
 
     vec3 IBL = texture(EnvironmentTex.iblMap, norm).rgb;
@@ -289,6 +317,9 @@ vec4 startPBR(vec3 vertexPos, vec2 texCoords, vec3 viewDir, vec3 norm){
     if(bool(Shadows.cascadeIndicatorToggle))
         result += cascadeIndicator.xyz;
 
+    if(showPixelComplexity)
+        result += pixelComplexityDebug();
+
     return vec4(result, alpha);
 }
 
@@ -312,6 +343,25 @@ void main() {
 
     vec4 result = startPBR(vertexPos, texCoords, viewDir, norm);
     color = result;
+}
+
+vec3 pixelComplexityDebug() {
+    //which tile?
+    ivec2 fragCoord = ivec2(gl_FragCoord.xy);
+    ivec2 tileID = fragCoord / ivec2(16, 16);
+    uint index = tileID.y * numberOfTilesX + tileID.x;
+
+    uint offset = index * 1024;
+    uint i;
+    for (i = 0; i < totalLightCount && visibleLightIndicesBuffer.data[offset + i].index != -1; i++);
+
+    vec3 colorA = vec3(0.079f, 0.584f, 1.000f);
+    vec3 colorB = vec3(1.000f, 0.074f, 0.008f);
+
+    float MAX_RECOMMENDED_LIGHT_COUNT = 50f;
+
+    float ratio = float(i) / float(MAX_RECOMMENDED_LIGHT_COUNT);
+    return mix(colorA, colorB, clamp(ratio, 0.0, 1.0));
 }
 
 float DistributionGGX(vec3 N, vec3 H, float roughness) {
@@ -378,7 +428,7 @@ vec3 calcPBR(vec3 L, vec3 lightDiffuseColor, vec3 N, vec3 V, vec3 vertexPos, vec
      return (kD * albedo / PI + specular) * radiance * NdotL;
 }
 
-float ShadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
+float shadowCalculation(vec3 norm, vec4 lightSpacePos, vec3 lightDir, int index)
 {
     vec3 projCoords = lightSpacePos.xyz / lightSpacePos.w;
 

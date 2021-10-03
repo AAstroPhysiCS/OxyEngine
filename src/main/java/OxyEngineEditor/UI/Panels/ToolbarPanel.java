@@ -4,7 +4,7 @@ import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiStyleVar;
 
-import static OxyEngine.Core.Context.Scene.Scene.*;
+import static OxyEngine.Core.Scene.Scene.*;
 
 public final class ToolbarPanel extends Panel {
 
@@ -13,10 +13,6 @@ public final class ToolbarPanel extends Panel {
     public static ToolbarPanel getInstance() {
         if (INSTANCE == null) INSTANCE = new ToolbarPanel();
         return INSTANCE;
-    }
-
-    @Override
-    public void preload() {
     }
 
     @Override

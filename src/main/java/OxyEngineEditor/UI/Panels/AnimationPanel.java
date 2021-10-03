@@ -1,13 +1,13 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.AnimationComponent;
-import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
 import OxyEngineEditor.UI.UIAssetManager;
 import imgui.ImGui;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Scene.SceneRuntime.entityContext;
 
 
 public final class AnimationPanel extends Panel {
@@ -22,11 +22,6 @@ public final class AnimationPanel extends Panel {
     public static AnimationPanel getInstance() {
         if (INSTANCE == null) INSTANCE = new AnimationPanel();
         return INSTANCE;
-    }
-
-    @Override
-    public void preload() {
-
     }
 
     @Override

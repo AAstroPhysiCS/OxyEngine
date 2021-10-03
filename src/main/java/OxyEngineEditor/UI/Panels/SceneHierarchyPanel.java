@@ -2,11 +2,13 @@ package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.*;
 import OxyEngine.Core.Camera.Camera;
-import OxyEngine.Core.Context.Renderer.Light.Light;
-import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
-import OxyEngine.Core.Context.Renderer.Mesh.RenderMode;
-import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
-import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngine.Core.Renderer.Light.Light;
+import OxyEngine.Core.Renderer.Light.SkyLight;
+import OxyEngine.Core.Renderer.Mesh.OpenGLMesh;
+import OxyEngine.Core.Renderer.Mesh.RenderMode;
+import OxyEngine.Core.Renderer.Renderer;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
+import OxyEngine.Core.Scene.Entity;
 import OxyEngineEditor.UI.UIAssetManager;
 import imgui.ImGui;
 import imgui.flag.*;
@@ -14,8 +16,8 @@ import imgui.flag.*;
 import java.util.List;
 import java.util.Set;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
-import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.entityContext;
 
 public final class SceneHierarchyPanel extends Panel {
 
@@ -30,7 +32,7 @@ public final class SceneHierarchyPanel extends Panel {
 
     public static boolean focusedWindow, focusedWindowDragging;
 
-    private static final int TABLE_COLORS = ImGui.getColorU32(bgC[0], bgC[1], bgC[2], bgC[3]);
+    private static int TABLE_COLORS;
 
     public static SceneHierarchyPanel getInstance() {
         if (INSTANCE == null) INSTANCE = new SceneHierarchyPanel();
@@ -38,11 +40,7 @@ public final class SceneHierarchyPanel extends Panel {
     }
 
     private SceneHierarchyPanel() {
-    }
-
-    @Override
-    public void preload() {
-
+        TABLE_COLORS = ImGui.getColorU32(bgC[0], bgC[1], bgC[2], bgC[3]);
     }
 
     private void updateEntityPanel(Set<Entity> entities) {
@@ -56,6 +54,7 @@ public final class SceneHierarchyPanel extends Panel {
 
             boolean hasMesh = e.has(OpenGLMesh.class);
             boolean isLight = e.has(Light.class);
+            boolean isSkyLight = e.has(SkyLight.class);
             boolean isCamera = e.has(Camera.class);
 
             ImGui.tableNextRow();
@@ -65,6 +64,7 @@ public final class SceneHierarchyPanel extends Panel {
 
             renderView(e);
             if (isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+            else if (isSkyLight) renderType(e, e.get(SkyLight.class).getClass().getSimpleName());
             else if (hasMesh) renderType(e, "Mesh");
             else if (isCamera) renderType(e, e.get(Camera.class).getClass().getSimpleName());
             else renderType(e, "Group");
@@ -74,7 +74,7 @@ public final class SceneHierarchyPanel extends Panel {
 
             String name = tagComponent.tag();
 
-            if (isLight) {
+            if (isLight || isSkyLight) {
                 name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 19, 2, 22f, 20f);
             } else if (hasMesh) {
                 name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 19, 2, 22.4f, 20f);
@@ -177,12 +177,14 @@ public final class SceneHierarchyPanel extends Panel {
             ImGui.tableNextRow();
             Entity e = relatedEntities.get(i);
             boolean hasMesh = e.has(OpenGLMesh.class);
-            boolean isLight = e.has(Light.class);
+            boolean isLight = e.has(Light.class) || e.has(SkyLight.class);
+            boolean isSkyLight = e.has(SkyLight.class);
             boolean isCamera = e.has(Camera.class);
 
             ImGui.pushID(relatedEntities.get(i).hashCode());
             renderView(e);
             if (isLight) renderType(e, e.get(Light.class).getClass().getSimpleName());
+            else if (isSkyLight) renderType(e, e.get(SkyLight.class).getClass().getSimpleName());
             else if (hasMesh) renderType(e, "Mesh");
             else if (isCamera) renderType(e, e.get(Camera.class).getClass().getSimpleName());
             else renderType(e, "Group");
@@ -191,7 +193,7 @@ public final class SceneHierarchyPanel extends Panel {
 
             String name = e.get(TagComponent.class).tag();
 
-            if (isLight) {
+            if (isLight || isSkyLight) {
                 name = renderImageBesideTreeNode(name, materialLightBulb.getTextureId(), 19, 2, 22f, 20f);
             } else if (hasMesh) {
                 name = renderImageBesideTreeNode(name, materialGreyMesh.getTextureId(), 19, 2, 22f, 20f);

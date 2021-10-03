@@ -1,6 +1,6 @@
 package OxyEngine.PhysX;
 
-import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngine.Core.Scene.Entity;
 import OxyEngine.System.Disposable;
 import org.lwjgl.system.MemoryStack;
 import physx.PxTopLevelFunctions;
@@ -10,7 +10,7 @@ import physx.cooking.PxCookingParams;
 import physx.extensions.PxDefaultAllocator;
 import physx.physics.*;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
 import static OxyEngine.PhysX.OxyPhysX.PHYSX_VERSION;
 
 public final class PhysXEnvironment implements Disposable {

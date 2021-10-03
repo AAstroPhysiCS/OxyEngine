@@ -1,0 +1,159 @@
+#version 450
+
+struct PointLight {
+    vec3 position;
+    float _padding1;
+    vec3 diffuse;
+    float _padding2;
+    float radius;
+    float cutoff;
+    vec2 _padding3;
+};
+
+struct VisibleIndex {
+	int index;
+};
+
+// Shader storage buffer objects
+layout(std430, binding = 0) readonly buffer LightBuffer {
+	PointLight data[];
+} lightBuffer;
+
+layout(std430, binding = 1) writeonly buffer VisibleLightIndicesBuffer {
+	VisibleIndex data[];
+} visibleLightIndicesBuffer;
+
+layout (std140, binding = 0) uniform Camera {
+    mat4 v_Matrix;
+    mat4 v_Matrix_NoTransform;
+    vec3 cameraPos;
+};
+
+uniform sampler2D depthPrePassMap;
+uniform ivec2 screenSize;
+uniform int lightCount;
+
+//Camera uniform buffer does not expose JUST the projection, so I have to do this
+//I can also change the uniform buffer so that i calculate the MVP in the shader.
+//But thats not my plan since I have to change it in so many shaders... i am lazy for it :)
+uniform mat4 projection;
+uniform mat4 view;
+
+shared uint minRecordedDepth;
+shared uint maxRecordedDepth;
+shared uint visibleLightCount;
+shared vec4 frustumPlanes[6];
+
+//These local storages are useful because these shared values are being calculated only on 1 thread and shared to many others.
+//Calculating these values on every thread would be pretty much a waste of performance.
+//We target the best performance as this is the motto of OxyEngine.
+shared int lightIndicesLocalStorage[1024];
+
+#define TILE_SIZE 16
+#define TOTAL_THREAD_COUNT TILE_SIZE * TILE_SIZE
+layout (local_size_x = TILE_SIZE, local_size_y = TILE_SIZE) in;
+
+void linearizeDepth(out float depth);
+void calculateFrustumPlanes(float minDepthFloat, float maxDepthFloat);
+
+void main(){
+
+    bool firstThread = gl_LocalInvocationIndex == 0;
+
+    if (firstThread) {
+        minRecordedDepth = 0xFFFFFFFF;
+        maxRecordedDepth = 0;
+        visibleLightCount = 0;
+    }
+
+    barrier();
+
+    float depth;
+    linearizeDepth(depth);
+
+    //Converting the depth to a atomic value (so that threads can access without any synchronization issues)
+    uint depthInt = floatBitsToUint(depth);
+    atomicMin(minRecordedDepth, depthInt);
+    atomicMax(maxRecordedDepth, depthInt);
+
+    barrier();
+
+    if (firstThread) {
+        float minDepthFloat = uintBitsToFloat(minRecordedDepth);
+        float maxDepthFloat = uintBitsToFloat(maxRecordedDepth);
+        calculateFrustumPlanes(minDepthFloat, maxDepthFloat);
+    }
+
+    barrier();
+
+    uint passCount = (lightCount + TOTAL_THREAD_COUNT - 1) / TOTAL_THREAD_COUNT;
+    for (uint i = 0; i < passCount; i++) {
+        uint lightIndex = i * TOTAL_THREAD_COUNT + gl_LocalInvocationIndex;
+        if(lightIndex >= lightCount) {
+            break;
+        }
+
+        vec3 pos = lightBuffer.data[lightIndex].position;
+        float radius = lightBuffer.data[lightIndex].radius;
+
+        float distance = 0.0;
+        for (uint j = 0; j < 6; j++) {
+            distance = dot(vec4(pos, 1.0f), frustumPlanes[j]) + radius;
+
+            if(distance <= 0.0) {
+                break;
+            }
+        }
+
+        if(distance > 0.0) {
+            uint offset = atomicAdd(visibleLightCount, 1);
+            lightIndicesLocalStorage[offset] = int(lightIndex);
+        }
+    }
+
+    barrier();
+
+    if(firstThread) {
+        int index = int(gl_WorkGroupID.y * gl_NumWorkGroups.x + gl_WorkGroupID.x);
+        uint offset = index * 1024;
+
+        for (uint i = 0; i < visibleLightCount; i++) {
+            visibleLightIndicesBuffer.data[offset + i].index = lightIndicesLocalStorage[i];
+        }
+
+        if(visibleLightCount != 1024) {
+            visibleLightIndicesBuffer.data[offset + visibleLightCount].index = -1;
+        }
+    }
+}
+
+void calculateFrustumPlanes(float minDepthFloat, float maxDepthFloat){
+    ivec2 tileID = ivec2(gl_WorkGroupID.xy);
+    ivec2 tileNumber = ivec2(gl_NumWorkGroups.xy);
+
+    vec2 negativeStep = (2.0 * vec2(tileID)) / vec2(tileNumber);
+    vec2 positiveStep = (2.0 * vec2(tileID + ivec2(1, 1))) / vec2(tileNumber);
+
+    frustumPlanes[0] = vec4(1.0, 0.0, 0.0, 1.0 - negativeStep.x); // Left
+    frustumPlanes[1] = vec4(-1.0, 0.0, 0.0, -1.0 + positiveStep.x); // Right
+    frustumPlanes[2] = vec4(0.0, 1.0, 0.0, 1.0 - negativeStep.y); // Bottom
+    frustumPlanes[3] = vec4(0.0, -1.0, 0.0, -1.0 + positiveStep.y); // Top
+    frustumPlanes[4] = vec4(0.0, 0.0, -1.0, -minDepthFloat); // Near
+    frustumPlanes[5] = vec4(0.0, 0.0, 1.0, maxDepthFloat); // Far
+
+    for (uint i = 0; i < 4; i++) {
+ 		frustumPlanes[i] *= v_Matrix;
+   		frustumPlanes[i] /= length(frustumPlanes[i].xyz);
+ 	}
+
+ 	frustumPlanes[4] *= view;
+    frustumPlanes[4] /= length(frustumPlanes[4].xyz);
+    frustumPlanes[5] *= view;
+    frustumPlanes[5] /= length(frustumPlanes[5].xyz);
+}
+
+void linearizeDepth(out float depth){
+    vec2 text = vec2(gl_GlobalInvocationID.xy) / screenSize;
+    depth = texture(depthPrePassMap, text).r;
+    depth = (0.5 * projection[3][2]) / (depth + 0.5 * projection[2][2] - 0.5);
+}

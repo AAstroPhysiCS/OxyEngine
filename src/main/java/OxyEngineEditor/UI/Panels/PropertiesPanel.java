@@ -5,15 +5,15 @@ import OxyEngine.Components.TransformComponent;
 import OxyEngine.Components.UUIDComponent;
 import OxyEngine.Core.Camera.Camera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Context.Renderer.Light.DirectionalLight;
-import OxyEngine.Core.Context.Renderer.Light.Light;
-import OxyEngine.Core.Context.Renderer.Light.PointLight;
-import OxyEngine.Core.Context.Renderer.Light.SkyLight;
-import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
-import OxyEngine.Core.Context.Renderer.Renderer;
-import OxyEngine.Core.Context.Scene.Entity;
-import OxyEngine.Core.Context.Scene.SceneRuntime;
-import OxyEngine.Core.Context.Scene.SceneState;
+import OxyEngine.Core.Renderer.Light.DirectionalLight;
+import OxyEngine.Core.Renderer.Light.Light;
+import OxyEngine.Core.Renderer.Light.PointLight;
+import OxyEngine.Core.Renderer.Light.SkyLight;
+import OxyEngine.Core.Renderer.Mesh.OpenGLMesh;
+import OxyEngine.Core.Renderer.Renderer;
+import OxyEngine.Core.Scene.Entity;
+import OxyEngine.Core.Scene.SceneRuntime;
+import OxyEngine.Core.Scene.SceneState;
 import OxyEngine.PhysX.PhysXActor;
 import OxyEngine.PhysX.PhysXComponent;
 import OxyEngine.PhysX.PhysXGeometry;
@@ -27,8 +27,8 @@ import imgui.type.ImString;
 
 import java.util.List;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
 import static OxyEngine.Utils.DEGREES_TO_RADIANS;
 
 public final class PropertiesPanel extends Panel {
@@ -44,10 +44,6 @@ public final class PropertiesPanel extends Panel {
 
     ImString name = new ImString(0);
     final ImString searchAddComponent = new ImString(100);
-
-    @Override
-    public void preload() {
-    }
 
     private void renderTransformControl(String label, float[] x, float[] y, float[] z, float defaultValue, float speed) {
         ImGui.pushID(label);
@@ -237,6 +233,14 @@ public final class PropertiesPanel extends Panel {
                         nodeList.add(PhysXGeometry.guiNode);
                     }
 
+                    if (ImGui.menuItem("Capsule Collider")) {
+                        if (!entityContext.has(PhysXComponent.class))
+                            entityContext.addComponent(new PhysXComponent(entityContext));
+                        PhysXGeometry capsuleGeometry = new PhysXGeometry.Capsule(entityContext);
+                        entityContext.get(PhysXComponent.class).setGeometryAs(capsuleGeometry);
+                        nodeList.add(PhysXGeometry.guiNode);
+                    }
+
                     ImGui.endMenu();
                 }
 
@@ -270,7 +274,7 @@ public final class PropertiesPanel extends Panel {
             if (ImGui.beginMenu("Light")) {
                 if (ImGui.menuItem("Point Light")) {
                     if (!entityContext.has(Light.class)) {
-                        PointLight pointLight = new PointLight(1.0f, 0.027f, 0.0028f);
+                        PointLight pointLight = new PointLight(1.0f, 1.0f, 0.0f);
                         entityContext.addComponent(pointLight);
                         nodeList.add(PointLight.guiNode);
                         Renderer.submitPointLight(pointLight);

@@ -1,6 +1,6 @@
 package OxyEngine.Core.Camera;
 
-import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Renderer.Renderer;
 import OxyEngine.Core.Window.*;
 import OxyEngineEditor.UI.Panels.SceneHierarchyPanel;
 import OxyEngineEditor.UI.Panels.ScenePanel;

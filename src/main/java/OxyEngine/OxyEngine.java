@@ -1,6 +1,6 @@
 package OxyEngine;
 
-import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Renderer.Renderer;
 import OxyEngine.Core.Window.Window;
 import OxyEngine.Core.Window.WindowBuilder;
 import OxyEngine.System.Disposable;
@@ -71,6 +71,7 @@ public final class OxyEngine implements Disposable {
         });
         window.init();
         glfwSwapInterval(vSync ? 1 : 0);
+
         Renderer.init(targetPlatform, debug);
         Renderer.enableGrid(true);
     }

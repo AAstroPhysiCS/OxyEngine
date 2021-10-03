@@ -1,10 +1,8 @@
 package OxyEngineEditor.UI.Panels;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
-import OxyEngine.Core.Context.Renderer.Mesh.Platform.OpenGLFrameBuffer;
-import OxyEngine.Core.Context.Renderer.Renderer;
-import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngine.Core.Renderer.Mesh.Platform.OpenGLFrameBuffer;
+import OxyEngine.Core.Renderer.Renderer;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
@@ -15,7 +13,7 @@ import org.joml.Matrix4f;
 import java.io.File;
 import java.util.Arrays;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.*;
+import static OxyEngine.Core.Scene.SceneRuntime.*;
 import static OxyEngine.System.OxySystem.getExtension;
 import static OxyEngine.System.OxySystem.isSupportedModelFileExtension;
 import static OxyEngineEditor.UI.SelectHandler.*;
@@ -43,10 +41,6 @@ public final class ScenePanel extends Panel {
     }
 
     @Override
-    public void preload() {
-    }
-
-    @Override
     public void renderPanel() {
 
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0, 0);
@@ -65,9 +59,7 @@ public final class ScenePanel extends Panel {
         focusedWindow = ImGui.isWindowFocused();
         hoveredWindow = ImGui.isWindowHovered();
 
-        OpenGLFrameBuffer blittedFrameBuffer = Renderer.getMainFrameBuffer().getBlittedFrameBuffer();
-
-        if (blittedFrameBuffer != null) {
+        if (Renderer.getMainFrameBuffer().getBlittedFrameBuffer() instanceof OpenGLFrameBuffer blittedFrameBuffer) {
 
             if (blittedFrameBuffer.getColorAttachmentTexture(0) != null) {
                 ImGui.image(blittedFrameBuffer.getColorAttachmentTexture(0)[0], blittedFrameBuffer.getWidth(), blittedFrameBuffer.getHeight(), 0, 1, 1, 0);
@@ -77,8 +69,7 @@ public final class ScenePanel extends Panel {
                         String fPath = f.getPath();
                         String extension = getExtension(fPath);
                         if (isSupportedModelFileExtension(extension)) {
-                            Entity model = sceneContext.createEntity(fPath);
-                            model.getGUINodes().add(OpenGLMesh.guiNode);
+                            sceneContext.createEntity(fPath);
                         }
                         ProjectPanel.lastDragDropFile = null;
                     }

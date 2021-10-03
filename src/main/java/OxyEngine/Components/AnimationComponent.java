@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static OxyEngine.Core.Context.Renderer.Mesh.Vertex.MAX_BONES;
+import static OxyEngine.Core.Renderer.Mesh.Vertex.MAX_BONES;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngine.Utils.*;
 import static org.lwjgl.assimp.Assimp.aiReleaseImport;

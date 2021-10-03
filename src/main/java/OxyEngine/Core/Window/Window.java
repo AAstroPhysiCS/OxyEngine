@@ -1,12 +1,13 @@
 package OxyEngine.Core.Window;
 
-import OxyEngine.Core.Context.Scene.SceneState;
+import OxyEngine.Core.Scene.SceneState;
 import OxyEngine.System.Disposable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -20,7 +21,7 @@ public final class Window implements Disposable {
     private long pointer;
     private final String title;
 
-    static final List<Event> eventPool = new ArrayList<>();
+    static final List<Event> eventPool = new CopyOnWriteArrayList<>();
     private static final List<Event> allCreatedEvents = new ArrayList<>();
 
     public Window(String title, int width, int height, WindowMode mode, WindowSpecs specs) {
@@ -157,6 +158,10 @@ public final class Window implements Disposable {
     public void dispose() {
         glfwFreeCallbacks(pointer);
         glfwDestroyWindow(pointer);
+    }
+
+    public void pollEvents() {
+        glfwPollEvents();
     }
 
     public record WindowSpecs(int resizable, int doubleBuffered) {

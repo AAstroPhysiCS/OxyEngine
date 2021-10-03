@@ -1,11 +1,11 @@
 //#type vertex
 #version 450 core
 
-#define MAX_BONES 100
-
 layout(location = 0) in vec3 pos;
 layout(location = 6) in vec4 boneIds;
 layout(location = 7) in vec4 weights;
+
+#define MAX_BONES 100
 
 uniform mat4 model;
 uniform mat4 lightSpaceMatrix;

@@ -1,8 +1,8 @@
 package Scripts;
 
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Context.Scene.Entity;
-import OxyEngine.Core.Context.Scene.Scene;
+import OxyEngine.Core.Scene.Entity;
+import OxyEngine.Core.Scene.Scene;
 import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.KeyCode;
 import OxyEngine.PhysX.PhysXActor;

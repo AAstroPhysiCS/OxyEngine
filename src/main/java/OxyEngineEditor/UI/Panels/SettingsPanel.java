@@ -1,9 +1,9 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Renderer.Renderer;
 import imgui.ImGui;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
 
 public final class SettingsPanel extends Panel {
 
@@ -12,11 +12,6 @@ public final class SettingsPanel extends Panel {
     public static SettingsPanel getInstance(){
         if(INSTANCE == null) INSTANCE = new SettingsPanel();
         return INSTANCE;
-    }
-
-    @Override
-    public void preload() {
-
     }
 
     @Override

@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Renderer.Renderer;
 import imgui.ImGui;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImBoolean;
@@ -15,10 +15,6 @@ public final class StatsPanel extends Panel {
     }
 
     private static final ImBoolean open = new ImBoolean(false);
-
-    @Override
-    public void preload() {
-    }
 
     @Override
     public void renderPanel() {

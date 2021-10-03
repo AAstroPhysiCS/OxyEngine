@@ -1,9 +1,9 @@
 package Scripts;
 
 import OxyEngine.Scripting.ScriptableEntity;
-import OxyEngine.Core.Context.Scene.Material;
-import OxyEngine.Core.Context.Scene.Entity;
-import OxyEngine.Core.Context.Scene.Scene;
+import OxyEngine.Core.Scene.Material;
+import OxyEngine.Core.Scene.Entity;
+import OxyEngine.Core.Scene.Scene;
 
 public final class ColorIteratorScript extends ScriptableEntity {
 

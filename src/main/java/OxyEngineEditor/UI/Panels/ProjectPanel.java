@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
 import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.MouseCode;
 import OxyEngine.System.OxyLogger;
@@ -49,11 +49,6 @@ public final class ProjectPanel extends Panel {
     private static final float[] bg = new float[]{48 / 255f, 46 / 255f, 48 / 255f, 1.0f};
 
     private ProjectPanel() {
-
-    }
-
-    @Override
-    public void preload() {
         var instance = UIAssetManager.getInstance();
         fileAsset = instance.getUIAsset("UI FILEASSET2");
         objAsset = instance.getUIAsset("UI OBJFILEASSET");

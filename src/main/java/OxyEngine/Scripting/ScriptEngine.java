@@ -1,6 +1,6 @@
 package OxyEngine.Scripting;
 
-import static OxyEngine.Core.Context.Renderer.Renderer.TS;
+import static OxyEngine.Core.Renderer.Renderer.TS;
 
 public final class ScriptEngine {
 

@@ -1,10 +1,10 @@
 package OxyEngine.Scripting;
 
 import OxyEngine.Components.UUIDComponent;
-import OxyEngine.Core.Context.Scene.Entity;
-import OxyEngine.Core.Context.Scene.Scene;
-import OxyEngine.Core.Context.Scene.SceneRuntime;
-import OxyEngine.Core.Context.Scene.SceneState;
+import OxyEngine.Core.Scene.Entity;
+import OxyEngine.Core.Scene.Scene;
+import OxyEngine.Core.Scene.SceneRuntime;
+import OxyEngine.Core.Scene.SceneState;
 import OxyEngine.System.FileSystem;
 import OxyEngine.System.OxySystem;
 import OxyEngineEditor.UI.GUINode;
@@ -20,8 +20,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
 import static OxyEngine.System.FileSystem.openDialog;
 import static OxyEngine.System.OxySystem.oxyAssert;
 import static OxyEngineEditor.UI.Panels.ProjectPanel.dirAssetGrey;

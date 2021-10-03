@@ -1,7 +1,7 @@
 package OxyEngine.System;
 
-import OxyEngine.Core.Context.Scene.SceneRuntime;
-import OxyEngine.Core.Context.Scene.SceneState;
+import OxyEngine.Core.Scene.SceneRuntime;
+import OxyEngine.Core.Scene.SceneState;
 import OxyEngineEditor.EntryPoint;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
 import static org.lwjgl.BufferUtils.createByteBuffer;
 
 public interface FileSystem {

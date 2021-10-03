@@ -7,7 +7,7 @@ import imgui.ImGui;
 import imgui.flag.ImGuiTreeNodeFlags;
 import org.joml.Matrix4f;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Scene.SceneRuntime.entityContext;
 
 public abstract class Camera implements EntityComponent {
 

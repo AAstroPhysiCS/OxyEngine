@@ -1,16 +1,13 @@
 package OxyEngine.Core.Layers;
 
-import OxyEngine.Components.AnimationComponent;
-import OxyEngine.Components.TransformComponent;
 import OxyEngine.Core.Camera.EditorCamera;
 import OxyEngine.Core.Camera.Camera;
 import OxyEngine.Core.Camera.SceneCamera;
-import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
-import OxyEngine.Core.Context.Renderer.Renderer;
-import OxyEngine.Core.Context.Scene.Entity;
-import OxyEngine.Core.Context.Scene.Scene;
-import OxyEngine.Core.Context.Scene.SceneRuntime;
-import OxyEngine.Core.Context.Scene.SceneState;
+import OxyEngine.Core.Renderer.Renderer;
+import OxyEngine.Core.Scene.Entity;
+import OxyEngine.Core.Scene.Scene;
+import OxyEngine.Core.Scene.SceneRuntime;
+import OxyEngine.Core.Scene.SceneState;
 import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.KeyCode;
 import OxyEngine.Core.Window.Event;
@@ -26,8 +23,8 @@ import org.joml.Vector3f;
 
 import java.io.File;
 
-import static OxyEngine.Core.Context.Scene.Scene.*;
-import static OxyEngine.Core.Context.Scene.SceneRuntime.*;
+import static OxyEngine.Core.Scene.Scene.*;
+import static OxyEngine.Core.Scene.SceneRuntime.*;
 import static OxyEngine.System.FileSystem.deleteDir;
 import static OxyEngineEditor.UI.SelectHandler.currentGizmoOperation;
 import static OxyEngineEditor.UI.SelectHandler.useSnap;
@@ -48,7 +45,8 @@ public final class EditorLayer extends Layer implements Disposable {
 
         OxyPhysX.init();
 
-        editorCamera = new EditorCamera(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f), true, 45f, ScenePanel.windowPos.x / ScenePanel.windowSize.y, 0.1f, 10000f, false);
+        //WTF WITH CAMERA???
+        editorCamera = new EditorCamera(new Vector3f(0), new Vector3f(-0.35f, -0.77f, 0.0f), true, 45f, ScenePanel.windowPos.x / ScenePanel.windowSize.y, 0.1f, 1000f, false);
         //just first frame update
         editorCamera.update();
         cameraContext = editorCamera;
@@ -99,8 +97,7 @@ public final class EditorLayer extends Layer implements Disposable {
 
             case GLFW_KEY_C -> {
                 if (control) {
-                    Entity copiedEntity = sceneContext.copyEntity(entityContext);
-                    Renderer.submitMesh(copiedEntity.get(OpenGLMesh.class), copiedEntity.get(TransformComponent.class), copiedEntity.get(AnimationComponent.class));
+                    sceneContext.copyEntity(entityContext);
                     System.gc();
                     sceneContext.setState(SceneState.STOP);
                 }
@@ -167,6 +164,7 @@ public final class EditorLayer extends Layer implements Disposable {
             case PLAY -> onUpdatePlay(ts);
             case STOP -> onUpdateStop(ts);
         }
+        Renderer.swapBuffers();
     }
 
     @Override

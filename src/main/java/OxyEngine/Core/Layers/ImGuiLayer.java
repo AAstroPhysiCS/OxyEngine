@@ -1,7 +1,8 @@
 package OxyEngine.Core.Layers;
 
-import OxyEngine.Core.Window.Input;
+import OxyEngine.Core.Renderer.Renderer;
 import OxyEngine.Core.Window.Event;
+import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.Window;
 import OxyEngine.System.FileSystem;
 import OxyEngine.System.OxySystem;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static OxyEngine.System.OxySystem.gl_Version;
+import static OxyEngine.System.OxySystem.glVersion;
 import static org.lwjgl.glfw.GLFW.*;
 
 public final class ImGuiLayer extends Layer {
@@ -39,12 +40,12 @@ public final class ImGuiLayer extends Layer {
 
     private static ImGuiLayer INSTANCE = null;
 
-    public static ImGuiLayer getInstance(Window window){
-        if(INSTANCE == null) INSTANCE = new ImGuiLayer(window);
+    public static ImGuiLayer getInstance(Window window) {
+        if (INSTANCE == null) INSTANCE = new ImGuiLayer(window);
         return INSTANCE;
     }
 
-    private ImGuiLayer(Window window){
+    private ImGuiLayer(Window window) {
         this.window = window;
         imGuiRenderer = new ImGuiImplGl3();
         imGuiGlfw = new ImGuiImplGlfw();
@@ -87,7 +88,7 @@ public final class ImGuiLayer extends Layer {
             OxySystem.Font.load(io, f.getPath(), 19, f.getName().split("\\.")[0]);
         }
 
-        imGuiRenderer.init(gl_Version);
+        imGuiRenderer.init(glVersion);
         imGuiGlfw.init(window.getPointer(), true);
 
         if (io.hasConfigFlags(ImGuiConfigFlags.ViewportsEnable)) {
@@ -99,7 +100,6 @@ public final class ImGuiLayer extends Layer {
 
     public void addPanel(Panel panel) {
         panelList.add(panel);
-        panel.preload();
     }
 
     private static float[][] loadStyle(String[] splittedContent) {

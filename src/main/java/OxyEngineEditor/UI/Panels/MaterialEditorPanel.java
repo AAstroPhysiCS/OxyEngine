@@ -1,14 +1,11 @@
 package OxyEngineEditor.UI.Panels;
 
-import OxyEngine.Core.Context.Renderer.Texture.Image2DTexture;
-import OxyEngine.Core.Context.Renderer.Texture.Texture;
-import OxyEngine.Core.Context.Renderer.Texture.TexturePixelType;
-import OxyEngine.Core.Context.Renderer.Texture.TextureSlot;
-import OxyEngine.Core.Context.Scene.Material;
-import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiHoveredFlags;
-import imgui.flag.ImGuiInputTextFlags;
-import imgui.flag.ImGuiTreeNodeFlags;
+import OxyEngine.Core.Renderer.Texture.Image2DTexture;
+import OxyEngine.Core.Renderer.Texture.Texture;
+import OxyEngine.Core.Renderer.Texture.TexturePixelType;
+import OxyEngine.Core.Renderer.Texture.TextureSlot;
+import OxyEngine.Core.Scene.Material;
+import imgui.flag.*;
 import imgui.internal.ImGui;
 import imgui.type.ImBoolean;
 import imgui.type.ImString;
@@ -49,11 +46,6 @@ public final class MaterialEditorPanel extends Panel {
     }
 
     @Override
-    public void preload() {
-
-    }
-
-    @Override
     public void renderPanel() {
         if (!show) return;
 
@@ -77,6 +69,10 @@ public final class MaterialEditorPanel extends Panel {
                 if (ImGui.beginTabItem(m.name, openState) && openState.get()) {
                     if (ImGui.collapsingHeader("Albedo", ImGuiTreeNodeFlags.DefaultOpen)) {
                         m.albedoTexture = renderNode(m.albedoTexture, albedoInputBuffer, TextureSlot.ALBEDO);
+                        ImGui.alignTextToFramePadding();
+                        ImGui.text("Base Color");
+                        ImGui.sameLine();
+                        ImGui.colorEdit3("##hideLabelalbedoColorPicker", m.albedoColor.getNumbers(), ImGuiColorEditFlags.DisplayRGB);
                     }
                     if (ImGui.collapsingHeader("Normals", ImGuiTreeNodeFlags.DefaultOpen)) {
                         m.normalTexture = renderNode(m.normalTexture, normalInputBuffer, TextureSlot.NORMAL);

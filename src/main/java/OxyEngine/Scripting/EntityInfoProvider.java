@@ -2,7 +2,7 @@ package OxyEngine.Scripting;
 
 import java.lang.reflect.Field;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
 
 final class EntityInfoProvider implements Provider {
 

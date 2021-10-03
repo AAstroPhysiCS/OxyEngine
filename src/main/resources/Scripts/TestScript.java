@@ -2,8 +2,8 @@ package Scripts;
 
 import OxyEngine.Components.TransformComponent;
 import OxyEngine.Scripting.ScriptableEntity;
-import OxyEngine.Core.Context.Scene.Entity;
-import OxyEngine.Core.Context.Scene.Scene;
+import OxyEngine.Core.Scene.Entity;
+import OxyEngine.Core.Scene.Scene;
 
 public final class TestScript extends ScriptableEntity {
 

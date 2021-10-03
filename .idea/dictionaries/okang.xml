@@ -23,6 +23,7 @@
       <w>glfw</w>
       <w>glsl</w>
       <w>gltffileasset</w>
+      <w>halfheight</w>
       <w>imgui</w>
       <w>inclimation</w>
       <w>irradiance</w>

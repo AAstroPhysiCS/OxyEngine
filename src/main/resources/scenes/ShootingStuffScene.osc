@@ -1,0 +1,252 @@
+Registry [
+	Sky Light: {
+		ID: 06503f30-9012-4710-838b-cbdfe78b716c
+		Name: Sky Light
+		Emitting: true
+		Hidden: false
+		Camera: false
+		Emitting Type: HDREnvironmentMap
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Mesh Path: null
+		Submesh Indices: 
+		Light Attributes: {
+			Intensity: 1.0
+			Environment Map: D:\programming\Java\OxyEngine\src\main\resources\hdr\dikhololo_night_4k.hdr
+			Environment LOD: 1.0
+			Environment Intensity: 1.0
+			Environment Primary: true
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+		}
+	}
+	Directional Light: {
+		ID: 2dc8d063-4e18-4cb1-9cc6-2a7029ee1634
+		Name: Directional Light
+		Emitting: true
+		Hidden: false
+		Camera: false
+		Emitting Type: DirectionalLight
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 2.724E+0 -3.220E-1 -2.030E-2)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Mesh Path: null
+		Submesh Indices: 
+		Light Attributes: {
+			Intensity: 1.0
+			Direction: ( 2.724E+0 -3.220E-1 -2.030E-2)
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+		}
+	}
+	Floor: {
+		ID: 70e97e95-a545-46a0-adcb-b4a148e3d8e5
+		Name: Floor
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: ( 0.000E+0  0.000E+0  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 4.500E+1  1.000E+0  4.500E+1)
+		Bounds Min: (-1.000E+0 -1.000E+0 -1.000E+0)
+		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Static
+			Collider Type: Box
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+		}
+		Material 0: {
+			Material Index: 0
+			Material Name: DefaultMaterial
+			Color: [0.89285904, 1.0, 0.8565401, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+		}
+	}
+	Wall 2: {
+		ID: d4ad111a-94ad-4823-b851-10155949284f
+		Name: Wall 2
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: ( 4.400E+1  1.600E+1  0.000E+0)
+		Rotation: ( 3.141E+0 -1.570E+0  3.141E+0)
+		Scale: ( 4.500E+1  1.500E+1  1.000E+0)
+		Bounds Min: (-1.000E+0 -1.000E+0 -1.000E+0)
+		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Static
+			Collider Type: Box
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+		}
+		Material 0: {
+			Material Index: 0
+			Material Name: DefaultMaterial
+			Color: [0.20253164, 0.20252961, 0.20252961, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+		}
+	}
+	Wall: {
+		ID: d140bcbb-089c-40fe-a098-635ee2930445
+		Name: Wall
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: ( 0.000E+0  1.600E+1 -4.403E+1)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 4.500E+1  1.500E+1  1.000E+0)
+		Bounds Min: (-1.000E+0 -1.000E+0 -1.000E+0)
+		Bounds Max: ( 1.000E+0  1.000E+0  1.000E+0)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\cube.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Static
+			Collider Type: Box
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+		}
+		Material 0: {
+			Material Index: 0
+			Material Name: DefaultMaterial
+			Color: [0.20253164, 0.20252961, 0.20252961, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+		}
+	}
+	Player: {
+		ID: bca2ebcc-f80a-4bb5-b3f2-a23bdc9d5134
+		Name: Player
+		Emitting: false
+		Hidden: false
+		Camera: false
+		Emitting Type: null
+		Position: (-1.314E+1  6.597E+0  1.379E+1)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 2.018E+0  2.018E+0  2.018E+0)
+		Bounds Min: (-1.133E+0 -2.115E+0 -1.133E+0)
+		Bounds Max: ( 1.133E+0  2.990E+0  1.133E+0)
+		Mesh Path: D:\programming\Java\OxyEngine\src\main\resources\models\capsule.fbx
+		Submesh Indices: [0]
+		PhysX: {
+			Rigid Body Type: Dynamic
+			Collider Type: Capsule
+			Dynamic Friction: 0.5
+			Static Friction: 0.5
+			Restitution: 0.5
+		}
+		Family: {
+			Root: null
+		}
+		Script: {
+			Path: D:\programming\Java\OxyEngine\src\main\resources\Scripts\PlayerMovementScript.java
+		}
+		Material 0: {
+			Material Index: 0
+			Material Name: DefaultMaterial
+			Color: [1.0, 0.3248945, 0.3248945, 1.0]
+			Albedo Texture: null
+			Normal Map Texture: null
+			Normal Map Strength: 1.0
+			Roughness Map Texture: null
+			Roughness Map Strength: 1.0
+			AO Map Texture: null
+			AO Map Strength: 1.0
+			Metallic Map Texture: null
+			Metallic Map Strength: 0.0
+			Emissive Map Texture: null
+			Emissive Map Strength: 1.0
+		}
+	}
+	Player Camera: {
+		ID: c21e6b06-e2ca-4664-8c58-895a6f101107
+		Name: Player Camera
+		Emitting: false
+		Hidden: false
+		Camera: true
+		Emitting Type: null
+		Position: ( 2.200E+0 -4.768E-7  0.000E+0)
+		Rotation: ( 0.000E+0  0.000E+0  0.000E+0)
+		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
+		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
+		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)
+		Mesh Path: null
+		Submesh Indices: 
+		Family: {
+			Root: bca2ebcc-f80a-4bb5-b3f2-a23bdc9d5134
+		}
+		Script: {
+		}
+	}
+]
+Scene: {
+	Scene Name: ShootingStuffScene
+	Scene Working Directory: D:\programming\Java\OxyEngine\src\main\resources\scenes
+	Scene Gamma Strength: 2.2
+	Scene Exposure: 1.0
+}

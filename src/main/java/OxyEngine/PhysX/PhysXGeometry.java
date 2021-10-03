@@ -2,9 +2,10 @@ package OxyEngine.PhysX;
 
 import OxyEngine.Components.BoundingBox;
 import OxyEngine.Components.TransformComponent;
-import OxyEngine.Core.Context.Renderer.Mesh.OpenGLMesh;
-import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngine.Core.Renderer.Mesh.OpenGLMesh;
+import OxyEngine.Core.Scene.Entity;
 import OxyEngine.PhysX.PhysXGeometry.Box;
+import OxyEngine.PhysX.PhysXGeometry.Capsule;
 import OxyEngine.PhysX.PhysXGeometry.Sphere;
 import OxyEngine.PhysX.PhysXGeometry.TriangleMesh;
 import OxyEngineEditor.UI.GUINode;
@@ -24,24 +25,29 @@ import physx.physics.PxShapeFlags;
 import physx.support.Vector_PxU32;
 import physx.support.Vector_PxVec3;
 
-import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Scene.SceneRuntime.entityContext;
 import static OxyEngine.Utils.toPxTransform;
 import static OxyEngine.Utils.toPxVec3;
 
 
 public sealed abstract class PhysXGeometry
-        permits Box, Sphere, TriangleMesh {
+        permits Box, Capsule, Sphere, TriangleMesh {
 
     protected final Entity eReference;
+    protected OpenGLMesh debugMesh;
 
     public PhysXGeometry(Entity eReference) {
         this.eReference = eReference;
     }
 
-    abstract void build();
+    public abstract void build();
 
     public String getColliderType() {
         return this.getClass().getSimpleName();
+    }
+
+    public OpenGLMesh getDebugMesh() {
+        return debugMesh;
     }
 
     @SuppressWarnings("preview")
@@ -70,6 +76,17 @@ public sealed abstract class PhysXGeometry
 //                    TriangleMesh.isConvex = !TriangleMesh.isConvex;
                 }
                 ImGui.columns(1);
+                ImGui.treePop();
+            }
+        } else if (geometry instanceof Capsule c) {
+            if (ImGui.treeNodeEx("Capsule Collider", ImGuiTreeNodeFlags.DefaultOpen)) {
+                float[] buffer = new float[1];
+                buffer[0] = c.radius;
+                ImGui.dragFloat("CapsuleRadius", buffer);
+                c.radius = buffer[0];
+                buffer[0] = c.halfHeight;
+                ImGui.dragFloat("CapsuleHalfHeight", buffer);
+                c.halfHeight = buffer[0];
                 ImGui.treePop();
             }
         } else if (geometry instanceof Box b) {
@@ -105,7 +122,7 @@ public sealed abstract class PhysXGeometry
         }
 
         @Override
-        void build() {
+        public void build() {
             if (eReference == null) return;
             if (!eReference.has(PhysXComponent.class)) return;
 
@@ -133,7 +150,7 @@ public sealed abstract class PhysXGeometry
                     int startVertex = submesh.baseVertex();
                     int lengthVertex = submesh.vertexCount();
 
-                    for(int i = startVertex; i < startVertex + lengthVertex; i++){
+                    for (int i = startVertex; i < startVertex + lengthVertex; i++) {
                         vec3VerticesTemp.setX(vertices[vertPtr++]);
                         vec3VerticesTemp.setY(vertices[vertPtr++]);
                         vec3VerticesTemp.setZ(vertices[vertPtr++]);
@@ -200,6 +217,39 @@ public sealed abstract class PhysXGeometry
         }
     }
 
+    public static final class Capsule extends PhysXGeometry {
+
+        private float radius = 1.0f, halfHeight = 0.5f;
+
+        public Capsule(Entity eReference) {
+            super(eReference);
+        }
+
+        @Override
+        public void build() {
+            if (eReference == null) return;
+            if (!eReference.has(PhysXComponent.class)) return;
+
+            PhysXEnvironment env = OxyPhysX.getPhysXEnv();
+            PhysXMaterial physXMaterial = eReference.get(PhysXComponent.class).getMaterial();
+
+//            if (debugMesh != null) Renderer.removeFromCommand(eReference.get(OpenGLMesh.class));
+//            debugMesh = MeshFactory.createCapsuleMesh(radius, halfHeight);
+//            Renderer.submitColliderMesh(debugMesh, eReference.get(TransformComponent.class), eReference.get(AnimationComponent.class));
+
+            try (MemoryStack stack = MemoryStack.stackPush()) {
+                PxCapsuleGeometry geometry = PxCapsuleGeometry.createAt(stack, MemoryStack::nmalloc, radius, halfHeight);
+                PxShapeFlags shapeFlags = PxShapeFlags.createAt(stack, MemoryStack::nmalloc, (byte) (PxShapeFlagEnum.eSCENE_QUERY_SHAPE | PxShapeFlagEnum.eSIMULATION_SHAPE));
+
+                PxShape shape = env.pxPhysics.createShape(geometry, physXMaterial.getPxMaterial(), true, shapeFlags);
+                shape.setSimulationFilterData(OxyPhysX.getDefaultFilterData());
+                PhysXActor physXActor = eReference.get(PhysXComponent.class).getActor();
+                physXActor.attachShape(shape);
+                shape.release();
+            }
+        }
+    }
+
     public static final class Box extends PhysXGeometry {
 
         private final Vector3f pxHalfScalar = new Vector3f(1f, 1f, 1f);
@@ -208,7 +258,7 @@ public sealed abstract class PhysXGeometry
             super(e);
         }
 
-        private void calculateBounds(){
+        private void calculateBounds() {
             Vector3f scale = eReference.get(TransformComponent.class).scale;
             BoundingBox aabb = eReference.get(OpenGLMesh.class).getAABB();
             Vector3f min = aabb.min();
@@ -217,7 +267,7 @@ public sealed abstract class PhysXGeometry
         }
 
         @Override
-        void build() {
+        public void build() {
             if (eReference == null) return;
             if (!eReference.has(PhysXComponent.class)) return;
 
@@ -251,7 +301,7 @@ public sealed abstract class PhysXGeometry
             super(eReference);
         }
 
-        private void calculateRadius(){
+        private void calculateBounds() {
             Vector3f scale = eReference.get(TransformComponent.class).scale;
             BoundingBox aabb = eReference.get(OpenGLMesh.class).getAABB();
             Vector3f min = aabb.min();
@@ -264,13 +314,13 @@ public sealed abstract class PhysXGeometry
         }
 
         @Override
-        void build() {
+        public void build() {
 
             if (eReference == null) return;
             if (!eReference.has(PhysXComponent.class)) return;
 
             PhysXMaterial physXMaterial = eReference.get(PhysXComponent.class).getMaterial();
-            calculateRadius();
+            calculateBounds();
 
             try (MemoryStack stack = MemoryStack.stackPush()) {
                 PxSphereGeometry geometry = PxSphereGeometry.createAt(stack, MemoryStack::nmalloc, r);

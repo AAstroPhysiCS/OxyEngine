@@ -295,8 +295,8 @@ Registry [
 		Hidden: false
 		Camera: true
 		Emitting Type: null
-		Position: ( 6.000E+2  1.500E+2  0.000E+0)
-		Rotation: (-2.616E-1  1.570E+0  8.724E-1)
+		Position: ( 6.000E+2  3.663E+2  0.000E+0)
+		Rotation: (-4.047E-1  1.570E+0 -1.725E-4)
 		Scale: ( 1.000E+0  1.000E+0  1.000E+0)
 		Bounds Min: ( 0.000E+0  0.000E+0  0.000E+0)
 		Bounds Max: ( 0.000E+0  0.000E+0  0.000E+0)

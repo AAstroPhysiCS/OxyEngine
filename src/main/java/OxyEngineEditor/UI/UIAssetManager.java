@@ -1,6 +1,6 @@
 package OxyEngineEditor.UI;
 
-import OxyEngine.Core.Context.Renderer.Texture.*;
+import OxyEngine.Core.Renderer.Texture.*;
 
 import java.io.File;
 import java.util.*;

@@ -1,16 +1,16 @@
 package OxyEngineEditor;
 
-import OxyEngine.Core.Context.Renderer.Renderer;
 import OxyEngine.Core.Layers.EditorLayer;
 import OxyEngine.Core.Layers.ImGuiLayer;
 import OxyEngine.Core.Layers.Layer;
+import OxyEngine.Core.Renderer.Renderer;
+import OxyEngine.Core.Scene.SceneRuntime;
+import OxyEngine.Core.Window.Event;
 import OxyEngine.Core.Window.Input;
 import OxyEngine.Core.Window.KeyCode;
-import OxyEngine.Core.Window.Event;
 import OxyEngine.Core.Window.Window;
 import OxyEngine.OxyApplication;
 import OxyEngine.OxyEngine;
-import OxyEngine.Core.Context.Scene.SceneRuntime;
 import OxyEngine.TargetPlatform;
 import OxyEngineEditor.UI.Panels.*;
 
@@ -59,7 +59,7 @@ public final class EditorApplication extends OxyApplication {
 
     @Override
     protected void update(float ts) {
-        Renderer.pollEvents();
+        window.pollEvents();
         for (Event event : Window.getEventPool()) {
             for (Layer l : layerStack.getLayerStack())
                 l.onEvent(event);
@@ -69,8 +69,6 @@ public final class EditorApplication extends OxyApplication {
         for (Layer l : layerStack.getLayerStack()) {
             l.update(ts);
         }
-
-        Renderer.swapBuffers();
     }
 
     protected Runnable run() {

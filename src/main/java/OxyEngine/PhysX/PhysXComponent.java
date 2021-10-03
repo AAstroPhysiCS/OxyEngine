@@ -1,7 +1,7 @@
 package OxyEngine.PhysX;
 
 import OxyEngine.Components.EntityComponent;
-import OxyEngine.Core.Context.Scene.Entity;
+import OxyEngine.Core.Scene.Entity;
 import OxyEngine.System.Disposable;
 import OxyEngineEditor.UI.GUINode;
 
@@ -29,14 +29,13 @@ public final class PhysXComponent implements EntityComponent, Disposable {
         List<GUINode> nodeList = e.getGUINodes();
         if (PhysXGeometry.Box.class.equals(targetedGeometryType)) {
             this.geometry = new PhysXGeometry.Box(e);
-        }
-        else if (PhysXGeometry.Sphere.class.equals(targetedGeometryType)) {
+        } else if (PhysXGeometry.Sphere.class.equals(targetedGeometryType)) {
             this.geometry = new PhysXGeometry.Sphere(e);
-        }
-        else if (PhysXGeometry.TriangleMesh.class.equals(targetedGeometryType)) {
+        } else if (PhysXGeometry.TriangleMesh.class.equals(targetedGeometryType)) {
             this.geometry = new PhysXGeometry.TriangleMesh(e);
-        }
-        else throw new IllegalStateException("No support for the given geometry type");
+        } else if (PhysXGeometry.Capsule.class.equals(targetedGeometryType)) {
+            this.geometry = new PhysXGeometry.Capsule(e);
+        } else throw new IllegalStateException("No support for the given geometry type");
 
         this.actor = new PhysXActor(PhysXRigidBodyType.valueOf(actorType), e);
         nodeList.add(PhysXGeometry.guiNode);
@@ -52,13 +51,15 @@ public final class PhysXComponent implements EntityComponent, Disposable {
             this.geometry = new PhysXGeometry.Sphere(newEntity);
         else if (other.geometry instanceof PhysXGeometry.TriangleMesh)
             this.geometry = new PhysXGeometry.TriangleMesh(newEntity);
+        else if (other.geometry instanceof PhysXGeometry.Capsule)
+            this.geometry = new PhysXGeometry.Capsule(newEntity);
         else throw new IllegalStateException("No copy implementation for the given geometry");
 
         this.actor = new PhysXActor(other.actor.getBodyType(), newEntity);
         this.material = other.material;
     }
 
-    public void reset(){
+    public void reset() {
         OxyPhysX.getPhysXEnv().removeActorFromScene(actor);
         actor.dispose();
     }

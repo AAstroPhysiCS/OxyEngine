@@ -1,17 +1,17 @@
 package OxyEngineEditor.UI;
 
 import OxyEngine.Components.SelectedComponent;
-import OxyEngine.Core.Context.Renderer.DrawCommand;
-import OxyEngine.Core.Context.Renderer.Renderer;
+import OxyEngine.Core.Renderer.DrawCommand;
+import OxyEngine.Core.Renderer.Renderer;
 import imgui.extension.imguizmo.ImGuizmo;
 import imgui.extension.imguizmo.flag.Mode;
 import imgui.extension.imguizmo.flag.Operation;
 
 import java.util.List;
 
-import static OxyEngine.Core.Context.Renderer.Renderer.getEntityIDByMousePosition;
-import static OxyEngine.Core.Context.Scene.SceneRuntime.sceneContext;
-import static OxyEngine.Core.Context.Scene.SceneRuntime.entityContext;
+import static OxyEngine.Core.Renderer.Renderer.getEntityIDByMousePosition;
+import static OxyEngine.Core.Scene.SceneRuntime.sceneContext;
+import static OxyEngine.Core.Scene.SceneRuntime.entityContext;
 
 public final class SelectHandler {
 
@@ -24,7 +24,7 @@ public final class SelectHandler {
     private SelectHandler(){}
 
     public static void startPicking() {
-        List<DrawCommand> drawCommands = Renderer.getAllDrawCommands();
+        List<DrawCommand> drawCommands = Renderer.getMeshDrawCommands();
 
         if (drawCommands.size() == 0) return;
 
