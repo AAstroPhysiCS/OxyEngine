@@ -1,4 +1,6 @@
 # OxyEngine
+*Project not active anymore (see: https://github.com/AAstroPhysiCS/Lucy)*
+
 OxyEngine is primarily a rendering engine for all platforms. Currently, this engine is still in an experimental state and is being developed by me!
 
 ## Pictures in Engine (Last update 19.06.2021)
